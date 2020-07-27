@@ -1,0 +1,6 @@
+java:
+  applicationPort: 8095
+  image: 'hmctspublic.azurecr.io/rd/caseworker-ref-api:latest'
+  ingressHost: rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: rd
+  environment:
