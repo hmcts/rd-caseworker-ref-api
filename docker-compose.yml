@@ -1,14 +1,14 @@
 version: '2.1'
 
 services:
-  spring-boot-template:
+  rd-caseworker-ref-api:
     build:
       context: .
       args:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmctspublic.azurecr.io/spring-boot/template
+    image: hmctspublic.azurecr.io/rd/caseworker-ref-api
     environment:
       # these environment variables are used by java-logging library
       - ROOT_APPENDER
@@ -23,4 +23,4 @@ services:
       - LOGBACK_REQUIRE_ALERT_LEVEL=false
       - LOGBACK_REQUIRE_ERROR_CODE=false
     ports:
-      - $SERVER_PORT:$SERVER_PORT
+      - 8095:8095
