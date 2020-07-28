@@ -1,0 +1,1 @@
+ALTER TABLE judicial_user_profile DROP CONSTRAINT personal_code_unique;

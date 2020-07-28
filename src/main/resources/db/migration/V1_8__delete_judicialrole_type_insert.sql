@@ -1,0 +1,1 @@
+delete from judicial_role_type where role_id = '1';
