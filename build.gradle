@@ -172,6 +172,10 @@ pitest {
   useClasspathFile = true
 }
 
+test {
+  useJUnitPlatform()
+  failFast = true
+}
 
 project.tasks['pitest'].group = "Verification"
 
