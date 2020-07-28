@@ -1,6 +1,5 @@
-# Temporary fix for template API version error on deployment
 provider "azurerm" {
-  version = "1.22.0"
+  version = "=1.44.0"
 }
 
 locals {
@@ -20,22 +19,65 @@ data "azurerm_key_vault" "rd_key_vault" {
   resource_group_name = "${local.key_vault_name}"
 }
 
-data "azurerm_key_vault_secret" "ACCOUNT_NAME" {
-  name = "ACCOUNT-NAME"
+data "azurerm_key_vault" "s2s_key_vault" {
+  name = "s2s-${local.local_env}"
+  resource_group_name = "rpe-service-auth-provider-${local.local_env}"
+}
+
+data "azurerm_key_vault_secret" "s2s_microservice" {
+  name = "s2s-microservice"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "ACCOUNT_KEY" {
-  name = "ACCOUNT-KEY"
+data "azurerm_key_vault_secret" "s2s_url" {
+  name = "s2s-url"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "CONTAINER_NAME" {
-  name = "CONTAINER-NAME"
+data "azurerm_key_vault_secret" "s2s_secret" {
+  name = "microservicekey-rd-caseworker-ref-api"
+  key_vault_id = "${data.azurerm_key_vault.s2s_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  name      = "${var.component}-POSTGRES-USER"
+  value     = "${module.db-rd-caseworker-ref-api.user_name}"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
 }
 
-data "azurerm_key_vault_secret" "BLOB_URL_SUFFIX" {
-  name = "BLOB-URL-SUFFIX"
+resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
+  name      = "${var.component}-POSTGRES-PASS"
+  value     = "${module.db-rd-caseworker-ref-api.postgresql_password}"
   key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  name      = "${var.component}-POSTGRES-HOST"
+  value     = "${module.db-rd-caseworker-ref-api.host_name}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  name      = "${var.component}-POSTGRES-PORT"
+  value     = "5432"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name      = "${var.component}-POSTGRES-DATABASE"
+  value     = "${module.db-rd-caseworker-ref-api.postgresql_database}"
+  key_vault_id = "${data.azurerm_key_vault.rd_key_vault.id}"
+}
+
+module "db-rd-caseworker-ref-api" {
+  source = "git@github.com:hmcts/cnp-module-postgres?ref=master"
+  product = "${var.product}-${var.component}-postgres-db"
+  location = "${var.location}"
+  subscription = "${var.subscription}"
+  env = "${var.env}"
+  postgresql_user = "dbrdcaseworker"
+  database_name = "dbrdcaseworker"
+  common_tags = "${var.common_tags}"
+  postgresql_version    = "${var.postgresql_version}"
+
 }
