@@ -29,7 +29,7 @@ spring:
   ### database configuration
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5457}/${POSTGRES_NAME:dbrdcaseworker}${POSTGRES_CONNECTION_OPTIONS:}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5457}/${POSTGRES_DB_NAME:dbrdcaseworker}${POSTGRES_CONNECTION_OPTIONS:}
     username: ${POSTGRES_USERNAME:dbrdcaseworker}
     password: ${POSTGRES_PASSWORD:dbrdcaseworker}
     min-idle: 1
@@ -51,3 +51,39 @@ spring:
       remove-abandoned-timeout: 60
       log-abandoned: true
       abandon-when-percentage-full: 0
+
+security:
+  anonymousPaths:
+    - "/"
+    - "/health"
+    - "/health/liveness"
+    - "/actuator/**"
+    - "/loggers/**"
+    - "/swagger-ui.html"
+    - "/swagger-resources/**"
+    - "/v2/api-docs"
+    - "/webjars/springfox-swagger-ui/**"
+    - "/csrf"
+    - "/error"
+    - "/favicon.ico"
+    - "/**"
+  authorisedServices:
+    - rd-caseworker-ref-api
+
+### dependency configuration
+auth.provider.service.client.baseUrl: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
+idam:
+  s2s-auth:
+    totp_secret: ${S2S_SECRET:}
+    microservice: rd-caseworker-ref-api
+    url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
+
+auth.idam.client.baseUrl: ${idam_url:https://idam-api.aat.platform.hmcts.net}
+
+auth.idam.client.detailsUri: "/details"
+
+feign:
+  allow:
+    headers:
+      - authorization
+      - serviceauthorization
