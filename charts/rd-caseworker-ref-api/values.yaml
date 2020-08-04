@@ -9,6 +9,7 @@ java:
     POSTGRES_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_PORT: 5432
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    TEST_VAR: Test-Value
   keyVaults:
     rd:
       secrets:
