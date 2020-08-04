@@ -307,11 +307,11 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
 
-  testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
+  testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
     force = true
   }
 
-  integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
+  integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.26') {
     force = true
   }
 
