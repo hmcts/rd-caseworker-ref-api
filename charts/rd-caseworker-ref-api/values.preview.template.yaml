@@ -3,15 +3,18 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-    POSTGRES_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
+    POSTGRES_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
+    POSTGRES_PORT: "{{ .Values.postgresql.postgresqlPort}}"
   postgresql:
     enabled: true
     postgresqlUsername: dbrdcaseworker
     postgresqlPassword: dbrdcaseworker
     postgresqlDatabase: dbrdcaseworker
+    postgresqlPort: 5432
   keyVaults:
     rd:
       secrets:
-        - s2s-secret
+        # - s2s-secret
+        - AppInsightsInstrumentationKey
