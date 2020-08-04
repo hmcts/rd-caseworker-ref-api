@@ -1,10 +1,9 @@
 spring:
   cloud:
     propertiesvolume:
+      paths: /mnt/secrets/rd
       prefixed: false
-      paths: /mnt/secrets/s2s,/mnt/secrets/rd
       aliases:
-        s2s.microservicekey-rd-caseworker-ref-api: S2S_SECRET
-        rd.s2s-url: S2S_URL
-        rd.caseworker-ref-api-POSTGRES-PASS: spring.datasource.password
-        rd.AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        caseworker-ref-api-S2S-SECRET: S2S_SECRET
+        caseworker-ref-api-POSTGRES-PASS: POSTGRES_PASSWORD
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key

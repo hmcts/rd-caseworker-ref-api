@@ -16,5 +16,5 @@ java:
   keyVaults:
     rd:
       secrets:
-        # - s2s-secret
+        - caseworker-ref-api-S2S-SECRET
         - AppInsightsInstrumentationKey
