@@ -260,9 +260,9 @@ dependencies {
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
 
-  compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
+  compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
 
-  compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+  compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
 
   testCompile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
