@@ -1,8 +1,9 @@
 .gradle
 /build/
+/target/
 !gradle/wrapper/gradle-wrapper.jar
-*.class
-bin/main/application.yaml
+/node_modules
+functional-output/
 
 ### STS ###
 .apt_generated
@@ -11,12 +12,25 @@ bin/main/application.yaml
 .project
 .settings
 .springBeans
+.sts4-cache
+.DS_Store
 
 ### IntelliJ IDEA ###
 .idea
-/out
 *.iws
 *.iml
 *.ipr
+/out/
+/bin/
+Connection
 
-.DS_Store
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### Helm ###
+charts/*/charts
+*.lock
