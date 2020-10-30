@@ -134,6 +134,7 @@ pmd {
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
+  finalizedBy aggregate
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
@@ -183,10 +184,6 @@ pitest {
   mutationThreshold = 90
 }
 
-test {
-  useJUnitPlatform()
-  failFast = true
-}
 
 project.tasks['pitest'].group = "Verification"
 
@@ -316,18 +313,6 @@ dependencies {
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-
-  testCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
-    force = true
-  }
-
-  integrationTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
-    force = true
-  }
-
-  functionalTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.23') {
-    force = true
-  }
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
