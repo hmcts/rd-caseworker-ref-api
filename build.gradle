@@ -43,7 +43,7 @@ def versions = [
   junitPlatform      : '1.6.2'
 ]
 
-mainClassName = 'uk.gov.hmcts.reform.demo.CaseWorkerRefApiApplication'
+mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
 def jarName = 'rd-caseworker-ref-api.jar'
 
 group = 'uk.gov.hmcts.reform.rdcaseworker'
