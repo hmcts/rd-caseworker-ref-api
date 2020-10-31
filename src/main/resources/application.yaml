@@ -2,14 +2,15 @@ server:
   port: 8095
 
 management:
+  endpoints:
+    jmx:
+      exposure:
+        include: 'health'
+    web:
+      base-path: "/"
   endpoint:
     health:
       show-details: "always"
-  endpoints:
-    web:
-      base-path: /
-      exposure:
-        include: health, info, prometheus
 
 spring:
   jpa:
