@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 @SpringBootApplication
 @EnableCircuitBreaker
 @EnableFeignClients(basePackages = {
-    "uk.gov.hmcts.reform.lrdapi" },
+    "uk.gov.hmcts.reform.cwrdapi" },
     basePackageClasses = { IdamApi.class }
 )
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
