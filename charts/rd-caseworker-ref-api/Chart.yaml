@@ -8,5 +8,5 @@ maintainers:
   - name: Reference Data Team
 dependencies:
   - name: java
-    version: 3.0.2
+    version: 2.9.1
     repository: '@hmctspublic'
