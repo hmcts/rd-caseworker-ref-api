@@ -199,7 +199,7 @@ sonarqube {
     property "sonar.pitest.mode", "reuseReport"
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/cwrdapi/config/**," +
-                "src/main/java/uk/gov/hmcts/reform/lrdapi/LrdApiApplication.java"
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
   }
 }
 
