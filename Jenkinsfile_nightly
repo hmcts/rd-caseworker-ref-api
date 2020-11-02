@@ -15,6 +15,11 @@ def type = "java"
 def product = "rd"
 def component = "caseworker-ref-api.jar"
 
+def vaultOverrides = [
+  'preview' : 'aat',
+  'spreview': 'saat'
+]
+
 withNightlyPipeline(type, product, component) {
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
