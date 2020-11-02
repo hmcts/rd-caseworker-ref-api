@@ -63,6 +63,8 @@ jacocoTestCoverageVerification {
   }
 }
 
+check.dependsOn jacocoTestCoverageVerification
+
 compileJava {
   options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
@@ -118,8 +120,6 @@ configurations {
   functionalTestCompile.extendsFrom testCompile
   functionalTestRuntime.extendsFrom testRuntime
 }
-
-check.dependsOn jacocoTestCoverageVerification
 
 
 pmd {
@@ -177,7 +177,10 @@ jacocoTestReport {
 pitest {
   targetClasses = ['uk.gov.hmcts.reform.*']
   excludedClasses = [
-    'uk.gov.hmcts.reform.*']
+    'uk.gov.hmcts.reform.cwrdapi.config.*',
+    'uk.gov.hmcts.reform.cwrdapi.controller.*',
+    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
+  ]
   threads = 10
   enableDefaultIncrementalAnalysis = true
   historyInputLocation = 'build/reports/pitest/fastermutationtesting'
