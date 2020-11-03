@@ -12,6 +12,5 @@ java:
   keyVaults:
     rd:
       secrets:
-        - caseworker-ref-api-S2S-SECRET
         - caseworker-ref-api-POSTGRES-PASS
         - AppInsightsInstrumentationKey
