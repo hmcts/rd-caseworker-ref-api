@@ -22,6 +22,9 @@ public class TopicPublisher {
     private final String destination;
     private final ConnectionFactory connectionFactory;
 
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
+
     @Autowired
     public TopicPublisher(JmsTemplate jmsTemplate,
                           @Value("${amqp.topic}") final String destination,
@@ -33,17 +36,17 @@ public class TopicPublisher {
 
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 2000, multiplier = 3))
     public void sendMessage(final String message) {
-        log.info("Sending message.");
+        log.info("{}:: Sending message.", loggingComponentName);
         try {
             jmsTemplate.send(destination, (Session session) -> session.createTextMessage(message));
-            log.info("Message sent.");
+            log.info("{}:: Message sent.", loggingComponentName);
         } catch (IllegalStateException e) {
             if (connectionFactory instanceof CachingConnectionFactory) {
-                log.info("Send failed, attempting to reset connection...");
+                log.info("{}:: Send failed, attempting to reset connection...", loggingComponentName);
                 ((CachingConnectionFactory) connectionFactory).resetConnection();
-                log.info("Resending..");
+                log.info("{}:: Resending..", loggingComponentName);
                 jmsTemplate.send(destination, (Session session) -> session.createTextMessage(message));
-                log.info("In catch, message sent.");
+                log.info("{}:: In catch, message sent.", loggingComponentName);
             } else {
                 throw e;
             }
@@ -52,7 +55,7 @@ public class TopicPublisher {
 
     @Recover
     public void recoverMessage(Throwable ex) throws Throwable {
-        log.error("TopicPublisher.recover(): Send message failed with exception: ", ex);
+        log.error("{}:: TopicPublisher.recover(): Send message failed with exception: ", loggingComponentName, ex);
         throw ex;
     }
 }

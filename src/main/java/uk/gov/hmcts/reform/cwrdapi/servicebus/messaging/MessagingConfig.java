@@ -24,6 +24,9 @@ import javax.net.ssl.X509TrustManager;
 @Slf4j
 public class MessagingConfig {
 
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
+
     @Bean
     public String jmsUrlString(@Value("${amqp.host}") final String host) {
         return String.format("amqps://%1s?amqp.idleTimeout=3600000", host);
@@ -31,18 +34,19 @@ public class MessagingConfig {
 
     @Bean
     public ConnectionFactory jmsConnectionFactory(
-        @Value("${spring.application.name}") final String clientId,
-        @Value("${amqp.username}") final String username,
-        @Value("${amqp.password}") final String password,
-        @Autowired final String jmsUrlString,
-        @Autowired(required = false) final SSLContext jmsSslContext) {
+            @Value("${spring.application.name}") final String clientId,
+            @Value("${amqp.username}") final String username,
+            @Value("${amqp.password}") final String password,
+            @Autowired final String jmsUrlString,
+            @Autowired(required = false) final SSLContext jmsSslContext,
+            @Value("${amqp.trustAllCerts}") final boolean trustAllCerts) {
 
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(jmsUrlString);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
         jmsConnectionFactory.setClientID(clientId);
         jmsConnectionFactory.setReceiveLocalOnly(true);
-        if (jmsSslContext != null) {
+        if (trustAllCerts && jmsSslContext != null) {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
 
@@ -59,43 +63,39 @@ public class MessagingConfig {
     @Bean
     @Deprecated
     public SSLContext jmsSslContext(@Value("${amqp.trustAllCerts}") final boolean trustAllCerts)
-        throws NoSuchAlgorithmException, KeyManagementException {
+            throws NoSuchAlgorithmException, KeyManagementException {
+        // https://stackoverflow.com/a/2893932
+        // DO NOT USE THIS IN PRODUCTION!
+        TrustManager[] trustCerts = getTrustManagers();
 
-        if (trustAllCerts) {
-            // https://stackoverflow.com/a/2893932
-            // DO NOT USE THIS IN PRODUCTION!
-            TrustManager[] trustCerts = getTrustManagers();
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustCerts, new SecureRandom());
 
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustCerts, new SecureRandom());
-
-            return sc;
-        }
-        return null;
+        return sc;
     }
 
     private TrustManager[] getTrustManagers() {
         return new TrustManager[]{
             new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
 
-                @Override
-                @SuppressWarnings("squid:S4830")
-                public void checkClientTrusted(
-                    X509Certificate[] certs, String authType) {
-                    // Empty
-                }
+                    @Override
+                    @SuppressWarnings("squid:S4830")
+                    public void checkClientTrusted(
+                            X509Certificate[] certs, String authType) {
+                        // Empty
+                    }
 
-                @Override
-                @SuppressWarnings("squid:S4830")
-                public void checkServerTrusted(
-                    X509Certificate[] certs, String authType) {
-                    // Empty
+                    @Override
+                    @SuppressWarnings("squid:S4830")
+                    public void checkServerTrusted(
+                            X509Certificate[] certs, String authType) {
+                        // Empty
+                    }
                 }
-            }
         };
     }
 
@@ -108,7 +108,7 @@ public class MessagingConfig {
 
     @Bean
     public JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
-        log.info("Creating JMSListenerContainer bean for topics..");
+        log.info("{}:: Creating JMSListenerContainer bean for topics..", loggingComponentName);
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
