@@ -55,7 +55,7 @@ public class TopicPublisher {
 
     @Recover
     public void recoverMessage(Throwable ex) throws Throwable {
-        log.error("{}:: TopicPublisher.recover(): Send message failed with exception: ", loggingComponentName, ex);
+        log.error("{}:: TopicPublisher.recover(): Send message failed with exception: {} ", loggingComponentName, ex);
         throw ex;
     }
 }
