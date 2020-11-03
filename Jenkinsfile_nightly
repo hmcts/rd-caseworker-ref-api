@@ -15,6 +15,16 @@ def type = "java"
 def product = "rd"
 def component = "caseworker-ref-api.jar"
 
+def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-rd-caseworker-ref-api', 'S2S_SECRET')
+  ],
+  'rd-${env}': [
+    secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
+    secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID')
+  ]
+]
+
 def vaultOverrides = [
   'preview' : 'aat',
   'spreview': 'saat'
