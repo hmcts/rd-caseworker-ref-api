@@ -95,3 +95,12 @@ feign:
     headers:
       - authorization
       - serviceauthorization
+
+amqp:
+  host: ${AMQP_HOST:rd-servicebus-sandbox.servicebus.windows.net}
+  username: ${AMQP_USERNAME:SendAndListenSharedAccessKey}
+  password: ${AMQP_PASSWORD:AAAAAAAAAAAAA}
+  topic: ${TOPIC_NAME:rd-caseworker-topic-sandbox}
+  subscription: ${SUBSCRIPTION_NAME:rd-caseworker-subscription-sandbox}
+  # DO NOT SET THIS 'true' IN PRODUCTION!
+  trustAllCerts: ${TRUST_ALL_CERTS:true}
