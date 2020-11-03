@@ -1,6 +1,6 @@
 {
   "10021_X-Content-Type-Options Header Missing_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/_GET": "ignore",
-  "10010_Cookie No HttpOnly Flag__http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/_GET": "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/_GET": "ignore",
   "100001_Unexpected Content-Type was returned_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/_GET": "ignore",
   "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/_GET": "ignore",
   "10054_Cookie Without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/_GET": "ignore",
