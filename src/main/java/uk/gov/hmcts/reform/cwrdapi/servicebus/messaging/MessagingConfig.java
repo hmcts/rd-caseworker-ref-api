@@ -62,8 +62,7 @@ public class MessagingConfig {
     @SuppressWarnings("squid:S4423")
     @Bean
     @Deprecated
-    public SSLContext jmsSslContext(@Value("${amqp.trustAllCerts}") final boolean trustAllCerts)
-            throws NoSuchAlgorithmException, KeyManagementException {
+    public SSLContext jmsSslContext() throws NoSuchAlgorithmException, KeyManagementException {
         // https://stackoverflow.com/a/2893932
         // DO NOT USE THIS IN PRODUCTION!
         TrustManager[] trustCerts = getTrustManagers();
