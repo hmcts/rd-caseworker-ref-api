@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.servicebus.messaging;
-
-import static org.junit.Assert.assertTrue;
+package uk.gov.hmcts.reform.cwrdapi.servicebus.messaging;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.servicebus.messaging.MessagingConfig;
+
+import static org.junit.Assert.assertTrue;
 
 public class MessagingConfigTest {
 
