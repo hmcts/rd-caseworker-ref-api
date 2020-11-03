@@ -25,6 +25,16 @@ def secrets = [
   ]
 ]
 
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   version    : '',
+   envVariable: envVar
+  ]
+}
+
+
 def vaultOverrides = [
   'preview' : 'aat',
   'spreview': 'saat'
@@ -45,4 +55,12 @@ withNightlyPipeline(type, product, component) {
   enableSecurityScan()
 
 }
+
+
+
+
+
+
+
+
 
