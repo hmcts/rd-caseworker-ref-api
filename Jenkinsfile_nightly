@@ -15,6 +15,30 @@ def type = "java"
 def product = "rd"
 def component = "caseworker-ref-api.jar"
 
+def secrets = [
+  's2s-${env}': [
+    secret('microservicekey-rd-caseworker-ref-api', 'S2S_SECRET')
+  ],
+  'rd-${env}': [
+    secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
+    secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID')
+  ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [$class     : 'AzureKeyVaultSecret',
+   secretType : 'Secret',
+   name       : secretName,
+   version    : '',
+   envVariable: envVar
+  ]
+}
+
+def vaultOverrides = [
+  'preview' : 'aat',
+  'spreview': 'saat'
+]
+
 withNightlyPipeline(type, product, component) {
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -30,4 +54,3 @@ withNightlyPipeline(type, product, component) {
   enableSecurityScan()
 
 }
-
