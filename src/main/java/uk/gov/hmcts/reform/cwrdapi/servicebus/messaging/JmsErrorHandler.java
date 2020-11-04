@@ -14,7 +14,7 @@ public class JmsErrorHandler implements ErrorHandler {
     @Override
     public void handleError(@NonNull Throwable throwable) {
         log.warn("{}:: Spring JMS custom error handling example", loggingComponentName);
-        log.error(throwable.getCause().getMessage());
+        log.error("{}:: {}", loggingComponentName, throwable.getCause().getMessage());
     }
 }
 
