@@ -17,11 +17,30 @@ public class MessagingConfigTest {
 
     private final MessagingConfig messagingConfig = new MessagingConfig();
     ConnectionFactory connectionFactoryMock = mock(ConnectionFactory.class);
+    SSLContext sslContextMock = mock(SSLContext.class);
 
     @Test
-    public void jmsUrlStringFormatsTheAmqpString() {
+    public void testJmsUrlStringFormatsTheAmqpString() {
         final String url = messagingConfig.jmsUrlString("myHost");
         assertTrue("Jms url string should begin with amqps://<host> ", url.startsWith("amqps://myHost?"));
+    }
+
+    @Test
+    public void testJmsConnectionFactoryTrustAllCertsFalse() {
+        ConnectionFactory connectionFactory =
+                messagingConfig.jmsConnectionFactory("clientId", "username",
+                        "password", "jmsUrlString", sslContextMock, false);
+
+        assertThat(connectionFactory).isNotNull();
+    }
+
+    @Test
+    public void testJmsConnectionFactoryTrustAllCertsTrue() {
+        ConnectionFactory connectionFactory =
+                messagingConfig.jmsConnectionFactory("clientId", "username",
+                        "password", "jmsUrlString", sslContextMock, true);
+
+        assertThat(connectionFactory).isNotNull();
     }
 
     @Test
