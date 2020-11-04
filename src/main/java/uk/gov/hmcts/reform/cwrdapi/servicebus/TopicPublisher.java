@@ -53,6 +53,7 @@ public class TopicPublisher {
         }
     }
 
+    @SuppressWarnings("SignatureDeclareThrowsException")
     @Recover
     public void recoverMessage(Throwable ex) throws Throwable {
         log.error("{}:: TopicPublisher.recover(): Send message failed with exception: {} ", loggingComponentName, ex);
