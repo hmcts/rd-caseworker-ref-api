@@ -61,7 +61,7 @@ public class MessagingConfig {
      */
     @SuppressWarnings("squid:S4423")
     @Bean
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public SSLContext jmsSslContext() throws NoSuchAlgorithmException, KeyManagementException {
         // https://stackoverflow.com/a/2893932
         // DO NOT USE THIS IN PRODUCTION!
@@ -105,6 +105,7 @@ public class MessagingConfig {
         return returnValue;
     }
 
+    @SuppressWarnings("rawtypes")
     @Bean
     public JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
         log.info("{}:: Creating JMSListenerContainer bean for topics..", loggingComponentName);
