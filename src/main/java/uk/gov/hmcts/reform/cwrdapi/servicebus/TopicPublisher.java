@@ -53,7 +53,7 @@ public class TopicPublisher {
         }
     }
 
-    @SuppressWarnings("SignatureDeclareThrowsException")
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     @Recover
     public void recoverMessage(Throwable ex) throws Throwable {
         log.error("{}:: TopicPublisher.recover(): Send message failed with exception: {} ", loggingComponentName, ex);
