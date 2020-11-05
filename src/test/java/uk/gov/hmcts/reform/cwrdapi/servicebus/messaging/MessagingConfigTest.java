@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.servicebus.messaging;
 
-import lombok.SneakyThrows;
 import org.junit.Test;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
@@ -55,13 +54,5 @@ public class MessagingConfigTest {
                 messagingConfig.topicJmsListenerContainerFactory(connectionFactoryMock);
 
         assertThat(jmsListenerContainerFactory).isNotNull();
-    }
-
-    @SuppressWarnings("removal")
-    @SneakyThrows
-    @Test
-    public void testJmsSslContext() {
-        SSLContext sslContext = messagingConfig.jmsSslContext();
-        assertThat(sslContext).isNotNull();
     }
 }

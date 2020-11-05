@@ -11,14 +11,8 @@ import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 @Configuration
 @Slf4j
@@ -28,18 +22,18 @@ public class MessagingConfig {
     private String loggingComponentName;
 
     @Bean
-    public String jmsUrlString(@Value("${amqp.host}") final String host) {
+    public String jmsUrlString(@Value("${cwrd.host}") final String host) {
         return String.format("amqps://%1s?amqp.idleTimeout=3600000", host);
     }
 
     @Bean
     public ConnectionFactory jmsConnectionFactory(
             @Value("${spring.application.name}") final String clientId,
-            @Value("${amqp.username}") final String username,
-            @Value("${amqp.password}") final String password,
+            @Value("${cwrd.username}") final String username,
+            @Value("${cwrd.password}") final String password,
             @Autowired final String jmsUrlString,
             @Autowired(required = false) final SSLContext jmsSslContext,
-            @Value("${amqp.trustAllCerts}") final boolean trustAllCerts) {
+            @Value("${cwrd.trustAllCerts}") final boolean trustAllCerts) {
 
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(jmsUrlString);
         jmsConnectionFactory.setUsername(username);
@@ -53,50 +47,50 @@ public class MessagingConfig {
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
-    /**
-     * DO NOT USE THIS IN PRODUCTION!.
-     * This was only used for testing unverified ssl certs locally!
-     *
-     * @deprecated Only used for testing.
-     */
+
+    // DO NOT USE THIS IN PRODUCTION!.
+    // This was only used for testing unverified ssl certs locally!
+    //
+    // @deprecated Only used for testing - uncomment below code and set trustAllCerts flag to true.
+
     @SuppressWarnings("squid:S4423")
-    @Bean
-    @Deprecated(forRemoval = true)
-    public SSLContext jmsSslContext() throws NoSuchAlgorithmException, KeyManagementException {
-        // https://stackoverflow.com/a/2893932
-        // DO NOT USE THIS IN PRODUCTION!
-        TrustManager[] trustCerts = getTrustManagers();
+    //@Bean
+    //@Deprecated(forRemoval = true)
+    //public SSLContext jmsSslContext() throws NoSuchAlgorithmException, KeyManagementException {
+    // https://stackoverflow.com/a/2893932
+    // DO NOT USE THIS IN PRODUCTION!
+    //TrustManager[] trustCerts = getTrustManagers();
 
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustCerts, new SecureRandom());
+    //SSLContext sc = SSLContext.getInstance("SSL");
+    //sc.init(null, trustCerts, new SecureRandom());
 
-        return sc;
-    }
+    //return sc;
+    //}
 
-    private TrustManager[] getTrustManagers() {
-        return new TrustManager[]{
-            new X509TrustManager() {
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
+    //private TrustManager[] getTrustManagers() {
+    //return new TrustManager[]{
+    //new X509TrustManager() {
+    //@Override
+    //public X509Certificate[] getAcceptedIssuers() {
+    //return new X509Certificate[0];
+    //}
 
-                    @Override
-                    @SuppressWarnings("squid:S4830")
-                    public void checkClientTrusted(
-                            X509Certificate[] certs, String authType) {
-                        // Empty
-                    }
+    //@Override
+    //@SuppressWarnings("squid:S4830")
+    //public void checkClientTrusted(
+    //X509Certificate[] certs, String authType) {
+    // Empty
+    //}
 
-                    @Override
-                    @SuppressWarnings("squid:S4830")
-                    public void checkServerTrusted(
-                            X509Certificate[] certs, String authType) {
-                        // Empty
-                    }
-                }
-        };
-    }
+    //@Override
+    //@SuppressWarnings("squid:S4830")
+    //public void checkServerTrusted(
+    //X509Certificate[] certs, String authType) {
+    // Empty
+    //}
+    //}
+    //};
+    //}
 
     @Bean
     public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {

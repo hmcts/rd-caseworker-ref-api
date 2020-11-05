@@ -27,7 +27,7 @@ public class TopicPublisher {
 
     @Autowired
     public TopicPublisher(JmsTemplate jmsTemplate,
-                          @Value("${amqp.topic}") final String destination,
+                          @Value("${cwrd.topic}") final String destination,
                           ConnectionFactory connectionFactory) {
         this.jmsTemplate = jmsTemplate;
         this.destination = destination;
