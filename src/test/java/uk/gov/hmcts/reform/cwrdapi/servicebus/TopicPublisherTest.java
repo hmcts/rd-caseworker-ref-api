@@ -8,6 +8,7 @@ import org.springframework.jms.IllegalStateException;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 
 import java.net.NoRouteToHostException;
 
@@ -26,11 +27,11 @@ public class TopicPublisherTest {
     private static final String DESTINATION = "Bermuda";
     private final JmsTemplate jmsTemplate = mock(JmsTemplate.class);
     private final CachingConnectionFactory connectionFactory = mock(CachingConnectionFactory.class);
-    private TopicPublisher underTest = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
+    private TopicPublisher topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
 
     @Test
     public void sendMessageCallsTheJmsTemplate() {
-        underTest.sendMessage("a message");
+        topicPublisher.sendMessage("a message");
 
         verify(jmsTemplate).send(eq(DESTINATION), any());
     }
@@ -38,42 +39,37 @@ public class TopicPublisherTest {
     @Test(expected = NoRouteToHostException.class)
     public void recoverMessageThrowsThePassedException() throws Throwable {
         Exception exception = new NoRouteToHostException("");
-        underTest.recoverMessage(exception);
+        topicPublisher.recoverMessage(exception);
     }
 
-    @Test
+    @Test(expected = CaseworkerMessageFailedException.class)
     public void sendMessageWhenThrowException() {
-        doThrow(IllegalStateException.class).when(jmsTemplate).send(anyString(),any());
+        doThrow(IllegalStateException.class).when(jmsTemplate).send(anyString(), any());
 
-        try {
-            underTest.sendMessage("a message");
-        } catch (Exception e) {
-            verify(connectionFactory).resetConnection();
-            verify(jmsTemplate,times(2)).send(eq(DESTINATION), any());
-        }
+        topicPublisher.sendMessage("a message");
     }
 
     @Test
     public void sendMessageWhenThrowExceptionWhenConnectionFactoryInstanceDifferent() {
         SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
-        doThrow(IllegalStateException.class).when(jmsTemplate).send(anyString(),any());
+        doThrow(IllegalStateException.class).when(jmsTemplate).send(anyString(), any());
 
-        underTest = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
+        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
 
         try {
-            underTest.sendMessage("a message");
+            topicPublisher.sendMessage("a message");
         } catch (Exception e) {
-            verify(connectionFactory,never()).resetConnection();
-            verify(jmsTemplate,times(1)).send(eq(DESTINATION), any());
+            verify(connectionFactory, never()).resetConnection();
+            verify(jmsTemplate, times(1)).send(eq(DESTINATION), any());
         }
 
     }
 
     @Test(expected = Exception.class)
     public void sendMessageWhenOtherThrowException() {
-        doThrow(Exception.class).when(jmsTemplate).send(anyString(),any());
+        doThrow(Exception.class).when(jmsTemplate).send(anyString(), any());
 
-        underTest.sendMessage("a message");
+        topicPublisher.sendMessage("a message");
 
         Assert.assertTrue(false);
 
