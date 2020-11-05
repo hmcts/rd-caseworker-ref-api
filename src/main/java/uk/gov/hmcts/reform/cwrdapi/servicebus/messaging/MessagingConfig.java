@@ -53,7 +53,7 @@ public class MessagingConfig {
     //
     // @deprecated Only used for testing - uncomment below code and set trustAllCerts flag to true.
 
-    @SuppressWarnings("squid:S4423")
+    //@SuppressWarnings("squid:S4423")
     //@Bean
     //@Deprecated(forRemoval = true)
     //public SSLContext jmsSslContext() throws NoSuchAlgorithmException, KeyManagementException {
