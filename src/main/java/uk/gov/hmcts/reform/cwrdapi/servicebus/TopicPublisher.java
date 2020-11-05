@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.IllegalStateException;
-import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Session;
@@ -41,19 +41,10 @@ public class TopicPublisher {
             jmsTemplate.send(destination, (Session session) -> session.createTextMessage(message));
             log.info("{}:: Message sent.", loggingComponentName);
         } catch (IllegalStateException e) {
-            if (connectionFactory instanceof CachingConnectionFactory) {
-                log.info("{}:: Send failed, attempting to reset connection...", loggingComponentName);
-                ((CachingConnectionFactory) connectionFactory).resetConnection();
-                log.info("{}:: Resending..", loggingComponentName);
-                jmsTemplate.send(destination, (Session session) -> session.createTextMessage(message));
-                log.info("{}:: In catch, message sent.", loggingComponentName);
-            } else {
-                throw e;
-            }
+            throw new CaseworkerMessageFailedException(e.getMessage());
         }
     }
 
-    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     @Recover
     public void recoverMessage(Throwable ex) throws Throwable {
         log.error("{}:: TopicPublisher.recover(): Send message failed with exception: {} ", loggingComponentName, ex);
