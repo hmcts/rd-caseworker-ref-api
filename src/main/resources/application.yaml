@@ -96,11 +96,11 @@ feign:
       - authorization
       - serviceauthorization
 
-amqp:
-  host: ${AMQP_HOST:rd-servicebus-sandbox.servicebus.windows.net}
-  username: ${AMQP_USERNAME:SendAndListenSharedAccessKey}
-  password: ${AMQP_PASSWORD:AAAAAAAAAAAAA}
-  topic: ${TOPIC_NAME:rd-caseworker-topic-sandbox}
-  subscription: ${SUBSCRIPTION_NAME:rd-caseworker-subscription-sandbox}
+cwrd:
+  host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
+  username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
+  password: ${CWRD_MQ_PASSWORD:AAAAAAAAAAAAA}
+  topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
+  subscription: ${CWRD_MQ_SUBSCRIPTION_NAME:rd-caseworker-subscription-sandbox}
   # DO NOT SET THIS 'true' IN PRODUCTION!
-  trustAllCerts: ${TRUST_ALL_CERTS:true}
+  trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:true}
