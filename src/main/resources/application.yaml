@@ -103,4 +103,4 @@ cwrd:
   topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
   subscription: ${CWRD_MQ_SUBSCRIPTION_NAME:rd-caseworker-subscription-sandbox}
   # DO NOT SET THIS 'true' IN PRODUCTION!
-  trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:true}
+  trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
