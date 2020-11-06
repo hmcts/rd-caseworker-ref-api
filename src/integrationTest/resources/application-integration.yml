@@ -1,0 +1,52 @@
+spring:
+  flyway.locations: classpath:db/migration
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:dbrdcaseworker
+    username: ${POSTGRES_USERNAME:dbrdcaseworker}
+    password: ${POSTGRES_PASSWORD:dbrdcaseworker}
+  security:
+    oauth2:
+      client:
+        provider:
+          oidc:
+            issuer-uri: ${OPEN_ID_API_BASE_URI:http://0.0.0.0:6000/o}
+        registration:
+          oidc:
+            client-id: microservicekey-rd-caseworker-ref-api
+            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+
+auth.provider.service.client.baseUrl: ${S2S_URL:http://127.0.0.1:8990}
+
+idam:
+  s2s-authorised:
+    services: rd_caseworker_ref_api
+  api.url: ${IDAM_URL:http://127.0.0.1:5000}
+  client:
+    redirect_uri: https://rd-professional-api-aat.service.core-compute-aat.internal/oauth2redirect
+    id: rd-caseworker-ref-api
+
+
+## IDAM feign connection
+auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
+prd:
+  security:
+    roles:
+      cwrd-admin: cwrd-admin
+
+## user profile feign connection
+user.profile.api.url: ${USER_PROFILE_URL:http://127.0.0.1:8091}
+
+oidc:
+  issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
+  expiration: 14400000 # milliseconds 4 hours
+
+loggingComponentName: RD-Caseworker-Ref-Api
