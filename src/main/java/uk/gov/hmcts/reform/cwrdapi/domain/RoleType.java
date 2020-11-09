@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
         name = "RoleType.alljoins",
         attributeNodes = {
                 @NamedAttributeNode(value = "caseWorkerRoles"),
-                @NamedAttributeNode(value = "caseWorkerIDAMRoleAssociations")
+                @NamedAttributeNode(value = "caseWorkerIdamRoleAssociations")
         }
 )
 public class RoleType implements Serializable {

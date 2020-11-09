@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,6 +23,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Size;
 
+@Entity(name = "case_worker_audit")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,7 +32,7 @@ import javax.validation.constraints.Size;
 @NamedEntityGraph(
         name = "CaseWorkerAudit.alljoins",
         attributeNodes = {
-                @NamedAttributeNode(value = "caseWorkerExceptions")
+                @NamedAttributeNode(value = "exceptionCaseWorkers")
         }
 )
 public class CaseWorkerAudit implements Serializable {

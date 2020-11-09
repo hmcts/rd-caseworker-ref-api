@@ -16,6 +16,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
@@ -39,6 +40,7 @@ import javax.validation.constraints.Size;
         }
 )
 public class CaseWorkerProfile implements Serializable {
+    @Id
     @Column(name = "case_worker_id")
     @Size(max = 64)
     private String caseWorkerId;
