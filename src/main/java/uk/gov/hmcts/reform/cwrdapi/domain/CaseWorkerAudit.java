@@ -63,7 +63,7 @@ public class CaseWorkerAudit implements Serializable {
     private String comments;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerException.class, mappedBy = "caseWorkerAudit")
-    private List<CaseWorkerException> caseWorkerExceptions = new ArrayList<>();
+    @OneToMany(targetEntity = ExceptionCaseWorker.class, mappedBy = "caseWorkerAudit")
+    private List<ExceptionCaseWorker> exceptionCaseWorkers = new ArrayList<>();
 
 }
