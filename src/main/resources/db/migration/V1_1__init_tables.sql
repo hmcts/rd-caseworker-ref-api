@@ -104,9 +104,6 @@ create table case_worker_exception (
 alter table case_worker_location add constraint case_worker_id_fk1 foreign key (case_worker_id)
 references case_worker_profile (case_worker_id);
 
-alter table case_worker_location add constraint case_worker_id_fk1 foreign key (case_worker_id)
-references case_worker_profile (case_worker_id);
-
 alter table case_worker_work_area add constraint case_worker_id_fk2 foreign key (case_worker_id)
 references case_worker_profile (case_worker_id);
 
