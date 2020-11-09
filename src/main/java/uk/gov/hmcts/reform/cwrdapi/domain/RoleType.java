@@ -9,12 +9,18 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.Size;
 
 @Entity(name = "role_type")
 @Getter
@@ -51,6 +57,6 @@ public class RoleType implements Serializable {
     private List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerIDAMRoleAssociation.class, mappedBy = "roleType")
-    private List<CaseWorkerIDAMRoleAssociation> caseWorkerIDAMRoleAssociations = new ArrayList<>();
+    @OneToMany(targetEntity = CaseWorkerIdamRoleAssociation.class, mappedBy = "roleType")
+    private List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
 }

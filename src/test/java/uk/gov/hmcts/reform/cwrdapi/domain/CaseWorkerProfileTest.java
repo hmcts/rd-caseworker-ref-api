@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.cwrdapi.domain;
 
 import org.junit.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class CaseWorkerProfileTest {
     @Test
@@ -79,7 +79,7 @@ public class CaseWorkerProfileTest {
 
         assertNotNull(caseWorkerProfile.getCaseWorkerLocations());
         assertFalse(caseWorkerProfile.getCaseWorkerLocations().isEmpty());
-        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerLocationId(), is (1L));
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerLocationId(), is(1L));
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerId(), is("CWID1"));
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation(), is("TestLocation"));
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId(), is(13));
