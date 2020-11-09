@@ -95,3 +95,12 @@ feign:
     headers:
       - authorization
       - serviceauthorization
+
+cwrd:
+  host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
+  username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
+  password: ${CWRD_MQ_PASSWORD:AAAAAAAAAAAAA}
+  topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
+  subscription: ${CWRD_MQ_SUBSCRIPTION_NAME:rd-caseworker-subscription-sandbox}
+  # DO NOT SET THIS 'true' IN PRODUCTION!
+  trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
