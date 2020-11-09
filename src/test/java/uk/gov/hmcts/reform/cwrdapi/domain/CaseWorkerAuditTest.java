@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.cwrdapi.domain;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 public class CaseWorkerAuditTest {
@@ -11,21 +13,22 @@ public class CaseWorkerAuditTest {
     public void testCaseWorkerAudit() {
         CaseWorkerAudit caseWorkerAudit = new CaseWorkerAudit();
 
-        caseWorkerAudit.setJobId(1);
+        caseWorkerAudit.setJobId(1L);
         caseWorkerAudit.setAuthenticatedUserId("AuthId");
-        caseWorkerAudit.setJobStartTime(LocalDate.now());
+        caseWorkerAudit.setJobStartTime(LocalDateTime.now());
         caseWorkerAudit.setFileName("Test_File_Name");
-        caseWorkerAudit.setJobEndTime(LocalDate.now();
+        caseWorkerAudit.setJobEndTime(LocalDateTime.now());
         caseWorkerAudit.setStatus("Test Status");
         caseWorkerAudit.setComments("Test Comments");
 
         assertNotNull(caseWorkerAudit);
-        assertThat(caseWorkerAudit.getAuthenticatedUserId(), "AuthId");
-        assertThat(caseWorkerAudit.getJobStartTime(), LocalDate.now());
-        assertThat(caseWorkerAudit.getFileName(), "Test_File_Name");
-        assertThat(caseWorkerAudit.getJobEndTime(), LocalDate.now());
-        assertThat(caseWorkerAudit.getStatus(), "Test Status");
-        assertThat(caseWorkerAudit.getComments(), "Test Comments");
+        assertThat(caseWorkerAudit.getJobId(), is(1L));
+        assertThat(caseWorkerAudit.getAuthenticatedUserId(), is("AuthId"));
+        assertNotNull(caseWorkerAudit.getJobStartTime());
+        assertThat(caseWorkerAudit.getFileName(), is("Test_File_Name"));
+        assertNotNull(caseWorkerAudit.getJobEndTime());
+        assertThat(caseWorkerAudit.getStatus(), is("Test Status"));
+        assertThat(caseWorkerAudit.getComments(), is("Test Comments"));
 
     }
 }
