@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @SequenceGenerator(name = "exception_id_seq", sequenceName = "exception_id_seq", allocationSize = 1)
-public class CaseWorkerException implements Serializable {
+public class ExceptionCaseWorker implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "exception_id_seq")

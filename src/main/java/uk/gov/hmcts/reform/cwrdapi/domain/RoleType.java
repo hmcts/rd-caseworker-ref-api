@@ -40,10 +40,6 @@ public class RoleType implements Serializable {
     @Column(name = "role_id")
     private Long roleId;
 
-    @Column(name = "description")
-    @Size(max = 512)
-    private String description;
-
     @CreationTimestamp
     @Column(name = "created_date")
     private LocalDateTime createdDate;
@@ -51,6 +47,10 @@ public class RoleType implements Serializable {
     @UpdateTimestamp
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
+
+    @Column(name = "description")
+    @Size(max = 512)
+    private String description;
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerRole.class, mappedBy = "roleType")

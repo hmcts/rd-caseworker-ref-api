@@ -52,12 +52,12 @@ public class CaseWorkerLocation implements Serializable {
     @Column(name = "location_id")
     private Integer locationId;
 
-    @Column(name = "primary_flag")
-    private Boolean primaryFlag;
-
     @CreationTimestamp
     @Column(name = "created_date")
     private LocalDateTime createdDate;
+
+    @Column(name = "primary_flag")
+    private Boolean primaryFlag;
 
     @UpdateTimestamp
     @Column(name = "last_update")

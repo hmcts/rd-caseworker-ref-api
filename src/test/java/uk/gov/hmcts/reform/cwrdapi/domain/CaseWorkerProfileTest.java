@@ -14,7 +14,6 @@ public class CaseWorkerProfileTest {
     @Test
     public void testCaseWorkerProfile() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
@@ -27,41 +26,11 @@ public class CaseWorkerProfileTest {
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
-        CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
-        caseWorkerLocation.setCaseWorkerLocationId(1L);
-        caseWorkerLocation.setCaseWorkerId("CWID1");
-        caseWorkerLocation.setLocation("TestLocation");
-        caseWorkerLocation.setLocationId(13);
-        caseWorkerLocation.setPrimaryFlag(false);
-        caseWorkerLocation.setCreatedDate(LocalDateTime.now());
-        caseWorkerLocation.setLastUpdate(LocalDateTime.now());
-
-        CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
-        caseWorkerRole.setCaseWorkerRoleId(1L);
-        caseWorkerRole.setCaseWorkerId("CWID1");
-        caseWorkerRole.setRoleId(1L);
-        caseWorkerRole.setPrimaryFlag(false);
-        caseWorkerRole.setCreatedDate(LocalDateTime.now());
-        caseWorkerRole.setLastUpdate(LocalDateTime.now());
-
-        CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
-        caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
-        caseWorkerWorkArea.setCaseWorkerId("CWID1");
-        caseWorkerWorkArea.setAreaOfWork("TestArea");
-        caseWorkerWorkArea.setServiceCode("SvcCode1");
-        caseWorkerWorkArea.setCreatedDate(LocalDateTime.now());
-        caseWorkerWorkArea.setLastUpdate(LocalDateTime.now());
-
         UserType userType = new UserType();
         userType.setUserTypeId(1L);
         userType.setDescription("Test Description");
         userType.setCreatedDate(LocalDateTime.now());
         userType.setLastUpdate(LocalDateTime.now());
-
-
-        caseWorkerProfile.setCaseWorkerLocations(Collections.singletonList(caseWorkerLocation));
-        caseWorkerProfile.setCaseWorkerRoles(Collections.singletonList(caseWorkerRole));
-        caseWorkerProfile.setCaseWorkerWorkAreas(Collections.singletonList(caseWorkerWorkArea));
         caseWorkerProfile.setUserType(userType);
 
         assertNotNull(caseWorkerProfile);
@@ -77,20 +46,24 @@ public class CaseWorkerProfileTest {
         assertNotNull(caseWorkerProfile.getCreatedDate());
         assertNotNull(caseWorkerProfile.getLastUpdate());
 
-        assertNotNull(caseWorkerProfile.getCaseWorkerLocations());
-        assertFalse(caseWorkerProfile.getCaseWorkerLocations().isEmpty());
-        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerLocationId(), is(1L));
-        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerId(), is("CWID1"));
-        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation(), is("TestLocation"));
-        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId(), is(13));
-        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getPrimaryFlag(), is(false));
+        assertNotNull(caseWorkerProfile.getUserType());
+        assertThat(caseWorkerProfile.getUserType().getUserTypeId(), is(1L));
+        assertThat(caseWorkerProfile.getUserType().getDescription(), is("Test Description"));
 
-        assertNotNull(caseWorkerProfile.getCaseWorkerRoles());
-        assertFalse(caseWorkerProfile.getCaseWorkerRoles().isEmpty());
-        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getCaseWorkerRoleId(), is(1L));
-        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getCaseWorkerId(), is("CWID1"));
-        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getRoleId(), is(1L));
-        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag(), is(false));
+    }
+
+    @Test
+    public void testCaseWorkerProfileContainingCaseWorkerWorkAreas() {
+        CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
+        caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
+        caseWorkerWorkArea.setCaseWorkerId("CWID1");
+        caseWorkerWorkArea.setAreaOfWork("TestArea");
+        caseWorkerWorkArea.setServiceCode("SvcCode1");
+        caseWorkerWorkArea.setCreatedDate(LocalDateTime.now());
+        caseWorkerWorkArea.setLastUpdate(LocalDateTime.now());
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerWorkAreas(Collections.singletonList(caseWorkerWorkArea));
 
         assertNotNull(caseWorkerProfile.getCaseWorkerWorkAreas());
         assertFalse(caseWorkerProfile.getCaseWorkerWorkAreas().isEmpty());
@@ -98,10 +71,49 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getCaseWorkerId(), is("CWID1"));
         assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getAreaOfWork(), is("TestArea"));
         assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getServiceCode(), is("SvcCode1"));
+    }
 
-        assertNotNull(caseWorkerProfile.getUserType());
-        assertThat(caseWorkerProfile.getUserType().getUserTypeId(), is(1L));
-        assertThat(caseWorkerProfile.getUserType().getDescription(), is("Test Description"));
+    @Test
+    public void testCaseWorkerProfileContainingCaseWorkerRoles() {
+        CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
+        caseWorkerRole.setCaseWorkerRoleId(1L);
+        caseWorkerRole.setCaseWorkerId("CWID1");
+        caseWorkerRole.setRoleId(1L);
+        caseWorkerRole.setPrimaryFlag(false);
+        caseWorkerRole.setCreatedDate(LocalDateTime.now());
+        caseWorkerRole.setLastUpdate(LocalDateTime.now());
 
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerRoles(Collections.singletonList(caseWorkerRole));
+
+        assertNotNull(caseWorkerProfile.getCaseWorkerRoles());
+        assertFalse(caseWorkerProfile.getCaseWorkerRoles().isEmpty());
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getCaseWorkerRoleId(), is(1L));
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getCaseWorkerId(), is("CWID1"));
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getRoleId(), is(1L));
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag(), is(false));
+    }
+
+    @Test
+    public void testCaseWorkerProfileContainingCaseWorkerLocations() {
+        CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
+        caseWorkerLocation.setCaseWorkerLocationId(1L);
+        caseWorkerLocation.setCaseWorkerId("CWID1");
+        caseWorkerLocation.setLocation("TestLocation");
+        caseWorkerLocation.setLocationId(13);
+        caseWorkerLocation.setPrimaryFlag(false);
+        caseWorkerLocation.setCreatedDate(LocalDateTime.now());
+        caseWorkerLocation.setLastUpdate(LocalDateTime.now());
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerLocations(Collections.singletonList(caseWorkerLocation));
+
+        assertNotNull(caseWorkerProfile.getCaseWorkerLocations());
+        assertFalse(caseWorkerProfile.getCaseWorkerLocations().isEmpty());
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerLocationId(), is(1L));
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerId(), is("CWID1"));
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation(), is("TestLocation"));
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId(), is(13));
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getPrimaryFlag(), is(false));
     }
 }
