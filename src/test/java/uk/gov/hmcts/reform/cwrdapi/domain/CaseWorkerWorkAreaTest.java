@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi.domain;
 
 import org.junit.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.is;

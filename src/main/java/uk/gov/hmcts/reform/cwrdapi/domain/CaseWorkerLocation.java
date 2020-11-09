@@ -4,22 +4,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 
 @Entity(name = "case_worker_location")
 @Getter
 @Setter
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@SequenceGenerator(name = "case_worker_location_id_seq", sequenceName = "case_worker_location_id_seq", allocationSize = 1)
+@SequenceGenerator(name = "case_worker_location_id_seq",
+        sequenceName = "case_worker_location_id_seq", allocationSize = 1)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "location_id"}))
 public class CaseWorkerLocation implements Serializable {
 
