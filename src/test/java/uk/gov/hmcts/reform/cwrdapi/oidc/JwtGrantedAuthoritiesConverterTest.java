@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-
 import uk.gov.hmcts.reform.cwrdapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
