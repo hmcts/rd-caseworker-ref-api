@@ -32,7 +32,7 @@ public class CaseWorkerProfileTest {
         caseWorkerLocation.setCaseWorkerId("CWID1");
         caseWorkerLocation.setLocation("TestLocation");
         caseWorkerLocation.setLocationId(13);
-        caseWorkerLocation.setPrimary(false);
+        caseWorkerLocation.setPrimaryFlag(false);
         caseWorkerLocation.setCreatedDate(LocalDateTime.now());
         caseWorkerLocation.setLastUpdate(LocalDateTime.now());
 
@@ -40,7 +40,7 @@ public class CaseWorkerProfileTest {
         caseWorkerRole.setCaseWorkerRoleId(1L);
         caseWorkerRole.setCaseWorkerId("CWID1");
         caseWorkerRole.setRoleId(1L);
-        caseWorkerRole.setPrimary(false);
+        caseWorkerRole.setPrimaryFlag(false);
         caseWorkerRole.setCreatedDate(LocalDateTime.now());
         caseWorkerRole.setLastUpdate(LocalDateTime.now());
 
@@ -83,14 +83,14 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getCaseWorkerId(), is("CWID1"));
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation(), is("TestLocation"));
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId(), is(13));
-        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getPrimary(), is(false));
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getPrimaryFlag(), is(false));
 
         assertNotNull(caseWorkerProfile.getCaseWorkerRoles());
         assertFalse(caseWorkerProfile.getCaseWorkerRoles().isEmpty());
         assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getCaseWorkerRoleId(), is(1L));
         assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getCaseWorkerId(), is("CWID1"));
         assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getRoleId(), is(1L));
-        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimary(), is(false));
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag(), is(false));
 
         assertNotNull(caseWorkerProfile.getCaseWorkerWorkAreas());
         assertFalse(caseWorkerProfile.getCaseWorkerWorkAreas().isEmpty());

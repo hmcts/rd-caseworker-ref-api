@@ -17,7 +17,7 @@ public class CaseWorkerRoleTest {
         caseWorkerRole.setCaseWorkerRoleId(1L);
         caseWorkerRole.setCaseWorkerId("CWID1");
         caseWorkerRole.setRoleId(1L);
-        caseWorkerRole.setPrimary(false);
+        caseWorkerRole.setPrimaryFlag(false);
         caseWorkerRole.setCreatedDate(LocalDateTime.now());
         caseWorkerRole.setLastUpdate(LocalDateTime.now());
 
@@ -33,7 +33,7 @@ public class CaseWorkerRoleTest {
         assertThat(caseWorkerRole.getCaseWorkerRoleId(), is(1L));
         assertThat(caseWorkerRole.getCaseWorkerId(), is("CWID1"));
         assertThat(caseWorkerRole.getRoleId(), is(1L));
-        assertThat(caseWorkerRole.getPrimary(), is(false));
+        assertThat(caseWorkerRole.getPrimaryFlag(), is(false));
         assertNotNull(caseWorkerRole.getCreatedDate());
         assertNotNull(caseWorkerRole.getLastUpdate());
 

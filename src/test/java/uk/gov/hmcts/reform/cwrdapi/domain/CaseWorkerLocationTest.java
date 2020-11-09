@@ -17,7 +17,7 @@ public class CaseWorkerLocationTest {
         caseWorkerLocation.setCaseWorkerId("CWID1");
         caseWorkerLocation.setLocation("TestLocation");
         caseWorkerLocation.setLocationId(13);
-        caseWorkerLocation.setPrimary(false);
+        caseWorkerLocation.setPrimaryFlag(false);
         caseWorkerLocation.setCreatedDate(LocalDateTime.now());
         caseWorkerLocation.setLastUpdate(LocalDateTime.now());
 
@@ -30,7 +30,7 @@ public class CaseWorkerLocationTest {
         assertThat(caseWorkerLocation.getCaseWorkerId(), is("CWID1"));
         assertThat(caseWorkerLocation.getLocation(), is("TestLocation"));
         assertThat(caseWorkerLocation.getLocationId(), is(13));
-        assertThat(caseWorkerLocation.getPrimary(), is(false));
+        assertThat(caseWorkerLocation.getPrimaryFlag(), is(false));
         assertNotNull(caseWorkerLocation.getCreatedDate());
         assertNotNull(caseWorkerLocation.getLastUpdate());
 

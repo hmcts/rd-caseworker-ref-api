@@ -23,7 +23,7 @@ public class RoleTypeTest {
         caseWorkerRole.setCaseWorkerRoleId(1L);
         caseWorkerRole.setCaseWorkerId("CWID1");
         caseWorkerRole.setRoleId(1L);
-        caseWorkerRole.setPrimary(false);
+        caseWorkerRole.setPrimaryFlag(false);
 
         roleType.setCaseWorkerRoles(Collections.singletonList(caseWorkerRole));
 

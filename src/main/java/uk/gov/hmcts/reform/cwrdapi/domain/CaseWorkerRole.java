@@ -37,8 +37,8 @@ public class CaseWorkerRole implements Serializable {
     @NaturalId
     private Long roleId;
 
-    @Column(name = "primary")
-    private Boolean primary;
+    @Column(name = "primary_flag")
+    private Boolean primaryFlag;
 
     @CreationTimestamp
     @Column(name = "created_date")
