@@ -41,10 +41,9 @@ public class CaseWorkerProfile implements Serializable {
     @Size(max = 128)
     private String lastName;
 
-    @Column(name = "email_id")
+    @Column(name = "email_id", unique = true)
     @Size(max = 512)
     @NotNull
-    @NaturalId
     private String emailId;
 
     @Column(name = "user_type_id")

@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @SequenceGenerator(name = "case_worker_location_id_seq", sequenceName = "case_worker_location_id_seq", allocationSize = 1)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "location_id"}))
 public class CaseWorkerLocation implements Serializable {
 
     @Id
@@ -30,7 +31,6 @@ public class CaseWorkerLocation implements Serializable {
     @Column(name = "case_worker_id")
     @NotNull
     @Size(max = 64)
-    @NaturalId
     private String caseWorkerId;
 
     @Column(name = "location")
@@ -39,7 +39,6 @@ public class CaseWorkerLocation implements Serializable {
     private String location;
 
     @Column(name = "location_id")
-    @NaturalId
     private Integer locationId;
 
     @Column(name = "primary_flag")
