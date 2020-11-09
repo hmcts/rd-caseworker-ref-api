@@ -42,8 +42,8 @@ public class CaseWorkerLocation implements Serializable {
     @NaturalId
     private Integer locationId;
 
-    @Column(name = "primary")
-    private Boolean primary;
+    @Column(name = "primary_flag")
+    private Boolean primaryFlag;
 
     @CreationTimestamp
     @Column(name = "created_date")
