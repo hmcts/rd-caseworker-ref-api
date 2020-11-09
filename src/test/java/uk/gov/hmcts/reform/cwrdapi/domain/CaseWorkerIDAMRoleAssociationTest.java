@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.cwrdapi.domain;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 
@@ -10,21 +12,22 @@ public class CaseWorkerIDAMRoleAssociationTest {
 
     @Test
     public void testCaseWorkerIDAMRoleAssociation() {
+
         CaseWorkerIDAMRoleAssociation caseWorkerIDAMRoleAssociation = new CaseWorkerIDAMRoleAssociation();
-        caseWorkerIDAMRoleAssociation.setCaseWorkerIDAMRoleAssociation(1);
-        caseWorkerIDAMRoleAssociation.setRoleId(1);
+        caseWorkerIDAMRoleAssociation.setCaseWorkerIDAMRoleAssociationId(1L);
+        caseWorkerIDAMRoleAssociation.setRoleId(1L);
         caseWorkerIDAMRoleAssociation.setServiceCode("SVCCode1");
-        caseWorkerIDAMRoleAssociation.setIDAMRole("IDAMRole");
-        caseWorkerIDAMRoleAssociation.setCreatedDate(LocalDate.now());
-        caseWorkerIDAMRoleAssociation.setLastUpdate(LocalDate.now());
+        caseWorkerIDAMRoleAssociation.setIdamRole("IDAMRole");
+        caseWorkerIDAMRoleAssociation.setCreatedDate(LocalDateTime.now());
+        caseWorkerIDAMRoleAssociation.setLastUpdate(LocalDateTime.now());
 
         assertNotNull(caseWorkerIDAMRoleAssociation);
 
-        assertThat(caseWorkerIDAMRoleAssociation.getCaseWorkerIDAMRoleAssociation(), 1);
-        assertThat(caseWorkerIDAMRoleAssociation.getRoleId(), 1);
-        assertThat(caseWorkerIDAMRoleAssociation.getServiceCode(), "SVCCode1");
-        assertThat(caseWorkerIDAMRoleAssociation.getIDAMRole(), "IDAMRole");
-        assertThat(caseWorkerIDAMRoleAssociation.getCreatedDate(), LocalDate.now());
-        assertThat(caseWorkerIDAMRoleAssociation.getLastUpdate(), LocalDate.now());
+        assertThat(caseWorkerIDAMRoleAssociation.getCaseWorkerIDAMRoleAssociationId(), is (1L));
+        assertThat(caseWorkerIDAMRoleAssociation.getRoleId(), is(1L));
+        assertThat(caseWorkerIDAMRoleAssociation.getServiceCode(), is("SVCCode1"));
+        assertThat(caseWorkerIDAMRoleAssociation.getIdamRole(), is("IDAMRole"));
+        assertNotNull(caseWorkerIDAMRoleAssociation.getCreatedDate());
+        assertNotNull(caseWorkerIDAMRoleAssociation.getLastUpdate());
     }
 }

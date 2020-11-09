@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.cwrdapi.domain;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
@@ -15,24 +17,24 @@ public class CaseWorkerLocationTest {
         caseWorkerLocation.setCaseWorkerId("CWID1");
         caseWorkerLocation.setLocation("TestLocation");
         caseWorkerLocation.setLocationId(13);
-        caseWorkerLocation.setPrimaryFlag(false);
-        caseWorkerLocation.setCreatedDate(LocalDate.now());
-        caseWorkerLocation.setLastUpdate(LocalDate.now());
+        caseWorkerLocation.setPrimary(false);
+        caseWorkerLocation.setCreatedDate(LocalDateTime.now());
+        caseWorkerLocation.setLastUpdate(LocalDateTime.now());
 
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerLocation.setCaseWorkerProfile(caseWorkerProfile);
 
         assertNotNull(caseWorkerLocation);
-        assertThat(caseWorkerLocation.getCaseWorkerLocationId(), 1L);
-        assertThat(caseWorkerLocation.getCaseWorkerId(), "CWID1");
-        assertThat(caseWorkerLocation.getLocation(), "TestLocation");
-        assertThat(caseWorkerLocation.getLocationId(), 13);
-        assertThat(caseWorkerLocation.getPrimaryFlag(), false);
-        assertThat(caseWorkerLocation.getCreatedDate(), LocalDate.now());
-        assertThat(caseWorkerLocation.getLastUpdate(), LocalDate.now());
+        assertThat(caseWorkerLocation.getCaseWorkerLocationId(), is(1L));
+        assertThat(caseWorkerLocation.getCaseWorkerId(), is("CWID1"));
+        assertThat(caseWorkerLocation.getLocation(), is("TestLocation"));
+        assertThat(caseWorkerLocation.getLocationId(), is(13));
+        assertThat(caseWorkerLocation.getPrimary(), is(false));
+        assertNotNull(caseWorkerLocation.getCreatedDate());
+        assertNotNull(caseWorkerLocation.getLastUpdate());
 
         assertNotNull(caseWorkerLocation.getCaseWorkerProfile());
-        assertThat(caseWorkerLocation.getCaseWorkerProfile().getCaseWorkerId(), "CWID1");
+        assertThat(caseWorkerLocation.getCaseWorkerProfile().getCaseWorkerId(), is("CWID1"));
     }
 }
