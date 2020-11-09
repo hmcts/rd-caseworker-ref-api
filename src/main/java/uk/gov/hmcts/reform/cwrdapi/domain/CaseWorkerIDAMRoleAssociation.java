@@ -30,7 +30,6 @@ public class CaseWorkerIDAMRoleAssociation implements Serializable {
 
     @Column(name = "role_id")
     @NotNull
-    @NaturalId
     private Long roleId;
 
     @Column(name = "service_code")

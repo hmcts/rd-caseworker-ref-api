@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @SequenceGenerator(name = "case_worker_work_area_id_seq", sequenceName = "case_worker_work_area_id_seq",
         allocationSize = 1)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "service_code"}))
 public class CaseWorkerWorkArea implements Serializable {
 
     @Id
@@ -31,7 +32,6 @@ public class CaseWorkerWorkArea implements Serializable {
     @Column(name = "case_worker_id")
     @NotNull
     @Size(max = 64)
-    @NaturalId
     private String caseWorkerId;
 
     @Column(name = "area_of_work")
@@ -42,7 +42,6 @@ public class CaseWorkerWorkArea implements Serializable {
     @Column(name = "service_code")
     @NotNull
     @Size(max = 16)
-    @NaturalId
     private String serviceCode;
 
     @CreationTimestamp
