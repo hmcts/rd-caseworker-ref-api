@@ -14,7 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class CaseWorkerReferenceDataClient {
         this.expiration = tokenExpirationInterval;
     }
 
-    public Map<String, Object> createCaseWorkerProfile(CaseWorkerProfileCreationRequest request, String role) {
+    public Map<String, Object> createCaseWorkerProfile(CaseWorkersProfileCreationRequest request, String role) {
         return postRequest(baseUrl, request, role, null);
     }
 

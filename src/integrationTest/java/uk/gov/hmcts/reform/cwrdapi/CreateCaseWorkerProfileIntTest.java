@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.util.Map;
@@ -14,7 +14,7 @@ public class CreateCaseWorkerProfileIntTest extends AuthorizationEnabledIntegrat
 
     @Test
     public void persists_and_returns_valid_organisation_with_contact_and_dxAddress() {
-        CaseWorkerProfileCreationRequest creationRequest = new CaseWorkerProfileCreationRequest();
+        CaseWorkersProfileCreationRequest creationRequest = new CaseWorkersProfileCreationRequest();
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(creationRequest, cwrdAdmin);
         assertThat(response);
