@@ -26,8 +26,10 @@ create table case_worker_location(
 	created_date timestamp,
 	last_update timestamp,
 	constraint case_worker_location_pk primary key (case_worker_location_id),
-	constraint location_id_uq unique (location_id)
+	constraint case_worker_locn_id_uq unique (case_worker_id,location_id)
 );
+
+
 
 create table case_worker_work_area(
 	case_worker_work_area_id serial,
@@ -37,7 +39,7 @@ create table case_worker_work_area(
 	created_date timestamp,
 	last_update timestamp,
 	constraint case_worker_work_area_pk primary key (case_worker_work_area_id),
-	constraint case_worker_work_area_uq unique (area_of_work)
+	constraint case_worker_work_area_uq unique (case_worker_id,service_code)
 );
 
 create table case_worker_role(
@@ -48,7 +50,7 @@ create table case_worker_role(
 	created_date timestamp,
 	last_update timestamp,
 	constraint case_worker_role_pk primary key (case_worker_role_id),
-	constraint case_worker_role_id_uq unique (role_id)
+	constraint case_worker_role_id_uq unique (case_worker_id,role_id)
 );
 
 create table role_type(
@@ -98,6 +100,9 @@ create table case_worker_exception (
    updated_timestamp timestamp,
    constraint case_worker_exception_pk primary key (id)
 );
+
+alter table case_worker_location add constraint case_worker_id_fk1 foreign key (case_worker_id)
+references case_worker_profile (case_worker_id);
 
 alter table case_worker_location add constraint case_worker_id_fk1 foreign key (case_worker_id)
 references case_worker_profile (case_worker_id);
