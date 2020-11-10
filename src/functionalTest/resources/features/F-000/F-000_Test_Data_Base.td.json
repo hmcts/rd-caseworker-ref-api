@@ -1,0 +1,10 @@
+{
+  "_guid_": "F-000_Test_Data_Base",
+
+  "productName": "Case worker API",
+  "operationName": "Case worker health API",
+
+  "method": "GET",
+  "uri": "/health/liveness"
+}
+
