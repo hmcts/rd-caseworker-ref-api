@@ -14,13 +14,10 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Size;
 
 @Entity(name = "case_worker_audit")
@@ -28,7 +25,6 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@SequenceGenerator(name = "job_id_seq", sequenceName = "job_id_seq", allocationSize = 1)
 @NamedEntityGraph(
         name = "CaseWorkerAudit.alljoins",
         attributeNodes = {
@@ -38,7 +34,6 @@ import javax.validation.constraints.Size;
 public class CaseWorkerAudit implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "job_id_seq")
     @Column(name = "job_id")
     private Long jobId;
 
