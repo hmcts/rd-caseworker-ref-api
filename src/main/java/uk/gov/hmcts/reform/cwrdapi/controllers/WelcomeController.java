@@ -1,19 +1,29 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl;
 import java.util.UUID;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Default endpoints per application.
@@ -28,6 +38,12 @@ public class WelcomeController {
 
     private static final String INSTANCE_ID = UUID.randomUUID().toString();
     private static final String MESSAGE = "Message for the Caseworker Ref Data API";
+
+    @Autowired
+    ExcelValidatorServiceImpl excelValidatorService;
+
+    @Autowired
+    ExcelAdaptorServiceImpl excelAdaptorService;
 
 
     /**
@@ -61,5 +77,32 @@ public class WelcomeController {
             .ok()
             .cacheControl(CacheControl.noCache())
             .body("{\"message\": \"" + MESSAGE + "\"}");
+    }
+
+    @PostMapping(
+            path = "/upload-file11",
+            consumes = "multipart/form-data",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    public ResponseEntity<String> uploadCaseWorkerProfile(@RequestPart(value = "file",required = true) MultipartFile file) {
+
+
+        Workbook workbook = excelValidatorService.validateExcelFile(file);
+
+        return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.noCache())
+                .body("{\"message\": \"" + MESSAGE + "\"}");
+    }
+
+    @RequestMapping(value = "/upload-file", method = RequestMethod.POST, consumes = "multipart/form-data")
+    public ResponseEntity<String> handleFormUpload(@RequestParam("file") MultipartFile file) {
+        Workbook workbook = excelValidatorService.validateExcelFile(file);
+
+        return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.noCache())
+                .body("{\"message\": \"" + MESSAGE + "\"}");
     }
 }

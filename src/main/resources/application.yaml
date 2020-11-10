@@ -36,6 +36,13 @@ spring:
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration
+  servlet:
+    multipart:
+       max-file-size: 128MB
+       max-request-size: 128MB
+  http:
+    multipart:
+      enabled: true
 
   ### database configuration
   datasource:
@@ -77,6 +84,7 @@ security:
     - "/csrf"
     - "/error"
     - "/favicon.ico"
+    - "/**"
 ### dependency configuration
 idam:
   s2s-auth:
@@ -95,3 +103,6 @@ feign:
     headers:
       - authorization
       - serviceauthorization
+
+excel:
+  password: ${EXCEL_PASSWORD:1234}
