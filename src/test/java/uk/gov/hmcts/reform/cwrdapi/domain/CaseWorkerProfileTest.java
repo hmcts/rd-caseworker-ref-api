@@ -116,4 +116,11 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId(), is(13));
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getPrimaryFlag(), is(false));
     }
+
+    @Test
+    public void testCaseWorkerProfileContainingDeleteFlag() {
+        CaseWorkerProfile caseWorkerLocation = new CaseWorkerProfile();
+        caseWorkerLocation.setDeleteFlag(false);
+        assertFalse(caseWorkerLocation.getDeleteFlag());
+    }
 }

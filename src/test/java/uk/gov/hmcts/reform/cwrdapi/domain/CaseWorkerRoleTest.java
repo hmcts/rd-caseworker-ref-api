@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CaseWorkerRoleTest {
     @Test
     public void testCaseWorkerRole() {
-
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
         caseWorkerRole.setCaseWorkerRoleId(1L);
         caseWorkerRole.setCaseWorkerId("CWID1");
@@ -42,5 +42,13 @@ public class CaseWorkerRoleTest {
         assertNotNull(caseWorkerRole.getRoleType());
         assertThat(caseWorkerRole.getRoleType().getRoleId(), is(1L));
 
+    }
+
+    @Test
+    public void testCaseWorkerRoleWithPrimaryFlagSetToTrue() {
+        CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
+        caseWorkerRole.setPrimaryFlag(true);
+
+        assertTrue(caseWorkerRole.getPrimaryFlag());
     }
 }

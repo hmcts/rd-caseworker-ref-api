@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.cwrdapi.domain;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class CaseWorkerAuditTest {
@@ -30,5 +32,15 @@ public class CaseWorkerAuditTest {
         assertThat(caseWorkerAudit.getStatus(), is("Test Status"));
         assertThat(caseWorkerAudit.getComments(), is("Test Comments"));
 
+    }
+
+    @Test
+    public void testCaseWorkerAuditContainingExceptionCaseWorkers() {
+        ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
+        exceptionCaseWorker.setId(1L);
+
+        CaseWorkerAudit caseWorkerAudit = new CaseWorkerAudit();
+        caseWorkerAudit.setExceptionCaseWorkers(Collections.singletonList(exceptionCaseWorker));
+        assertFalse(caseWorkerAudit.getExceptionCaseWorkers().isEmpty());
     }
 }
