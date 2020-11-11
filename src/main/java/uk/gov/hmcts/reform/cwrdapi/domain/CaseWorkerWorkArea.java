@@ -65,4 +65,10 @@ public class CaseWorkerWorkArea implements Serializable {
     @JoinColumn(name = "case_worker_id", referencedColumnName = "case_worker_id",
             insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
+
+    public CaseWorkerWorkArea(String areaOfWork, String serviceCode) {
+
+        this.areaOfWork = areaOfWork;
+        this.serviceCode = serviceCode;
+    }
 }

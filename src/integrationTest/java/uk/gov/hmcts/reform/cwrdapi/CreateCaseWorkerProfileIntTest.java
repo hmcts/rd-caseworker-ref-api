@@ -12,14 +12,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class CreateCaseWorkerProfileIntTest extends AuthorizationEnabledIntegrationTest {
 
-    @Test
+    /*@Test
     public void persists_and_returns_valid_organisation_with_contact_and_dxAddress() {
         CaseWorkersProfileCreationRequest creationRequest = new CaseWorkersProfileCreationRequest();
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(creationRequest, cwrdAdmin);
         assertThat(response);
 
-    }
+    }*/
 
 
 

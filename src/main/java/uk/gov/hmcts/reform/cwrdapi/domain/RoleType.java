@@ -59,4 +59,6 @@ public class RoleType implements Serializable {
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerIdamRoleAssociation.class, mappedBy = "roleType")
     private List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
+
+
 }

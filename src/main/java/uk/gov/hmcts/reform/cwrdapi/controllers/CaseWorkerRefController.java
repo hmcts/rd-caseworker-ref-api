@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.List;
 
@@ -23,6 +27,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 public class CaseWorkerRefController {
 
+    @Autowired
+    CaseWorkerService caseWorkerService;
 
     @ApiOperation(
             value = "This API creates caseworker profiles",
@@ -54,7 +60,11 @@ public class CaseWorkerRefController {
     @PostMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
+        if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
 
+            throw new InvalidRequestException("Caseworker Profiles Request is empty");
+        }
+        caseWorkerService.createCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
         return ResponseEntity.status(200).body("");
     }
 }

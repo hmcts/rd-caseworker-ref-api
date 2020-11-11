@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.request;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,18 +16,40 @@ public class CaseWorkersProfileCreationRequest {
 
     private String firstName;
     private String lastName;
-    private String email;
+    private String emailId;
     private String regionId;
     private String userType;
     private String region;
     private boolean deleteFlag;
-    Set<String> idamRoles = new HashSet<>();
-    List<CaseWorkerLocationRequest> baseLocations = new ArrayList<>();
+    private Set<String> idamRoles;
+    private List<CaseWorkerRoleRequest> roles;
+    private List<CaseWorkerLocationRequest> baseLocations;
 
-    List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests = new ArrayList<>();
+    private List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests;
 
-    public CaseWorkersProfileCreationRequest() {
+    @JsonCreator
+    public CaseWorkersProfileCreationRequest( @JsonProperty("first_name") String firstName,
+            @JsonProperty("last_name") String lastName,
+            @JsonProperty("email_id") String emailId,
+            @JsonProperty("region_id") String regionId,
+            @JsonProperty("user_type") String userType,
+            @JsonProperty("region") String region,
+            @JsonProperty("delete_flag") boolean deleteFlag,
+            @JsonProperty("idam_roles") Set<String> idamRoles,
+            @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
+            @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
+            @JsonProperty("work_area") List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests) {
 
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailId = emailId;
+        this.regionId = regionId;
+        this.userType = userType;
+        this.deleteFlag = deleteFlag;
+        this.idamRoles = idamRoles;
+        this.roles = roles;
+        this.baseLocations = baseLocations;
+        this.workerWorkAreaRequests = workerWorkAreaRequests;
     }
 
 

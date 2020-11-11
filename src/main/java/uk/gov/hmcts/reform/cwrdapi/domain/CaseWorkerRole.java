@@ -66,4 +66,10 @@ public class CaseWorkerRole implements Serializable {
             insertable = false, updatable = false, nullable = false)
     private RoleType roleType;
 
+    public CaseWorkerRole(Long roleId, Boolean primaryFlag) {
+
+        this.roleId = roleId;
+        this.primaryFlag = primaryFlag;
+    }
+
 }

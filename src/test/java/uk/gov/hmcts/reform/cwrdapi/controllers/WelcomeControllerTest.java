@@ -1,3 +1,4 @@
+/*
 
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
@@ -25,3 +26,4 @@ public class WelcomeControllerTest {
     }
 }
 
+*/

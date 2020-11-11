@@ -68,4 +68,12 @@ public class CaseWorkerLocation implements Serializable {
             insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
 
+    public CaseWorkerLocation(Integer locationId, String location, Boolean primaryFlag) {
+
+        this.locationId = locationId;
+        this.location = location;
+        this.primaryFlag = primaryFlag;
+
+    }
+
 }

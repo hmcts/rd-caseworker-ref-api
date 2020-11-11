@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -30,6 +32,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @NamedEntityGraph(
         name = "CaseWorkerProfile.alljoins",
@@ -85,19 +88,30 @@ public class CaseWorkerProfile implements Serializable {
     private LocalDateTime lastUpdate;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile")
+    @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile", cascade = CascadeType.ALL)
     private List<CaseWorkerLocation> caseWorkerLocations = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerWorkArea.class, mappedBy = "caseWorkerProfile")
+    @OneToMany(targetEntity = CaseWorkerWorkArea.class, mappedBy = "caseWorkerProfile", cascade = CascadeType.ALL)
     private List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerRole.class, mappedBy = "caseWorkerProfile")
+    @OneToMany(targetEntity = CaseWorkerRole.class, mappedBy = "caseWorkerProfile", cascade = CascadeType.ALL)
     private List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_type_id", referencedColumnName = "user_type_id",
             insertable = false, updatable = false, nullable = false)
     private UserType userType;
+
+    public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
+                             String region) {
+
+        this.caseWorkerId = caseWorkerId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailId = emailId;
+        this.userTypeId = userTypeId;
+        this.region = region;
+    }
 }
