@@ -39,8 +39,6 @@ public class CaseWorkerWorkArea implements Serializable {
     private Long caseWorkerWorkAreaId;
 
     @Column(name = "case_worker_id")
-    @NotNull
-    @Size(max = 64)
     private String caseWorkerId;
 
     @Column(name = "area_of_work")
@@ -66,8 +64,8 @@ public class CaseWorkerWorkArea implements Serializable {
             insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
 
-    public CaseWorkerWorkArea(String areaOfWork, String serviceCode) {
-
+    public CaseWorkerWorkArea(String caseWorkerId, String areaOfWork, String serviceCode) {
+        this.caseWorkerId = caseWorkerId;
         this.areaOfWork = areaOfWork;
         this.serviceCode = serviceCode;
     }

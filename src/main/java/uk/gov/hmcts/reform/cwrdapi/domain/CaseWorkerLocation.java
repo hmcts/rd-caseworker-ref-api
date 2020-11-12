@@ -40,8 +40,6 @@ public class CaseWorkerLocation implements Serializable {
     private Long caseWorkerLocationId;
 
     @Column(name = "case_worker_id")
-    @NotNull
-    @Size(max = 64)
     private String caseWorkerId;
 
     @Column(name = "location")
@@ -64,12 +62,14 @@ public class CaseWorkerLocation implements Serializable {
     private LocalDateTime lastUpdate;
 
     @ManyToOne
-    @JoinColumn(name = "case_worker_id", referencedColumnName = "case_worker_id",
-            insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "case_worker_id",referencedColumnName = "case_worker_id",insertable = false,
+            updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
 
-    public CaseWorkerLocation(Integer locationId, String location, Boolean primaryFlag) {
+    public CaseWorkerLocation(String caseWorkerId, Integer locationId,
+                              String location, Boolean primaryFlag) {
 
+        this.caseWorkerId = caseWorkerId;
         this.locationId = locationId;
         this.location = location;
         this.primaryFlag = primaryFlag;

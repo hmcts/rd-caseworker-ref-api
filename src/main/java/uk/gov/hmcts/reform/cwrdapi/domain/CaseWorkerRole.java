@@ -20,8 +20,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Entity(name = "case_worker_role")
 @Getter
@@ -38,8 +36,6 @@ public class CaseWorkerRole implements Serializable {
     private Long caseWorkerRoleId;
 
     @Column(name = "case_worker_id")
-    @NotNull
-    @Size(max = 64)
     private String caseWorkerId;
 
     @Column(name = "role_id", unique = true)
@@ -66,8 +62,8 @@ public class CaseWorkerRole implements Serializable {
             insertable = false, updatable = false, nullable = false)
     private RoleType roleType;
 
-    public CaseWorkerRole(Long roleId, Boolean primaryFlag) {
-
+    public CaseWorkerRole(String caseWorkerId, Long roleId, Boolean primaryFlag) {
+        this.caseWorkerId = caseWorkerId;
         this.roleId = roleId;
         this.primaryFlag = primaryFlag;
     }

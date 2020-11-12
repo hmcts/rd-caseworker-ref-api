@@ -105,13 +105,14 @@ public class CaseWorkerProfile implements Serializable {
     private UserType userType;
 
     public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
-                             String region) {
+                             Integer regionId, String region) {
 
         this.caseWorkerId = caseWorkerId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailId = emailId;
         this.userTypeId = userTypeId;
+        this.regionId = regionId;
         this.region = region;
     }
 }

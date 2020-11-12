@@ -36,10 +36,6 @@ public class CaseWorkerIdamRoleAssociation implements Serializable {
     @Column(name = "cw_idam_role_assoc_id")
     private Long caseWorkerIdamRoleAssociationId;
 
-    @Column(name = "role_id")
-    @NotNull
-    private Long roleId;
-
     @Column(name = "service_code")
     @NotNull
     @Size(max = 16)

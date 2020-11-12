@@ -17,7 +17,7 @@ public class CaseWorkersProfileCreationRequest {
     private String firstName;
     private String lastName;
     private String emailId;
-    private String regionId;
+    private Integer regionId;
     private String userType;
     private String region;
     private boolean deleteFlag;
@@ -31,7 +31,7 @@ public class CaseWorkersProfileCreationRequest {
     public CaseWorkersProfileCreationRequest( @JsonProperty("first_name") String firstName,
             @JsonProperty("last_name") String lastName,
             @JsonProperty("email_id") String emailId,
-            @JsonProperty("region_id") String regionId,
+            @JsonProperty("region_id") Integer regionId,
             @JsonProperty("user_type") String userType,
             @JsonProperty("region") String region,
             @JsonProperty("delete_flag") boolean deleteFlag,
