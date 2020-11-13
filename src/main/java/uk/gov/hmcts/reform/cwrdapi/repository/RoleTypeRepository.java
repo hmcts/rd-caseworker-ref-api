@@ -8,5 +8,4 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 public interface RoleTypeRepository extends JpaRepository<RoleType,Long> {
 
 
-
 }

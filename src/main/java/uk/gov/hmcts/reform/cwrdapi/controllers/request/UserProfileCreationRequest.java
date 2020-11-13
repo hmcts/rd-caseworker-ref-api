@@ -31,7 +31,7 @@ public class UserProfileCreationRequest  {
     private UserCategory userCategory;
 
     @NotBlank
-    private UserType userType;
+    private UserTypeRequest userType;
 
     @NotEmpty
     private Set<String> roles;
@@ -44,7 +44,7 @@ public class UserProfileCreationRequest  {
                                       @JsonProperty(value = "lastName") String lastName,
                                       @JsonProperty(value = "languagePreference") LanguagePreference languagePreference,
                                       @JsonProperty(value = "userCategory") UserCategory userCategory,
-                                      @JsonProperty(value = "userType") UserType userType,
+                                      @JsonProperty(value = "userType") UserTypeRequest userType,
                                       @JsonProperty(value = "roles") Set<String> roles,
                                       @JsonProperty(value = "resendInvite") boolean resendInvite) {
 

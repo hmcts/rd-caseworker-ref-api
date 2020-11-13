@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserType;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 
 import java.util.HashSet;
@@ -66,7 +66,7 @@ public class CaseWorkerUtil {
                 cwrdProfileRequest.getLastName(),
                 LanguagePreference.EN,
                 UserCategory.CASEWORKER,
-                UserType.INTERNAL,
+                UserTypeRequest.INTERNAL,
                 userRoles,
                 false);
 

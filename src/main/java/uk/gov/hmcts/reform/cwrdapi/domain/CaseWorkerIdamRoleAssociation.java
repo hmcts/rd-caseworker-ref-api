@@ -34,7 +34,7 @@ public class CaseWorkerIdamRoleAssociation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cw_idam_role_assoc_id_seq")
     @Column(name = "cw_idam_role_assoc_id")
-    private Long caseWorkerIdamRoleAssociationId;
+    private Long cwIdamRoleAssociationId;
 
     @Column(name = "service_code")
     @NotNull

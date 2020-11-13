@@ -26,7 +26,7 @@ create table case_worker_location(
 	created_date timestamp,
 	last_update timestamp,
 	constraint case_worker_location_pk primary key (case_worker_location_id),
-	constraint case_worker_locn_id_uq unique (location_id)
+	constraint case_worker_locn_id_uq unique (case_worker_id,location_id)
 );
 
 
