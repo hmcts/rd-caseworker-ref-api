@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl;
@@ -99,6 +101,10 @@ public class WelcomeController {
     @RequestMapping(value = "/upload-file", method = RequestMethod.POST, consumes = "multipart/form-data")
     public ResponseEntity<String> handleFormUpload(@RequestParam("file") MultipartFile file) {
         Workbook workbook = excelValidatorService.validateExcelFile(file);
+
+        if (containsIgnoreCase(file.getOriginalFilename(), "caseworker")) {
+            excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
+        }
 
         return ResponseEntity
                 .ok()
