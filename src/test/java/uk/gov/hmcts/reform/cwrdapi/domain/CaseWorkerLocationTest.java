@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CaseWorkerLocationTest {
     @Test
@@ -35,5 +36,13 @@ public class CaseWorkerLocationTest {
 
         assertNotNull(caseWorkerLocation.getCaseWorkerProfile());
         assertThat(caseWorkerLocation.getCaseWorkerProfile().getCaseWorkerId(), is("CWID1"));
+    }
+
+    @Test
+    public void testCaseWorkerLocationWithPrimaryFlagSetToTrue() {
+        CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
+        caseWorkerLocation.setPrimaryFlag(true);
+
+        assertTrue(caseWorkerLocation.getPrimaryFlag());
     }
 }
