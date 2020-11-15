@@ -16,7 +16,7 @@ public class CaseWorkerLocationRequest {
     private boolean isPrimaryFlag;
 
     @JsonCreator
-    CaseWorkerLocationRequest(@JsonProperty("location_id") Integer locationId,
+    public CaseWorkerLocationRequest(@JsonProperty("location_id") Integer locationId,
                               @JsonProperty("location") String location,
                               @JsonProperty("is_primary") boolean isPrimaryFlag) {
 

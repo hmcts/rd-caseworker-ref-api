@@ -34,7 +34,7 @@ public class WelcomeController {
 
 
 
-/**
+    /**
      * Root GET endpoint.
      *
      * <p>Azure application service has a hidden feature of making requests to root endpoint when

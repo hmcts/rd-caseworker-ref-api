@@ -15,7 +15,7 @@ public class CaseWorkerWorkAreaRequest {
     private String serviceCode;
 
     @JsonCreator
-    CaseWorkerWorkAreaRequest(@JsonProperty("area_of_work") String areaOfWork,
+    public CaseWorkerWorkAreaRequest(@JsonProperty("area_of_work") String areaOfWork,
                               @JsonProperty("service_code") String serviceCode) {
         this.areaOfWork = areaOfWork;
         this.serviceCode = serviceCode;

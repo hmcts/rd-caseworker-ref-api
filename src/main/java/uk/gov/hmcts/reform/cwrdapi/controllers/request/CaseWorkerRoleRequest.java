@@ -15,7 +15,7 @@ public class CaseWorkerRoleRequest {
     private boolean isPrimaryFlag;
 
     @JsonCreator
-    CaseWorkerRoleRequest(@JsonProperty("role") String role,
+    public CaseWorkerRoleRequest(@JsonProperty("role") String role,
                           @JsonProperty("is_primary")boolean isPrimaryFlag) {
 
         this.role = role;

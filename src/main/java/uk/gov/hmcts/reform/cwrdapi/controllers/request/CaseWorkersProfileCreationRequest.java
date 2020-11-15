@@ -28,7 +28,7 @@ public class CaseWorkersProfileCreationRequest {
     private List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests;
 
     @JsonCreator
-    public CaseWorkersProfileCreationRequest( @JsonProperty("first_name") String firstName,
+    public CaseWorkersProfileCreationRequest(@JsonProperty("first_name") String firstName,
             @JsonProperty("last_name") String lastName,
             @JsonProperty("email_id") String emailId,
             @JsonProperty("region_id") Integer regionId,
