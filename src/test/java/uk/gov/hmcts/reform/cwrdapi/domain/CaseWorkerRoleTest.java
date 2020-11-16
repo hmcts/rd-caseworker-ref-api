@@ -42,6 +42,12 @@ public class CaseWorkerRoleTest {
         assertNotNull(caseWorkerRole.getRoleType());
         assertThat(caseWorkerRole.getRoleType().getRoleId(), is(1L));
 
+        CaseWorkerRole caseWorkerRole1 = new CaseWorkerRole("caseWorkerId", 1L, true);
+        assertNotNull(caseWorkerRole1);
+        assertThat(caseWorkerRole1.getCaseWorkerId(), is("caseWorkerId"));
+        assertThat(caseWorkerRole1.getRoleId(), is(1L));
+        assertThat(caseWorkerRole1.getPrimaryFlag(), is(true));
+
     }
 
     @Test
