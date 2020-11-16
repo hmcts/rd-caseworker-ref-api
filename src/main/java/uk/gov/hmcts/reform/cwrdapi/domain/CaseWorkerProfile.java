@@ -43,6 +43,7 @@ import javax.validation.constraints.Size;
         }
 )
 public class CaseWorkerProfile implements Serializable {
+
     @Id
     @Column(name = "case_worker_id")
     @Size(max = 64)
