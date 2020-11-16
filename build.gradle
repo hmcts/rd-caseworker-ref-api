@@ -317,8 +317,7 @@ dependencies {
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
-  compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+  compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
