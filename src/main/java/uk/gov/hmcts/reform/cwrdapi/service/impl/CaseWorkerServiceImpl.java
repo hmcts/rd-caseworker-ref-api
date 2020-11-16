@@ -54,18 +54,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     CaseWorkerProfileRepository caseWorkerProfileRepo;
 
     @Autowired
-    RoleTypeRepository roleTypeRepository;
+    static RoleTypeRepository roleTypeRepository;
 
     @Autowired
-    UserTypeRepository userTypeRepository;
+    static UserTypeRepository userTypeRepository;
 
     @Autowired
     CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
 
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
-
-    private static final String IDAM_ERROR_MESSAGE = "{}:: Idam register user failed with status code : %s";
 
     static List<RoleType> roleTypes = new ArrayList<>();
 
@@ -78,29 +76,19 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public ResponseEntity<Object> saveOrUpdateOrDeleteCaseWorkerUserProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        if (roleTypes.size() == 0) {
-            roleTypes = roleTypeRepository.findAll();
-        }
-
-        if (userTypes.size() == 0) {
-            userTypes = userTypeRepository.findAll();
-        }
-
         try {
-
+            getRolesAndUserTypes();
             cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
                 CaseWorkerProfile caseWorkerProfileRespose = null;
 
-                CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
+                caseWorkerProfile = caseWorkerProfileRepo
                         .findByEmailId(cwrProfileCreationRequest.getEmailId());
                 if (Objects.isNull(caseWorkerProfile)) {
 
                     caseWorkerProfileRespose = createCaseWorkerProfile(cwrProfileCreationRequest);
                     if (Objects.nonNull(caseWorkerProfileRespose)) {
-
                         // collecting all the successfully case worker profiles to save in caseworker db.
                         caseWorkerProfiles.add(caseWorkerProfileRespose);
-                        //caseWorkerProfileRepo.save(caseWorkerProfileRespose);
 
                     }
                 } else if (Objects.nonNull(caseWorkerProfile) && !caseWorkerProfile.getDeleteFlag()) {
@@ -183,13 +171,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             //caseWorkerWorkAreas setting to case worker profile
             caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
-
-
         } else {
-            Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
             //Add failed request to list and save to the exception table
-            log.error("{}:: " + String.format(IDAM_ERROR_MESSAGE, responseEntity.getStatusCode().value()),
-                    loggingComponentName, idamRoles);
+            log.error("{}::Idam register user failed", loggingComponentName);
 
         }
         return caseWorkerProfile;
@@ -224,7 +208,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
                 new HashSet<String>();
         userRoles.add("cwd-user");
-        //userRoles.addAll(getUserRolesByRoleId(cwrdProfileRequest));
+
+        Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
+        if (idamRoles.size() > 0) {
+            userRoles.addAll(idamRoles);
+        }
         //Creating user profile request
         return  new UserProfileCreationRequest(
                 cwrdProfileRequest.getEmailId(),
@@ -237,6 +225,17 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 false);
     }
 
+
+    public static void getRolesAndUserTypes() {
+
+        if (roleTypes.isEmpty()) {
+            roleTypes = roleTypeRepository.findAll();
+        }
+
+        if (userTypes.isEmpty()) {
+            userTypes = userTypeRepository.findAll();
+        }
+    }
 
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerIdamRoleAssociation>  idamRolesInRequest = new ArrayList<>();
