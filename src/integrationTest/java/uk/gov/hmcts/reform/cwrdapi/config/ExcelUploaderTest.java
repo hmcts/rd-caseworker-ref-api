@@ -110,7 +110,7 @@ public class ExcelUploaderTest extends SpringBootIntegrationTest {
     @Test
     public void parseXlsxShouldReturnWorkbookObjectTest() throws IOException {
         Workbook workbook = excelValidatorService.validateExcelFile(
-                getMultipartFile("src/integrationTest/resources/WithXlsxOnlyHeader.xlsx",
+                getMultipartFile("src/integrationTest/resources/WithCorrectPassword.xlsx",
                         TYPE_XLSX));
         List<Object> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);

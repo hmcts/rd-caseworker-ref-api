@@ -22,6 +22,7 @@ import java.util.Map;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.negate;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 @SuppressWarnings("unchecked")
@@ -42,7 +43,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         try {
             return mapToPojo(headers, sheet, classType);
         } catch (Exception e) {
-            throw new ExcelValidationException(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
+            throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
         }
 
     }
