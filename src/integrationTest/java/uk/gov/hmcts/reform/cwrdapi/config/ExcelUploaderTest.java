@@ -21,10 +21,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
+import static uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorServiceImpl.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.INVALID_EXCEL_FILE_ERROR_MESSAGE;
 
 @RunWith(SpringRunner.class)
 public class ExcelUploaderTest extends SpringBootIntegrationTest {
@@ -113,7 +113,7 @@ public class ExcelUploaderTest extends SpringBootIntegrationTest {
                 getMultipartFile("src/integrationTest/resources/WithXlsxOnlyHeader.xlsx",
                         TYPE_XLSX));
         List<Object> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
-        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows()-1);
+        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
@@ -132,6 +132,6 @@ public class ExcelUploaderTest extends SpringBootIntegrationTest {
 
         Assertions.assertThatThrownBy(() -> excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage("Invalid Excel File");
+                .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
     }
 }

@@ -26,6 +26,8 @@ import static org.apache.commons.lang3.BooleanUtils.negate;
 @Service
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
+    public static String FILE_NO_DATA_ERROR_MESSAGE = "No data in Excel File";
+    public static String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
 
     public List<Object> parseExcel(Workbook workbook, Class classType) {
         List<String> headers = new LinkedList<>();
@@ -34,13 +36,13 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
         // check at least 1 row
         if (sheet.getPhysicalNumberOfRows() < 2) {
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, "Invalid Excel File");
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
 
         try {
             return mapToPojo(headers, sheet, classType);
         } catch (Exception e) {
-            throw new ExcelValidationException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while parsing ");
+            throw new ExcelValidationException(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
         }
 
     }
