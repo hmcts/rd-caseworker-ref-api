@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import static org.apache.poi.hssf.record.crypto.Biff8EncryptionKey.setCurrentUserPassword;
-
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.crypt.Decryptor;
@@ -12,11 +10,17 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.util.IOUtils;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.web.multipart.MultipartFile;
+
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
+
 import java.io.IOException;
 import java.io.InputStream;
+
+import static org.apache.poi.hssf.record.crypto.Biff8EncryptionKey.setCurrentUserPassword;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class WorkBookCustomFactory extends WorkbookFactory {
 
@@ -67,13 +71,12 @@ public class WorkBookCustomFactory extends WorkbookFactory {
                             setCurrentUserPassword(null);
                         }
                     }
-                    throw new ExcelValidationException
-                            (HttpStatus.BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                    throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
                 }
             case OOXML:
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
             default:
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
+                throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
         }
     }
 
@@ -94,7 +97,7 @@ public class WorkBookCustomFactory extends WorkbookFactory {
         try {
             Class.forName(factoryClass, true, WorkbookFactory.class.getClassLoader());
         } catch (ClassNotFoundException e) {
-            throw new ExcelValidationException(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE);
+            throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE);
         }
     }
 }

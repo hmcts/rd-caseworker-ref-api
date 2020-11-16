@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang3.BooleanUtils.negate;
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -13,18 +9,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import static java.lang.Boolean.TRUE;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.BooleanUtils.negate;
 
 @Service
+@SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
     public List<Object> parseExcel(Workbook workbook, Class classType) {
@@ -56,21 +56,16 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
     public List<Object> mapToPojo(List<String> headers, Sheet sheet, Class classType) throws ClassNotFoundException,
             IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        int headerIndex = 0;
         List<Object> objectList = new ArrayList<>();
-        Set<Class> childClassNames= new HashSet<>();
-        Map<String, Object> childClassHeaderValues = new HashMap<>();
+        Map<String, Object> childHeaderValues = new HashMap<>();
         Iterator<Row> rowIterator = sheet.rowIterator();
         rowIterator.next();//skip header
-        while(rowIterator.hasNext()) {
+        while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Object bean = Class.forName(classType.getName()).getDeclaredConstructor().newInstance();
-            Iterator<Cell> cellIterator = row.cellIterator();
-            while(cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-                Object cellValue = getCellValue(cell);
-                setFields(cellValue, bean, headers ,headerIndex, childClassNames, childClassHeaderValues);
-                headerIndex = headerIndex + 1;
+            Map<String, Field> fieldHashMap = getBeanFields(bean);
+            for (int i = 0; i < headers.size(); i++) {
+                setFields(getCellValue(row.getCell(i)), bean, headers.get(i), fieldHashMap, childHeaderValues);
             }
             //populateChildObjects(bean, childClassNames, childClassHeaderValues);
             objectList.add(bean);
@@ -78,74 +73,42 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         return objectList;
     }
 
-    private void populateChildObjects(Object bean,
-                           List<Class> childClassNames, Map<String, Object> childClassHeaderValues)
-            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
-            InvocationTargetException, InstantiationException {
-            try {
-                for (Field field : bean.getClass().getDeclaredFields()) {
-                    MappingField mappingField = AnnotationUtils.findAnnotation(field, MappingField.class);
-                    if (mappingField.columnName().isBlank()) {
-                        Class listType = mappingField.clazz();
-                        //List<listType> lists = new ArrayList<>();
-                        List list = (List)Class.forName("java.util.ArrayList").getDeclaredConstructor().newInstance();
-                        Object childBean = Class.forName(mappingField.clazz().getName()).getDeclaredConstructor().newInstance();
-                        for (Field childBeanField : childBean.getClass().getDeclaredFields()) {
-                            MappingField mappingFieldForChild = AnnotationUtils.findAnnotation(childBeanField, MappingField.class);
-                            childClassHeaderValues.forEach((k, v) -> {
-                                if(containsIgnoreCase(k, mappingFieldForChild.columnName())){
-                                    childBeanField.setAccessible(TRUE);
-                                    try {
-                                        childBeanField.set(childBean, v);
-                                        list.add(childBeanField);
-                                    } catch (IllegalAccessException e) {
-                                        throw new ExcelValidationException(HttpStatus.BAD_REQUEST, "Invalid Excel File");
-                                    }
-                                }
-                            });
-
-                        }
-
-                        field.setAccessible(TRUE);
-                        field.set(bean, list);
-                    }
-                }
-            } catch (IllegalAccessException ex) {
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, "Invalid Excel File");
-            }
+    private void setFields(Object cellValue, Object bean, String header, Map<String, Field> fieldHashMap,
+                           Map<String, Object> childHeaderValues) throws IllegalAccessException {
+        Field field = fieldHashMap.get(header);
+        if (nonNull(field)) {
+            field.setAccessible(TRUE);
+            field.set(bean, cellValue);
+            fieldHashMap.remove(header);
+        } else {
+            childHeaderValues.put(header, cellValue);
         }
+    }
 
-
-
-    private void setFields(Object cellValue, Object bean, List<String> headers, int headerIndex,
-                           Set<Class> childClassNames, Map<String, Object> childClassHeaderValues) {
+    //called once per Row/Object
+    private Map<String, Field> getBeanFields(Object bean) {
+        Map<String, Field> fieldHashMap = new HashMap<>();
         Class objectClass = bean.getClass();
-        try {
-            for (Field field : objectClass.getDeclaredFields()) {
-                MappingField mappingField = AnnotationUtils.findAnnotation(field, MappingField.class);
-                if (negate(mappingField.columnName().isBlank()) &&
-                        headers.get(headerIndex).equals(mappingField.columnName())) {
-                        field.setAccessible(TRUE);
-                        field.set(bean, cellValue);
-                } else {
-                    // map set
-                    childClassHeaderValues.put(headers.get(headerIndex), cellValue);
-                    childClassNames.add(mappingField.clazz());
-
-                }
+        Field[] fields = objectClass.getDeclaredFields();
+        for (Field field: fields) {
+            MappingField mappingField = AnnotationUtils.findAnnotation(field, MappingField.class);
+            if (negate(mappingField.columnName().isEmpty())) {
+                fieldHashMap.put(mappingField.columnName(), field);
+            } else {
+                fieldHashMap.put(mappingField.clazz().getCanonicalName(), field);
             }
-        } catch (IllegalAccessException ex) {
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, "Invalid Excel File");
         }
+        return fieldHashMap;
     }
 
     public Object getCellValue(Cell cell) {
         switch (cell.getCellType()) {
             case STRING:
-                 return cell.getStringCellValue();
+                return cell.getStringCellValue();
             case NUMERIC:
-                 return cell.getNumericCellValue();
-            default: return null;
+                return Double.valueOf(cell.getNumericCellValue()).intValue();
+            default:
+                return null;
         }
     }
 }

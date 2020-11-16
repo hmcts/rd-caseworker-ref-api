@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -22,10 +19,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl;
+
 import java.util.UUID;
+
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Default endpoints per application.
@@ -87,7 +87,8 @@ public class WelcomeController {
             produces = APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public ResponseEntity<String> uploadCaseWorkerProfile(@RequestPart(value = "file",required = true) MultipartFile file) {
+    public ResponseEntity<String> uploadCaseWorkerProfile(
+            @RequestPart(value = "file",required = true) MultipartFile file) {
 
 
         Workbook workbook = excelValidatorService.validateExcelFile(file);
@@ -99,7 +100,7 @@ public class WelcomeController {
     }
 
     @RequestMapping(value = "/upload-file", method = RequestMethod.POST, consumes = "multipart/form-data")
-    public ResponseEntity<String> handleFormUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file) {
         Workbook workbook = excelValidatorService.validateExcelFile(file);
 
         if (containsIgnoreCase(file.getOriginalFilename(), "caseworker")) {
@@ -107,8 +108,7 @@ public class WelcomeController {
         }
 
         return ResponseEntity
-                .ok()
-                .cacheControl(CacheControl.noCache())
-                .body("{\"message\": \"" + MESSAGE + "\"}");
+                .ok().build();
+
     }
 }

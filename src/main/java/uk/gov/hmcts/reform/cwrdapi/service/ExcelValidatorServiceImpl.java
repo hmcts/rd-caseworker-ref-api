@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import static org.apache.commons.lang3.BooleanUtils.negate;
-import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.validatePasswordAndGetWorkBook;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -13,7 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
+
 import java.io.IOException;
+
+import static org.apache.commons.lang3.BooleanUtils.negate;
+import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.validatePasswordAndGetWorkBook;
 
 @Slf4j
 @Service
@@ -22,7 +22,8 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
     public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public static String TYPE_XLS = "application/vnd.ms-excel";
     public static String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "File provided in request is not in xls(x) format";
-    public static String FILE_PASSWORD_INCORRECT_ERROR_MESSAGE = "Failed to open the file. Please provide the file with a valid password.";
+    public static String FILE_PASSWORD_INCORRECT_ERROR_MESSAGE =
+            "Failed to open the file. Please provide the file with a valid password.";
 
     @Value("${excel.password}")
     private String excelPassword;

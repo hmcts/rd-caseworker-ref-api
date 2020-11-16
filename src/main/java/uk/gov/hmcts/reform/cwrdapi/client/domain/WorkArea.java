@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+@NoArgsConstructor
 public class WorkArea {
 
     @MappingField(columnName = "Aow1 Service Code,Aow2 Service Code,Aow3 Service Code,Aow4 Service Code,"
