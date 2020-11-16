@@ -202,6 +202,8 @@ sonarqube {
     property "sonar.pitest.mode", "reuseReport"
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/cwrdapi/config/**," +
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**,"
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
   }
 }
@@ -315,6 +317,8 @@ dependencies {
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
+// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+  compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
 
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath

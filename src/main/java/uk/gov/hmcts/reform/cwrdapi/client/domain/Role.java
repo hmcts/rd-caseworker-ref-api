@@ -12,11 +12,8 @@ public class Role {
 
     private int roleId;
 
-    @MappingField(columnName = "Primary Role")
-    private String primaryRoleName;
-
-    @MappingField(columnName = "Secondary Role")
-    private String secondaryRoleName;
+    @MappingField(columnName = "Primary Role,Secondary Role")
+    private String roleName;
 
     private boolean isPrimary;
 }

@@ -37,12 +37,13 @@ spring:
             client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
-  flyway.locations: classpath:db/migration
+  flyway.locations: classpath:db/testmigration
 
   ### database configuration
   datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5457}/${POSTGRES_DB_NAME:dbrdcaseworker}${POSTGRES_CONNECTION_OPTIONS:}
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:dbrdcaseworker
+    platform: h2
     username: ${POSTGRES_USERNAME:dbrdcaseworker}
     password: ${POSTGRES_PASSWORD:dbrdcaseworker}
     min-idle: 1

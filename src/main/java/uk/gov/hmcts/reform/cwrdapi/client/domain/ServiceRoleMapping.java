@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 @Getter
 @Setter
-public class ServiceRoleMapping implements ICasWorkerDomain {
+public class ServiceRoleMapping extends CasWorkerDomain {
 
     @MappingField(columnName = "Service ID")
     @NotEmpty

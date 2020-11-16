@@ -12,7 +12,7 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 @Getter
 @Setter
-public class CaseWorkerProfile implements ICasWorkerDomain {
+public class CaseWorkerProfile extends CasWorkerDomain {
 
     @MappingField(columnName = "FIRST NAME")
     @NotEmpty
