@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
