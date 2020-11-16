@@ -10,17 +10,21 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.INVALID_EXCEL_FILE_ERROR_MESSAGE;
 
 @RunWith(SpringRunner.class)
 public class ExcelUploaderTest extends SpringBootIntegrationTest {
@@ -30,6 +34,9 @@ public class ExcelUploaderTest extends SpringBootIntegrationTest {
 
     @Autowired
     ExcelValidatorServiceImpl excelValidatorService;
+
+    @Autowired
+    ExcelAdaptorServiceImpl excelAdaptorService;
 
     @Test
     public void sendXlsWithCorrectPasswordTest() throws IOException {
@@ -98,5 +105,33 @@ public class ExcelUploaderTest extends SpringBootIntegrationTest {
         FileInputStream input = new FileInputStream(file);
         return new MockMultipartFile("file",
                 file.getName(), fileType, IOUtils.toByteArray(input));
+    }
+
+    @Test
+    public void parseXlsxShouldReturnWorkbookObjectTest() throws IOException {
+        Workbook workbook = excelValidatorService.validateExcelFile(
+                getMultipartFile("src/integrationTest/resources/WithXlsxOnlyHeader.xlsx",
+                        TYPE_XLSX));
+        List<Object> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
+        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows()-1);
+        CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
+        assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
+        assertThat(caseWorkerProfile.getLastName()).isNotBlank();
+        assertThat(caseWorkerProfile.getOfficialEmail()).isNotBlank();
+        assertThat(caseWorkerProfile.getRegionName()).isNotBlank();
+        assertThat(caseWorkerProfile.getUserType()).isNotBlank();
+        assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
+        assertThat(caseWorkerProfile.getDeleteFlag()).isNotBlank();
+    }
+
+    @Test
+    public void parseXlsxShouldThrowExceptionWhenOnlyHeaderPresentTest() throws IOException {
+        Workbook workbook = excelValidatorService.validateExcelFile(
+                getMultipartFile("src/integrationTest/resources/WithXlsxOnlyHeader.xlsx",
+                        TYPE_XLSX));
+
+        Assertions.assertThatThrownBy(() -> excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class))
+                .isExactlyInstanceOf(ExcelValidationException.class)
+                .hasMessage("Invalid Excel File");
     }
 }
