@@ -123,4 +123,13 @@ public class CaseWorkerProfileTest {
         caseWorkerLocation.setDeleteFlag(false);
         assertFalse(caseWorkerLocation.getDeleteFlag());
     }
+
+    @Test
+    public void testCaseWorkerProfileAllArgsConstructor() {
+        CaseWorkerProfile caseWorkerProfile = new
+                CaseWorkerProfile("CWID1", "testFN", "testLN", "test@test.com",
+                1L,  "testRegion", 2, true, LocalDateTime.now(), LocalDateTime.now(),
+                LocalDateTime.now(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), null);
+        assertNotNull(caseWorkerProfile);
+    }
 }

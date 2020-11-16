@@ -29,4 +29,16 @@ public class CaseWorkerIdamRoleAssociationTest {
         assertNotNull(caseWorkerIdamRoleAssociation.getCreatedDate());
         assertNotNull(caseWorkerIdamRoleAssociation.getLastUpdate());
     }
+
+    @Test
+    public void testCaseWorkerIdamRoleAssociationContainingRoleType() {
+
+        RoleType roleType = new RoleType();
+        roleType.setRoleId(1L);
+
+        CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
+        caseWorkerIdamRoleAssociation.setRoleType(roleType);
+
+        assertNotNull(caseWorkerIdamRoleAssociation.getRoleType());
+    }
 }
