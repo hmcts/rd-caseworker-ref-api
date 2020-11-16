@@ -8,6 +8,7 @@ import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,8 +50,12 @@ public class CaseWorkerRefController {
                     message = "Bad Request"
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "No Caseworker profiles found with the given ID"
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied for invalid permissions"
             ),
             @ApiResponse(
                     code = 500,
@@ -58,13 +63,13 @@ public class CaseWorkerRefController {
             )
     })
     @PostMapping(produces = APPLICATION_JSON_VALUE)
+    @Secured("cwd-admin")
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
         if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
 
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
-
         return caseWorkerService.saveOrUpdateOrDeleteCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
     }
 }

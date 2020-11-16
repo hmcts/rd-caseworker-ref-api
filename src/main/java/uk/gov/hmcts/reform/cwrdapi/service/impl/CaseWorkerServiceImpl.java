@@ -53,10 +53,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     CaseWorkerProfileRepository caseWorkerProfileRepo;
 
     @Autowired
-    static RoleTypeRepository roleTypeRepository;
+    RoleTypeRepository roleTypeRepository;
 
     @Autowired
-    static UserTypeRepository userTypeRepository;
+    UserTypeRepository userTypeRepository;
 
     @Autowired
     CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
@@ -64,9 +64,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
 
-    static List<RoleType> roleTypes = new ArrayList<>();
+    List<RoleType> roleTypes = new ArrayList<>();
 
-    static List<UserType> userTypes = new ArrayList<>();
+    List<UserType> userTypes = new ArrayList<>();
 
     CaseWorkerProfile caseWorkerProfile = null;
 
@@ -178,7 +178,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return caseWorkerProfile;
     }
 
-
+    /**
+     *  Idam_UP call.
+     *
+     */
     private ResponseEntity<Object> createUserProfileInIdamUP(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Response response = null;
@@ -200,14 +203,13 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     /**
      * creating user profile request.
-     * @return
+     *
      * */
     public UserProfileCreationRequest createUserProfileRequest(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
                 new HashSet<String>();
         userRoles.add("cwd-user");
-
         Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
         if (idamRoles.size() > 0) {
             userRoles.addAll(idamRoles);
@@ -224,8 +226,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 false);
     }
 
-
-    public static void getRolesAndUserTypes() {
+    /**
+     *  get the roleTypes and userTypes.
+     */
+    public  void getRolesAndUserTypes() {
 
         if (roleTypes.isEmpty()) {
             roleTypes = roleTypeRepository.findAll();
@@ -236,6 +240,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
     }
 
+    /**
+     *  get the roles that needs to send to idam based on the roleType in the request.
+     */
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerIdamRoleAssociation>  idamRolesInRequest = new ArrayList<>();
         cwrdProfileRequest.getRoles().forEach(role -> {
@@ -256,6 +263,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return idamRoles;
     }
 
+    /**
+     * get the userTypeId by description.
+     */
     public Long getUserTypeIdByDesc(String  userTypeReq) {
         Long userTypeId = 0L;
         for (UserType userType : userTypes) {

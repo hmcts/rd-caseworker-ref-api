@@ -119,9 +119,9 @@ public class CaseWorkerProfileTest {
 
     @Test
     public void testCaseWorkerProfileContainingDeleteFlag() {
-        CaseWorkerProfile caseWorkerLocation = new CaseWorkerProfile();
-        caseWorkerLocation.setDeleteFlag(false);
-        assertFalse(caseWorkerLocation.getDeleteFlag());
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setDeleteFlag(false);
+        assertFalse(caseWorkerProfile.getDeleteFlag());
     }
 
     @Test
