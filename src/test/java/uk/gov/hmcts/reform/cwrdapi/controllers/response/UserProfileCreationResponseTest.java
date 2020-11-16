@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.response;
 
 import org.junit.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class UserProfileCreationResponseTest {
 
@@ -20,12 +18,5 @@ public class UserProfileCreationResponseTest {
 
         assertThat(userProfileCreationResponse.getIdamId()).isEqualTo(testUuid);
         assertThat(userProfileCreationResponse.getIdamRegistrationResponse()).isEqualTo(201);
-    }
-
-    @Test
-    public void test_isUserCreated() {
-        userProfileCreationResponse.setIdamRegistrationResponse(HttpStatus.CREATED.value());
-
-        assertTrue(userProfileCreationResponse.isUserCreated());
     }
 }
