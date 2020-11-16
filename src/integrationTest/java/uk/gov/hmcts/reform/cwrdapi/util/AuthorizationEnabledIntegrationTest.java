@@ -58,8 +58,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @ClassRule
     public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
 
-    @Value("${prd.security.roles.cwrd-admin}")
-    protected String cwrdAdmin;
+    @Value("${cwrd.security.roles.cwd-admin}")
+    public String cwdAdmin;
 
     @Value("${oidc.issuer}")
     private String issuer;
