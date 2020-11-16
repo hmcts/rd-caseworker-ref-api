@@ -73,6 +73,6 @@ public class CaseWorkerRefControllerTest {
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         verify(caseWorkerServiceMock,times(1))
-                .createCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
+                .saveOrUpdateOrDeleteCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
     }
 }

@@ -73,20 +73,9 @@ public class ExceptionMapper {
 
     }
 
-    @ExceptionHandler(CwrdApiException.class)
-    public ResponseEntity<Object> getExceptionError(CwrdApiException ex) {
-        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getErrorMessage());
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         return errorDetailsResponseEntity(ex,INTERNAL_SERVER_ERROR, ErrorConstants.UNKNOWN_EXCEPTION.getErrorMessage());
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Object> handleResourceNotFoundException(
-        ResourceNotFoundException ex) {
-        return errorDetailsResponseEntity(ex, NOT_FOUND, ErrorConstants.EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

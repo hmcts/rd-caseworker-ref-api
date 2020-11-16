@@ -75,7 +75,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
     @Override
-    public ResponseEntity<Object> createCaseWorkerUserProfiles(List<CaseWorkersProfileCreationRequest>
+    public ResponseEntity<Object> saveOrUpdateOrDeleteCaseWorkerUserProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         if (roleTypes.size() == 0) {
@@ -95,7 +95,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .findByEmailId(cwrProfileCreationRequest.getEmailId());
                 if (Objects.isNull(caseWorkerProfile)) {
 
-                    caseWorkerProfileRespose = saveCaseWorkerProfile(cwrProfileCreationRequest);
+                    caseWorkerProfileRespose = createCaseWorkerProfile(cwrProfileCreationRequest);
                     if (Objects.nonNull(caseWorkerProfileRespose)) {
 
                         // collecting all the successfully case worker profiles to save in caseworker db.
@@ -129,7 +129,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
     }
 
-    public CaseWorkerProfile saveCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+    public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         List<CaseWorkerLocation> cwLocations = new ArrayList<>();
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();

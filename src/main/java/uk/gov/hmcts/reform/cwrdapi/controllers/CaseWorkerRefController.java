@@ -65,6 +65,6 @@ public class CaseWorkerRefController {
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
 
-        return caseWorkerService.createCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
+        return caseWorkerService.saveOrUpdateOrDeleteCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
     }
 }

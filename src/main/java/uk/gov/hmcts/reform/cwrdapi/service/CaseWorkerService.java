@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CaseWorkerService {
 
-    ResponseEntity<Object> createCaseWorkerUserProfiles(List<CaseWorkersProfileCreationRequest>
+    ResponseEntity<Object> saveOrUpdateOrDeleteCaseWorkerUserProfiles(List<CaseWorkersProfileCreationRequest>
                                                                 caseWorkersProfileCreationRequest);
 
 }
