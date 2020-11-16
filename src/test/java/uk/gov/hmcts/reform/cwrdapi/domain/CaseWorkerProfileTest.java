@@ -128,8 +128,16 @@ public class CaseWorkerProfileTest {
     public void testCaseWorkerProfileAllArgsConstructor() {
         CaseWorkerProfile caseWorkerProfile = new
                 CaseWorkerProfile("CWID1", "testFN", "testLN", "test@test.com",
-                1L,  "testRegion", 2, true, LocalDateTime.now(), LocalDateTime.now(),
-                LocalDateTime.now(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), null);
+                1L,  1, "region");
         assertNotNull(caseWorkerProfile);
+        assertThat(caseWorkerProfile.getCaseWorkerId(), is("CWID1"));
+        assertThat(caseWorkerProfile.getFirstName(), is("testFN"));
+        assertThat(caseWorkerProfile.getLastName(), is("testLN"));
+        assertThat(caseWorkerProfile.getEmailId(), is("test@test.com"));
+        assertThat(caseWorkerProfile.getUserTypeId(), is(1L));
+        assertThat(caseWorkerProfile.getRegion(), is("region"));
+        assertThat(caseWorkerProfile.getRegionId(), is(1));
+
+
     }
 }
