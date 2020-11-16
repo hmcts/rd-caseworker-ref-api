@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
