@@ -37,7 +37,6 @@ public class CaseWorkerLocation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_worker_location_id_seq")
     @Column(name = "case_worker_location_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_worker_location_id_seq")
     private Long caseWorkerLocationId;
 
     @Column(name = "case_worker_id")

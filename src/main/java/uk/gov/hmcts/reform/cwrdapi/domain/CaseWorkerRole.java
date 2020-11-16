@@ -31,7 +31,6 @@ import javax.persistence.UniqueConstraint;
 public class CaseWorkerRole implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_worker_role_id_seq")
     @Column(name = "case_worker_role_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_worker_role_id_seq")
     private Long caseWorkerRoleId;
