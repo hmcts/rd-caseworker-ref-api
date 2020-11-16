@@ -133,7 +133,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             caseWorkerProfile = new CaseWorkerProfile(userProfileCreationResponse.getIdamId(),
                     cwrdProfileRequest.getFirstName(), cwrdProfileRequest.getLastName(),cwrdProfileRequest.getEmailId(),
                             getUserTypeIdByDesc(cwrdProfileRequest.getUserType()), cwrdProfileRequest.getRegionId(),
-                            cwrdProfileRequest.getRegion());
+                            cwrdProfileRequest.getRegion(), false);
 
             //Locations data request mapping
             cwrdProfileRequest.getBaseLocations().forEach(location -> {

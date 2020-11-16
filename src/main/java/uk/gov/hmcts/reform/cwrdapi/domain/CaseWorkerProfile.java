@@ -106,7 +106,7 @@ public class CaseWorkerProfile implements Serializable {
     private UserType userType;
 
     public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
-                             Integer regionId, String region) {
+                             Integer regionId, String region, boolean deleteFlag) {
 
         this.caseWorkerId = caseWorkerId;
         this.firstName = firstName;
@@ -115,5 +115,6 @@ public class CaseWorkerProfile implements Serializable {
         this.userTypeId = userTypeId;
         this.regionId = regionId;
         this.region = region;
+        this.deleteFlag = deleteFlag;
     }
 }
