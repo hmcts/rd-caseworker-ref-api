@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -18,9 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CaseWorkerRefControllerTest {
 
@@ -32,12 +35,19 @@ public class CaseWorkerRefControllerTest {
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequest = new ArrayList<>();
     CaseWorkersProfileCreationRequest cwRequest;
     CaseWorkerProfileCreationResponse cwProfileCreationResponse;
+    CaseWorkerProfileCreationResponse cwResponse;
+    ResponseEntity<Object> responseEntity;
 
     @Before
     public void setUp() throws Exception {
 
         caseWorkerServiceMock = mock(CaseWorkerService.class);
-
+        cwResponse = new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.");
+        responseEntity = new ResponseEntity<>(
+                cwResponse,
+                null,
+                HttpStatus.OK
+        );
         Set<String> roles = new HashSet<>();
         roles.add("tribunal_case_worker");
 
@@ -65,14 +75,22 @@ public class CaseWorkerRefControllerTest {
 
     }
 
-    @Ignore
     @Test
     public void createCaseWorkerProfilesTest() {
 
-        //when(caseWorkerServiceMock.createCaseWorkerUserProfiles(caseWorkersProfileCreationRequest)).thenReturn();
+        when(caseWorkerServiceMock.saveOrUpdateOrDeleteCaseWorkerUserProfiles(caseWorkersProfileCreationRequest))
+             .thenReturn(responseEntity);
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
+        assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
                 .saveOrUpdateOrDeleteCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void createCaseWorkerProfilesShouldThrow400() {
+
+        caseWorkersProfileCreationRequest = null;
+        ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
     }
 }
