@@ -58,5 +58,7 @@ public class ValidationService implements IValidationService {
                 exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now());
                 exceptionCaseWorkers.add(exceptionCaseWorker);
             }));
+        auditService.auditException(exceptionCaseWorkers);
+        //@To do set Audit JOB status to Partial Success in Request Session
     }
 }
