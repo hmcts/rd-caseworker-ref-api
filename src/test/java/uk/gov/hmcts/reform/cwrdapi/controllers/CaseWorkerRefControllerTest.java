@@ -78,13 +78,13 @@ public class CaseWorkerRefControllerTest {
     @Test
     public void createCaseWorkerProfilesTest() {
 
-        when(caseWorkerServiceMock.saveOrUpdateOrDeleteCaseWorkerUserProfiles(caseWorkersProfileCreationRequest))
+        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
              .thenReturn(responseEntity);
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
-                .saveOrUpdateOrDeleteCaseWorkerUserProfiles(caseWorkersProfileCreationRequest);
+                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
     }
 
     @Test(expected = InvalidRequestException.class)

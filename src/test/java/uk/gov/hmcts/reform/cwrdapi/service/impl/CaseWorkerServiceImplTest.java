@@ -118,7 +118,7 @@ public class CaseWorkerServiceImplTest {
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(201).build());
 
         ResponseEntity<Object> objectResponseEntity = caseWorkerServiceImpl
-                .saveOrUpdateOrDeleteCaseWorkerUserProfiles(
+                .processCaseWorkerProfiles(
                         Collections.singletonList(caseWorkersProfileCreationRequest));
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());

@@ -72,7 +72,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
     @Override
-    public ResponseEntity<Object> saveOrUpdateOrDeleteCaseWorkerUserProfiles(List<CaseWorkersProfileCreationRequest>
+    public ResponseEntity<Object> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         try {
@@ -109,7 +109,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         } catch (Exception exp) {
 
-            log.error("{}:: createCaseWorkerUserProfiles failed" + exp, loggingComponentName);
+            log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName,exp);
         }
         return ResponseEntity
                 .status(201)
@@ -118,48 +118,25 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
-        List<CaseWorkerLocation> cwLocations = new ArrayList<>();
-        List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
 
         //User Profile Call
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
-        if (responseEntity != null && responseEntity.getStatusCode().is2xxSuccessful()
-                && null != responseEntity.getBody()) {
+        if (Objects.nonNull(responseEntity) && responseEntity.getStatusCode().is2xxSuccessful()
+                && Objects.nonNull(responseEntity.getBody())) {
 
             UserProfileCreationResponse userProfileCreationResponse
                     = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
+
             // case worker profile request mapping
-            caseWorkerProfile = new CaseWorkerProfile(userProfileCreationResponse.getIdamId(),
-                    cwrdProfileRequest.getFirstName(), cwrdProfileRequest.getLastName(),cwrdProfileRequest.getEmailId(),
-                            getUserTypeIdByDesc(cwrdProfileRequest.getUserType()), cwrdProfileRequest.getRegionId(),
-                            cwrdProfileRequest.getRegion(), false);
+            caseWorkerProfile = mapCaseWorkerProfileRequest(userProfileCreationResponse,cwrdProfileRequest);
 
-            //Locations data request mapping
-            cwrdProfileRequest.getBaseLocations().forEach(location -> {
-
-                CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation(userProfileCreationResponse.getIdamId(),
-                        location.getLocationId(), location.getLocation(), location.isPrimaryFlag());
-                cwLocations.add(caseWorkerLocation);
-            });
-
-            //Locations data setting to case worker profile
-            caseWorkerProfile.setCaseWorkerLocations(cwLocations);
-
-            //caseworker roles request mapping
-            cwrdProfileRequest.getRoles().forEach(role -> {
-
-                roleTypes.stream().forEach(roleType -> {
-                    if (role.getRole().equalsIgnoreCase(roleType.getDescription().trim())) {
-                        CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResponse.getIdamId(),
-                                roleType.getRoleId(),role.isPrimaryFlag());
-                        caseWorkerRoles.add(workerRole);
-                    }
-                });
-
-            });
-            //caseWorkerRoles data setting to case worker profile
-            caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
+            //Locations data request mapping and setting to case worker profile
+            caseWorkerProfile.setCaseWorkerLocations(mapCaseWorkerLocationRequest(userProfileCreationResponse,
+                    cwrdProfileRequest));
+            //caseWorkerRoles roles request mapping and data setting to case worker profile
+            caseWorkerProfile.setCaseWorkerRoles(mapCaseWorkerRoleRequestMapping(userProfileCreationResponse,
+                    cwrdProfileRequest));
 
             //caseworkerworkarea request mapping
             cwrdProfileRequest.getWorkerWorkAreaRequests().forEach(caseWorkerWorkAreaRequest -> {
@@ -176,6 +153,47 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         }
         return caseWorkerProfile;
+    }
+
+    public CaseWorkerProfile mapCaseWorkerProfileRequest(UserProfileCreationResponse userProfileCreationResponse,
+                                            CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+        caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId(userProfileCreationResponse.getIdamId());
+        caseWorkerProfile.setFirstName(cwrdProfileRequest.getFirstName());
+        caseWorkerProfile.setLastName(cwrdProfileRequest.getLastName());
+        caseWorkerProfile.setEmailId(cwrdProfileRequest.getEmailId().toLowerCase());
+        caseWorkerProfile.setDeleteFlag(false);
+        caseWorkerProfile.setUserTypeId(getUserTypeIdByDesc(cwrdProfileRequest.getUserType()));
+        caseWorkerProfile.setRegionId(cwrdProfileRequest.getRegionId());
+        caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());
+        return caseWorkerProfile;
+    }
+
+    public List<CaseWorkerLocation> mapCaseWorkerLocationRequest(UserProfileCreationResponse userProfileCreationResp,
+                                             CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+        List<CaseWorkerLocation> cwLocations = new ArrayList<>();
+        cwrdProfileRequest.getBaseLocations().forEach(location -> {
+
+            CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation(userProfileCreationResp.getIdamId(),
+                    location.getLocationId(), location.getLocation(), location.isPrimaryFlag());
+            cwLocations.add(caseWorkerLocation);
+        });
+        return cwLocations;
+    }
+
+    public  List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
+                                                CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+        List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
+        cwrdProfileRequest.getRoles().forEach(role -> {
+            roleTypes.forEach(roleType -> {
+                if (role.getRole().equalsIgnoreCase(roleType.getDescription().trim())) {
+                    CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
+                            roleType.getRoleId(),role.isPrimaryFlag());
+                    caseWorkerRoles.add(workerRole);
+                }
+            });
+        });
+        return caseWorkerRoles;
     }
 
     /**
@@ -275,5 +293,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
         return userTypeId;
     }
+
 }
 
