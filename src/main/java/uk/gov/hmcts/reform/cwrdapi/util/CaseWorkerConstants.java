@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-public interface CaseWorkerConstants {
+public final class CaseWorkerConstants {
 
-    String PARTIAL_SUCCESS = "PARTIAL SUCCESS";
+    private CaseWorkerConstants() {
+        super();
+    }
 
-    String SUCCESS = "SUCCESS";
+    public static String PARTIAL_SUCCESS = "PARTIAL SUCCESS";
 
-    String FAILURE = "FAILURE";
+    public static String SUCCESS = "SUCCESS";
+
+    public static String FAILURE = "FAILURE";
 }
