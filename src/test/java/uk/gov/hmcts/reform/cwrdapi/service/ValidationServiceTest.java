@@ -4,6 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditService;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationService;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -1,8 +1,10 @@
-package uk.gov.hmcts.reform.cwrdapi.service;
+package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -17,7 +19,7 @@ import javax.validation.ValidatorFactory;
 
 @Component
 @Slf4j
-public class JsrValidatorInitializer<T> {
+public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
 
     private Validator validator;
 

@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.cwrdapi.config.RepositoryConfig;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

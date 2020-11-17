@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditService;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -1,15 +1,16 @@
-package uk.gov.hmcts.reform.cwrdapi.service;
+package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.service.IAuditService;
 
 import java.util.List;
 
 @Component
-public class AuditService {
+public class AuditService implements IAuditService {
 
     @Autowired
     SimpleJpaRepository<CaseWorkerAudit, Long> caseWorkerAuditRepository;

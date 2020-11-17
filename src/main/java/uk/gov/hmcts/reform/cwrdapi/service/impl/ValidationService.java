@@ -1,9 +1,12 @@
-package uk.gov.hmcts.reform.cwrdapi.service;
+package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.service.IAuditService;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,14 +15,16 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
+import static java.util.Objects.nonNull;
+
 @Component
-public class ValidationService {
+public class ValidationService implements IValidationService {
 
     @Autowired
-    JsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer;
+    IJsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer;
 
     @Autowired
-    AuditService auditService;
+    IAuditService auditService;
 
     /**
      * Returns invalid record list and JSR Constraint violations pair.
@@ -43,7 +48,7 @@ public class ValidationService {
             = jsrValidatorInitializer.getConstraintViolations();
         List<ExceptionCaseWorker> exceptionCaseWorkers = new ArrayList<>();
         //if JSR violation present then only persist exception
-        if (constraintViolationSet != null && constraintViolationSet.size() > 0) {
+        if (nonNull(constraintViolationSet) && constraintViolationSet.size() > 0) {
             constraintViolationSet.stream().forEach(constraintViolation -> {
                 ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
                 exceptionCaseWorker.setJobId(jobId);
