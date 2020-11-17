@@ -35,10 +35,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Slf4j
@@ -264,14 +266,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerIdamRoleAssociation>  idamRolesInRequest = new ArrayList<>();
         cwrdProfileRequest.getRoles().forEach(role -> {
-            roleTypes.forEach(roleType -> {
-                if (role.getRole().equalsIgnoreCase(roleType.getDescription().trim())) {
+            roleTypes.stream().filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                .map(roleType -> {
                     List<CaseWorkerIdamRoleAssociation>  caseWorkerIdamRoles = cwIdamRoleAssocRepository
                             .findByRoleType(roleType);
-                    idamRolesInRequest.addAll(caseWorkerIdamRoles);
-                }
-            });
-
+                    return idamRolesInRequest.addAll(caseWorkerIdamRoles);
+                }).collect(toList());
         });
 
         Set<String> idamRoles = idamRolesInRequest.stream().map(idamRole -> {
@@ -285,13 +285,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
      * get the userTypeId by description.
      */
     public Long getUserTypeIdByDesc(String  userTypeReq) {
-        Long userTypeId = 0L;
-        for (UserType userType : userTypes) {
-            if (userType.getDescription().equalsIgnoreCase(userTypeReq.trim())) {
-                userTypeId = userType.getUserTypeId();
-            }
-        }
-        return userTypeId;
+        Optional<Long> userTypeId = userTypes.stream().filter(userType ->
+                (userType.getDescription().equalsIgnoreCase(userTypeReq.trim())))
+                .map(userType -> userType.getUserTypeId()).findFirst();
+        return userTypeId.get();
     }
 
 }
