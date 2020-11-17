@@ -26,7 +26,6 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 @SequenceGenerator(name = "cw_idam_role_assoc_id_seq", sequenceName = "cw_idam_role_assoc_id_seq", allocationSize = 1)
 public class CaseWorkerIdamRoleAssociation implements Serializable {
 

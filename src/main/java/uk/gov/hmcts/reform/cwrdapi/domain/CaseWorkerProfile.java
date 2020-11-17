@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -17,12 +16,9 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -33,15 +29,6 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@NamedEntityGraph(
-        name = "CaseWorkerProfile.alljoins",
-        attributeNodes = {
-                @NamedAttributeNode(value = "caseWorkerLocations"),
-                @NamedAttributeNode(value = "caseWorkerWorkAreas"),
-                @NamedAttributeNode(value = "caseWorkerRoles"),
-        }
-)
 public class CaseWorkerProfile implements Serializable {
 
     @Id
@@ -107,7 +94,6 @@ public class CaseWorkerProfile implements Serializable {
 
     public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
                              Integer regionId, String region, boolean deleteFlag) {
-
         this.caseWorkerId = caseWorkerId;
         this.firstName = firstName;
         this.lastName = lastName;
