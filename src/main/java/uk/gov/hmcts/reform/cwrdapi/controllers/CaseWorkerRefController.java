@@ -22,7 +22,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RequestMapping(
-        path = "/refdata/location/orgServices"
+        path = "/refdata/case-worker"
 )
 @RestController
 @Slf4j
@@ -62,7 +62,11 @@ public class CaseWorkerRefController {
                     message = "Internal Server Error"
             )
     })
-    @PostMapping(produces = APPLICATION_JSON_VALUE)
+    @PostMapping(
+            path = "/users/",
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
+    )
     @Secured("cwd-admin")
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
