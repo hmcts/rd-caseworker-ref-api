@@ -47,10 +47,11 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
             logComponentName);
         List<T> invalidList = new ArrayList<>();
         domains.forEach(domain -> {
-            constraintViolations = validator.validate(domain);
-            if (isNotTrue(constraintViolations.isEmpty())) {
+            Set<ConstraintViolation<T>> constraintErrors = validator.validate(domain);
+            if (isNotTrue(constraintErrors.isEmpty())) {
                 invalidList.add(domain);
             }
+            this.constraintViolations.addAll(constraintErrors);
         });
 
         log.info("{}:: JsrValidatorInitializer data processing validate complete::", logComponentName);

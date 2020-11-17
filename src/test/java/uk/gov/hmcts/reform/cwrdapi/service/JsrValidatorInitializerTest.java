@@ -40,6 +40,7 @@ public class JsrValidatorInitializerTest {
     public void testGetInvalidJsrRecords() {
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
+        profile.setOfficialEmail("abc.com");
         caseWorkerProfiles.add(profile);
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         assertEquals(1, records.size());
