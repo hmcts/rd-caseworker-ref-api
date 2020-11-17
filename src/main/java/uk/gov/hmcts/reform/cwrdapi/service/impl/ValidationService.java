@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.service.IAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
@@ -15,13 +15,13 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
-import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 
 @Component
 public class ValidationService implements IValidationService {
 
     @Autowired
-    IJsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer;
+    IJsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
     @Autowired
     IAuditService auditService;
@@ -32,10 +32,9 @@ public class ValidationService implements IValidationService {
      * @param caseWorkerProfileList List
      * @return CasWorkerDomain list
      */
-    public List<CasWorkerDomain> getInvalidRecords(List<CasWorkerDomain> caseWorkerProfileList) {
+    public List<CaseWorkerDomain> getInvalidRecords(List<CaseWorkerDomain> caseWorkerProfileList) {
         //Gets Invalid records
-        List<CasWorkerDomain> invalidRecords = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfileList);
-        return invalidRecords;
+        return jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfileList);
     }
 
     /**
@@ -44,12 +43,13 @@ public class ValidationService implements IValidationService {
      * @param jobId long
      */
     public void auditJsr(long jobId) {
-        Set<ConstraintViolation<CasWorkerDomain>> constraintViolationSet
+        Set<ConstraintViolation<CaseWorkerDomain>> constraintViolationSet
             = jsrValidatorInitializer.getConstraintViolations();
         List<ExceptionCaseWorker> exceptionCaseWorkers = new ArrayList<>();
+
         //if JSR violation present then only persist exception
-        if (nonNull(constraintViolationSet) && constraintViolationSet.size() > 0) {
-            constraintViolationSet.stream().forEach(constraintViolation -> {
+        ofNullable(constraintViolationSet).ifPresent(constraintViolations ->
+            constraintViolations.forEach(constraintViolation -> {
                 ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
                 exceptionCaseWorker.setJobId(jobId);
                 exceptionCaseWorker.setFieldInError(constraintViolation.getPropertyPath().toString());
@@ -57,9 +57,6 @@ public class ValidationService implements IValidationService {
                 exceptionCaseWorker.setExcelRowId(String.valueOf(constraintViolation.getRootBean().getRowId()));
                 exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now());
                 exceptionCaseWorkers.add(exceptionCaseWorker);
-            });
-            auditService.auditException(exceptionCaseWorkers);
-            //@To do set Audit JOB status to Partial Success in Request Session
-        }
+            }));
     }
 }

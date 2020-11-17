@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public interface IValidationService {
      * @param caseWorkerProfileList List
      * @return CasWorkerDomain list
      */
-    List<CasWorkerDomain> getInvalidRecords(List<CasWorkerDomain> caseWorkerProfileList);
+    List<CaseWorkerDomain> getInvalidRecords(List<CaseWorkerDomain> caseWorkerProfileList);
 
     /**
      * Audit JSR exceptions..

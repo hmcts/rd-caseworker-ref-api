@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationService;
@@ -16,7 +16,7 @@ public class TestConfig {
     }
 
     @Bean
-    JsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer() {
+    JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer() {
         return new JsrValidatorInitializer();
     }
 

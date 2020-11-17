@@ -49,8 +49,8 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
             Set<ConstraintViolation<T>> constraintViolations = validator.validate(domain);
             if (constraintViolations.size() > 0) {
                 invalidList.add(domain);
+                this.constraintViolations.addAll(constraintViolations);
             }
-            this.constraintViolations.addAll(constraintViolations);
         });
 
         log.info("{}:: JsrValidatorInitializer data processing validate complete::", logComponentName);

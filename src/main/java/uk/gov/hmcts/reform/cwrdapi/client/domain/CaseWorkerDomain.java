@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class CasWorkerDomain {
+public abstract class CaseWorkerDomain {
     protected long rowId;
 }

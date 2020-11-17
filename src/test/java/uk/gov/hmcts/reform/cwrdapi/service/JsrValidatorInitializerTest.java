@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 
@@ -20,7 +20,7 @@ public class JsrValidatorInitializerTest {
 
     @Spy
     @InjectMocks
-    JsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer;
+    JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
     @Before
     public void init() {
@@ -30,18 +30,18 @@ public class JsrValidatorInitializerTest {
 
     @Test
     public void testGetNoInvalidJsrRecords() {
-        List<CasWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
-        List<CasWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
+        List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
+        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         assertEquals(records.size(), 0);
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 
     @Test
     public void testGetInvalidJsrRecords() {
-        List<CasWorkerDomain> caseWorkerProfiles = new ArrayList<>();
+        List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         caseWorkerProfiles.add(profile);
-        List<CasWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
+        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         assertEquals(records.size(), 1);
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }

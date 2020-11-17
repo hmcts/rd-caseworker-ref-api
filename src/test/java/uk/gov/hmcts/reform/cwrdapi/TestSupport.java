@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
@@ -15,7 +15,7 @@ public class TestSupport {
         super();
     }
 
-    public static List<CasWorkerDomain> buildCaseWorkerProfileData() {
+    public static List<CaseWorkerDomain> buildCaseWorkerProfileData() {
 
         ImmutableList<Location> locations = ImmutableList.of(
             Location.builder().baseLocationId(1)

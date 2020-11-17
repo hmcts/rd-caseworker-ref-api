@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.config.RepositoryConfig;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
@@ -44,7 +44,7 @@ public class ValidationServiceTest {
     ValidationService validationService;
 
     @Autowired
-    JsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer;
+    JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
     @Autowired
     SimpleJpaRepository<ExceptionCaseWorker, Long> simpleJpaRepositoryException;
@@ -55,7 +55,7 @@ public class ValidationServiceTest {
     @Test
     public void testAuditJsr() {
 
-        List<CasWorkerDomain> caseWorkerProfiles = new ArrayList<>();
+        List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         profile.setRowId(1);
         profile.setOfficialEmail("test@abc.com");

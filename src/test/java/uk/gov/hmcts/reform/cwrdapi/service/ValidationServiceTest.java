@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
@@ -34,12 +34,12 @@ public class ValidationServiceTest {
 
     @Test
     public void testGetInvalidRecords() throws Exception {
-        JsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer = new JsrValidatorInitializer<>();
+        JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer = new JsrValidatorInitializer<>();
         jsrValidatorInitializer.initializeFactory();
         Field validationField = validationService.getClass().getDeclaredField("jsrValidatorInitializer");
         validationField.setAccessible(true);
         setField(validationField, validationService, jsrValidatorInitializer);
-        List<CasWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
+        List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
         jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
 
         validationService.getInvalidRecords(caseWorkerProfiles);
@@ -48,12 +48,12 @@ public class ValidationServiceTest {
 
     @Test
     public void testAuditJsr() throws Exception {
-        JsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer = new JsrValidatorInitializer<>();
+        JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer = new JsrValidatorInitializer<>();
         jsrValidatorInitializer.initializeFactory();
         Field validationField = validationService.getClass().getDeclaredField("jsrValidatorInitializer");
         validationField.setAccessible(true);
         setField(validationField, validationService, jsrValidatorInitializer);
-        List<CasWorkerDomain> caseWorkerProfiles = new ArrayList<>();
+        List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         caseWorkerProfiles.add(profile);
         jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
