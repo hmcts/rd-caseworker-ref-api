@@ -38,7 +38,7 @@ public class JsonFeignResponseUtil {
         Optional<Object>  payload = decode(response, clazz);
 
         return new ResponseEntity<>(
-                payload.orElse(null),
+                payload.orElse("unknown"),
                 convertHeaders(response.headers()),
                 HttpStatus.valueOf(response.status()));
     }

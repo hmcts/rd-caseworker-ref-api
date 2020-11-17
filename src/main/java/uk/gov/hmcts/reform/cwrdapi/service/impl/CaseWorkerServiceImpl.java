@@ -288,7 +288,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Optional<Long> userTypeId = userTypes.stream().filter(userType ->
                 (userType.getDescription().equalsIgnoreCase(userTypeReq.trim())))
                 .map(userType -> userType.getUserTypeId()).findFirst();
-        return userTypeId.get();
+        return userTypeId.orElse(0L);
     }
 
 }
