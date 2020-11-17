@@ -6,9 +6,9 @@ public final class CaseWorkerConstants {
         super();
     }
 
-    public static String PARTIAL_SUCCESS = "PARTIAL SUCCESS";
+    public static final String PARTIAL_SUCCESS = "PARTIAL SUCCESS";
 
-    public static String SUCCESS = "SUCCESS";
+    public static final String SUCCESS = "SUCCESS";
 
-    public static String FAILURE = "FAILURE";
+    public static final String FAILURE = "FAILURE";
 }

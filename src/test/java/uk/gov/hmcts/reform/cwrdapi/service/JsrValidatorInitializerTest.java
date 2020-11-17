@@ -32,7 +32,7 @@ public class JsrValidatorInitializerTest {
     public void testGetNoInvalidJsrRecords() {
         List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(records.size(), 0);
+        assertEquals(0, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 
@@ -42,7 +42,7 @@ public class JsrValidatorInitializerTest {
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         caseWorkerProfiles.add(profile);
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(records.size(), 1);
+        assertEquals(1, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 }

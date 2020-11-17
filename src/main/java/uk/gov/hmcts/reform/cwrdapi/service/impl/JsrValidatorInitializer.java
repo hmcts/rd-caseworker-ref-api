@@ -3,11 +3,10 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,13 +16,15 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
+
 @Component
 @Slf4j
 public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
 
     private Validator validator;
 
-    private Set<ConstraintViolation<T>> constraintViolations;
+    private Set<ConstraintViolation<T>> constraintViolations = new HashSet<>();
 
     @Value("${logging-component-name}")
     private String logComponentName;
@@ -42,14 +43,13 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
      */
     public List<T> getInvalidJsrRecords(List<T> domains) {
 
-        log.info("{}:: JsrValidatorInitializer data processing validate starts::", logComponentName);
-        this.constraintViolations = new LinkedHashSet<>();
+        log.info("{}:: JsrValidatorInitializer data processing validate starts::",
+            logComponentName);
         List<T> invalidList = new ArrayList<>();
         domains.forEach(domain -> {
-            Set<ConstraintViolation<T>> constraintViolations = validator.validate(domain);
-            if (constraintViolations.size() > 0) {
+            constraintViolations = validator.validate(domain);
+            if (isNotTrue(constraintViolations.isEmpty())) {
                 invalidList.add(domain);
-                this.constraintViolations.addAll(constraintViolations);
             }
         });
 
