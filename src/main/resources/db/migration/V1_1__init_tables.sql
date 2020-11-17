@@ -9,7 +9,7 @@ create table case_worker_profile(
 	user_type_id int,
 	region varchar(64),
 	region_id integer not null,
-	delete_flag boolean default false,
+	delete_flag boolean,
 	delete_date timestamp,
 	created_date timestamp,
 	last_update timestamp,
