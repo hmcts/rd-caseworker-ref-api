@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import feign.FeignException;
 import feign.Response;
 import lombok.Setter;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -93,7 +95,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     //update the existing case worker profile logic
                 } else if (Objects.nonNull(caseWorkerProfile) && caseWorkerProfile.getDeleteFlag()) {
 
+                    UserProfileUpdatedData usrProfileStatusUpdate = new UserProfileUpdatedData("SUSPENDED");
                     // updating the status in idam to suspend.
+                    modifyCaseWorkerUserStatus(usrProfileStatusUpdate,caseWorkerProfile.getCaseWorkerId(),"EXUI");
                 }
             });
 
@@ -103,7 +107,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              saving it automatically saves data in the sub entities like cwlocation, cwWorkArea,cwRole and
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
-            caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+            if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
+                caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+            }
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
         } catch (Exception exp) {
@@ -211,6 +217,26 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 clazz = ErrorResponse.class;
             }
 
+        } catch (FeignException ex) {
+            log.error("{}:: UserProfile api failed:: status code {}", loggingComponentName, ex.status());
+            clazz = ErrorResponse.class;
+        }
+        return JsonFeignResponseUtil.toResponseEntity(response, clazz);
+    }
+
+
+    public ResponseEntity<Object> modifyCaseWorkerUserStatus(UserProfileUpdatedData userProfileUpdatedData,
+                                                     String userId, String origin) {
+        Response response = null;
+        Object clazz = null;
+        try {
+
+            response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId,origin);
+            if (response.status() == 200) {
+                clazz = UserProfileCreationResponse.class;
+            } else {
+                clazz = ErrorResponse.class;
+            }
         } catch (FeignException ex) {
             log.error("{}:: UserProfile api failed:: status code {}", loggingComponentName, ex.status());
             clazz = ErrorResponse.class;

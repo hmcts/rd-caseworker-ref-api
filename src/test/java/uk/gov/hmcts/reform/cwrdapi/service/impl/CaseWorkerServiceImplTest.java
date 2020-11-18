@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -126,4 +128,33 @@ public class CaseWorkerServiceImplTest {
         assertThat(objectResponseEntity.getStatusCodeValue()).isEqualTo(201);
     }
 
+    @Test
+    public void testDeleteCwUserProfile() throws JsonProcessingException {
+
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setDeleteFlag(true);
+        profile.setEmailId(caseWorkersProfileCreationRequest.getEmailId());
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+
+        when(caseWorkerProfileRepository.findByEmailId(caseWorkersProfileCreationRequest.getEmailId()))
+                .thenReturn(profile);
+
+        when(userProfileFeignClient.modifyUserRoles(any(),any(),any()))
+                .thenReturn(Response.builder()
+                .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                        null)).body(body, Charset.defaultCharset()).status(200).build());
+
+        ResponseEntity<Object> objectResponseEntity = caseWorkerServiceImpl
+                .processCaseWorkerProfiles(
+                        Collections.singletonList(caseWorkersProfileCreationRequest));
+
+        verify(caseWorkerProfileRepository, times(0)).saveAll(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(),any(),any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        assertThat(objectResponseEntity.getStatusCodeValue()).isEqualTo(201);
+    }
 }
