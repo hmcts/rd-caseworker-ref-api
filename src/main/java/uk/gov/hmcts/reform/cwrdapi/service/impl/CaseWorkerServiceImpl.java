@@ -70,8 +70,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     List<UserType> userTypes = new ArrayList<>();
 
-    CaseWorkerProfile caseWorkerProfile = null;
-
 
     @Override
     public ResponseEntity<Object> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
@@ -80,26 +78,25 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         try {
             getRolesAndUserTypes();
             cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
-                CaseWorkerProfile caseWorkerProfileRespose = null;
-
-                caseWorkerProfile = caseWorkerProfileRepo
-                        .findByEmailId(cwrProfileCreationRequest.getEmailId());
+                CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
+                        .findByEmailId(cwrProfileCreationRequest.getEmailId().toLowerCase());
                 if (Objects.isNull(caseWorkerProfile)) {
 
-                    caseWorkerProfileRespose = createCaseWorkerProfile(cwrProfileCreationRequest);
-                    if (Objects.nonNull(caseWorkerProfileRespose)) {
+                    caseWorkerProfile = createCaseWorkerProfile(cwrProfileCreationRequest);
+                    if (Objects.nonNull(caseWorkerProfile)) {
                         // collecting all the successfully case worker profiles to save in caseworker db.
-                        caseWorkerProfiles.add(caseWorkerProfileRespose);
+                        caseWorkerProfiles.add(caseWorkerProfile);
 
                     }
                 } else if (Objects.nonNull(caseWorkerProfile) && !caseWorkerProfile.getDeleteFlag()) {
 
                     //update the existing case worker profile logic
-                } else if (caseWorkerProfile.getDeleteFlag()) {
+                } else if (Objects.nonNull(caseWorkerProfile) && caseWorkerProfile.getDeleteFlag()) {
 
                     // updating the status in idam to suspend.
                 }
             });
+
 
             /**  caseworker profile bacth save
              in caseWorkerProfile request contains all the associated entities information and while
@@ -107,11 +104,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
             caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
-            log.info("{}::case worker profiles inserted::" + caseWorkerProfiles.size(), loggingComponentName);
+            log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
         } catch (Exception exp) {
 
-            log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName,exp);
+            log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
         return ResponseEntity
                 .status(201)
@@ -121,6 +118,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
+        CaseWorkerProfile caseWorkerProfile = null;
 
         //User Profile Call
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
@@ -159,7 +157,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public CaseWorkerProfile mapCaseWorkerProfileRequest(UserProfileCreationResponse userProfileCreationResponse,
                                             CaseWorkersProfileCreationRequest cwrdProfileRequest) {
-        caseWorkerProfile = new CaseWorkerProfile();
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId(userProfileCreationResponse.getIdamId());
         caseWorkerProfile.setFirstName(cwrdProfileRequest.getFirstName());
         caseWorkerProfile.setLastName(cwrdProfileRequest.getLastName());
@@ -187,13 +185,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                                 CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
         cwrdProfileRequest.getRoles().forEach(role -> {
-            roleTypes.forEach(roleType -> {
-                if (role.getRole().equalsIgnoreCase(roleType.getDescription().trim())) {
-                    CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
+            roleTypes.stream().filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                    .map(roleType -> {
+                        CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
                             roleType.getRoleId(),role.isPrimaryFlag());
-                    caseWorkerRoles.add(workerRole);
-                }
-            });
+                        return caseWorkerRoles.add(workerRole);
+                    });
         });
         return caseWorkerRoles;
     }
@@ -286,7 +283,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
      */
     public Long getUserTypeIdByDesc(String  userTypeReq) {
         Optional<Long> userTypeId = userTypes.stream().filter(userType ->
-                (userType.getDescription().equalsIgnoreCase(userTypeReq.trim())))
+                userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
                 .map(userType -> userType.getUserTypeId()).findFirst();
         return userTypeId.orElse(0L);
     }
