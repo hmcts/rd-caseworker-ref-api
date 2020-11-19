@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -56,6 +57,6 @@ public class ExceptionCaseWorker implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "job_id", referencedColumnName = "job_id",
-            insertable = false, updatable = false, nullable = false)
+        insertable = false, updatable = false, nullable = false)
     private CaseWorkerAudit caseWorkerAudit;
 }

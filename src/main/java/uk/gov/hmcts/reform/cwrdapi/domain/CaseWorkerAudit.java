@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +22,9 @@ import javax.validation.constraints.Size;
 @Entity(name = "case_worker_audit")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @SequenceGenerator(name = "job_id_seq", sequenceName = "job_id_seq", allocationSize = 1)
 public class CaseWorkerAudit implements Serializable {
 
@@ -53,8 +55,7 @@ public class CaseWorkerAudit implements Serializable {
     @Size(max = 512)
     private String comments;
 
-    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = ExceptionCaseWorker.class, mappedBy = "caseWorkerAudit")
-    private List<ExceptionCaseWorker> exceptionCaseWorkers = new ArrayList<>();
+    private List<ExceptionCaseWorker> exceptionCaseWorkers;
 
 }

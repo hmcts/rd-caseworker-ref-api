@@ -33,13 +33,9 @@ public class ExceptionCaseWorkerTest {
 
     @Test
     public void testCaseWorkerContainingAudit() {
-        CaseWorkerAudit caseWorkerAudit = new CaseWorkerAudit();
-        caseWorkerAudit.setJobId(1L);
-
+        CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder().jobId(1L).build();
         ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
         exceptionCaseWorker.setCaseWorkerAudit(caseWorkerAudit);
-
         assertNotNull(exceptionCaseWorker.getCaseWorkerAudit());
-
     }
 }
