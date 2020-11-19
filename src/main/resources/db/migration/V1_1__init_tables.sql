@@ -19,7 +19,7 @@ create table case_worker_profile(
 
 create table case_worker_location(
 	case_worker_location_id bigint,
-	case_worker_id varchar(64) not null,
+	case_worker_id varchar(64),
 	location varchar(128),
     location_id int not null,
     primary_flag boolean,

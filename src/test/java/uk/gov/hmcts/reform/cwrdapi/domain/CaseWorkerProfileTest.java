@@ -119,8 +119,24 @@ public class CaseWorkerProfileTest {
 
     @Test
     public void testCaseWorkerProfileContainingDeleteFlag() {
-        CaseWorkerProfile caseWorkerLocation = new CaseWorkerProfile();
-        caseWorkerLocation.setDeleteFlag(false);
-        assertFalse(caseWorkerLocation.getDeleteFlag());
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setDeleteFlag(false);
+        assertFalse(caseWorkerProfile.getDeleteFlag());
+    }
+
+    @Test
+    public void testCaseWorkerProfileAllArgsConstructor() {
+        CaseWorkerProfile caseWorkerProfile = new
+                CaseWorkerProfile("CWID1", "testFN", "testLN", "test@test.com",
+                1L,  1, "region", false);
+        assertNotNull(caseWorkerProfile);
+        assertThat(caseWorkerProfile.getCaseWorkerId(), is("CWID1"));
+        assertThat(caseWorkerProfile.getFirstName(), is("testFN"));
+        assertThat(caseWorkerProfile.getLastName(), is("testLN"));
+        assertThat(caseWorkerProfile.getEmailId(), is("test@test.com"));
+        assertThat(caseWorkerProfile.getUserTypeId(), is(1L));
+        assertThat(caseWorkerProfile.getRegion(), is("region"));
+        assertThat(caseWorkerProfile.getRegionId(), is(1));
+        assertThat(caseWorkerProfile.getDeleteFlag(), is(false));
     }
 }
