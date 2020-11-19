@@ -1,3 +1,4 @@
+
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 import io.swagger.annotations.ApiOperation;
@@ -15,9 +16,11 @@ import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+
 /**
  * Default endpoints per application.
  */
+
 
 @Slf4j
 @RestController
@@ -30,6 +33,7 @@ public class WelcomeController {
     private static final String MESSAGE = "Message for the Caseworker Ref Data API";
 
 
+
     /**
      * Root GET endpoint.
      *
@@ -39,6 +43,7 @@ public class WelcomeController {
      *
      * @return Welcome message from the service.
      */
+
 
     @ApiOperation("Welcome message for the Caseworker Ref Data API")
     @ApiResponses({
@@ -63,3 +68,4 @@ public class WelcomeController {
             .body("{\"message\": \"" + MESSAGE + "\"}");
     }
 }
+

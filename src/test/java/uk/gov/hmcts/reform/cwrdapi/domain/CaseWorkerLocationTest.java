@@ -44,5 +44,14 @@ public class CaseWorkerLocationTest {
         caseWorkerLocation.setPrimaryFlag(true);
 
         assertTrue(caseWorkerLocation.getPrimaryFlag());
+
+        CaseWorkerLocation caseWorkerLocation1 = new CaseWorkerLocation("caseWorkerId",
+                1,"TestLocation", false);
+
+        assertNotNull(caseWorkerLocation1);
+        assertThat(caseWorkerLocation1.getCaseWorkerId(), is("caseWorkerId"));
+        assertThat(caseWorkerLocation1.getLocation(), is("TestLocation"));
+        assertThat(caseWorkerLocation1.getLocationId(), is(1));
+        assertThat(caseWorkerLocation1.getPrimaryFlag(), is(false));
     }
 }

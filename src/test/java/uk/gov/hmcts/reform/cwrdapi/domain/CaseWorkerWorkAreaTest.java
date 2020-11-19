@@ -34,5 +34,12 @@ public class CaseWorkerWorkAreaTest {
 
         assertNotNull(caseWorkerWorkArea.getCaseWorkerProfile());
         assertThat(caseWorkerWorkArea.getCaseWorkerProfile().getCaseWorkerId(), is("CWID1"));
+
+        CaseWorkerWorkArea caseWorkerWorkArea1 = new CaseWorkerWorkArea("caseWorkerId",
+                "areaOfWork","serviceCode");
+        assertThat(caseWorkerWorkArea1.getCaseWorkerId(), is("caseWorkerId"));
+        assertThat(caseWorkerWorkArea1.getAreaOfWork(), is("areaOfWork"));
+        assertThat(caseWorkerWorkArea1.getServiceCode(), is("serviceCode"));
+
     }
 }
