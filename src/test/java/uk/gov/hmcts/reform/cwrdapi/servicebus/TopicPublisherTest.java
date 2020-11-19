@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus;
 
 import org.junit.Assert;
@@ -76,3 +77,4 @@ public class TopicPublisherTest {
     }
 }
 
+*/
