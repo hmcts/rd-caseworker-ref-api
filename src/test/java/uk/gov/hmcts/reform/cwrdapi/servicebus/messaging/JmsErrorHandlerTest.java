@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus.messaging;
 
 import org.junit.Test;
@@ -23,3 +24,4 @@ public class JmsErrorHandlerTest {
         verify(throwableMock.getCause(), times(1)).getMessage();
     }
 }
+*/
