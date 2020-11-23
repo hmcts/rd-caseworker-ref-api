@@ -41,11 +41,11 @@ data "azurerm_key_vault" "s2s_key_vault" {
 
 data "azurerm_key_vault_secret" "s2s_secret" {
   key_vault_id = data.azurerm_key_vault.s2s_key_vault.id
-  name      = "microservicekey-bulk-scan-orchestrator"
+  name      = "microservicekey-rd-caseworker-ref-api"
 }
 
 resource "azurerm_key_vault_secret" "rd_caseworker_ref_api_app_s2s_secret" {
-  name         = "s2s-secret-rd_caseworker_ref_api"
+  name         = "s2s-secret-rd-caseworker-ref-api"
   value        = data.azurerm_key_vault_secret.s2s_secret.value
   key_vault_id = data.azurerm_key_vault.key_vault.id
 }
