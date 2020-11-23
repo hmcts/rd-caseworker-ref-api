@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus.messaging;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,3 +19,4 @@ public class JmsErrorHandler implements ErrorHandler {
     }
 }
 
+*/
