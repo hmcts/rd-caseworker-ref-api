@@ -13,10 +13,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,7 +30,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
 @PropertySource(value = "/integrationTest/resources/application-integration.yml")
 public class CaseWorkerReferenceDataClient {
 
-    private static final String APP_BASE_PATH = "/refdata/case-worker/users";
+    private static final String APP_BASE_PATH = "/refdata/case-worker";
     private static String JWT_TOKEN = null;
     private final Integer cwrdApiPort;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -48,7 +50,11 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public Map<String, Object> createCaseWorkerProfile(CaseWorkersProfileCreationRequest request, String role) {
-        return postRequest(baseUrl, request, role, null);
+        return postRequest(baseUrl + "/users", request, role, null);
+    }
+
+    public Map<String, Object> createIdamRolesAssoc(List<ServiceRoleMapping> serviceRoleMapping, String role) {
+        return postRequest(baseUrl + "/idam-roles-mapping", serviceRoleMapping, role, null);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
