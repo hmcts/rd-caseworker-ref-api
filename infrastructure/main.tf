@@ -27,3 +27,25 @@ module "db-rd-caseworker-ref-api" {
   common_tags         = var.common_tags
   postgresql_version  = var.postgresql_version
 }
+
+data "azurerm_key_vault" "key_vault" {
+  name = "${var.raw_product}-${var.env}"
+  resource_group_name = "${var.raw_product}-${var.env}"
+}
+
+data "azurerm_key_vault" "s2s_key_vault" {
+  name                = "s2s-${var.env}"
+  resource_group_name = "rpe-service-auth-provider-${var.env}"
+}
+
+
+data "azurerm_key_vault_secret" "s2s_secret" {
+  key_vault_id = data.azurerm_key_vault.s2s_key_vault.id
+  name      = "microservicekey-bulk-scan-orchestrator"
+}
+
+resource "azurerm_key_vault_secret" "rd_caseworker_ref_api_app_s2s_secret" {
+  name         = "s2s-secret-rd_caseworker_ref_api"
+  value        = data.azurerm_key_vault_secret.s2s_secret.value
+  key_vault_id = data.azurerm_key_vault.key_vault.id
+}
