@@ -1,5 +1,6 @@
-package uk.gov.hmcts.reform.cwrdapi.config;
+package uk.gov.hmcts.reform.cwrdapi.service;
 
+import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
@@ -7,12 +8,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorServiceImpl;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,8 +25,8 @@ import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE
 import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE;
 
-@RunWith(SpringRunner.class)
-public class ExcelUploaderTest extends SpringBootIntegrationTest {
+@RunWith(SpringIntegrationSerenityRunner.class)
+public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
 
     public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public static String TYPE_XLS = "application/vnd.ms-excel";
