@@ -48,7 +48,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
         collectHeaderList(headers, sheet);
         //scan parent and domain object fields by reflection and make maps
-        List<Triple<String,Field, List<Field>>> customObjectFieldsMapping = createBeanFieldMaps(classType, parentFieldMap);
+        List<Triple<String,Field, List<Field>>> customObjectFieldsMapping =
+                createBeanFieldMaps(classType, parentFieldMap);
         Iterator<Row> rowIterator = sheet.rowIterator();
         rowIterator.next();//skip header
         while (rowIterator.hasNext()) {

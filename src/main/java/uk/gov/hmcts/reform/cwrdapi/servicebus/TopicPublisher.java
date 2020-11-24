@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,3 +53,4 @@ public class TopicPublisher {
     }
 }
 
+*/

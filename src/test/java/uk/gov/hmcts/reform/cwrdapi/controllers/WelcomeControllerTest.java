@@ -14,7 +14,7 @@ public class WelcomeControllerTest {
     private final WelcomeController welcomeController = new WelcomeController();
 
     @Test
-    public void test_should_return_welcome_response() {
+    public void test_should_return_welcome_response() throws Exception {
 
         ResponseEntity<String> responseEntity = welcomeController.welcome();
         String expectedMessage = "Message for the Caseworker Ref Data API";

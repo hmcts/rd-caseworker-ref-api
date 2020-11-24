@@ -1,3 +1,4 @@
+
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 import io.swagger.annotations.ApiOperation;
@@ -27,9 +28,11 @@ import java.util.UUID;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+
 /**
  * Default endpoints per application.
  */
+
 
 @Slf4j
 @RestController
@@ -48,6 +51,7 @@ public class WelcomeController {
     ExcelAdaptorServiceImpl excelAdaptorService;
 
 
+
     /**
      * Root GET endpoint.
      *
@@ -57,6 +61,7 @@ public class WelcomeController {
      *
      * @return Welcome message from the service.
      */
+
 
     @ApiOperation("Welcome message for the Caseworker Ref Data API")
     @ApiResponses({
@@ -112,3 +117,4 @@ public class WelcomeController {
 
     }
 }
+

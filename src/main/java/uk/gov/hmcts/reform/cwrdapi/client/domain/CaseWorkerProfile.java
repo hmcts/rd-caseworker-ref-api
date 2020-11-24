@@ -1,17 +1,22 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.util.List;
+
 import javax.validation.constraints.NotEmpty;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
-public class CaseWorkerProfile {
+@AllArgsConstructor
+public class CaseWorkerProfile extends CaseWorkerDomain {
 
     @MappingField(columnName = "FIRST NAME")
     @NotEmpty
@@ -23,7 +28,6 @@ public class CaseWorkerProfile {
 
     @MappingField(columnName = "Official Email")
     @NotEmpty
-    //TODO: pattern
     private String officialEmail;
 
     @MappingField(columnName = "Region Id")
