@@ -51,4 +51,3 @@ oidc:
   expiration: 14400000 # milliseconds 4 hours
 
 loggingComponentName: RD-Caseworker-Ref-Api
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
