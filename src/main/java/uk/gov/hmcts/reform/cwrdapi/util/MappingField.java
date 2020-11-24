@@ -8,5 +8,9 @@ public @interface MappingField {
 
     String columnName() default "";
 
+    String isPrimary() default "";
+
     Class clazz() default Object.class;
+
+    int objectCount() default 0;
 }

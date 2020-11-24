@@ -11,10 +11,12 @@ import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 public class Location {
 
     @MappingField(columnName = "Base location 1 id,Base location 2 id")
-    private int locationId;
+    private Integer locationId;
 
-    @MappingField(columnName = "Primary Base Location Name,Secondary Location")
+    @MappingField(columnName = "Primary Base Location Name,Secondary Location",
+            isPrimary = "Primary Base Location Name")
     private String locationName;
 
     private boolean isPrimary;
 }
+

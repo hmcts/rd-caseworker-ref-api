@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 @Setter
 public class Role {
 
-    private int roleId;
+    private Integer roleId;
 
-    @MappingField(columnName = "Primary Role,Secondary Role")
+    @MappingField(columnName = "Primary Role,Secondary Role", isPrimary = "Primary Role")
     private String role;
 
     private boolean isPrimary;

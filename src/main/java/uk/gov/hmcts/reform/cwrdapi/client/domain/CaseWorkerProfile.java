@@ -33,7 +33,7 @@ public class CaseWorkerProfile {
     @NotEmpty
     private String regionName;
 
-    @MappingField(clazz = Location.class)
+    @MappingField(clazz = Location.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary location exists")
     private List<Location> locations;
 
@@ -41,11 +41,11 @@ public class CaseWorkerProfile {
     @NotEmpty
     private String userType;
 
-    @MappingField(clazz = Role.class)
+    @MappingField(clazz = Role.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary roles exists")
     private List<Role> roles;
 
-    @MappingField(clazz = WorkArea.class)
+    @MappingField(clazz = WorkArea.class, objectCount = 8)
     @NotEmpty(message = "no area of works exists")
     private List<WorkArea> workAreas;
 
