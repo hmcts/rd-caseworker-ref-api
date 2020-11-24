@@ -56,7 +56,7 @@ public class ValidationServiceTest {
     public void testAuditJsr() {
 
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
-        CaseWorkerProfile profile = new CaseWorkerProfile();
+        CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         profile.setRowId(1);
         profile.setOfficialEmail("test@abc.com");
         caseWorkerProfiles.add(profile);

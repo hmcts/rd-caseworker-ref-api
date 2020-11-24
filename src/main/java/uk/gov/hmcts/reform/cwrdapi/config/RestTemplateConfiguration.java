@@ -6,24 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
-import javax.servlet.MultipartConfigElement;
 
 @Configuration
 public class RestTemplateConfiguration {
-
-    @Bean
-    public MultipartConfigElement multipartConfigElement() {
-        return new MultipartConfigElement("");
-    }
-
-    @Bean(name = "multipartResolver")
-    public CommonsMultipartResolver multipartResolver() {
-        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(-1);
-        return multipartResolver;
-    }
 
     @Bean
     public RestOperations restOperations(

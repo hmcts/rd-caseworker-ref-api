@@ -1,43 +1,73 @@
 #!/usr/bin/env sh
 
-GRADLE_CLEAN=true
-GRADLE_INSTALL=true
+print_help() {
+  echo "Script to run docker containers for Spring Boot Template API service
 
-# Test S2S key - not used in any HMCTS key vaults or services
-export S2S_SECRET=SZDUA3L7N32PE2IS
-export S2S_MICROSERVICE=rd_professional_api
+  Usage:
 
-clean_old_docker_artifacts() {
-    docker stop rd-professional-api
-    docker stop rd-caseworker-ref-api-db
-    docker stop service-token-provider
+  ./run-in-docker.sh [OPTIONS]
 
-    docker rm rd-professional-api
-    docker rm rd-caseworker-ref-api-db
-    docker rm service-token-provider
+  Options:
+    --clean, -c                   Clean and install current state of source code
+    --install, -i                 Install current state of source code
+    --param PARAM=, -p PARAM=     Parse script parameter
+    --help, -h                    Print this help block
 
-    docker rmi hmcts/rd-professional-api
-    docker rmi hmcts/rd-caseworker-ref-api-db
-    docker rmi hmcts/service-token-provider
+  Available parameters:
 
-    docker volume rm rd-caseworker-ref-api_rd-caseworker-ref-api-db-volume
+  "
 }
+
+# script execution flags
+GRADLE_CLEAN=false
+GRADLE_INSTALL=false
+
+# TODO custom environment variables application requires.
+# TODO also consider enlisting them in help string above ^
+# TODO sample: DB_PASSWORD   Defaults to 'dev'
+# environment variables
+#DB_PASSWORD=dev
+#S2S_URL=localhost
+#S2S_SECRET=secret
 
 execute_script() {
+  cd $(dirname "$0")/..
 
-  clean_old_docker_artifacts
+  if [ ${GRADLE_CLEAN} = true ]
+  then
+    echo "Clearing previous build.."
+    ./gradlew clean
+  fi
 
-    docker-compose down -v
+  if [ ${GRADLE_INSTALL} = true ]
+  then
+    echo "Assembling distribution.."
+    ./gradlew assemble
+  fi
 
-    docker system prune -a -f
+#  echo "Assigning environment variables.."
+#
+#  export DB_PASSWORD=${DB_PASSWORD}
+#  export S2S_URL=${S2S_URL}
+#  export S2S_SECRET=${S2S_SECRET}
 
-    ./gradlew clean assemble
+  echo "Bringing up docker containers.."
 
-    pwd
-
-    chmod +x bin/*
-
-    docker-compose up
+  docker-compose up
 }
 
-execute_script
+while true ; do
+  case "$1" in
+    -h|--help) print_help ; shift ; break ;;
+    -c|--clean) GRADLE_CLEAN=true ; GRADLE_INSTALL=true ; shift ;;
+    -i|--install) GRADLE_INSTALL=true ; shift ;;
+    -p|--param)
+      case "$2" in
+#        DB_PASSWORD=*) DB_PASSWORD="${2#*=}" ; shift 2 ;;
+#        S2S_URL=*) S2S_URL="${2#*=}" ; shift 2 ;;
+#        S2S_SECRET=*) S2S_SECRET="${2#*=}" ; shift 2 ;;
+        *) shift 2 ;;
+      esac ;;
+    *) execute_script ; break ;;
+  esac
+done

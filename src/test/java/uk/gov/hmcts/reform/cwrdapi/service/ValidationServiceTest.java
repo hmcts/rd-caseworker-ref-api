@@ -54,7 +54,7 @@ public class ValidationServiceTest {
         validationField.setAccessible(true);
         setField(validationField, validationService, jsrValidatorInitializer);
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
-        CaseWorkerProfile profile = new CaseWorkerProfile();
+        CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         caseWorkerProfiles.add(profile);
         jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         doNothing().when(auditService).auditException(anyList());
