@@ -56,7 +56,7 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
      * @param excelFile multipart file for processing
      */
     public static void isTypeExcel(MultipartFile excelFile) {
-        if (nonNull(excelFile)) {
+        if (nonNull(excelFile) && nonNull(excelFile.getOriginalFilename()) && nonNull(excelFile.getContentType())) {
             String fileName = excelFile.getOriginalFilename();
             String contentType = excelFile.getContentType();
             if (negate((TYPE_XLS.equals(contentType) || TYPE_XLSX.equals(contentType))

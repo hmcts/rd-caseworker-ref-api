@@ -108,4 +108,12 @@ public class ExcelValidatorServiceImplTest {
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NOT_PRESENT_ERROR_MESSAGE);
     }
+
+    @Test
+    public void sendNoFileContentNullTest() throws IOException {
+        MultipartFile file = getMultipartFile("src/test/resources/test.txt", null);
+        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
+                .isExactlyInstanceOf(ExcelValidationException.class)
+                .hasMessage(FILE_NOT_PRESENT_ERROR_MESSAGE);
+    }
 }
