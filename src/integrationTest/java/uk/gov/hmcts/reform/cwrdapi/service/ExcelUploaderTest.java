@@ -113,7 +113,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
                         TYPE_XLSX));
         List<CaseWorkerProfile> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
-        CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
+        CaseWorkerProfile caseWorkerProfile = profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
         assertThat(caseWorkerProfile.getOfficialEmail()).isNotBlank();

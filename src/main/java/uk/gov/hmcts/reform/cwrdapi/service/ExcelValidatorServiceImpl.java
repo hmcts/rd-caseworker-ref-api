@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 
 import java.io.IOException;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.negate;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.validatePasswordAndGetWorkBook;
@@ -19,10 +20,11 @@ import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.validate
 @Service
 public class ExcelValidatorServiceImpl implements ExcelValidatorService {
 
-    public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static String TYPE_XLS = "application/vnd.ms-excel";
-    public static String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "File provided in request is not in xls(x) format";
-    public static String FILE_PASSWORD_INCORRECT_ERROR_MESSAGE =
+    public static final String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    public static final String TYPE_XLS = "application/vnd.ms-excel";
+    public static final String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "File provided in request is not in xls(x) format";
+    public static final String FILE_NOT_PRESENT_ERROR_MESSAGE = "File not present";
+    public static final String FILE_PASSWORD_INCORRECT_ERROR_MESSAGE =
             "Failed to open the file. Please provide the file with a valid password.";
 
     @Value("${excel.password}")
@@ -54,11 +56,15 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
      * @param excelFile multipart file for processing
      */
     public static void isTypeExcel(MultipartFile excelFile) {
-        String fileName = excelFile.getOriginalFilename();
-        String contentType = excelFile.getContentType();
-        if (negate((TYPE_XLS.equals(contentType) || TYPE_XLSX.equals(contentType))
-                && (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")))) {
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
+        if (nonNull(excelFile)) {
+            String fileName = excelFile.getOriginalFilename();
+            String contentType = excelFile.getContentType();
+            if (negate((TYPE_XLS.equals(contentType) || TYPE_XLSX.equals(contentType))
+                    && (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")))) {
+                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
+            }
+        } else {
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
         }
     }
 }

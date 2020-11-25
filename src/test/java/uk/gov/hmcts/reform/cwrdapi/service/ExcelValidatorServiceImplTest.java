@@ -20,6 +20,7 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_NOT_PRESENT_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorServiceImpl.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE;
 
@@ -99,5 +100,12 @@ public class ExcelValidatorServiceImplTest {
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void sendNoFileTest() {
+        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(null))
+                .isExactlyInstanceOf(ExcelValidationException.class)
+                .hasMessage(FILE_NOT_PRESENT_ERROR_MESSAGE);
     }
 }

@@ -99,7 +99,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         for (Field field: objectClass.getDeclaredFields()) {
             MappingField mappingField = findAnnotation(field, MappingField.class);
             if (isNull(mappingField)) {
-                continue;
+                // do nothing
             } else if (negate(mappingField.columnName().isEmpty())) {
                 headerToCellValueMap.put(mappingField.columnName(), field);
             } else { // make triple of child domain object
@@ -171,7 +171,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:
-                return Double.valueOf(cell.getNumericCellValue()).intValue();
+                return Integer.valueOf((int)cell.getNumericCellValue());
             default:
                 return null;
         }
