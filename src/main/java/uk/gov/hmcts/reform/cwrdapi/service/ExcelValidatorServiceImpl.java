@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 
 import java.io.IOException;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.BooleanUtils.negate;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.validatePasswordAndGetWorkBook;
@@ -56,15 +56,14 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
      * @param excelFile multipart file for processing
      */
     public static void isTypeExcel(MultipartFile excelFile) {
-        if (nonNull(excelFile) && nonNull(excelFile.getOriginalFilename()) && nonNull(excelFile.getContentType())) {
-            String fileName = excelFile.getOriginalFilename();
-            String contentType = excelFile.getContentType();
-            if (negate((TYPE_XLS.equals(contentType) || TYPE_XLSX.equals(contentType))
-                    && (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")))) {
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
-            }
-        } else {
+        if (isNull(excelFile)) {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
+        } else if (isNull(excelFile.getOriginalFilename()) || isNull(excelFile.getContentType())
+                || negate(excelFile.getOriginalFilename().endsWith(".xlsx")
+                || excelFile.getOriginalFilename().endsWith(".xls"))
+                || negate((TYPE_XLS.equals(excelFile.getContentType())
+                    || TYPE_XLSX.equals(excelFile.getContentType())))) {
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
         }
     }
 }
