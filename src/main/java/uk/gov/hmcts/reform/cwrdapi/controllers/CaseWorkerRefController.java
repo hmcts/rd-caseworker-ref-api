@@ -7,17 +7,23 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.List;
+
+import javax.validation.Valid;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -75,5 +81,50 @@ public class CaseWorkerRefController {
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
         return caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+    }
+
+    @ApiOperation(
+            value = "This API builds the idam role mappings for case worker roles",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "Successfully created idam role mappings for case worker roles",
+                    response = String.class,
+                    responseContainer = "list"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied for invalid permissions"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @PostMapping(
+            path = "/idam-roles-mapping/",
+            consumes = APPLICATION_JSON_VALUE
+    )
+    @Secured("cwd-user")
+    public ResponseEntity<String> buildIdamRoleMappings(@Valid @RequestBody List<ServiceRoleMapping>
+                                                                   serviceRoleMappings) {
+        IdamRoleAssocResponse idamRoleAssocResponse =
+                caseWorkerService.buildIdamRoleMappings(serviceRoleMappings);
+        return ResponseEntity
+                .status(idamRoleAssocResponse.getStatusCode())
+                .body(idamRoleAssocResponse.getMessage());
     }
 }

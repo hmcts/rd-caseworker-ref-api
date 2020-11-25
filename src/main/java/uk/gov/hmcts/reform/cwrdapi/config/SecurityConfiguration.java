@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,6 +31,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
+//@EnableGlobalMethodSecurity(securedEnabled = true)
 @Slf4j
 @SuppressWarnings("unchecked")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -56,8 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring()
-                    .antMatchers(anonymousPaths.toArray(new String[0]));
+        web.ignoring().antMatchers("/**");
     }
 
     @Inject
