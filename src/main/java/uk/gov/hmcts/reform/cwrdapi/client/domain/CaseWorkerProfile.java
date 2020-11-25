@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
 
     @MappingField(columnName = "Official Email")
     @NotEmpty
+    @JsonProperty("email_id")
     private String officialEmail;
 
     @MappingField(columnName = "Region Id")
@@ -43,6 +45,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
 
     @MappingField(clazz = Role.class)
     @NotEmpty(message = "no primary or secondary roles exists")
+    @JsonProperty("roles")
     private List<Role> roles;
 
     @MappingField(clazz = WorkArea.class)

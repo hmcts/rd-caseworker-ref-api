@@ -75,13 +75,13 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     @Override
     public ResponseEntity<Object> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
-                                                                           cwrsProfilesCreationRequest) {
+                                                                cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         try {
             getRolesAndUserTypes();
             cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
                 CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
-                        .findByEmailId(cwrProfileCreationRequest.getEmailId().toLowerCase());
+                    .findByEmailId(cwrProfileCreationRequest.getEmailId().toLowerCase());
                 if (Objects.isNull(caseWorkerProfile)) {
 
                     caseWorkerProfile = createCaseWorkerProfile(cwrProfileCreationRequest);
@@ -90,6 +90,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         caseWorkerProfiles.add(caseWorkerProfile);
 
                     }
+                    //CW not UP has it
+                    //409 identifier,
+                    //I get roles
+
                 } else if (Objects.nonNull(caseWorkerProfile) && !caseWorkerProfile.getDeleteFlag()) {
 
                     //update the existing case worker profile logic
@@ -97,7 +101,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
                     UserProfileUpdatedData usrProfileStatusUpdate = new UserProfileUpdatedData("SUSPENDED");
                     // updating the status in idam to suspend.
-                    modifyCaseWorkerUserStatus(usrProfileStatusUpdate,caseWorkerProfile.getCaseWorkerId(),"EXUI");
+                    modifyCaseWorkerUserStatus(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(), "EXUI");
                 }
             });
 
@@ -107,7 +111,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              saving it automatically saves data in the sub entities like cwlocation, cwWorkArea,cwRole and
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
-            if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
+            if (!CollectionUtils.isEmpty(caseWorkerProfiles)) {
                 caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
             }
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
@@ -117,8 +121,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
         return ResponseEntity
-                .status(201)
-                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
+            .status(201)
+            .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
@@ -129,25 +133,25 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         //User Profile Call
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
         if (Objects.nonNull(responseEntity) && responseEntity.getStatusCode().is2xxSuccessful()
-                && Objects.nonNull(responseEntity.getBody())) {
+            && Objects.nonNull(responseEntity.getBody())) {
 
             UserProfileCreationResponse userProfileCreationResponse
-                    = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
+                = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
 
             // case worker profile request mapping
-            caseWorkerProfile = mapCaseWorkerProfileRequest(userProfileCreationResponse,cwrdProfileRequest);
+            caseWorkerProfile = mapCaseWorkerProfileRequest(userProfileCreationResponse, cwrdProfileRequest);
 
             //Locations data request mapping and setting to case worker profile
             caseWorkerProfile.setCaseWorkerLocations(mapCaseWorkerLocationRequest(userProfileCreationResponse,
-                    cwrdProfileRequest));
+                cwrdProfileRequest));
             //caseWorkerRoles roles request mapping and data setting to case worker profile
             caseWorkerProfile.setCaseWorkerRoles(mapCaseWorkerRoleRequestMapping(userProfileCreationResponse,
-                    cwrdProfileRequest));
+                cwrdProfileRequest));
 
             //caseworkerworkarea request mapping
             cwrdProfileRequest.getWorkerWorkAreaRequests().forEach(caseWorkerWorkAreaRequest -> {
-                CaseWorkerWorkArea caseWorkerWorkArea =  new CaseWorkerWorkArea(userProfileCreationResponse.getIdamId(),
-                        caseWorkerWorkAreaRequest.getAreaOfWork(), caseWorkerWorkAreaRequest.getServiceCode());
+                CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea(userProfileCreationResponse.getIdamId(),
+                    caseWorkerWorkAreaRequest.getAreaOfWork(), caseWorkerWorkAreaRequest.getServiceCode());
                 caseWorkerWorkAreas.add(caseWorkerWorkArea);
             });
 
@@ -162,7 +166,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     public CaseWorkerProfile mapCaseWorkerProfileRequest(UserProfileCreationResponse userProfileCreationResponse,
-                                            CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+                                                         CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId(userProfileCreationResponse.getIdamId());
         caseWorkerProfile.setFirstName(cwrdProfileRequest.getFirstName());
@@ -176,34 +180,34 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     public List<CaseWorkerLocation> mapCaseWorkerLocationRequest(UserProfileCreationResponse userProfileCreationResp,
-                                             CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+                                                                 CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerLocation> cwLocations = new ArrayList<>();
         cwrdProfileRequest.getBaseLocations().forEach(location -> {
 
             CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation(userProfileCreationResp.getIdamId(),
-                    location.getLocationId(), location.getLocation(), location.isPrimaryFlag());
+                location.getLocationId(), location.getLocation(), location.isPrimaryFlag());
             cwLocations.add(caseWorkerLocation);
         });
         return cwLocations;
     }
 
-    public  List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
-                                                CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+    public List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
+                                                                CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
         cwrdProfileRequest.getRoles().forEach(role -> {
-            roleTypes.stream().filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                    .map(roleType -> {
-                        CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
-                            roleType.getRoleId(),role.isPrimaryFlag());
-                        return caseWorkerRoles.add(workerRole);
-                    });
+            roleTypes.stream().filter(roleType ->
+                role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                .forEach(roleType -> {
+                    CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
+                        roleType.getRoleId(), role.isPrimaryFlag());
+                    caseWorkerRoles.add(workerRole);
+                });
         });
         return caseWorkerRoles;
     }
 
     /**
-     *  Idam_UP call.
-     *
+     * Idam_UP call.
      */
     private ResponseEntity<Object> createUserProfileInIdamUP(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
@@ -226,12 +230,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
     public ResponseEntity<Object> modifyCaseWorkerUserStatus(UserProfileUpdatedData userProfileUpdatedData,
-                                                     String userId, String origin) {
+                                                             String userId, String origin) {
         Response response = null;
         Object clazz = null;
         try {
 
-            response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId,origin);
+            response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
             if (response.status() == 200) {
                 clazz = UserProfileCreationResponse.class;
             } else {
@@ -246,33 +250,32 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     /**
      * creating user profile request.
-     *
-     * */
+     */
     public UserProfileCreationRequest createUserProfileRequest(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
-                new HashSet<String>();
+            new HashSet<String>();
         userRoles.add("cwd-user");
         Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
         if (idamRoles.size() > 0) {
             userRoles.addAll(idamRoles);
         }
         //Creating user profile request
-        return  new UserProfileCreationRequest(
-                cwrdProfileRequest.getEmailId(),
-                cwrdProfileRequest.getFirstName(),
-                cwrdProfileRequest.getLastName(),
-                LanguagePreference.EN,
-                UserCategory.CASEWORKER,
-                UserTypeRequest.INTERNAL,
-                userRoles,
-                false);
+        return new UserProfileCreationRequest(
+            cwrdProfileRequest.getEmailId(),
+            cwrdProfileRequest.getFirstName(),
+            cwrdProfileRequest.getLastName(),
+            LanguagePreference.EN,
+            UserCategory.CASEWORKER,
+            UserTypeRequest.INTERNAL,
+            userRoles,
+            false);
     }
 
     /**
-     *  get the roleTypes and userTypes.
+     * get the roleTypes and userTypes.
      */
-    public  void getRolesAndUserTypes() {
+    public void getRolesAndUserTypes() {
 
         if (roleTypes.isEmpty()) {
             roleTypes = roleTypeRepository.findAll();
@@ -284,15 +287,15 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     /**
-     *  get the roles that needs to send to idam based on the roleType in the request.
+     * get the roles that needs to send to idam based on the roleType in the request.
      */
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
-        List<CaseWorkerIdamRoleAssociation>  idamRolesInRequest = new ArrayList<>();
+        List<CaseWorkerIdamRoleAssociation> idamRolesInRequest = new ArrayList<>();
         cwrdProfileRequest.getRoles().forEach(role -> {
             roleTypes.stream().filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
                 .map(roleType -> {
-                    List<CaseWorkerIdamRoleAssociation>  caseWorkerIdamRoles = cwIdamRoleAssocRepository
-                            .findByRoleType(roleType);
+                    List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoles = cwIdamRoleAssocRepository
+                        .findByRoleType(roleType);
                     return idamRolesInRequest.addAll(caseWorkerIdamRoles);
                 }).collect(toList());
         });
@@ -307,10 +310,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     /**
      * get the userTypeId by description.
      */
-    public Long getUserTypeIdByDesc(String  userTypeReq) {
+    public Long getUserTypeIdByDesc(String userTypeReq) {
         Optional<Long> userTypeId = userTypes.stream().filter(userType ->
-                userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
-                .map(userType -> userType.getUserTypeId()).findFirst();
+            userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
+            .map(userType -> userType.getUserTypeId()).findFirst();
         return userTypeId.orElse(0L);
     }
 

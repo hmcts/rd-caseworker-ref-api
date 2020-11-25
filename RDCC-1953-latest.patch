@@ -1,0 +1,1009 @@
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/ICasWorkerDomain.java
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/ICasWorkerDomain.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/ICasWorkerDomain.java	(revision d12621e4972a254150741b6f9937211cf785a774)
+@@ -1,4 +0,0 @@
+-package uk.gov.hmcts.reform.cwrdapi.client.domain;
+-
+-public interface ICasWorkerDomain {
+-}
+Index: src/test/java/uk/gov/hmcts/reform/cwrdapi/domain/ExceptionCaseWorkerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/uk/gov/hmcts/reform/cwrdapi/domain/ExceptionCaseWorkerTest.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/test/java/uk/gov/hmcts/reform/cwrdapi/domain/ExceptionCaseWorkerTest.java	(date 1605269937424)
+@@ -33,13 +33,9 @@
+ 
+     @Test
+     public void testCaseWorkerContainingAudit() {
+-        CaseWorkerAudit caseWorkerAudit = new CaseWorkerAudit();
+-        caseWorkerAudit.setJobId(1L);
+-
++        CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder().jobId(1L).build();
+         ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
+         exceptionCaseWorker.setCaseWorkerAudit(caseWorkerAudit);
+-
+         assertNotNull(exceptionCaseWorker.getCaseWorkerAudit());
+-
+     }
+ }
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/util/CaseWorkerConstants.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/util/CaseWorkerConstants.java	(date 1605268675210)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/util/CaseWorkerConstants.java	(date 1605268675210)
+@@ -0,0 +1,10 @@
++package uk.gov.hmcts.reform.cwrdapi.util;
++
++public class CaseWorkerConstants {
++
++   public static final String PARTIAL_SUCCESS = "PARTIAL SUCCESS";
++
++   public static final String SUCCESS = "SUCCESS";
++
++   public static final String FAILURE = "FAILURE";
++}
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/ServiceRoleMapping.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/ServiceRoleMapping.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/ServiceRoleMapping.java	(date 1605267904922)
+@@ -10,7 +10,7 @@
+ @Builder
+ @Getter
+ @Setter
+-public class ServiceRoleMapping implements ICasWorkerDomain {
++public class ServiceRoleMapping extends CasWorkerDomain {
+ 
+     @MappingField(columnName = "Service ID")
+     @NotEmpty
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/service/AuditService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/service/AuditService.java	(date 1605291064748)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/service/AuditService.java	(date 1605291064748)
+@@ -0,0 +1,49 @@
++package uk.gov.hmcts.reform.cwrdapi.service;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
++import org.springframework.stereotype.Component;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
++import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
++import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
++
++import java.util.List;
++import java.util.Set;
++
++import javax.validation.ConstraintViolation;
++
++@Component
++public class AuditService {
++
++    @Autowired
++    SimpleJpaRepository<CaseWorkerAudit, Long> repository;
++
++    @Autowired
++    SimpleJpaRepository<ExceptionCaseWorker,Long> exceptionCaseWorkerLongSimpleJpaRepository;
++
++    /**
++     * Capture and log scheduler details with file status.
++     * @param audit
++     * @return
++     */
++    public Long auditSchedulerStatus(CaseWorkerAudit audit) {
++       return repository.save(audit).getJobId();
++    }
++
++    /**
++     * Records JSR Exceptions in batches.
++     * @param exceptionCaseWorkers
++     */
++    public void auditException(Set<ConstraintViolation<CasWorkerDomain>> constraintViolationSet) {
++        constraintViolationSet.stream().map(s -> s.getRootBean());
++        //exceptionCaseWorkerLongSimpleJpaRepository.saveAll(exceptionCaseWorkers);
++    }
++
++    /**
++     * Records run time failures.
++     * @param exceptionCaseWorker
++     */
++    public void auditException(ExceptionCaseWorker exceptionCaseWorker) {
++        exceptionCaseWorkerLongSimpleJpaRepository.save(exceptionCaseWorker);
++    }
++}
+Index: src/test/java/uk/gov/hmcts/reform/cwrdapi/service/JsrValidatorInitializerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/uk/gov/hmcts/reform/cwrdapi/service/JsrValidatorInitializerTest.java	(date 1605183294252)
++++ src/test/java/uk/gov/hmcts/reform/cwrdapi/service/JsrValidatorInitializerTest.java	(date 1605183294252)
+@@ -0,0 +1,47 @@
++package uk.gov.hmcts.reform.cwrdapi.service;
++
++import org.junit.Before;
++import org.junit.Test;
++import org.mockito.InjectMocks;
++import org.mockito.Spy;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
++
++import java.util.ArrayList;
++import java.util.List;
++
++import static org.junit.Assert.assertEquals;
++import static org.mockito.Mockito.times;
++import static org.mockito.MockitoAnnotations.openMocks;
++import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
++import static org.mockito.Mockito.verify;
++
++public class JsrValidatorInitializerTest {
++
++    @Spy
++    @InjectMocks
++    JsrValidatorInitializer<CaseWorkerProfile> jsrValidatorInitializer;
++
++    @Before
++    public void init() {
++        openMocks(this);
++        jsrValidatorInitializer.initializeFactory();
++    }
++
++    @Test
++    public void testGetNoInvalidJsrRecords() {
++        List<CaseWorkerProfile> caseWorkerProfiles = buildCaseWorkerProfileData();
++        List<CaseWorkerProfile> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
++        assertEquals(records.size(), 0);
++        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
++    }
++
++    @Test
++    public void testGetInvalidJsrRecords() {
++        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
++        CaseWorkerProfile profile =  CaseWorkerProfile.builder().build();
++        caseWorkerProfiles.add(profile);
++        List<CaseWorkerProfile> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
++        assertEquals(records.size(), 1);
++        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
++    }
++}
+Index: src/main/resources/application.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/application.yaml	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/resources/application.yaml	(date 1605184496467)
+@@ -21,6 +21,8 @@
+         jdbc:
+           lob:
+             non_contextual_creation: true
++          batch_size: 10
++
+   application:
+     name: RD Caseworker Ref API
+   security:
+Index: src/integrationTest/resources/application-test.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/integrationTest/resources/application-test.yml	(date 1605176151941)
++++ src/integrationTest/resources/application-test.yml	(date 1605176151941)
+@@ -0,0 +1,62 @@
++spring:
++  flyway:
++    locations: classpath:db/migration,db/migrationAks
++  datasource:
++    driverClassName: org.h2.Driver
++    url: jdbc:h2:mem:locrefdata
++    platform: h2
++    username: ${POSTGRES_USERNAME:dbrdlocationref}
++    password: ${POSTGRES_PASSWORD:dbrdlocationref}
++  jpa:
++    show-sql: true
++    database-platform: org.hibernate.dialect.H2Dialect
++    hibernate:
++      ddl-auto: validate
++    properties:
++      hibernate:
++        enable_lazy_load_no_trans: true
++  main:
++    allow-bean-definition-overriding: true
++  security:
++    oauth2:
++      client:
++        provider:
++          oidc:
++            issuer-uri: ${OPEN_ID_API_BASE_URI:http://0.0.0.0:6000/o}
++        registration:
++          oidc:
++            client-id: microservicekey-rd-location-ref-api
++            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
++security:
++  anonymousPaths:
++    - "/"
++    - "/csrf"
++    - "/health"
++    - "/health/liveness"
++    - "/loggers/**"
++    - "/swagger-ui.html"
++    - "/swagger-resources/**"
++    - "/v2/api-docs"
++    - "/webjars/springfox-swagger-ui/**"
++    - "/favicon.ico"
++    - "/error"
++idam:
++  s2s-auth:
++    totp_secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
++    microservice: rd_location_ref_api
++    url: ${S2S_URL:http://127.0.0.1:8990}
++  client:
++      redirect_uri: https://rd-location-ref-api-aat.service.core-compute-aat.internal/oauth2redirect
++      id: rd-location-ref-api
++
++  s2s-authorised:
++    services: ${LRD_S2S_AUTHORISED_SERVICES:rd_location_ref_api}
++  api:
++    url: ${IDAM_URL:http://127.0.0.1:5000}
++
++auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
++oidc:
++  issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
++  expiration: 14400000 # milliseconds 4 hours
++
++loggingComponentName: Rd_location_ref_api
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/repository/ServiceRepositoryImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/repository/ServiceRepositoryImpl.java	(date 1605194345541)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/repository/ServiceRepositoryImpl.java	(date 1605194345541)
+@@ -0,0 +1,27 @@
++package uk.gov.hmcts.reform.cwrdapi.repository;
++
++import org.hibernate.Session;
++import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
++import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
++
++import java.io.Serializable;
++import java.util.List;
++
++import javax.persistence.EntityManager;
++
++public class ServiceRepositoryImpl<T, ID extends Serializable>
++    extends SimpleJpaRepository<T, ID>  implements BaseRepository<T, ID>  {
++
++    private EntityManager em;
++
++    public ServiceRepositoryImpl(Class<T> domainClass,
++                                 EntityManager entityManager) {
++        super(domainClass, entityManager);
++    }
++
++    public void saveAllInBatch(List<ExceptionCaseWorker> entities, int batchSize) {
++        Session session = em.unwrap(Session.class);
++        session.setJdbcBatchSize(batchSize);
++        em.persist(entities);
++    }
++}
+Index: src/integrationTest/resources/db/migration/V1_1__init_tables.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/integrationTest/resources/db/migration/V1_1__init_tables.sql	(date 1605176151941)
++++ src/integrationTest/resources/db/migration/V1_1__init_tables.sql	(date 1605176151941)
+@@ -0,0 +1,120 @@
++
++create schema if not exists dbrdcaseworker;
++
++create table case_worker_profile(
++	case_worker_id varchar(64),
++	first_name varchar(128),
++	last_name varchar(128),
++	email_id varchar(512) not null,
++	user_type_id int,
++	region varchar(64),
++	region_id integer not null,
++	delete_flag boolean,
++	delete_date timestamp,
++	created_date timestamp,
++	last_update timestamp,
++	constraint case_worker_profile_pk primary key (case_worker_id),
++	constraint email_id_unique unique (email_id)
++);
++
++create table case_worker_location(
++	case_worker_location_id serial,
++	case_worker_id varchar(64) not null,
++	location varchar(128),
++    location_id int not null,
++    primary_flag boolean,
++	created_date timestamp,
++	last_update timestamp,
++	constraint case_worker_location_pk primary key (case_worker_location_id),
++	constraint case_worker_locn_id_uq unique (case_worker_id,location_id)
++);
++
++
++
++create table case_worker_work_area(
++	case_worker_work_area_id serial,
++	case_worker_id varchar(64) not null,
++	area_of_work varchar(128) not null,
++    service_code varchar(16) not null,
++	created_date timestamp,
++	last_update timestamp,
++	constraint case_worker_work_area_pk primary key (case_worker_work_area_id),
++	constraint case_worker_work_area_uq unique (case_worker_id,service_code)
++);
++
++create table case_worker_role(
++	case_worker_role_id serial,
++	case_worker_id varchar(64) not null,
++	role_id int not null,
++	primary_flag boolean,
++	created_date timestamp,
++	last_update timestamp,
++	constraint case_worker_role_pk primary key (case_worker_role_id),
++	constraint case_worker_role_id_uq unique (case_worker_id,role_id)
++);
++
++create table role_type(
++	role_id int,
++	description varchar(512),
++	created_date timestamp,
++	last_update timestamp,
++	constraint role_id_pk primary key (role_id)
++);
++
++create table user_type(
++	user_type_id int,
++	description varchar(512),
++	created_date timestamp,
++	last_update timestamp,
++	constraint user_type_id_pk primary key (user_type_id)
++);
++
++create table case_worker_idam_role_assoc(
++    cw_idam_role_assoc_id serial,
++    role_id int not null,
++	service_code varchar(16) not null,
++	idam_role varchar(64) not null,
++	created_date timestamp,
++	last_update timestamp,
++	constraint cw_idam_role_assoc_id_pk primary key (cw_idam_role_assoc_id)
++);
++
++create table case_worker_audit (
++    job_id serial,
++    authenticated_user_id varchar(32),
++    job_start_time timestamp not null,
++    file_name varchar(64) not null,
++    job_end_time timestamp,
++    status varchar(32),
++    comments varchar(512),
++    constraint case_Worker_audit_pk primary key (job_id)
++);
++
++create table case_worker_exception (
++   id serial,
++   job_id bigint not null,
++   excel_row_id varchar(32),
++   email_id varchar(32),
++   field_in_error varchar(256),
++   error_description varchar(512),
++   updated_timestamp timestamp,
++   constraint case_worker_exception_pk primary key (id)
++);
++
++alter table case_worker_location add constraint case_worker_id_fk1 foreign key (case_worker_id)
++references case_worker_profile (case_worker_id);
++
++alter table case_worker_work_area add constraint case_worker_id_fk2 foreign key (case_worker_id)
++references case_worker_profile (case_worker_id);
++
++alter table case_worker_role add constraint case_worker_id_fk3 foreign key (case_worker_id)
++references case_worker_profile (case_worker_id);
++
++alter table case_worker_role add constraint role_id_fk1 foreign key (role_id)
++references role_type (role_id);
++
++alter table case_worker_idam_role_assoc add constraint role_id_fk2 foreign key (role_id)
++references role_type (role_id);
++
++alter table case_worker_exception add constraint job_id_fk1 foreign key (job_id)
++references case_worker_audit (job_id);
+\ No newline at end of file
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/repository/BaseRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/repository/BaseRepository.java	(date 1605193254450)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/repository/BaseRepository.java	(date 1605193254450)
+@@ -0,0 +1,12 @@
++package uk.gov.hmcts.reform.cwrdapi.repository;
++
++import org.springframework.data.repository.NoRepositoryBean;
++import org.springframework.data.repository.Repository;
++;
++
++import java.io.Serializable;
++
++@NoRepositoryBean
++public interface BaseRepository <T, ID extends Serializable> extends Repository<T, ID> {
++
++}
+Index: src/integrationTest/resources/db/migration/V1_2__add_sequences.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/integrationTest/resources/db/migration/V1_2__add_sequences.sql	(date 1605176151941)
++++ src/integrationTest/resources/db/migration/V1_2__add_sequences.sql	(date 1605176151941)
+@@ -0,0 +1,25 @@
++
++create sequence CASE_WORKER_LOCATION_ID_SEQ;
++create sequence CASE_WORKER_WORK_AREA_ID_SEQ;
++create sequence CASE_WORKER_ROLE_ID_SEQ;
++create sequence CW_IDAM_ROLE_ASSOC_ID_SEQ;
++create sequence JOB_ID_SEQ;
++create sequence EXCEPTION_ID_SEQ;
++
++ALTER TABLE case_worker_location ALTER COLUMN case_worker_location_id
++SET DEFAULT nextval('CASE_WORKER_LOCATION_ID_SEQ');
++
++ALTER TABLE case_worker_work_area ALTER COLUMN case_worker_work_area_id
++SET DEFAULT nextval('CASE_WORKER_WORK_AREA_ID_SEQ');
++
++ALTER TABLE case_worker_role ALTER COLUMN case_worker_role_id
++SET DEFAULT nextval('CASE_WORKER_ROLE_ID_SEQ');
++
++ALTER TABLE case_worker_idam_role_assoc ALTER COLUMN cw_idam_role_assoc_id
++SET DEFAULT nextval('CW_IDAM_ROLE_ASSOC_ID_SEQ');
++
++ALTER TABLE case_worker_audit ALTER COLUMN job_id
++SET DEFAULT nextval('JOB_ID_SEQ');
++
++ALTER TABLE case_worker_exception ALTER COLUMN id
++SET DEFAULT nextval('EXCEPTION_ID_SEQ');
+Index: src/integrationTest/resources/db/migration/V1_3__insert_queries_role_user_type.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/integrationTest/resources/db/migration/V1_3__insert_queries_role_user_type.sql	(date 1605176151941)
++++ src/integrationTest/resources/db/migration/V1_3__insert_queries_role_user_type.sql	(date 1605176151941)
+@@ -0,0 +1,7 @@
++-- insert queries for role_type table
++INSERT INTO role_type (role_id, description, created_date) VALUES (1, 'SENIOR_TRIBUNAL_CASEWORKER',timezone('utc', now()));
++INSERT INTO role_type (role_id, description, created_date) VALUES (2, 'TRIBUNAL_CASEWORKER',timezone('utc', now()));
++-- insert queries for user_type table
++INSERT INTO user_type (user_type_id, description, created_date) VALUES (1, 'CTSC',timezone('utc', now()));
++INSERT INTO user_type (user_type_id, description, created_date) VALUES (2, 'CTRT', timezone('utc', now()));
++INSERT INTO user_type (user_type_id, description, created_date) VALUES (3, 'Legal office', timezone('utc', now()));
+\ No newline at end of file
+Index: src/test/java/uk/gov/hmcts/reform/cwrdapi/controllers/WelcomeControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/uk/gov/hmcts/reform/cwrdapi/controllers/WelcomeControllerTest.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/test/java/uk/gov/hmcts/reform/cwrdapi/controllers/WelcomeControllerTest.java	(date 1605176151945)
+@@ -14,7 +14,7 @@
+     private final WelcomeController welcomeController = new WelcomeController();
+ 
+     @Test
+-    public void test_should_return_welcome_response() {
++    public void test_should_return_welcome_response() throws Exception {
+ 
+         ResponseEntity<String> responseEntity = welcomeController.welcome();
+         String expectedMessage = "Message for the Caseworker Ref Data API";
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/config/SecurityConfiguration.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/config/SecurityConfiguration.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/config/SecurityConfiguration.java	(date 1605271483720)
+@@ -5,9 +5,9 @@
+ import org.springframework.boot.context.properties.ConfigurationProperties;
+ import org.springframework.context.annotation.Bean;
+ import org.springframework.context.annotation.Configuration;
++import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+ import org.springframework.security.config.annotation.web.builders.WebSecurity;
+-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+ import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+@@ -18,18 +18,16 @@
+ import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+ import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
+ import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
+ import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
+ 
+ import java.util.List;
++
+ import javax.inject.Inject;
+ 
+-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+-
+ @Configuration
+ @ConfigurationProperties(prefix = "security")
+-@EnableWebSecurity
++//@EnableWebSecurity
+ @Slf4j
+ @SuppressWarnings("unchecked")
+ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+@@ -73,23 +71,23 @@
+ 
+     @Override
+     protected void configure(final HttpSecurity http) throws Exception {
+-        http
+-           .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
+-           .sessionManagement().sessionCreationPolicy(STATELESS).and()
+-           .csrf().disable()
+-           .formLogin().disable()
+-           .logout().disable()
+-           .authorizeRequests()
+-           .antMatchers("/error").permitAll()
+-           .anyRequest()
+-           .authenticated()
+-           .and()
+-           .oauth2ResourceServer()
+-           .jwt()
+-           .jwtAuthenticationConverter(jwtAuthenticationConverter)
+-           .and()
+-           .and()
+-            .oauth2Client();
++//        http
++//           .addFilterBefore(serviceAuthFilter, BearerTokenAuthenticationFilter.class)
++//           .sessionManagement().sessionCreationPolicy(STATELESS).and()
++//           .csrf().disable()
++//           .formLogin().disable()
++//           .logout().disable()
++//           .authorizeRequests()
++//           .antMatchers("/error").permitAll()
++//           .anyRequest()
++//           .authenticated()
++//           .and()
++//           .oauth2ResourceServer()
++//           .jwt()
++//           .jwtAuthenticationConverter(jwtAuthenticationConverter)
++//           .and()
++//           .and()
++//            .oauth2Client();
+     }
+ 
+     @Bean
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/config/RepositoryConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/config/RepositoryConfig.java	(date 1605279954142)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/config/RepositoryConfig.java	(date 1605279954142)
+@@ -0,0 +1,27 @@
++package uk.gov.hmcts.reform.cwrdapi.config;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
++import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
++import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
++
++import javax.persistence.EntityManager;
++
++@Configuration
++public class RepositoryConfig {
++
++    @Autowired
++    EntityManager entityManager;
++
++    @Bean
++    public SimpleJpaRepository<CaseWorkerAudit, Long> getCaseWorkerAuditRepository() {
++        return new SimpleJpaRepository<>(CaseWorkerAudit.class, entityManager);
++    }
++
++    @Bean
++    public SimpleJpaRepository<ExceptionCaseWorker, Long> getExceptionCaseWorkerRepository() {
++        return new SimpleJpaRepository<>(ExceptionCaseWorker.class, entityManager);
++    }
++}
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/service/JsrValidatorInitializer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/service/JsrValidatorInitializer.java	(date 1605194816703)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/service/JsrValidatorInitializer.java	(date 1605194816703)
+@@ -0,0 +1,63 @@
++package uk.gov.hmcts.reform.cwrdapi.service;
++
++import lombok.extern.slf4j.Slf4j;
++import org.springframework.beans.factory.annotation.Value;
++import org.springframework.stereotype.Component;
++
++import java.util.ArrayList;
++import java.util.LinkedHashSet;
++import java.util.List;
++import java.util.Set;
++
++import javax.annotation.PostConstruct;
++import javax.validation.ConstraintViolation;
++import javax.validation.Validation;
++import javax.validation.Validator;
++import javax.validation.ValidatorFactory;
++
++@Component
++@Slf4j
++public class JsrValidatorInitializer<T> {
++
++    private Validator validator;
++
++    private Set<ConstraintViolation<T>> constraintViolations;
++
++    @Value("${logging-component-name}")
++    private String logComponentName;
++
++    @PostConstruct
++    public void initializeFactory() {
++        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
++        validator = factory.getValidator();
++    }
++
++    /**
++     * JSR validation.
++     *
++     * @param domains List
++     * @return List binder list
++     */
++    public List<T> getInvalidJsrRecords(List<T> domains) {
++
++        log.info("{}:: JsrValidatorInitializer data processing validate starts::", logComponentName);
++        this.constraintViolations = new LinkedHashSet<>();
++        List<T> invalidList = new ArrayList<>();
++        domains.forEach(domain -> {
++            Set<ConstraintViolation<T>> constraintViolations = validator.validate(domain);
++            if (constraintViolations.size() > 0) {
++                invalidList.add(domain);
++            }
++            this.constraintViolations.addAll(constraintViolations);
++        });
++
++        log.info("{}:: JsrValidatorInitializer data processing validate complete::", logComponentName);
++        return invalidList;
++    }
++
++    public Set<ConstraintViolation<T>> getConstraintViolations() {
++        return constraintViolations;
++    }
++
++}
++
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/CasWorkerDomain.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/CasWorkerDomain.java	(date 1605268675219)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/CasWorkerDomain.java	(date 1605268675219)
+@@ -0,0 +1,5 @@
++package uk.gov.hmcts.reform.cwrdapi.client.domain;
++
++public abstract class CasWorkerDomain {
++    protected long rowId;
++}
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/service/ValidationService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/service/ValidationService.java	(date 1605280192237)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/service/ValidationService.java	(date 1605280192237)
+@@ -0,0 +1,60 @@
++package uk.gov.hmcts.reform.cwrdapi.service;
++
++import org.apache.commons.lang3.tuple.ImmutablePair;
++import org.apache.commons.lang3.tuple.Pair;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Component;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
++import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
++
++import java.time.LocalDateTime;
++import java.util.List;
++import java.util.Set;
++
++import javax.validation.ConstraintViolation;
++
++import static java.util.stream.Collectors.toList;
++import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
++
++@Component
++public class ValidationService {
++
++    @Autowired
++    JsrValidatorInitializer<CasWorkerDomain> jsrValidatorInitializer;
++
++    @Autowired
++    AuditService auditService;
++
++    /***
++     * Returns invalid record list and JSR Constraint violations pair.
++     * @param caseWorkerProfileList
++     * @param fileName
++     * @param jobId
++     * @return
++     * @throws Exception
++     */
++    public Pair<List<CasWorkerDomain>,  Set<ConstraintViolation<CasWorkerDomain>>> getInvalidRecordsWithJsrConstraints
++        (List<CasWorkerDomain> caseWorkerProfileList, String fileName, long jobId )
++        throws Exception {
++
++        //Gets Invalid records
++        List<CasWorkerDomain> invalidRecords = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfileList);
++        Set<ConstraintViolation<CasWorkerDomain>> constraintViolationSet
++            = jsrValidatorInitializer.getConstraintViolations();
++
++        Pair<List<CasWorkerDomain>,  Set<ConstraintViolation<CasWorkerDomain>>> pair =
++            new ImmutablePair<>(invalidRecords, constraintViolationSet);
++
++        CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder()
++            .fileName(fileName)
++            //.jobId(jobId)
++            .jobStartTime(LocalDateTime.now())
++            .status(PARTIAL_SUCCESS).build();
++        //Audit Invalid Records & Update Job status to Partial success
++        auditService.auditSchedulerStatus(caseWorkerAudit);
++
++
++
++        return pair;
++    }
++}
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/WelcomeController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/WelcomeController.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/WelcomeController.java	(date 1605279235653)
+@@ -4,6 +4,7 @@
+ import io.swagger.annotations.ApiResponse;
+ import io.swagger.annotations.ApiResponses;
+ import lombok.extern.slf4j.Slf4j;
++import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.beans.factory.annotation.Value;
+ import org.springframework.http.CacheControl;
+ import org.springframework.http.ResponseEntity;
+@@ -11,6 +12,12 @@
+ import org.springframework.web.bind.annotation.ResponseBody;
+ import org.springframework.web.bind.annotation.RestController;
+ 
++import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.CasWorkerDomain;
++import uk.gov.hmcts.reform.cwrdapi.service.ValidationService;
++
++import java.util.ArrayList;
++import java.util.List;
+ import java.util.UUID;
+ 
+ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+@@ -29,6 +36,9 @@
+     private static final String INSTANCE_ID = UUID.randomUUID().toString();
+     private static final String MESSAGE = "Message for the Caseworker Ref Data API";
+ 
++    @Autowired
++    ValidationService validationService;
++
+ 
+     /**
+      * Root GET endpoint.
+@@ -49,14 +59,18 @@
+         )
+     })
+     @GetMapping(
+-        path = "/",
++        path = "/test",
+         produces = APPLICATION_JSON_VALUE
+     )
+     @ResponseBody
+-    public ResponseEntity<String> welcome() {
++    public ResponseEntity<String> welcome() throws Exception {
+ 
+         log.info("{}:: Welcome '{}' from running instance: {}", loggingComponentName, MESSAGE, INSTANCE_ID);
+ 
++        CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
++        List<CasWorkerDomain> caseWorkerProfileList = new ArrayList<>();
++        caseWorkerProfileList.add(profile);
++        validationService.getInvalidRecordsWithJsrConstraints(caseWorkerProfileList, "caseworker.xlsx", 1);
+         return ResponseEntity
+             .ok()
+             .cacheControl(CacheControl.noCache())
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/CaseWorkerProfile.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/CaseWorkerProfile.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/CaseWorkerProfile.java	(date 1605267904917)
+@@ -12,7 +12,7 @@
+ @Builder
+ @Getter
+ @Setter
+-public class CaseWorkerProfile implements ICasWorkerDomain {
++public class CaseWorkerProfile extends CasWorkerDomain {
+ 
+     @MappingField(columnName = "FIRST NAME")
+     @NotEmpty
+Index: src/test/java/uk/gov/hmcts/reform/cwrdapi/TestSupport.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/uk/gov/hmcts/reform/cwrdapi/TestSupport.java	(date 1605182653493)
++++ src/test/java/uk/gov/hmcts/reform/cwrdapi/TestSupport.java	(date 1605182653493)
+@@ -0,0 +1,38 @@
++package uk.gov.hmcts.reform.cwrdapi;
++
++import com.google.common.collect.ImmutableList;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
++import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
++
++import java.util.List;
++
++public class TestSupport {
++
++    public static List<CaseWorkerProfile> buildCaseWorkerProfileData() {
++
++        ImmutableList<Location> locations = ImmutableList.of
++            (Location.builder().baseLocationId(1)
++                .primaryBaseLocationName("1").isPrimary(true).build());
++
++        ImmutableList<WorkArea> workAreas = ImmutableList.of
++            (WorkArea.builder().serviceCode("AAA1").areaOfWork("area1").build());
++
++
++        ImmutableList<Role> roles = ImmutableList.of
++            (Role.builder().isPrimary(true)
++                .primaryRoleName("rl1").build());
++
++        return ImmutableList.of(CaseWorkerProfile.builder().
++            firstName("test").lastName("test")
++            .officialEmail("test@test.com")
++            .regionId(1)
++            .regionName("test")
++            .userType("testUser")
++            .workAreas(workAreas)
++            .locations(locations)
++            .roles(roles)
++            .build());
++    }
++}
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/CaseWorkerAudit.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/CaseWorkerAudit.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/CaseWorkerAudit.java	(date 1605271903035)
+@@ -1,40 +1,37 @@
+ package uk.gov.hmcts.reform.cwrdapi.domain;
+ 
++import lombok.AllArgsConstructor;
++import lombok.Builder;
+ import lombok.Getter;
+ import lombok.NoArgsConstructor;
+ import lombok.Setter;
+ import org.hibernate.annotations.Fetch;
+ import org.hibernate.annotations.FetchMode;
+-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+ 
+ import java.io.Serializable;
+ import java.time.LocalDateTime;
+ import java.util.ArrayList;
+ import java.util.List;
++
+ import javax.persistence.Column;
+ import javax.persistence.Entity;
+-import javax.persistence.EntityListeners;
++import javax.persistence.GeneratedValue;
++import javax.persistence.GenerationType;
+ import javax.persistence.Id;
+-import javax.persistence.NamedAttributeNode;
+-import javax.persistence.NamedEntityGraph;
+ import javax.persistence.OneToMany;
+ import javax.validation.constraints.Size;
+ 
+ @Entity(name = "case_worker_audit")
+ @Getter
+ @Setter
++@Builder
+ @NoArgsConstructor
+-@EntityListeners(AuditingEntityListener.class)
+-@NamedEntityGraph(
+-        name = "CaseWorkerAudit.alljoins",
+-        attributeNodes = {
+-                @NamedAttributeNode(value = "exceptionCaseWorkers")
+-        }
+-)
++@AllArgsConstructor
+ public class CaseWorkerAudit implements Serializable {
+ 
+     @Id
+     @Column(name = "job_id")
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Long jobId;
+ 
+     @Column(name = "authenticated_user_id")
+@@ -61,6 +58,6 @@
+ 
+     @Fetch(FetchMode.SUBSELECT)
+     @OneToMany(targetEntity = ExceptionCaseWorker.class, mappedBy = "caseWorkerAudit")
+-    private List<ExceptionCaseWorker> exceptionCaseWorkers = new ArrayList<>();
++    private List<ExceptionCaseWorker> exceptionCaseWorkers;
+ 
+ }
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/ExceptionCaseWorker.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/ExceptionCaseWorker.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/ExceptionCaseWorker.java	(date 1605268095175)
+@@ -21,7 +21,6 @@
+ @Getter
+ @Setter
+ @NoArgsConstructor
+-@EntityListeners(AuditingEntityListener.class)
+ public class ExceptionCaseWorker implements Serializable {
+ 
+     @Id
+Index: src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/WorkArea.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/WorkArea.java	(revision d12621e4972a254150741b6f9937211cf785a774)
++++ src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/WorkArea.java	(date 1605182653498)
+@@ -1,14 +1,20 @@
+ package uk.gov.hmcts.reform.cwrdapi.client.domain;
+ 
++import lombok.Builder;
++import lombok.Getter;
++import lombok.Setter;
+ import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
+ 
++@Builder
++@Getter
++@Setter
+ public class WorkArea {
+ 
+     @MappingField(columnName = "Aow1 Service Code,Aow2 Service Code,Aow3 Service Code,Aow4 Service Code,"
+         + "Aow5 Service Code, Aow6 Service Code,Aow7 Service Code,Aow8 Service Code")
+-    int serviceCode;
++    String serviceCode;
+ 
+     @MappingField(columnName = "Area of Work1,Area of Work2,Area of Work3,Area of Work4,Area of Work5,Area of Work6,"
+         + "Area of Work7,Area of Work8")
+-    int areaOfWork;
++    String areaOfWork;
+ }

@@ -8,10 +8,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder(builderMethodName = "caseWorkerRoleRequest")
+@Builder
 public class CaseWorkerRoleRequest {
 
+    @JsonProperty("role")
     private String role;
+    @JsonProperty("is_primary")
     private boolean isPrimaryFlag;
 
     @JsonCreator

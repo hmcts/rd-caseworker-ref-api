@@ -68,20 +68,20 @@ public class CaseWorkerServiceImplTest {
                 new CaseWorkerRoleRequest("testRole", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
-                .caseWorkersLocationRequest()
+                .builder()
                 .isPrimaryFlag(true)
                 .location("testLocation")
                 .locationId(1)
                 .build();
 
         CaseWorkerWorkAreaRequest caseWorkerWorkAreaRequest = CaseWorkerWorkAreaRequest
-                .caseWorkerWorkAreaRequest()
+            .builder()
                 .areaOfWork("testAOW")
                 .serviceCode("testServiceCode")
                 .build();
 
         caseWorkersProfileCreationRequest = CaseWorkersProfileCreationRequest
-                .caseWorkersProfileCreationRequest()
+                .builder()
                 .deleteFlag(false)
                 .emailId("test@test.com")
                 .idamRoles(idamRoles)

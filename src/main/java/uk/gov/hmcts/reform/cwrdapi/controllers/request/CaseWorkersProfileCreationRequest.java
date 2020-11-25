@@ -11,18 +11,27 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Builder(builderMethodName = "caseWorkersProfileCreationRequest")
+@Builder
 public class CaseWorkersProfileCreationRequest {
 
+    @JsonProperty("first_name")
     private String firstName;
+    @JsonProperty("last_name")
     private String lastName;
     private String emailId;
+    @JsonProperty("region_id")
     private Integer regionId;
+    @JsonProperty("user_type")
     private String userType;
+    @JsonProperty("region")
     private String region;
+    @JsonProperty("delete_flag")
     private boolean deleteFlag;
+    @JsonProperty("idam_roles")
     private Set<String> idamRoles;
+    @JsonProperty("roles")
     private List<CaseWorkerRoleRequest> roles;
+    @JsonProperty("base_location")
     private List<CaseWorkerLocationRequest> baseLocations;
 
     private List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests;

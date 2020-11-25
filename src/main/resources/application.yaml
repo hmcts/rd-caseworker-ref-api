@@ -98,7 +98,7 @@ feign:
     headers:
       - authorization
       - serviceauthorization
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+userProfUrl: ${USER_PROFILE_URL:https://rd-user-profile-api-pr-575.service.core-compute-preview.internal}
 cwrd:
   host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
   username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
