@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.BooleanUtils.negate;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -93,23 +93,19 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     //called once per file only
-    private List<Triple<String,Field, List<Field>>> createBeanFieldMaps(Class objectClass,
+    private <T> List<Triple<String,Field, List<Field>>> createBeanFieldMaps(Class<T> objectClass,
                                                                   Map<String, Field> headerToCellValueMap) {
         List<Triple<String,Field, List<Field>>> customObjects = new ArrayList<>();
         for (Field field: objectClass.getDeclaredFields()) {
             MappingField mappingField = findAnnotation(field, MappingField.class);
             if (isNull(mappingField)) {
                 // do nothing
-            } else if (negate(mappingField.columnName().isEmpty())) {
+            } else if (!(mappingField.columnName().isEmpty())) {
                 headerToCellValueMap.put(mappingField.columnName(), field);
-            } else { // make triple of child domain object
-                List<Field> customObjectFields = new ArrayList<>();
-                Class childDomainObjectClassType = mappingField.clazz();
-                for (Field childField: childDomainObjectClassType.getDeclaredFields()) {
-                    customObjectFields.add(childField);
-                }
+            } else {
                 // make triple of child domain object class name, parent field, respective list of domain object fields
-                customObjects.add(Triple.of(childDomainObjectClassType.getCanonicalName(), field, customObjectFields));
+                customObjects.add(Triple.of(mappingField.clazz().getCanonicalName(), field,
+                        asList(mappingField.clazz().getDeclaredFields())));
             }
         }
         return customObjects;
