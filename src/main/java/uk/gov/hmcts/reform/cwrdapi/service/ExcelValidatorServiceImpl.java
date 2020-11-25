@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 
 import java.io.IOException;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.negate;
 import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
@@ -54,17 +53,23 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
 
     /**
      * Validates extension and type of file is excel or not.
-     * @param excelFile multipart file for processing
+     * @param file multipart file for processing
      */
-    public static void isTypeExcel(MultipartFile excelFile) {
-        if (isNull(excelFile) || isNull(excelFile.getOriginalFilename()) || isNull(excelFile.getContentType())) {
+    public static void isTypeExcel(MultipartFile file) {
+        if (nonNull(file)) {
+            String fileName = file.getOriginalFilename();
+            String contentType = file.getContentType();
+            if (nonNull(fileName) && nonNull(contentType)) {
+                //sonar mandates to check null, as for multipart file name and content will never be null
+                if ((negate(fileName.endsWith(".xlsx") || fileName.endsWith(".xls"))
+                        || negate((TYPE_XLS.equals(contentType) || TYPE_XLSX.equals(contentType))))) {
+                    throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
+                }
+            } else {
+                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
+            }
+        } else {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
-        } else if ((nonNull(excelFile.getContentType()) && nonNull(excelFile.getOriginalFilename())) //sonar dont allow
-                && (negate(excelFile.getOriginalFilename().endsWith(".xlsx")
-                || excelFile.getOriginalFilename().endsWith(".xls"))
-                || negate((TYPE_XLS.equals(excelFile.getContentType())
-                || TYPE_XLSX.equals(excelFile.getContentType()))))) {
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
         }
     }
 }
