@@ -56,13 +56,13 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
      * @param excelFile multipart file for processing
      */
     public static void isTypeExcel(MultipartFile excelFile) {
-        if (isNull(excelFile)) {
+        if (isNull(excelFile) || isNull(excelFile.getOriginalFilename())) {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
-        } else if (isNull(excelFile.getOriginalFilename()) || isNull(excelFile.getContentType())
+        } else if (isNull(excelFile.getContentType())
                 || negate(excelFile.getOriginalFilename().endsWith(".xlsx")
                 || excelFile.getOriginalFilename().endsWith(".xls"))
                 || negate((TYPE_XLS.equals(excelFile.getContentType())
-                    || TYPE_XLSX.equals(excelFile.getContentType())))) {
+                || TYPE_XLSX.equals(excelFile.getContentType())))) {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
         }
     }

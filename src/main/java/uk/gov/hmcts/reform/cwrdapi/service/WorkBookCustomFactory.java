@@ -24,11 +24,11 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class WorkBookCustomFactory extends WorkbookFactory {
 
-    public static String FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE = "File is not password protected";
-    public static String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
-    public static String ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
-    public static String CLASS_XSSF_WORKBOOK_FACTORY = "org.apache.poi.xssf.usermodel.XSSFWorkbookFactory";
-    public static String CLASS_HSSF_WORKBOOK_FACTORY = "org.apache.poi.hssf.usermodel.HSSFWorkbookFactory";
+    public static final String FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE = "File is not password protected";
+    public static final String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
+    public static final String ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
+    public static final String CLASS_XSSF_WORKBOOK_FACTORY = "org.apache.poi.xssf.usermodel.XSSFWorkbookFactory";
+    public static final String CLASS_HSSF_WORKBOOK_FACTORY = "org.apache.poi.hssf.usermodel.HSSFWorkbookFactory";
 
     /**
      * Authenticate password file and if successful the returns Workbook object.
