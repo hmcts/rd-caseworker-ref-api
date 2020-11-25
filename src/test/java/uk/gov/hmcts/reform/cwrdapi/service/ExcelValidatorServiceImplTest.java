@@ -53,54 +53,50 @@ public class ExcelValidatorServiceImplTest {
     }
 
     @Test
-    public void sendXlsWithIncorrectPasswordSetTest() {
-        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(
-                getMultipartFile("src/test/resources/WithIncorrectPassword.xls",
-                        TYPE_XLS)))
+    public void sendXlsWithIncorrectPasswordSetTest() throws IOException {
+
+        MultipartFile file = getMultipartFile("src/test/resources/WithIncorrectPassword.xls", TYPE_XLS);
+        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_PASSWORD_INCORRECT_ERROR_MESSAGE);
     }
 
     @Test
-    public void sendXlsWithNoPasswordSetTest() {
+    public void sendXlsWithNoPasswordSetTest() throws IOException {
+        MultipartFile file = getMultipartFile("src/integrationTest/resources/WithNoPasswordSet.xls", TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl
-                .validateExcelFile(getMultipartFile("src/integrationTest/resources/WithNoPasswordSet.xls",
-                        TYPE_XLS)))
+                .validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
     public void sendXlsxWithCorrectPasswordTest() throws IOException {
-        Workbook workbook = excelValidatorServiceImpl.validateExcelFile(
-                getMultipartFile("src/test/resources/WithCorrectPassword.xlsx",
-                        TYPE_XLSX));
+        MultipartFile file = getMultipartFile("src/test/resources/WithCorrectPassword.xlsx", TYPE_XLSX);
+        Workbook workbook = excelValidatorServiceImpl.validateExcelFile(file);
         assertThat(workbook).isNotNull();
     }
 
     @Test
-    public void sendXlsxWithIncorrectPasswordSetTest() {
-        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(
-                getMultipartFile("src/test/resources/WithIncorrectPassword.xlsx",
-                        TYPE_XLSX)))
+    public void sendXlsxWithIncorrectPasswordSetTest() throws IOException {
+        MultipartFile file = getMultipartFile("src/test/resources/WithIncorrectPassword.xlsx", TYPE_XLSX);
+        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_PASSWORD_INCORRECT_ERROR_MESSAGE);
     }
 
     @Test
-    public void sendXlsxWithNoPasswordSetTest() {
-        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(
-                getMultipartFile("src/test/resources/WithNoPasswordSet.xlsx",
-                        TYPE_XLSX)))
+    public void sendXlsxWithNoPasswordSetTest() throws IOException {
+        MultipartFile file = getMultipartFile("src/test/resources/WithNoPasswordSet.xlsx", TYPE_XLSX);
+        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
-    public void sendTextFileTest() {
-        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(
-                getMultipartFile("src/test/resources/test.txt",
-                        "text/plain")))
+    public void sendTextFileTest() throws IOException {
+        MultipartFile file = getMultipartFile("src/test/resources/test.txt", "text/plain");
+        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
     }

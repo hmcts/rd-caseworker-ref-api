@@ -5,5 +5,5 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.util.List;
 
 public interface ExcelAdaptorService {
-    List<Object> parseExcel(Workbook workbook, Class classType);
+    <T> List<T>  parseExcel(Workbook workbook, Class<T> classType);
 }

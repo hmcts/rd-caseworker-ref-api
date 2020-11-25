@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.negate;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
@@ -27,21 +28,24 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @Service
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
-    public static String FILE_NO_DATA_ERROR_MESSAGE = "No data in Excel File";
-    public static String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
-    public static String IS_PRIMARY_FIELD = "isPrimary";
-    public static String DELIMITER_COMMA = ",";
+    public static final String FILE_NO_DATA_ERROR_MESSAGE = "No data in Excel File";
+    public static final String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
+    public static final String IS_PRIMARY_FIELD = "isPrimary";
+    public static final String DELIMITER_COMMA = ",";
 
-    public List<Object> parseExcel(Workbook workbook, Class classType) {
+    public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
+        if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
+        }
         Sheet sheet = workbook.getSheetAt(1);
-        if (sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
+        if (nonNull(sheet) && sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
         return mapToPojo(sheet, classType);
     }
 
-    private List<Object> mapToPojo(Sheet sheet, Class classType) {
-        List<Object> objectList = new ArrayList<>();
+    private <T> List<T> mapToPojo(Sheet sheet, Class<T> classType) {
+        List<T> objectList = new ArrayList<>();
         Map<String, Object> childHeaderToCellMap = new HashMap<>();
         Map<String, Field> parentFieldMap = new HashMap<>();
         List<String> headers = new LinkedList<>();
@@ -60,7 +64,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                         childHeaderToCellMap);
             }
             populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
-            objectList.add(bean);
+            objectList.add((T) bean);
         }
         return objectList;
     }
@@ -68,7 +72,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private void populateChildDomainObjects(
             Object parentBean, List<Triple<String,Field, List<Field>>> customObjectFields,
             Map<String, Object> childHeaderValues) {
-        customObjectFields.forEach((customObjectTriple) -> {
+        customObjectFields.forEach(customObjectTriple -> {
             Field parentField = customObjectTriple.getMiddle();
             List domainObjectList = new ArrayList();
             int objectCount = findAnnotation(parentField, MappingField.class).objectCount();//take count from parent
@@ -94,7 +98,9 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         List<Triple<String,Field, List<Field>>> customObjects = new ArrayList<>();
         for (Field field: objectClass.getDeclaredFields()) {
             MappingField mappingField = findAnnotation(field, MappingField.class);
-            if (negate(mappingField.columnName().isEmpty())) {
+            if (isNull(mappingField)) {
+                continue;
+            } else if (negate(mappingField.columnName().isEmpty())) {
                 headerToCellValueMap.put(mappingField.columnName(), field);
             } else { // make triple of child domain object
                 List<Field> customObjectFields = new ArrayList<>();

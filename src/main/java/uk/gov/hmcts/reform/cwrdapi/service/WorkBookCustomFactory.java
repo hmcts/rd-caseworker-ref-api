@@ -47,36 +47,40 @@ public class WorkBookCustomFactory extends WorkbookFactory {
         FileMagic fm = FileMagic.valueOf(is);
         switch (fm) {
             case OLE2:
-                POIFSFileSystem fs = new POIFSFileSystem(is);
-                DirectoryNode directoryNode = fs.getRoot();
-                if (directoryNode.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
-                    InputStream stream = null;
-                    try {
-                        stream = DocumentFactoryHelper.getDecryptedStream(directoryNode, password);
-                        initXssf();
-                        return createXssfByStream.apply(stream);
-                    } finally {
-                        IOUtils.closeQuietly(stream);
-                        fs.getRoot().getFileSystem().close();
-                    }
-                } else {
-                    try {
-                        new HSSFWorkbook(fs).isWriteProtected();
-                    } catch (EncryptedDocumentException ede) {
-                        setCurrentUserPassword(password);
-                        try {
-                            initHssf();
-                            return createHssfByNode.apply(directoryNode);
-                        } finally {
-                            setCurrentUserPassword(null);
-                        }
-                    }
-                    throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
-                }
+                return createWorkBook(password, is);
             case OOXML:
                 throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
             default:
                 throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
+        }
+    }
+
+    private static Workbook createWorkBook(String password, InputStream is) throws IOException {
+        POIFSFileSystem fs = new POIFSFileSystem(is);
+        DirectoryNode directoryNode = fs.getRoot();
+        if (directoryNode.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
+            InputStream stream = null;
+            try {
+                stream = DocumentFactoryHelper.getDecryptedStream(directoryNode, password);
+                initXssf();
+                return createXssfByStream.apply(stream);
+            } finally {
+                IOUtils.closeQuietly(stream);
+                fs.getRoot().getFileSystem().close();
+            }
+        } else {
+            try {
+                new HSSFWorkbook(fs).isWriteProtected();
+            } catch (EncryptedDocumentException ede) {
+                setCurrentUserPassword(password);
+                try {
+                    initHssf();
+                    return createHssfByNode.apply(directoryNode);
+                } finally {
+                    setCurrentUserPassword(null);
+                }
+            }
+            throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
         }
     }
 

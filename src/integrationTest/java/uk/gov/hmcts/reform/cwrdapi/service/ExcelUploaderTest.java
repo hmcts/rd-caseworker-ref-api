@@ -111,7 +111,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
         Workbook workbook = excelValidatorService.validateExcelFile(
                 getMultipartFile("src/integrationTest/resources/WithCorrectPassword.xlsx",
                         TYPE_XLSX));
-        List<Object> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
+        List<CaseWorkerProfile> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();

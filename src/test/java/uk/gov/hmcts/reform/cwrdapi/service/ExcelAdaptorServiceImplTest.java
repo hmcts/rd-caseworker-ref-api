@@ -28,7 +28,7 @@ public class ExcelAdaptorServiceImplTest {
         Workbook workbook = WorkbookFactory
                 .create(new File("src/test/resources/WithCorrectPassword.xlsx"), "1234");
 
-        List<Object> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
+        List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();

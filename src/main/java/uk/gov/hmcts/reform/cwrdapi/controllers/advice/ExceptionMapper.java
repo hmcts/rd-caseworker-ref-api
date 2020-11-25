@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants;
 
 import java.text.SimpleDateFormat;
@@ -39,6 +40,12 @@ public class ExceptionMapper {
     public ResponseEntity<Object> customValidationError(
         InvalidRequestException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, ErrorConstants.INVALID_REQUEST_EXCEPTION.getErrorMessage());
+    }
+
+    @ExceptionHandler(ExcelValidationException.class)
+    public ResponseEntity<Object> excelValidationExceptionHandler(
+            ExcelValidationException ex) {
+        return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
     }
 
     private String getTimeStamp() {
