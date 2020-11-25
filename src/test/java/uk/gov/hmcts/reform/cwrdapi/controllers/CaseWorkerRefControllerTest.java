@@ -6,15 +6,18 @@ import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CaseWorkerRefControllerTest {
 
@@ -92,5 +96,25 @@ public class CaseWorkerRefControllerTest {
 
         caseWorkersProfileCreationRequest = null;
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+    }
+
+    @Test
+    public void test_buildIdamRoleMappings_success() {
+        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
+                .serivceId("BA11")
+                .idamRoles("role1")
+                .roleId(1)
+                .build();
+
+        IdamRoleAssocResponse idamRoleAssocResponse = new IdamRoleAssocResponse(200, "testMessage");
+        when(caseWorkerServiceMock.buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping)))
+                .thenReturn(idamRoleAssocResponse);
+        ResponseEntity<String> actual = caseWorkerRefController
+                .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
+
+        assertNotNull(actual);
+        assertThat(actual.getStatusCodeValue()).isEqualTo(200);
+        verify(caseWorkerServiceMock,times(1))
+                .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
     }
 }

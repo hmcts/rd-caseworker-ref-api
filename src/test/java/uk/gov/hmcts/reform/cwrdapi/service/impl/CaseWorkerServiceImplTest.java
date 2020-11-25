@@ -11,11 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepos
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -33,6 +36,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -50,6 +54,8 @@ public class CaseWorkerServiceImplTest {
     private CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
     @Mock
     private UserProfileFeignClient userProfileFeignClient;
+    @Mock
+    private IdamRoleMappingService idamRoleMappingService;
 
     private CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest;
     private RoleType roleType;
@@ -156,5 +162,34 @@ public class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(),any(),any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
         assertThat(objectResponseEntity.getStatusCodeValue()).isEqualTo(201);
+    }
+
+    @Test
+    public void test_buildIdamRoleMappings_success() {
+        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
+                .serivceId("BA11")
+                .idamRoles("role1")
+                .roleId(1)
+                .build();
+
+        IdamRoleAssocResponse idamRoleAssocResponse = caseWorkerServiceImpl
+                .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
+
+        assertThat(idamRoleAssocResponse.getStatusCode()).isEqualTo(200);
+        assertThat(idamRoleAssocResponse.getMessage())
+                .isEqualTo("Successfully built the idam role mappings for case worker roles");
+    }
+
+    @Test
+    public void test_buildIdamRoleMappings_exception() {
+        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().build();
+        doThrow(new RuntimeException("Exception message"))
+                .when(idamRoleMappingService).buildIdamRoleAssociation(any());
+
+        IdamRoleAssocResponse idamRoleAssocResponse = caseWorkerServiceImpl
+                .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
+
+        assertThat(idamRoleAssocResponse.getStatusCode()).isEqualTo(500);
+        assertThat(idamRoleAssocResponse.getMessage()).isEqualTo("Exception message");
     }
 }
