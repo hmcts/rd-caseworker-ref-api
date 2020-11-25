@@ -114,6 +114,6 @@ public class ExcelValidatorServiceImplTest {
         MultipartFile file = getMultipartFile("src/test/resources/test.txt", null);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
+                .hasMessage(FILE_NOT_PRESENT_ERROR_MESSAGE);
     }
 }
