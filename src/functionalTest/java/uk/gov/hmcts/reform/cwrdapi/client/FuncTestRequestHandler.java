@@ -20,7 +20,7 @@ public class FuncTestRequestHandler {
     @Value("${targetInstance}")
     protected String caseWorkerApiUrl;
 
-    public static final String BEARER = "BEARER";
+    public static final String BEARER = "Bearer ";
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -30,17 +30,17 @@ public class FuncTestRequestHandler {
             path);
     }
 
-    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz) {
-        return sendGet(httpStatus, urlPath).as(clazz);
+    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz, String baseUrl) {
+        return sendGet(httpStatus, urlPath, baseUrl).as(clazz);
     }
 
-    public Response sendGet(HttpStatus httpStatus, String urlPath) {
+    public Response sendGet(HttpStatus httpStatus, String urlPath, String baseUrl) {
 
         return SerenityRest
             .given()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .baseUri(caseWorkerApiUrl)
-            .header("ServiceAuthorization", BEARER + getS2sToken())
+            .baseUri(baseUrl)
+            .header("ServiceAuthorization", getS2sToken())
             .header("Authorization", BEARER + getSidamToken())
             .when()
             .get(urlPath)
@@ -48,5 +48,4 @@ public class FuncTestRequestHandler {
             .log().all(true)
             .statusCode(httpStatus.value()).extract().response();
     }
-
 }

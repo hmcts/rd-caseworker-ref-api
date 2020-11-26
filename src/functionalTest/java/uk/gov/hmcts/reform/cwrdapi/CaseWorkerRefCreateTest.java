@@ -7,6 +7,7 @@ import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
@@ -18,6 +19,9 @@ import java.util.Map;
 @ActiveProfiles("functional")
 @Slf4j
 public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
+
+    @Value("${userProfUrl}")
+    protected String baseUrlUserProfile;
 
     @Test
     public void whenUserNotExistsInCwrAndSidamAndUp_Ac1() {
@@ -50,11 +54,10 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
             .statusCode(201);
 
         //        UserProfileResponse upResponse = funcTestRequestHandler.sendGet(HttpStatus.OK,
-        //        "/v1/userprofile?email="
+        //            "/v1/userprofile?email="
         //                + userEmail.toLowerCase(),
-        //            UserProfileResponse.class);
+        //            UserProfileResponse.class, baseUrlUserProfile);
         //        List<String> exceptedRoles = ImmutableList.of("caseworker-iac-bulkscan", "caseworker_iac_dwp");
         //        assertEquals(upResponse.getRoles(), exceptedRoles);
-
     }
 }
