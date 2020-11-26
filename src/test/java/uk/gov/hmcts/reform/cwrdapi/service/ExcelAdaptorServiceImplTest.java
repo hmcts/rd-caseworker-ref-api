@@ -9,13 +9,14 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorServiceImpl.FILE_NO_DATA_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExcelAdaptorServiceImplTest {

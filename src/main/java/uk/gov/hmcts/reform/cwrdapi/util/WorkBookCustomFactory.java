@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.service;
+package uk.gov.hmcts.reform.cwrdapi.util;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -21,14 +21,13 @@ import java.io.InputStream;
 import static org.apache.poi.hssf.record.crypto.Biff8EncryptionKey.setCurrentUserPassword;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CLASS_HSSF_WORKBOOK_FACTORY;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CLASS_XSSF_WORKBOOK_FACTORY;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EXCEL_FILE_ERROR_MESSAGE;
 
 public class WorkBookCustomFactory extends WorkbookFactory {
-
-    public static final String FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE = "File is not password protected";
-    public static final String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
-    public static final String ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
-    public static final String CLASS_XSSF_WORKBOOK_FACTORY = "org.apache.poi.xssf.usermodel.XSSFWorkbookFactory";
-    public static final String CLASS_HSSF_WORKBOOK_FACTORY = "org.apache.poi.hssf.usermodel.HSSFWorkbookFactory";
 
     /**
      * Authenticate password file and if successful the returns Workbook object.

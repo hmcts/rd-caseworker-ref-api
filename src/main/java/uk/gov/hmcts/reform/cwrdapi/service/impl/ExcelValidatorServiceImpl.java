@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.service;
+package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EncryptedDocumentException;
@@ -8,24 +8,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 
 import java.io.IOException;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.negate;
-import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.service.WorkBookCustomFactory.validatePasswordAndGetWorkBook;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PRESENT_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
+import static uk.gov.hmcts.reform.cwrdapi.util.WorkBookCustomFactory.validatePasswordAndGetWorkBook;
 
 @Slf4j
 @Service
 public class ExcelValidatorServiceImpl implements ExcelValidatorService {
-
-    public static final String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static final String TYPE_XLS = "application/vnd.ms-excel";
-    public static final String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "File provided in request is not in xls(x) format";
-    public static final String FILE_NOT_PRESENT_ERROR_MESSAGE = "File not present";
-    public static final String FILE_PASSWORD_INCORRECT_ERROR_MESSAGE =
-            "Failed to open the file. Please provide the file with a valid password.";
 
     @Value("${excel.password}")
     private String excelPassword;

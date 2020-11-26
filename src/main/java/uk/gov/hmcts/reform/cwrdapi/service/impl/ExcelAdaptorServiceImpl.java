@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.service;
+package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.lang.reflect.Field;
@@ -24,15 +25,14 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IS_PRIMARY_FIELD;
 
 @Service
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
-    public static final String FILE_NO_DATA_ERROR_MESSAGE = "No data in Excel File";
-    public static final String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
-    public static final String IS_PRIMARY_FIELD = "isPrimary";
-    public static final String DELIMITER_COMMA = ",";
-
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
