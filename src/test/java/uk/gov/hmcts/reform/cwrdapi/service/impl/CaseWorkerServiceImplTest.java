@@ -182,8 +182,7 @@ public class CaseWorkerServiceImplTest {
 
         assertThat(idamRoleAssocResponse.getStatusCode()).isEqualTo(201);
         assertThat(idamRoleAssocResponse.getMessage())
-                .isEqualTo(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS +
-                        serviceCode.toString());
+                .isEqualTo(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCode.toString());
     }
 
     @Test(expected = IdamRolesMappingException.class)
