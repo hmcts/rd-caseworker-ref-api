@@ -222,7 +222,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             }
 
         } catch (FeignException ex) {
-            log.error("{}:: UserProfile api failed:: status code {} & message {},  stack trace {}", loggingComponentName,
+            log.error("{}:: UserProfile api failed:: status code {} & message {},  stack trace {}",
+                loggingComponentName,
                 ex.status(), ex.getMessage(), ex.getStackTrace().toString());
             clazz = ErrorResponse.class;
         }
