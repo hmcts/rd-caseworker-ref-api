@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -54,7 +56,29 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public Map<String, Object> createIdamRolesAssoc(List<ServiceRoleMapping> serviceRoleMapping, String role) {
-        return postRequest(baseUrl + "/idam-roles-mapping", serviceRoleMapping, role, null);
+        String uriPath = baseUrl + "/idam-roles-mapping/";
+
+        HttpEntity<List<ServiceRoleMapping>>    request =
+                new HttpEntity<>(serviceRoleMapping, getMultipleAuthHeaders(role, null));
+
+        ResponseEntity<IdamRoleAssocResponse> responseEntity;
+
+        try {
+            responseEntity = restTemplate.postForEntity(
+                    uriPath,
+                    request,
+                    IdamRoleAssocResponse.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", ex.getRawStatusCode());
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        Map<String, Object> idamRoleAssocResponse = new HashMap<>();
+        idamRoleAssocResponse.put("http_status", responseEntity.getStatusCodeValue());
+        return idamRoleAssocResponse;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

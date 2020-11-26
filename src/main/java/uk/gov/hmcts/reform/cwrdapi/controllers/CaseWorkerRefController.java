@@ -116,15 +116,19 @@ public class CaseWorkerRefController {
     })
     @PostMapping(
             path = "/idam-roles-mapping/",
-            consumes = APPLICATION_JSON_VALUE
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
     )
-    @Secured("cwd-user")
-    public ResponseEntity<String> buildIdamRoleMappings(@Valid @RequestBody List<ServiceRoleMapping>
+    @Secured("cwd-admin")
+    public ResponseEntity<Object> buildIdamRoleMappings(@RequestBody List<ServiceRoleMapping>
                                                                    serviceRoleMappings) {
+        if (CollectionUtils.isEmpty(serviceRoleMappings)) {
+            throw new InvalidRequestException("ServiceRoleMapping Request is empty");
+        }
         IdamRoleAssocResponse idamRoleAssocResponse =
                 caseWorkerService.buildIdamRoleMappings(serviceRoleMappings);
         return ResponseEntity
                 .status(idamRoleAssocResponse.getStatusCode())
-                .body(idamRoleAssocResponse.getMessage());
+                .body(idamRoleAssocResponse);
     }
 }

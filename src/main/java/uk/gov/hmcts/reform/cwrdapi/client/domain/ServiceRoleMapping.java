@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Builder
@@ -14,7 +15,7 @@ import javax.validation.constraints.NotEmpty;
 public class ServiceRoleMapping extends CaseWorkerDomain {
 
     @MappingField(columnName = "Service ID")
-    @NotEmpty
+    @NotBlank
     @JsonProperty(value = "service_code")
     String serivceId;
 

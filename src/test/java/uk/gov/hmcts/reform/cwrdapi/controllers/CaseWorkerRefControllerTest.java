@@ -109,7 +109,7 @@ public class CaseWorkerRefControllerTest {
         IdamRoleAssocResponse idamRoleAssocResponse = new IdamRoleAssocResponse(200, "testMessage");
         when(caseWorkerServiceMock.buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping)))
                 .thenReturn(idamRoleAssocResponse);
-        ResponseEntity<String> actual = caseWorkerRefController
+        ResponseEntity<Object> actual = caseWorkerRefController
                 .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
 
         assertNotNull(actual);

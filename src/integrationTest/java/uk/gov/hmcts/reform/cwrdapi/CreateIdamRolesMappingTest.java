@@ -24,39 +24,16 @@ public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.singletonList(serviceRoleMapping), cwdAdmin);
 
-        assertThat(response.get("http_status").toString()).isEqualTo("OK");
-    }
-
-    @Test
-    public void returns_403_when_no_role_associated() {
-
-        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().build();
-
-        Map<String, Object> response = caseworkerReferenceDataClient
-                .createIdamRolesAssoc(Collections.singletonList(serviceRoleMapping), cwdAdmin);
-
-        assertThat(response.get("http_status")).isEqualTo("403");
-    }
-
-    @Test
-    public void returns_401_when_user_is_invalid() {
-
-        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().build();
-
-        Map<String, Object> response = caseworkerReferenceDataClient
-                .createIdamRolesAssoc(Collections.singletonList(serviceRoleMapping), cwdAdmin);
-
-        assertThat(response.get("http_status")).isEqualTo("401");
-
+        assertThat(response).containsEntry("http_status", 200);
     }
 
     @Test
     public void returns_400_when_request_invalid() {
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createIdamRolesAssoc(Collections.singletonList(null), cwdAdmin);
+                .createIdamRolesAssoc(Collections.emptyList(), cwdAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("400");
+        assertThat(response).containsEntry("http_status", 400);
     }
 
     @Test
@@ -65,7 +42,7 @@ public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.singletonList(null), cwdAdmin);
 
-        assertThat(response.get("http_status")).isEqualTo("500");
+        assertThat(response).containsEntry("http_status", 500);
 
     }
 }

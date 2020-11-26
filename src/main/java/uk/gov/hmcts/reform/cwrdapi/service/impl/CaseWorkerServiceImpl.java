@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ import static java.util.stream.Collectors.toList;
 public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
+    public static final String DELETE_RECORD_FOR_SERVICE_ID = "deleted all the records for the service id provided";
+    public static final String IDAM_ROLE_MAPPINGS_FAILURE = "failed to build the idam role mappings for case worker roles for the service id provided";
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
@@ -137,7 +140,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public IdamRoleAssocResponse buildIdamRoleMappings(List<ServiceRoleMapping> serviceRoleMappings) {
         List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
         Set<String> serviceCodes = new HashSet<>();
-        IdamRoleAssocResponse idamRoleAssocResponse = new IdamRoleAssocResponse();
+        IdamRoleAssocResponse idamRoleAssocResponse;
         serviceRoleMappings.forEach(serviceRoleMapping -> {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
             caseWorkerIdamRoleAssociation.setRoleId((long) serviceRoleMapping.getRoleId());
@@ -148,18 +151,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         });
         try {
             idamRoleMappingService.deleteExistingRecordForServiceCode(serviceCodes);
-            log.info("{}::deleted all the records for the service id provided ::{}", loggingComponentName,
+            log.info("{}::" + DELETE_RECORD_FOR_SERVICE_ID + " ::{}", loggingComponentName,
                     serviceCodes.toString());
             idamRoleMappingService.buildIdamRoleAssociation(caseWorkerIdamRoleAssociations);
-            log.info("{}::successfully built the idam role mappings for case worker roles " +
-                            "for the service id provided ::{}", loggingComponentName,
+            log.info("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + "::{}", loggingComponentName,
                     serviceCodes.toString());
             idamRoleAssocResponse = new IdamRoleAssocResponse(200,
-                    "Successfully built the idam role mappings for case worker roles");
+                    CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString());
         } catch (Exception e) {
-            log.error("{}::failed to build the idam role mappings for case worker roles " +
-                            "for the service id provided ::{}. Reason:: {}" , loggingComponentName, serviceCodes.toString(),
-                    e.getMessage());
+            log.error("{}::" + IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}", loggingComponentName,
+                    serviceCodes.toString(), e.getMessage());
             idamRoleAssocResponse = new IdamRoleAssocResponse(500, e.getMessage());
         }
 

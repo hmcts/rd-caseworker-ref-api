@@ -15,7 +15,9 @@ management:
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
+    show-sql: true
+  main:
+    allow-bean-definition-overriding: true
     properties:
       hibernate:
         jdbc:

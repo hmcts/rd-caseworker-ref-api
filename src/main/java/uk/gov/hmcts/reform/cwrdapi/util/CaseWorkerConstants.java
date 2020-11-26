@@ -11,4 +11,7 @@ public final class CaseWorkerConstants {
     public static final String SUCCESS = "SUCCESS";
 
     public static final String FAILURE = "FAILURE";
+
+    public static final String IDAM_ROLE_MAPPINGS_SUCCESS =
+            "Successfully built the idam role mappings for case worker roles for the service id provided";
 }
