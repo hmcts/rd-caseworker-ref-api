@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
@@ -14,6 +13,8 @@ import java.io.IOException;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.negate;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PRESENT_ERROR_MESSAGE;
@@ -39,14 +40,10 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
         isTypeExcel(excelFile);
         try {
             return validatePasswordAndGetWorkBook(excelFile, excelPassword);
-        } catch (IOException | EncryptedDocumentException exception) {
-            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-            String errorMessage = ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE;
-            if (exception instanceof EncryptedDocumentException) {
-                status = HttpStatus.BAD_REQUEST;
-                errorMessage = FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
-            }
-            throw new ExcelValidationException(status, errorMessage);
+        } catch (IOException exception) {
+            throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE);
+        } catch (EncryptedDocumentException exception) {
+            throw new ExcelValidationException(BAD_REQUEST, FILE_PASSWORD_INCORRECT_ERROR_MESSAGE);
         }
     }
 
@@ -62,13 +59,13 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
                 //sonar mandates to check null, as for multipart file name and content will never be null
                 if ((negate(fileName.endsWith(".xlsx") || fileName.endsWith(".xls"))
                         || negate((TYPE_XLS.equals(contentType) || TYPE_XLSX.equals(contentType))))) {
-                    throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
+                    throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE);
                 }
             } else {
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
+                throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
             }
         } else {
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
+            throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PRESENT_ERROR_MESSAGE);
         }
     }
 }
