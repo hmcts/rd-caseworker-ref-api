@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
@@ -152,12 +153,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             idamRoleMappingService.buildIdamRoleAssociation(caseWorkerIdamRoleAssociations);
             log.info("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + "::{}", loggingComponentName,
                     serviceCodes.toString());
-            idamRoleAssocResponse = new IdamRoleAssocResponse(200,
+            idamRoleAssocResponse = new IdamRoleAssocResponse(HttpStatus.CREATED.value(),
                     CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString());
         } catch (Exception e) {
             log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}",
                     loggingComponentName, serviceCodes.toString(), e.getMessage());
-            idamRoleAssocResponse = new IdamRoleAssocResponse(500, e.getMessage());
+            idamRoleAssocResponse = new IdamRoleAssocResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
         }
 
         return idamRoleAssocResponse;

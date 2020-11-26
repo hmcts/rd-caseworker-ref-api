@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -175,9 +176,13 @@ public class CaseWorkerServiceImplTest {
         IdamRoleAssocResponse idamRoleAssocResponse = caseWorkerServiceImpl
                 .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
 
-        assertThat(idamRoleAssocResponse.getStatusCode()).isEqualTo(200);
+        Set<String> serviceCode = new HashSet<>();
+        serviceCode.add(serviceRoleMapping.getSerivceId());
+
+        assertThat(idamRoleAssocResponse.getStatusCode()).isEqualTo(201);
         assertThat(idamRoleAssocResponse.getMessage())
-                .isEqualTo("Successfully built the idam role mappings for case worker roles");
+                .isEqualTo(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS +
+                        serviceCode.toString());
     }
 
     @Test
