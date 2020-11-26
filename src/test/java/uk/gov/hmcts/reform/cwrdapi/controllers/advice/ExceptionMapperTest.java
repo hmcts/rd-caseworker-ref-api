@@ -39,4 +39,17 @@ public class ExceptionMapperTest {
                 .getErrorDescription());
 
     }
+
+    @Test
+    public void test_handle_idam_role_mapping_exception() {
+        IdamRolesMappingException idamRolesMappingException =
+                new IdamRolesMappingException("Idam Roles Mapping Exception");
+
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleIdamRolesMappingError(idamRolesMappingException);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals(idamRolesMappingException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
+
+    }
 }

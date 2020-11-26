@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
@@ -158,9 +159,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         } catch (Exception e) {
             log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}",
                     loggingComponentName, serviceCodes.toString(), e.getMessage());
-            idamRoleAssocResponse = new IdamRoleAssocResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
+            throw new IdamRolesMappingException(e.getMessage());
         }
-
         return idamRoleAssocResponse;
     }
 

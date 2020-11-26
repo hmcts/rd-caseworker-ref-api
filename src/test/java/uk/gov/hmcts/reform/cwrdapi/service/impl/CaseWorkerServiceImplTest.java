@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
@@ -185,16 +186,11 @@ public class CaseWorkerServiceImplTest {
                         serviceCode.toString());
     }
 
-    @Test
+    @Test(expected = IdamRolesMappingException.class)
     public void test_buildIdamRoleMappings_exception() {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().build();
         doThrow(new RuntimeException("Exception message"))
                 .when(idamRoleMappingService).buildIdamRoleAssociation(any());
-
-        IdamRoleAssocResponse idamRoleAssocResponse = caseWorkerServiceImpl
-                .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
-
-        assertThat(idamRoleAssocResponse.getStatusCode()).isEqualTo(500);
-        assertThat(idamRoleAssocResponse.getMessage()).isEqualTo("Exception message");
+        caseWorkerServiceImpl.buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
     }
 }
