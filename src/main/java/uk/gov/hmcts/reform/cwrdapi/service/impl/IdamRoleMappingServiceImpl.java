@@ -16,7 +16,7 @@ public class IdamRoleMappingServiceImpl implements IdamRoleMappingService {
     CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
 
     /**
-     * Builds the idam role mappings for case worker roles
+     * Builds the idam role mappings for case worker roles.
      * @param caseWorkerIdamRoleAssociations list of CaseWorkerIdamRoleAssociation
      */
     @Override
@@ -26,7 +26,7 @@ public class IdamRoleMappingServiceImpl implements IdamRoleMappingService {
     }
 
     /**
-     * Deletes all the records for the service code provided
+     * Deletes all the records for the service code provided.
      * @param serviceCode set of service code
      */
     @Override

@@ -13,7 +13,7 @@ public interface CaseWorkerService {
                                                                 caseWorkersProfileCreationRequest);
 
     /**
-     * Builds the idam role mappings for case worker roles
+     * Builds the idam role mappings for case worker roles.
      * @param serviceRoleMappings list of ServiceRoleMapping
      * @return IdamRoleAssocResponse
      */

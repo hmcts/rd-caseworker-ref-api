@@ -53,9 +53,6 @@ import static java.util.stream.Collectors.toList;
 @Setter
 public class CaseWorkerServiceImpl implements CaseWorkerService {
 
-
-    public static final String DELETE_RECORD_FOR_SERVICE_ID = "deleted all the records for the service id provided";
-    public static final String IDAM_ROLE_MAPPINGS_FAILURE = "failed to build the idam role mappings for case worker roles for the service id provided";
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
@@ -131,8 +128,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     /**
-     * Builds the idam role mappings for case worker roles
-     *
+     * Builds the idam role mappings for case worker roles.
      * @param serviceRoleMappings list of ServiceRoleMapping
      * @return list of CaseWorkerIdamRoleAssociation
      */
@@ -151,7 +147,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         });
         try {
             idamRoleMappingService.deleteExistingRecordForServiceCode(serviceCodes);
-            log.info("{}::" + DELETE_RECORD_FOR_SERVICE_ID + " ::{}", loggingComponentName,
+            log.info("{}::" + CaseWorkerConstants.DELETE_RECORD_FOR_SERVICE_ID + " ::{}", loggingComponentName,
                     serviceCodes.toString());
             idamRoleMappingService.buildIdamRoleAssociation(caseWorkerIdamRoleAssociations);
             log.info("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + "::{}", loggingComponentName,
@@ -159,8 +155,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             idamRoleAssocResponse = new IdamRoleAssocResponse(200,
                     CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString());
         } catch (Exception e) {
-            log.error("{}::" + IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}", loggingComponentName,
-                    serviceCodes.toString(), e.getMessage());
+            log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}",
+                    loggingComponentName, serviceCodes.toString(), e.getMessage());
             idamRoleAssocResponse = new IdamRoleAssocResponse(500, e.getMessage());
         }
 

@@ -4,18 +4,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
-
-import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IdamRoleMappingServiceImplTest {

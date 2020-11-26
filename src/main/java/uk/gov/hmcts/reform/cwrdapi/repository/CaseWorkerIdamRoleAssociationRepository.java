@@ -14,7 +14,7 @@ public interface CaseWorkerIdamRoleAssociationRepository extends JpaRepository<C
     List<CaseWorkerIdamRoleAssociation> findByRoleType(RoleType roleType);
 
     /**
-     * Deletes the record for all the service code
+     * Deletes the record for all the service code.
      * @param serviceCode set of service code
      */
     void deleteByServiceCodeIn(Set<String> serviceCode);
