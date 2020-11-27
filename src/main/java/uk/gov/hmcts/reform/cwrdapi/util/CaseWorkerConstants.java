@@ -13,10 +13,10 @@ public final class CaseWorkerConstants {
     public static final String FAILURE = "FAILURE";
 
     public static final String IDAM_ROLE_MAPPINGS_SUCCESS =
-            "Successfully built the idam role mappings for case worker roles for the service id provided";
+            "Successfully built the idam role mappings for the service id provided";
 
     public static final String DELETE_RECORD_FOR_SERVICE_ID = "deleted all the records for the service id provided";
 
     public static final String IDAM_ROLE_MAPPINGS_FAILURE =
-            "failed to build the idam role mappings for case worker roles for the service id provided";
+            "failed to build the idam role mappings for the service id provided";
 }

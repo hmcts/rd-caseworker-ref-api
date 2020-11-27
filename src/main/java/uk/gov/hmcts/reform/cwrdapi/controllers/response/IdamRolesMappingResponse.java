@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdamRoleAssocResponse {
+public class IdamRolesMappingResponse {
     @JsonProperty
     private int statusCode;
     @JsonProperty

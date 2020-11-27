@@ -37,15 +37,6 @@ public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationT
     }
 
     @Test
-    public void returns_401_for_invalid_role() {
-
-        Map<String, Object> response = caseworkerReferenceDataClient
-                .createIdamRolesAssoc(Collections.emptyList(), "invalid role");
-
-        assertThat(response).containsEntry("http_status", "403");
-    }
-
-    @Test
     public void returns_400_when_request_invalid() {
 
         Map<String, Object> response = caseworkerReferenceDataClient
@@ -56,9 +47,11 @@ public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationT
 
     @Test
     public void returns_500_when_exception_occurs() {
-
+        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
+                .roleId(0)
+                .build();
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createIdamRolesAssoc(Collections.singletonList(null), cwdAdmin);
+                .createIdamRolesAssoc(Collections.singletonList(serviceRoleMapping), cwdAdmin);
 
         assertThat(response).containsEntry("http_status", "500");
 

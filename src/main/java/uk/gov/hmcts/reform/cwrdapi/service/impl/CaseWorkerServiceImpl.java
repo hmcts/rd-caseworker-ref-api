@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
@@ -135,10 +135,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
      * @return list of CaseWorkerIdamRoleAssociation
      */
     @Override
-    public IdamRoleAssocResponse buildIdamRoleMappings(List<ServiceRoleMapping> serviceRoleMappings) {
+    public IdamRolesMappingResponse buildIdamRoleMappings(List<ServiceRoleMapping> serviceRoleMappings) {
         List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
         Set<String> serviceCodes = new HashSet<>();
-        IdamRoleAssocResponse idamRoleAssocResponse;
+        IdamRolesMappingResponse idamRolesMappingResponse;
         serviceRoleMappings.forEach(serviceRoleMapping -> {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
             caseWorkerIdamRoleAssociation.setRoleId((long) serviceRoleMapping.getRoleId());
@@ -151,17 +151,19 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             idamRoleMappingService.deleteExistingRecordForServiceCode(serviceCodes);
             log.info("{}::" + CaseWorkerConstants.DELETE_RECORD_FOR_SERVICE_ID + " ::{}", loggingComponentName,
                     serviceCodes.toString());
+
             idamRoleMappingService.buildIdamRoleAssociation(caseWorkerIdamRoleAssociations);
             log.info("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + "::{}", loggingComponentName,
                     serviceCodes.toString());
-            idamRoleAssocResponse = new IdamRoleAssocResponse(HttpStatus.CREATED.value(),
+
+            idamRolesMappingResponse = new IdamRolesMappingResponse(HttpStatus.CREATED.value(),
                     CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString());
         } catch (Exception e) {
             log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}",
                     loggingComponentName, serviceCodes.toString(), e.getMessage());
             throw new IdamRolesMappingException(e.getMessage());
         }
-        return idamRoleAssocResponse;
+        return idamRolesMappingResponse;
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {

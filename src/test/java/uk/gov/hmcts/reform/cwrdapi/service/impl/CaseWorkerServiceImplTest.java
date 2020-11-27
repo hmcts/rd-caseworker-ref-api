@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
@@ -174,14 +174,14 @@ public class CaseWorkerServiceImplTest {
                 .roleId(1)
                 .build();
 
-        IdamRoleAssocResponse idamRoleAssocResponse = caseWorkerServiceImpl
+        IdamRolesMappingResponse idamRolesMappingResponse = caseWorkerServiceImpl
                 .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
 
         Set<String> serviceCode = new HashSet<>();
         serviceCode.add(serviceRoleMapping.getSerivceId());
 
-        assertThat(idamRoleAssocResponse.getStatusCode()).isEqualTo(201);
-        assertThat(idamRoleAssocResponse.getMessage())
+        assertThat(idamRolesMappingResponse.getStatusCode()).isEqualTo(201);
+        assertThat(idamRolesMappingResponse.getMessage())
                 .isEqualTo(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCode.toString());
     }
 

@@ -39,7 +39,7 @@ public class CaseWorkerReferenceDataClient {
     private String issuer;
     private long expiration;
 
-    @Value("${idam.s2s-authorised.services}")
+    @Value("${s2s-authorised.services}")
     private String serviceName;
 
     public CaseWorkerReferenceDataClient(int port, String issuer, Long tokenExpirationInterval) {

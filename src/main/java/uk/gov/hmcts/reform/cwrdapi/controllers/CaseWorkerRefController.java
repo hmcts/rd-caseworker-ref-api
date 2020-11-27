@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.List;
@@ -89,9 +89,8 @@ public class CaseWorkerRefController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = "Successfully created idam role mappings for case worker roles",
-                    response = String.class,
-                    responseContainer = "list"
+                    message = "Successfully built idam role mappings for case worker roles",
+                    response = IdamRolesMappingResponse.class
             ),
             @ApiResponse(
                     code = 400,
@@ -121,10 +120,10 @@ public class CaseWorkerRefController {
         if (CollectionUtils.isEmpty(serviceRoleMappings)) {
             throw new InvalidRequestException("ServiceRoleMapping Request is empty");
         }
-        IdamRoleAssocResponse idamRoleAssocResponse =
+        IdamRolesMappingResponse idamRolesMappingResponse =
                 caseWorkerService.buildIdamRoleMappings(serviceRoleMappings);
         return ResponseEntity
-                .status(idamRoleAssocResponse.getStatusCode())
-                .body(idamRoleAssocResponse);
+                .status(idamRolesMappingResponse.getStatusCode())
+                .body(idamRolesMappingResponse);
     }
 }
