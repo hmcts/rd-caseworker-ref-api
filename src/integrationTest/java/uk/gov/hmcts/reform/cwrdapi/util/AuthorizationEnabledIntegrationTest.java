@@ -52,7 +52,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @ClassRule
     public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000)
-            .extensions(CaseWorkerTransformer.class));
+            .extensions(new CaseWorkerTransformer()));
 
     @ClassRule
     public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
@@ -78,13 +78,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         s2sService.stubFor(get(urlEqualTo("/details"))
                 .willReturn(aResponse()
-                        .withStatus(401)
+                        .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("rd_caseworker_ref_api")));
 
         sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
                 .willReturn(aResponse()
-                        .withStatus(401)
+                        .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{"
                                 +  "  \"id\": \"%s\","
@@ -101,7 +101,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
         mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
                 .willReturn(aResponse()
-                        .withStatus(401)
+                        .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(getDynamicJwksResponse())));
     }

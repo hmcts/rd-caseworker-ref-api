@@ -24,7 +24,25 @@ public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.singletonList(serviceRoleMapping), cwdAdmin);
 
-        assertThat(response).containsEntry("http_status", 200);
+        assertThat(response).containsEntry("http_status", "201 CREATED");
+    }
+
+    @Test
+    public void returns_403_for_invalid_role() {
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+                .createIdamRolesAssoc(Collections.emptyList(), "invalid role");
+
+        assertThat(response).containsEntry("http_status", "403");
+    }
+
+    @Test
+    public void returns_401_for_invalid_role() {
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+                .createIdamRolesAssoc(Collections.emptyList(), "invalid role");
+
+        assertThat(response).containsEntry("http_status", "403");
     }
 
     @Test
@@ -33,7 +51,7 @@ public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.emptyList(), cwdAdmin);
 
-        assertThat(response).containsEntry("http_status", 400);
+        assertThat(response).containsEntry("http_status", "400");
     }
 
     @Test
@@ -42,7 +60,7 @@ public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationT
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.singletonList(null), cwdAdmin);
 
-        assertThat(response).containsEntry("http_status", 500);
+        assertThat(response).containsEntry("http_status", "500");
 
     }
 }

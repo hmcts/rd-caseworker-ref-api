@@ -30,7 +30,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
-//@EnableGlobalMethodSecurity(securedEnabled = true)
 @Slf4j
 @SuppressWarnings("unchecked")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -57,7 +56,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/**");
+        web.ignoring()
+                    .antMatchers(anonymousPaths.toArray(new String[0]));
     }
 
     @Inject

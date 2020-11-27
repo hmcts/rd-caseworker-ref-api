@@ -16,15 +16,14 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-  main:
-    allow-bean-definition-overriding: true
     properties:
       hibernate:
         jdbc:
           lob:
             non_contextual_creation: true
-          batch_size: 10
-
+        batch_size: 10
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: RD Caseworker Ref API
   security:
@@ -32,7 +31,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
+            issuer-uri: ${OPEN_ID_API_BASE_URI:http://0.0.0.0:6000/o}
         registration:
           oidc:
             client-id: microservicekey-rd-caseworker-ref-api
@@ -88,16 +87,18 @@ idam:
   s2s-auth:
     totp_secret: ${S2S_SECRET:}
     microservice: rd_caseworker_ref_api
-    url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
+    url: ${S2S_URL:http://127.0.0.1:8990}
   s2s-authorised:
     services: ${CRD_S2S_AUTHORISED_SERVICES:rd_caseworker_ref_api}
-  api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
+  api.url: ${IDAM_URL:http://127.0.0.1:5000}
 
+auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
 oidc:
-  issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
+  issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
   expiration: 14400000 # milliseconds 4 hours
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
 
+## user profile feign connection
+userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 loggingComponentName: RD-Caseworker-Ref-Api
 feign:
   allow:

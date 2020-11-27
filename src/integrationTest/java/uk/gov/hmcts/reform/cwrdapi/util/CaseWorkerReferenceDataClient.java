@@ -6,7 +6,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -16,7 +15,6 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRoleAssocResponse;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -29,7 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
 
 @Slf4j
-@PropertySource(value = "/integrationTest/resources/application-integration.yml")
+@PropertySource(value = "/integrationTest/resources/application-test.yml")
 public class CaseWorkerReferenceDataClient {
 
     private static final String APP_BASE_PATH = "/refdata/case-worker";
@@ -41,7 +39,7 @@ public class CaseWorkerReferenceDataClient {
     private String issuer;
     private long expiration;
 
-    @Value("${s2s-authorised.services}")
+    @Value("${idam.s2s-authorised.services}")
     private String serviceName;
 
     public CaseWorkerReferenceDataClient(int port, String issuer, Long tokenExpirationInterval) {
@@ -56,29 +54,7 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public Map<String, Object> createIdamRolesAssoc(List<ServiceRoleMapping> serviceRoleMapping, String role) {
-        String uriPath = baseUrl + "/idam-roles-mapping/";
-
-        HttpEntity<List<ServiceRoleMapping>>    request =
-                new HttpEntity<>(serviceRoleMapping, getMultipleAuthHeaders(role, null));
-
-        ResponseEntity<IdamRoleAssocResponse> responseEntity;
-
-        try {
-            responseEntity = restTemplate.postForEntity(
-                    uriPath,
-                    request,
-                    IdamRoleAssocResponse.class);
-
-        } catch (RestClientResponseException ex) {
-            HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", ex.getRawStatusCode());
-            statusAndBody.put("response_body", ex.getResponseBodyAsString());
-            return statusAndBody;
-        }
-
-        Map<String, Object> idamRoleAssocResponse = new HashMap<>();
-        idamRoleAssocResponse.put("http_status", responseEntity.getStatusCodeValue());
-        return idamRoleAssocResponse;
+        return postRequest(baseUrl + "/idam-roles-mapping/", serviceRoleMapping, role, null);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
