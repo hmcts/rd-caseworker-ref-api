@@ -19,12 +19,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.util.ReflectionUtils.makeAccessible;
+import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
@@ -122,14 +123,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
     private void setFieldValue(Field field, Object bean, Object value) {
         if (nonNull(field)) {
-            try {
-                //sonar warns for this but for reflection setAccessible and set is mandatory
-                //treat as false positive
-                field.setAccessible(TRUE);
-                field.set(bean, value);
-            } catch (IllegalAccessException e) {
-                throwFileParsingException();
-            }
+            makeAccessible(field);
+            setField(field, bean, value);
         }
     }
 
