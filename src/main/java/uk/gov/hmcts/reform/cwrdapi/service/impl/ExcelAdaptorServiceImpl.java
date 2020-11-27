@@ -74,7 +74,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             Map<String, Object> childHeaderValues) {
         customObjectFields.forEach(customObjectTriple -> {
             Field parentField = customObjectTriple.getMiddle();
-            List domainObjectList = new ArrayList();
+            List<Object> domainObjectList = new ArrayList<>();
             int objectCount = findAnnotation(parentField, MappingField.class).objectCount();//take count from parent
             for (int i = 0; i < objectCount; i++) {
                 Object childDomainObject = getInstanceOf(customObjectTriple.getLeft());//instantiate child domain object
@@ -123,6 +123,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private void setFieldValue(Field field, Object bean, Object value) {
         if (nonNull(field)) {
             try {
+                //sonar warns for this but for reflection setAccessible and set is mandatory
+                //treat as false positive
                 field.setAccessible(TRUE);
                 field.set(bean, value);
             } catch (IllegalAccessException e) {
