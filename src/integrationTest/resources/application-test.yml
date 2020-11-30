@@ -21,7 +21,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-        batch_size: 10
+          batch_size: 10
   main:
     allow-bean-definition-overriding: true
   application:

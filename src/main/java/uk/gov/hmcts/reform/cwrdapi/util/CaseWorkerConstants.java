@@ -19,4 +19,13 @@ public final class CaseWorkerConstants {
 
     public static final String IDAM_ROLE_MAPPINGS_FAILURE =
             "failed to build the idam role mappings for the service id provided";
+
+    public static final String UNAUTHORIZED_ERROR =
+            "Unauthorized Error : The requested resource is restricted and requires authentication";
+
+    public static final String FORBIDDEN_ERROR = "Forbidden Error: Access denied for invalid permissions";
+
+    public static final String BAD_REQUEST = "Bad Request";
+
+    public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
 }

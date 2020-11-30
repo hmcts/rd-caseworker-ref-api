@@ -22,6 +22,10 @@ import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 
 @RequestMapping(
         path = "/refdata/case-worker"
@@ -49,19 +53,19 @@ public class CaseWorkerRefController {
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Bad Request"
+                    message = BAD_REQUEST
             ),
             @ApiResponse(
                     code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+                    message = UNAUTHORIZED_ERROR
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden Error: Access denied for invalid permissions"
+                    message = FORBIDDEN_ERROR
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error"
+                    message = INTERNAL_SERVER_ERROR
             )
     })
     @PostMapping(
@@ -94,19 +98,19 @@ public class CaseWorkerRefController {
             ),
             @ApiResponse(
                     code = 400,
-                    message = "Bad Request"
+                    message = BAD_REQUEST
             ),
             @ApiResponse(
                     code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+                    message = UNAUTHORIZED_ERROR
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden Error: Access denied for invalid permissions"
+                    message = FORBIDDEN_ERROR
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error"
+                    message = INTERNAL_SERVER_ERROR
             )
     })
     @PostMapping(

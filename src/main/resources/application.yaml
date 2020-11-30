@@ -21,8 +21,8 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-        batch_size: 5
-        order_inserts: true
+          batch_size: 5
+          order_inserts: true
   application:
     name: RD Caseworker Ref API
   security:
