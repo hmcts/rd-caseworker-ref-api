@@ -7,6 +7,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,7 +26,7 @@ public class ExceptionMapperTest {
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals(emptyResultDataAccessException.getMessage(),
-                ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+                ((ErrorResponse) responseEntity.getBody()).getErrorDescription());
     }
 
     @Test
@@ -35,7 +36,21 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.customValidationError(invalidRequestException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(invalidRequestException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+        assertEquals(invalidRequestException.getMessage(), ((ErrorResponse) responseEntity.getBody())
+                .getErrorDescription());
+
+    }
+
+    @Test
+    public void test_handle_excel_validation_exception() {
+        ExcelValidationException excelValidationException = new ExcelValidationException(HttpStatus.BAD_REQUEST,
+                "Excel exception");
+
+        ResponseEntity<Object> responseEntity = exceptionMapper
+                .excelValidationExceptionHandler(excelValidationException);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(excelValidationException.getMessage(), ((ErrorResponse) responseEntity.getBody())
                 .getErrorDescription());
 
     }
@@ -48,7 +63,7 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.handleIdamRolesMappingError(idamRolesMappingException);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertEquals(idamRolesMappingException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+        assertEquals(idamRolesMappingException.getMessage(), ((ErrorResponse) responseEntity.getBody())
                 .getErrorDescription());
 
     }

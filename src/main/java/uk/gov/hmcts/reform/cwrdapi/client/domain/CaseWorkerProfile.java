@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
@@ -11,6 +13,8 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CaseWorkerProfile extends CaseWorkerDomain {
 
     @MappingField(columnName = "FIRST NAME")
@@ -32,7 +36,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
     @NotEmpty
     private String regionName;
 
-    @MappingField(clazz = Location.class)
+    @MappingField(clazz = Location.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary location exists")
     private List<Location> locations;
 
@@ -40,11 +44,11 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
     @NotEmpty
     private String userType;
 
-    @MappingField(clazz = Role.class)
+    @MappingField(clazz = Role.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary roles exists")
     private List<Role> roles;
 
-    @MappingField(clazz = WorkArea.class)
+    @MappingField(clazz = WorkArea.class, objectCount = 8)
     @NotEmpty(message = "no area of works exists")
     private List<WorkArea> workAreas;
 

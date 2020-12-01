@@ -117,3 +117,6 @@ cwrd:
   security:
     roles:
       cwd-admin: cwd-admin
+
+excel:
+  password: ${EXCEL_PASSWORD:1234}
