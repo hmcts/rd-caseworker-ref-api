@@ -12,7 +12,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
-public class CreateIdamRolesMappingTest extends AuthorizationEnabledIntegrationTest {
+public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void returns_200_when_idam_roles_mapping_created_successfully() {

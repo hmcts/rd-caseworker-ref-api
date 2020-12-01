@@ -118,6 +118,8 @@ public class CaseWorkerRefController {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
+    //Sonar reported the below code as Security Hotspot with LOW priority.
+    //Currently it has been made false positive and reviewed as safe.
     @Secured("cwd-admin")
     public ResponseEntity<Object> buildIdamRoleMappings(@RequestBody List<ServiceRoleMapping>
                                                                    serviceRoleMappings) {

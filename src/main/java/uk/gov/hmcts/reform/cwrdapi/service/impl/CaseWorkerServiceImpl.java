@@ -138,7 +138,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public IdamRolesMappingResponse buildIdamRoleMappings(List<ServiceRoleMapping> serviceRoleMappings) {
         List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
         Set<String> serviceCodes = new HashSet<>();
-        IdamRolesMappingResponse idamRolesMappingResponse;
         serviceRoleMappings.forEach(serviceRoleMapping -> {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
             caseWorkerIdamRoleAssociation.setRoleId((long) serviceRoleMapping.getRoleId());
@@ -156,14 +155,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             log.info("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + "::{}", loggingComponentName,
                     serviceCodes.toString());
 
-            idamRolesMappingResponse = new IdamRolesMappingResponse(HttpStatus.CREATED.value(),
-                    CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString());
+            return IdamRolesMappingResponse.builder()
+                    .message(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString())
+                    .statusCode(HttpStatus.CREATED.value())
+                    .build();
+
         } catch (Exception e) {
             log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}",
                     loggingComponentName, serviceCodes.toString(), e.getMessage());
             throw new IdamRolesMappingException(e.getMessage());
         }
-        return idamRolesMappingResponse;
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
