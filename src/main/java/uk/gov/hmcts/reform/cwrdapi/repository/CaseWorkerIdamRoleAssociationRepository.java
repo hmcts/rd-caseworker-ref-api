@@ -7,8 +7,10 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 
 import java.util.List;
 import java.util.Set;
+import javax.transaction.Transactional;
 
 @Repository
+@Transactional
 public interface CaseWorkerIdamRoleAssociationRepository extends JpaRepository<CaseWorkerIdamRoleAssociation,Long> {
 
     List<CaseWorkerIdamRoleAssociation> findByRoleType(RoleType roleType);

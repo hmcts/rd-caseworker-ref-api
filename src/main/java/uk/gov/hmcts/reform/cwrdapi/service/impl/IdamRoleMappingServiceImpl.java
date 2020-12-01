@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 
 import java.util.List;
 import java.util.Set;
-import javax.transaction.Transactional;
 
 @Service
 public class IdamRoleMappingServiceImpl implements IdamRoleMappingService {
@@ -30,7 +29,6 @@ public class IdamRoleMappingServiceImpl implements IdamRoleMappingService {
      * @param serviceCode set of service code
      */
     @Override
-    @Transactional
     public void deleteExistingRecordForServiceCode(Set<String> serviceCode) {
         cwIdamRoleAssocRepository.deleteByServiceCodeIn(serviceCode);
     }
