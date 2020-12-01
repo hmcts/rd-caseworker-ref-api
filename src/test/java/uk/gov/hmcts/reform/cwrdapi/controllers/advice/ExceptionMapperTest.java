@@ -26,7 +26,7 @@ public class ExceptionMapperTest {
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals(emptyResultDataAccessException.getMessage(),
-                ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+                ((ErrorResponse) responseEntity.getBody()).getErrorDescription());
     }
 
     @Test
@@ -36,7 +36,7 @@ public class ExceptionMapperTest {
         ResponseEntity<Object> responseEntity = exceptionMapper.customValidationError(invalidRequestException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(invalidRequestException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+        assertEquals(invalidRequestException.getMessage(), ((ErrorResponse) responseEntity.getBody())
                 .getErrorDescription());
 
     }
@@ -50,7 +50,20 @@ public class ExceptionMapperTest {
                 .excelValidationExceptionHandler(excelValidationException);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals(excelValidationException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+        assertEquals(excelValidationException.getMessage(), ((ErrorResponse) responseEntity.getBody())
+                .getErrorDescription());
+
+    }
+
+    @Test
+    public void test_handle_idam_role_mapping_exception() {
+        IdamRolesMappingException idamRolesMappingException =
+                new IdamRolesMappingException("Idam Roles Mapping Exception");
+
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleIdamRolesMappingError(idamRolesMappingException);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals(idamRolesMappingException.getMessage(), ((ErrorResponse) responseEntity.getBody())
                 .getErrorDescription());
 
     }

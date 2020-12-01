@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -46,6 +47,12 @@ public class ExceptionMapper {
     public ResponseEntity<Object> excelValidationExceptionHandler(
             ExcelValidationException ex) {
         return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
+    }
+
+    @ExceptionHandler(IdamRolesMappingException.class)
+    public ResponseEntity<Object> handleIdamRolesMappingError(
+            IdamRolesMappingException ex) {
+        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     private String getTimeStamp() {

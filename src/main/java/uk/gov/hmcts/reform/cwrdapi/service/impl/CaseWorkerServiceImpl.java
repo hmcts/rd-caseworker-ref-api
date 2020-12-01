@@ -7,9 +7,12 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
@@ -17,6 +20,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
@@ -31,6 +35,8 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
 import java.util.ArrayList;
@@ -49,7 +55,6 @@ import static java.util.stream.Collectors.toList;
 @Setter
 public class CaseWorkerServiceImpl implements CaseWorkerService {
 
-
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
@@ -64,6 +69,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     @Autowired
     CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
+
+    @Autowired
+    IdamRoleMappingService idamRoleMappingService;
 
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
@@ -119,6 +127,44 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return ResponseEntity
                 .status(201)
                 .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
+    }
+
+    /**
+     * Builds the idam role mappings for case worker roles.
+     * @param serviceRoleMappings list of ServiceRoleMapping
+     * @return list of CaseWorkerIdamRoleAssociation
+     */
+    @Override
+    public IdamRolesMappingResponse buildIdamRoleMappings(List<ServiceRoleMapping> serviceRoleMappings) {
+        List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
+        Set<String> serviceCodes = new HashSet<>();
+        serviceRoleMappings.forEach(serviceRoleMapping -> {
+            CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
+            caseWorkerIdamRoleAssociation.setRoleId((long) serviceRoleMapping.getRoleId());
+            caseWorkerIdamRoleAssociation.setIdamRole(serviceRoleMapping.getIdamRoles());
+            caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getSerivceId());
+            serviceCodes.add(serviceRoleMapping.getSerivceId());
+            caseWorkerIdamRoleAssociations.add(caseWorkerIdamRoleAssociation);
+        });
+        try {
+            idamRoleMappingService.deleteExistingRecordForServiceCode(serviceCodes);
+            log.info("{}::" + CaseWorkerConstants.DELETE_RECORD_FOR_SERVICE_ID + " ::{}", loggingComponentName,
+                    serviceCodes.toString());
+
+            idamRoleMappingService.buildIdamRoleAssociation(caseWorkerIdamRoleAssociations);
+            log.info("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + "::{}", loggingComponentName,
+                    serviceCodes.toString());
+
+            return IdamRolesMappingResponse.builder()
+                    .message(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString())
+                    .statusCode(HttpStatus.CREATED.value())
+                    .build();
+
+        } catch (Exception e) {
+            log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}",
+                    loggingComponentName, serviceCodes.toString(), e.getMessage());
+            throw new IdamRolesMappingException(e.getMessage());
+        }
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {

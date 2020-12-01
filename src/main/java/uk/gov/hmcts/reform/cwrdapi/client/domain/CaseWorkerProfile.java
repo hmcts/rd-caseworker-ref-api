@@ -8,7 +8,6 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.util.List;
-
 import javax.validation.constraints.NotEmpty;
 
 @Builder
