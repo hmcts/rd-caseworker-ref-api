@@ -120,7 +120,7 @@ public class CaseWorkerRefController {
     )
     //Sonar reported the below code as Security Hotspot with LOW priority.
     //Currently it has been made false positive and reviewed as safe.
-    @Secured("cwd-user")
+    @Secured("cwd-admin")
     public ResponseEntity<Object> buildIdamRoleMappings(@RequestBody List<ServiceRoleMapping>
                                                                    serviceRoleMappings) {
         if (CollectionUtils.isEmpty(serviceRoleMappings)) {
