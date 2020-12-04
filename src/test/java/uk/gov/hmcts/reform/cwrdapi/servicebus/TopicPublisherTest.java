@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus;
 
 import org.junit.Assert;
@@ -71,10 +70,6 @@ public class TopicPublisherTest {
         doThrow(Exception.class).when(jmsTemplate).send(anyString(), any());
 
         topicPublisher.sendMessage("a message");
-
-        Assert.assertTrue(false);
-
     }
 }
 
-*/

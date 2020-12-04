@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.controllers.response;
 
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CaseWorkerProfileCreationResponseTest {
@@ -15,7 +17,7 @@ public class CaseWorkerProfileCreationResponseTest {
         assertThat(response.getCaseWorkerRegistrationResponse()).isEqualTo("response");
 
         CaseWorkerProfileCreationResponse response1 =
-                new CaseWorkerProfileCreationResponse("response");
+                new CaseWorkerProfileCreationResponse("response", Collections.emptySet());
         assertThat(response1).isNotNull();
         assertThat(response1.getCaseWorkerRegistrationResponse()).isEqualTo("response");
     }

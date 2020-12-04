@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus.messaging;
 
 import org.junit.Test;
@@ -57,4 +56,3 @@ public class MessagingConfigTest {
         assertThat(jmsListenerContainerFactory).isNotNull();
     }
 }
-*/
