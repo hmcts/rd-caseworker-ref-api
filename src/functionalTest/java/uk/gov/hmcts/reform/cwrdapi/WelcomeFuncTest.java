@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.config.TopicConsumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -50,5 +51,11 @@ public class WelcomeFuncTest {
 
             Assert.fail();
         }
+    }
+
+    @Test
+    public void test_should_publish_user_ids_to_topic() {
+        TopicConsumer topicConsumer = new TopicConsumer(1);
+        topicConsumer.onMessage("testMessage");
     }
 }
