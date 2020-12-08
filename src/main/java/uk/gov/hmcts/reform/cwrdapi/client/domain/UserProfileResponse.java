@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.client.response;
+package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,9 +18,6 @@ public class UserProfileResponse {
     private String firstName;
     private String lastName;
     private String idamStatus;
-    private RoleAdditionResponse roleAdditionResponse;
-    private List<RoleDeletionResponse> roleDeletionResponse;
-    private AttributeResponse attributeResponse;
     private List<String> roles;
     private String idamStatusCode;
 }

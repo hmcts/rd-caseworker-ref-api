@@ -30,7 +30,7 @@ public class FuncTestRequestHandler {
             path);
     }
 
-    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz, String baseUrl) {
+    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz, String baseUrl) throws Exception {
         return sendGet(httpStatus, urlPath, baseUrl).as(clazz);
     }
 
@@ -48,4 +48,6 @@ public class FuncTestRequestHandler {
             .log().all(true)
             .statusCode(httpStatus.value()).extract().response();
     }
+
+
 }

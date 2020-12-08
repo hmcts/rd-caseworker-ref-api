@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.google.common.collect.ImmutableList;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -8,11 +9,15 @@ import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -20,8 +25,7 @@ import java.util.Map;
 @Slf4j
 public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
-    @Value("${userProfUrl}")
-    protected String baseUrlUserProfile;
+
 
     @Test
     public void whenUserNotExistsInCwrAndSidamAndUp_Ac1() {
@@ -38,12 +42,12 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void whenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() {
-        Map<String, String> userDeatil = idamOpenIdClient.createUser("caseworker_iac_dwp");
-        String userEmail = userDeatil.get(EMAIL);
+    public void whenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() throws Exception {
+        Map<String, String> userDetail = idamOpenIdClient.createUser("caseworker-iac-bulkscan");
+        String userEmail = userDetail.get(EMAIL);
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-            .createCaseWorkerProfiles(userEmail);
+            .createCaseWorkerProfiles(userEmail.toLowerCase());
 
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal()
             .body(caseWorkersProfileCreationRequests)
@@ -53,11 +57,11 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
             .assertThat()
             .statusCode(201);
 
-        //        UserProfileResponse upResponse = funcTestRequestHandler.sendGet(HttpStatus.OK,
-        //            "/v1/userprofile?email="
-        //                + userEmail.toLowerCase(),
-        //            UserProfileResponse.class, baseUrlUserProfile);
-        //        List<String> exceptedRoles = ImmutableList.of("caseworker-iac-bulkscan", "caseworker_iac_dwp");
-        //        assertEquals(upResponse.getRoles(), exceptedRoles);
+        UserProfileResponse upResponse = funcTestRequestHandler.sendGet(HttpStatus.OK,
+            "/v1/userprofile/roles?email="
+                + userEmail.toLowerCase() +"",
+            UserProfileResponse.class, baseUrlUserProfile);
+        List<String> exceptedRoles = ImmutableList.of("cwd-user","caseworker-iac-bulkscan");
+        assertEquals(exceptedRoles, upResponse.getRoles());
     }
 }

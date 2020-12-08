@@ -74,6 +74,9 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static List<String> emailsTobeDeleted = new ArrayList<>();
 
+    @Value("${userProfUrl}")
+    protected String baseUrlUserProfile;
+
     @Override
     public void beforeTestClass(TestContext testContext) {
         testContext.getApplicationContext()
@@ -125,4 +128,5 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static void setEmailsTobeDeleted(String emailTobeDeleted) {
         emailsTobeDeleted.add(emailTobeDeleted);
     }
+
 }

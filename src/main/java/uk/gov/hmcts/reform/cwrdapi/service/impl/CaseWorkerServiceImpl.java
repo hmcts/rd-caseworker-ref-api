@@ -7,8 +7,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -42,7 +44,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toList;
+import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
 
 @Service
 @Slf4j
@@ -90,18 +94,17 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         caseWorkerProfiles.add(caseWorkerProfile);
 
                     }
-                    //CW not UP has it
-                    //409 identifier,
-                    //I get roles
+
 
                 } else if (Objects.nonNull(caseWorkerProfile) && !caseWorkerProfile.getDeleteFlag()) {
-
                     //update the existing case worker profile logic
+
                 } else if (Objects.nonNull(caseWorkerProfile) && caseWorkerProfile.getDeleteFlag()) {
 
-                    UserProfileUpdatedData usrProfileStatusUpdate = new UserProfileUpdatedData("SUSPENDED");
+                    UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
+                        .idamStatus("SUSPENDED").build();
                     // updating the status in idam to suspend.
-                    modifyCaseWorkerUserStatus(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(), "EXUI");
+                    modifyCaseWorkerUser(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(), "EXUI");
                 }
             });
 
@@ -157,12 +160,43 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             //caseWorkerWorkAreas setting to case worker profile
             caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
+        } else if(Objects.nonNull(responseEntity) && responseEntity.getStatusCode().equals(HttpStatus.CONFLICT)
+            && Objects.nonNull(responseEntity.getBody())) {
+
+            updateUserRolesWhenUserExistsInUpAndIdam(cwrdProfileRequest, responseEntity);
+
         } else {
             //Add failed request to list and save to the exception table
             log.error("{}::Idam register user failed", loggingComponentName);
 
         }
         return caseWorkerProfile;
+    }
+
+    private void updateUserRolesWhenUserExistsInUpAndIdam(CaseWorkersProfileCreationRequest cwrProfileRequest,
+                                                          ResponseEntity<Object> responseEntity) {
+        UserProfileCreationResponse userProfileCreationResponse
+            = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
+
+        String sidamId = userProfileCreationResponse.getIdamId();
+
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(sidamId);
+
+        ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response,
+            UserProfileResponse.class);
+
+
+        UserProfileResponse userProfileResponse =
+            (UserProfileResponse) requireNonNull(responseResponseEntity.getBody());
+        Set<String>  userProfileRoles = copyOf(userProfileResponse.getRoles());
+        Set<String> idamRolesCwr = cwrProfileRequest.getIdamRoles();
+        if(isNotTrue(userProfileRoles.equals(idamRolesCwr))) {
+            List<String> mergedRoles = userProfileRoles.stream().filter(s ->
+                !idamRolesCwr.contains(s)).collect(toList());
+            UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
+                .roles(mergedRoles).build();
+            modifyCaseWorkerUser(usrProfileStatusUpdate, sidamId, "EXUI");
+        }
     }
 
     public CaseWorkerProfile mapCaseWorkerProfileRequest(UserProfileCreationResponse userProfileCreationResponse,
@@ -231,8 +265,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
 
-    public ResponseEntity<Object> modifyCaseWorkerUserStatus(UserProfileUpdatedData userProfileUpdatedData,
-                                                             String userId, String origin) {
+    public ResponseEntity<Object> modifyCaseWorkerUser(UserProfileUpdatedData userProfileUpdatedData,
+                                                       String userId, String origin) {
         Response response = null;
         Object clazz = null;
         try {

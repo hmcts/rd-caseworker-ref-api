@@ -114,7 +114,6 @@ public class CaseWorkerApiClient {
             .serviceCode("BAA1").areaOfWork("Non-Money Claims").build());
 
         Set<String> idamRoles = new HashSet<>();
-        idamRoles.add("caseworker-iac-bulkscan");
 
         String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
         setEmailsTobeDeleted(emailToUsed);
