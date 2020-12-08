@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -128,4 +130,24 @@ public class CaseWorkerRefControllerTest {
         verify(caseWorkerServiceMock,times(0))
                 .buildIdamRoleMappings(anyList());
     }
+
+    @Test(expected = InvalidRequestException.class)
+    public void fetchCaseworkersByIdShouldThrow400() {
+        caseWorkerRefController.fetchCaseworkersById(Collections.emptyList());
+    }
+
+    @Test
+    public void shouldFetchCaseworkerDetails() {
+        responseEntity = ResponseEntity.ok().body(null);
+        when(caseWorkerServiceMock.fetchCaseworkersById(any()))
+                .thenReturn(responseEntity);
+
+        List<String> caseWorkerIds = new ArrayList<>(Arrays.asList("185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
+        ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(caseWorkerIds);
+
+        assertNotNull(actual);
+        verify(caseWorkerServiceMock,times(1))
+                .fetchCaseworkersById(caseWorkerIds);
+    }
+
 }
