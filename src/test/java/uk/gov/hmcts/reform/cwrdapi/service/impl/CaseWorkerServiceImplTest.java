@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
@@ -20,7 +21,9 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
@@ -31,6 +34,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +42,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -191,5 +196,44 @@ public class CaseWorkerServiceImplTest {
         doThrow(new RuntimeException("Exception message"))
                 .when(idamRoleMappingService).buildIdamRoleAssociation(any());
         caseWorkerServiceImpl.buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void test_shouldThrow404WhenCaseworker_profile_not_found() {
+        doReturn(Collections.emptyList())
+                .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(any());
+        caseWorkerServiceImpl.fetchCaseworkersById(Collections.singletonList(""));
+    }
+
+    @Test
+    public void test_should_return_caseworker_profile() {
+        doReturn(Collections.singletonList(buildCaseWorkerProfile()))
+                .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(Collections.singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
+        caseWorkerServiceImpl.fetchCaseworkersById(Collections.singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
+        verify(caseWorkerProfileRepository, times(1)).findByCaseWorkerIdIn(any());
+    }
+
+    public CaseWorkerProfile buildCaseWorkerProfile() {
+        CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
+        caseWorkerRole.setCaseWorkerRoleId(1L);
+        caseWorkerRole.setCaseWorkerId("CWID1");
+        caseWorkerRole.setRoleId(1L);
+        caseWorkerRole.setPrimaryFlag(false);
+        caseWorkerRole.setCreatedDate(LocalDateTime.now());
+        caseWorkerRole.setLastUpdate(LocalDateTime.now());
+
+        CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
+        caseWorkerLocation.setCaseWorkerId("CWID1");
+        caseWorkerLocation.setCaseWorkerLocationId(11111L);
+        caseWorkerLocation.setCreatedDate(LocalDateTime.now());
+        caseWorkerLocation.setLastUpdate(LocalDateTime.now());
+        caseWorkerLocation.setLocationId(11112);
+        caseWorkerLocation.setPrimaryFlag(true);
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
+        caseWorkerProfile.setCaseWorkerRoles(Collections.singletonList(caseWorkerRole));
+        caseWorkerProfile.setCaseWorkerLocations(Collections.singletonList(caseWorkerLocation));
+        return caseWorkerProfile;
     }
 }
