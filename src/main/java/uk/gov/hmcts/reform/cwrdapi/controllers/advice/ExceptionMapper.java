@@ -49,6 +49,12 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handlerForNoCaseWorkersFound (
+            ResourceNotFoundException ex) {
+        return errorDetailsResponseEntity(ex, NOT_FOUND, ErrorConstants.EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
+    }
+
     @ExceptionHandler(IdamRolesMappingException.class)
     public ResponseEntity<Object> handleIdamRolesMappingError(
             IdamRolesMappingException ex) {
