@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,6 +43,7 @@ public class UserType implements Serializable {
     private LocalDateTime lastUpdate;
 
     @Fetch(FetchMode.SUBSELECT)
+    @JsonIgnore
     @OneToMany(targetEntity = CaseWorkerProfile.class, mappedBy = "userType")
     private List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
 

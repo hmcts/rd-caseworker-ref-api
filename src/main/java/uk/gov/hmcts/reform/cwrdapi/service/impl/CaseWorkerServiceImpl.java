@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
@@ -167,6 +168,77 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
     }
 
+    /**
+     * Returns the caseworker details based on the id's.
+     * @param caseWorkerIds list
+     * @return CaseWorkerProfile
+     */
+    @Override
+    public ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds) {
+        long timeinmills = System.currentTimeMillis();
+        List<CaseWorkerProfile> caseWorkerProfileList = caseWorkerProfileRepo.findByCaseWorkerIdIn(caseWorkerIds);
+        System.out.println("~time taken by service method = " + (System.currentTimeMillis() - timeinmills));
+        if (CollectionUtils.isEmpty(caseWorkerProfileList)) {
+            throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+        }
+        return ResponseEntity.ok().body((caseWorkerProfileList));
+    }
+
+
+    /*private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> convertToDTO(List<CaseWorkerProfile> caseWorkerProfileList) {
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> cwDtoList = new ArrayList<>();
+
+        for (CaseWorkerProfile cwProfile : caseWorkerProfileList) {
+            uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile cwDto =
+                    new uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile();
+
+            cwDto.setLocations(Collections.emptyList());
+            cwDto.setWorkAreas(Collections.emptyList());
+            cwDto.setRoles(Collections.emptyList());
+            cwDto.setId(cwProfile.getCaseWorkerId());
+            cwDto.setFirstName(cwProfile.getFirstName());
+            cwDto.setLastName(cwProfile.getLastName());
+            cwDto.setOfficialEmail(cwProfile.getEmailId());
+            cwDto.setRegionId(cwProfile.getRegionId());
+            cwDto.setRegionName(cwProfile.getRegion());
+            cwDto.setUserType(cwProfile.getUserType().getDescription()); //
+            cwDto.setUserId(cwProfile.getUserTypeId());
+            cwDto.setCreatedDate(cwProfile.getCreatedDate());
+            cwDto.setLastUpdate(cwProfile.getLastUpdate());
+
+            for(CaseWorkerRole caseWorkerRole: cwProfile.getCaseWorkerRoles()) {
+                Role roleDto = new Role();
+                roleDto.setRoleId(caseWorkerRole.getRoleId());
+                roleDto.setRoleName(caseWorkerRole.getRoleType().getDescription());
+                roleDto.setPrimary(caseWorkerRole.getPrimaryFlag());
+                roleDto.setCreatedDate(caseWorkerRole.getCreatedDate());
+                roleDto.setLastUpdate(caseWorkerRole.getLastUpdate());
+            }
+
+            for(CaseWorkerLocation location : cwProfile.getCaseWorkerLocations()) {
+                Location locationDto = new Location();
+                locationDto.setBaseLocationId(location.getLocationId());
+                locationDto.setLocationName(location.getLocation());
+                locationDto.setPrimary(location.getPrimaryFlag());
+                locationDto.setCreatedDate(location.getCreatedDate());
+                locationDto.setLastUpdate(location.getLastUpdate());
+                cwDto.getLocations().add(locationDto);
+            }
+
+            for(CaseWorkerWorkArea caseWorkerWorkArea: cwProfile.getCaseWorkerWorkAreas()) {
+                WorkArea workArea = new WorkArea();
+                workArea.setAreaOfWork(caseWorkerWorkArea.getAreaOfWork());
+                workArea.setServiceCode(caseWorkerWorkArea.getServiceCode());
+                workArea.setCreatedDate(caseWorkerWorkArea.getCreatedDate());
+                workArea.setLastUpdate(caseWorkerWorkArea.getLastUpdate());
+                cwDto.getWorkAreas().add(workArea);
+            }
+            cwDtoList.add(cwDto);
+        }
+        return cwDtoList;
+    }*/
+
+
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
@@ -236,14 +308,23 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public  List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
                                                 CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
-        cwrdProfileRequest.getRoles().forEach(role -> {
-            roleTypes.stream().filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                    .map(roleType -> {
-                        CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
+        cwrdProfileRequest.getRoles().forEach(role -> roleTypes.forEach(roleType -> {
+            if(roleType.getDescription().trim().equalsIgnoreCase(role.getRole())) {
+                CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
+                        roleType.getRoleId(),role.isPrimaryFlag());
+                caseWorkerRoles.add(workerRole);
+            }
+        }));
+
+
+       /* cwrdProfileRequest.getRoles().forEach(role -> roleTypes.stream()
+                .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                .map(roleType -> {
+                    CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
                             roleType.getRoleId(),role.isPrimaryFlag());
-                        return caseWorkerRoles.add(workerRole);
-                    });
-        });
+                    return caseWorkerRoles.add(workerRole);
+
+                }));*/
         return caseWorkerRoles;
     }
 

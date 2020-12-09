@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -57,6 +58,7 @@ public class CaseWorkerWorkArea implements Serializable {
     private LocalDateTime lastUpdate;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "case_worker_id", referencedColumnName = "case_worker_id",
             insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
