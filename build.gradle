@@ -285,6 +285,21 @@ dependencies {
             'with the subsequent stream. While this would most likely lead to an error and the closure of the HTTP/2 connection, ' +
             'it is possible that information could leak between requests'
   }
+  implementation('org.codehaus.groovy:groovy:2.5.14') {
+    because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+            'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+            'Java JDK method call that is potentially not secure on some operating systems in some contexts'
+  }
+  implementation('org.codehaus.groovy:groovy-json:2.5.14') {
+    because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+            'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+            'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+  }
+  implementation('org.codehaus.groovy:groovy-xml:2.5.14') {
+    because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+            'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+            'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+  }
   compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
@@ -341,6 +356,10 @@ dependencies {
   testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+
+  testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+  testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
+  testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
 
   compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 
