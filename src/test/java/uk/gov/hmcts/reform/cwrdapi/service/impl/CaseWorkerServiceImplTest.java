@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
@@ -28,12 +29,15 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
+import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,6 +62,8 @@ public class CaseWorkerServiceImplTest {
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
     private IdamRoleMappingService idamRoleMappingService;
+    @Mock
+    private TopicPublisher topicPublisher;
 
     private CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest;
     private RoleType roleType;
@@ -192,4 +198,15 @@ public class CaseWorkerServiceImplTest {
                 .when(idamRoleMappingService).buildIdamRoleAssociation(any());
         caseWorkerServiceImpl.buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
     }
+
+    @Test
+    public void test_sendCaseWorkerIdsToTopic() throws JsonProcessingException {
+        ReflectionTestUtils.setField(caseWorkerServiceImpl, "caseWorkerDataPerMessage", 1);
+        List<String> cwIds = new ArrayList<>();
+        cwIds.add("1234");
+        cwIds.add("2345");
+        caseWorkerServiceImpl.sendCaseWorkerIdsToTopic(cwIds);
+        verify(topicPublisher, times(2)).sendMessage(any());
+    }
+
 }
