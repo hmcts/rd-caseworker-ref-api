@@ -86,12 +86,13 @@ public class CaseWorkerRefControllerTest {
     public void createCaseWorkerProfilesTest() {
 
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-             .thenReturn(responseEntity);
+             .thenReturn(Collections.emptyList());
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
                 .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+
     }
 
     @Test(expected = InvalidRequestException.class)

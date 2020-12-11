@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
@@ -38,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -132,13 +132,10 @@ public class CaseWorkerServiceImplTest {
         when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(201).build());
 
-        ResponseEntity<Object> objectResponseEntity = caseWorkerServiceImpl
-                .processCaseWorkerProfiles(
+        caseWorkerServiceImpl.processCaseWorkerProfiles(
                         Collections.singletonList(caseWorkersProfileCreationRequest));
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
-
-        assertThat(objectResponseEntity.getStatusCodeValue()).isEqualTo(201);
     }
 
     @Test
@@ -161,14 +158,12 @@ public class CaseWorkerServiceImplTest {
                 .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                         null)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity<Object> objectResponseEntity = caseWorkerServiceImpl
-                .processCaseWorkerProfiles(
-                        Collections.singletonList(caseWorkersProfileCreationRequest));
+        caseWorkerServiceImpl.processCaseWorkerProfiles(Collections.singletonList(caseWorkersProfileCreationRequest));
 
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(),any(),any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
-        assertThat(objectResponseEntity.getStatusCodeValue()).isEqualTo(201);
+
     }
 
     @Test

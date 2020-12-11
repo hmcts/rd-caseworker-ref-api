@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
@@ -83,12 +82,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
     @Override
-    public ResponseEntity<Object> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
+    public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         try {
             getRolesAndUserTypes();
-            cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
+            for (CaseWorkersProfileCreationRequest cwrProfileCreationRequest : cwrsProfilesCreationRequest) {
                 CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                         .findByEmailId(cwrProfileCreationRequest.getEmailId().toLowerCase());
                 if (Objects.isNull(caseWorkerProfile)) {
@@ -108,16 +107,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     // updating the status in idam to suspend.
                     modifyCaseWorkerUserStatus(usrProfileStatusUpdate,caseWorkerProfile.getCaseWorkerId(),"EXUI");
                 }
-            });
+            }
 
 
-            /**  caseworker profile bacth save
+            /**  caseworker profile batch save
              in caseWorkerProfile request contains all the associated entities information and while
              saving it automatically saves data in the sub entities like cwlocation, cwWorkArea,cwRole and
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
             if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
-                caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+                caseWorkerProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
             }
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
@@ -125,9 +124,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
-        return ResponseEntity
-                .status(201)
-                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
+        return caseWorkerProfiles;
     }
 
     /**
@@ -181,7 +178,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         if (CollectionUtils.isEmpty(caseWorkerProfileList)) {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
         }
-        return ResponseEntity.ok().body((caseWorkerProfileList));
+        return ResponseEntity.ok().body(caseWorkerProfileList);
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {

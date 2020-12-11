@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CaseWorkerService {
 
-    ResponseEntity<Object> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
+    List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                 caseWorkersProfileCreationRequest);
 
     /**
