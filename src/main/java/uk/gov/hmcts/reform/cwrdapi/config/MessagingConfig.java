@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.servicebus.messaging;
+package uk.gov.hmcts.reform.cwrdapi.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
@@ -13,6 +13,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
+import uk.gov.hmcts.reform.cwrdapi.servicebus.messaging.JmsErrorHandler;
 
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
