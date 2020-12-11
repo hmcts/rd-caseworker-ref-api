@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
 import java.util.List;
 
@@ -36,6 +38,8 @@ public class CaseWorkerRefController {
 
     @Autowired
     CaseWorkerService caseWorkerService;
+    @Autowired
+    TopicPublisher topicPublisher;
 
     @ApiOperation(
             value = "This API creates caseworker profiles",
@@ -73,14 +77,21 @@ public class CaseWorkerRefController {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured("cwd-admin")
+    @Secured("prd-admin")
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
         if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
 
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
-        return caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        ResponseEntity<Object> objectResponseEntity =
+                caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        CaseWorkerProfileCreationResponse  responseBody =
+                (CaseWorkerProfileCreationResponse) objectResponseEntity.getBody();
+        if (responseBody != null && !responseBody.getCaseWorkerIds().isEmpty()) {
+            caseWorkerService.sendCaseWorkerIdsToTopic(responseBody.getCaseWorkerIds());
+        }
+        return objectResponseEntity;
     }
 
     @ApiOperation(

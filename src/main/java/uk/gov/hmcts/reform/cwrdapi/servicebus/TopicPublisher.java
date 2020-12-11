@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 
 import javax.jms.ConnectionFactory;
-import javax.jms.Session;
 
 @Slf4j
 @Service
@@ -36,10 +34,10 @@ public class TopicPublisher {
     }
 
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 2000, multiplier = 3))
-    public void sendMessage(final String message) {
+    public void sendMessage(Object message) {
         log.info("{}:: Sending message.", loggingComponentName);
         try {
-            jmsTemplate.send(destination, (Session session) -> session.createTextMessage(message));
+            jmsTemplate.convertAndSend(destination, message);
             log.info("{}:: Message sent.", loggingComponentName);
         } catch (IllegalStateException e) {
             throw new CaseworkerMessageFailedException(e.getMessage());
@@ -53,4 +51,3 @@ public class TopicPublisher {
     }
 }
 
-*/

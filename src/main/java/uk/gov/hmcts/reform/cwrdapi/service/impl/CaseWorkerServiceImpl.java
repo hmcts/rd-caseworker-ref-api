@@ -5,12 +5,14 @@ import feign.FeignException;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.TopicCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
@@ -36,6 +38,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
+import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
@@ -58,6 +61,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+    @Value("${cwrd.caseWorkerDataPerMessage}")
+    private int caseWorkerDataPerMessage;
+
     @Autowired
     CaseWorkerProfileRepository caseWorkerProfileRepo;
 
@@ -76,6 +82,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
 
+    @Autowired
+    private TopicPublisher topicPublisher;
+
     List<RoleType> roleTypes = new ArrayList<>();
 
     List<UserType> userTypes = new ArrayList<>();
@@ -85,6 +94,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public ResponseEntity<Object> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        List<CaseWorkerProfile> createdCwProfiles = new ArrayList<>();
+        List<String> caseWorkerIds = new ArrayList<>();
         try {
             getRolesAndUserTypes();
             cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
@@ -116,7 +127,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
             if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
-                caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+                createdCwProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
             }
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
@@ -124,9 +135,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
+        if (!createdCwProfiles.isEmpty()) {
+            caseWorkerIds = createdCwProfiles
+                    .stream()
+                    .map(CaseWorkerProfile::getCaseWorkerId)
+                    .collect(Collectors.toList());
+        }
         return ResponseEntity
                 .status(201)
-                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
+                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.",
+                        caseWorkerIds));
     }
 
     /**
@@ -165,6 +183,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     loggingComponentName, serviceCodes.toString(), e.getMessage());
             throw new IdamRolesMappingException(e.getMessage());
         }
+    }
+
+    @Override
+    public void sendCaseWorkerIdsToTopic(List<String> caseWorkerIds) {
+        ListUtils.partition(caseWorkerIds, caseWorkerDataPerMessage)
+                .forEach(data -> {
+                    TopicCaseWorkerData topicCaseWorkerData = new TopicCaseWorkerData();
+                    topicCaseWorkerData.setUserIds(data);
+                    topicPublisher.sendMessage(topicCaseWorkerData);
+                });
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
@@ -299,10 +327,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
                 new HashSet<String>();
         userRoles.add("cwd-user");
-        Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
-        if (idamRoles.size() > 0) {
-            userRoles.addAll(idamRoles);
-        }
+//        Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
+//        if (idamRoles.size() > 0) {
+//            userRoles.addAll(idamRoles);
+//        }
         //Creating user profile request
         return  new UserProfileCreationRequest(
                 cwrdProfileRequest.getEmailId(),

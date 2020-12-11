@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi.servicebus.messaging;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +10,9 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.MessageConverter;
+import org.springframework.jms.support.converter.MessageType;
 
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
@@ -48,55 +50,11 @@ public class MessagingConfig {
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
-
-    // DO NOT USE THIS IN PRODUCTION!.
-    // This was only used for testing unverified ssl certs locally!
-    //
-    // @deprecated Only used for testing - uncomment below code and set trustAllCerts flag to true.
-
-    //@SuppressWarnings("squid:S4423")
-    //@Bean
-    //@Deprecated(forRemoval = true)
-    //public SSLContext jmsSslContext() throws NoSuchAlgorithmException, KeyManagementException {
-    // https://stackoverflow.com/a/2893932
-    // DO NOT USE THIS IN PRODUCTION!
-    //TrustManager[] trustCerts = getTrustManagers();
-
-    //SSLContext sc = SSLContext.getInstance("SSL");
-    //sc.init(null, trustCerts, new SecureRandom());
-
-    //return sc;
-    //}
-
-    //private TrustManager[] getTrustManagers() {
-    //return new TrustManager[]{
-    //new X509TrustManager() {
-    //@Override
-    //public X509Certificate[] getAcceptedIssuers() {
-    //return new X509Certificate[0];
-    //}
-
-    //@Override
-    //@SuppressWarnings("squid:S4830")
-    //public void checkClientTrusted(
-    //X509Certificate[] certs, String authType) {
-    // Empty
-    //}
-
-    //@Override
-    //@SuppressWarnings("squid:S4830")
-    //public void checkServerTrusted(
-    //X509Certificate[] certs, String authType) {
-    // Empty
-    //}
-    //}
-    //};
-    //}
-
     @Bean
     public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
+        returnValue.setMessageConverter(new MappingJackson2MessageConverter());
         return returnValue;
     }
 
@@ -111,6 +69,11 @@ public class MessagingConfig {
         return returnValue;
     }
 
-}
+    @Bean // Serialize message content to json using TextMessage
+    public MessageConverter jacksonJmsMessageConverter() {
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        converter.setTargetType(MessageType.TEXT);
+        return converter;
+    }
 
-*/
+}

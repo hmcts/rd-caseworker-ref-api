@@ -18,5 +18,7 @@ public interface CaseWorkerService {
      * @return IdamRoleAssocResponse
      */
     IdamRolesMappingResponse buildIdamRoleMappings(List<ServiceRoleMapping> serviceRoleMappings);
+
+    void sendCaseWorkerIdsToTopic(List<String> responseBody);
 }
 
