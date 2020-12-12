@@ -77,7 +77,7 @@ public class CaseWorkerRefController {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured("prd-admin")
+    @Secured("cwd-admin")
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
         if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
