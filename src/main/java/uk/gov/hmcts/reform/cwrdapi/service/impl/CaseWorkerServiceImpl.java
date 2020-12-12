@@ -327,10 +327,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
                 new HashSet<String>();
         userRoles.add("cwd-user");
-//        Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
-//        if (idamRoles.size() > 0) {
-//            userRoles.addAll(idamRoles);
-//        }
+        Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
+        if (idamRoles.size() > 0) {
+            userRoles.addAll(idamRoles);
+        }
         //Creating user profile request
         return  new UserProfileCreationRequest(
                 cwrdProfileRequest.getEmailId(),
