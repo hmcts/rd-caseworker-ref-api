@@ -114,6 +114,7 @@ cwrd:
   subscription: ${CWRD_MQ_SUBSCRIPTION_NAME:rd-caseworker-subscription-sandbox}
   # DO NOT SET THIS 'true' IN PRODUCTION!
   trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
+  caseWorkerDataPerMessage: 3
   security:
     roles:
       cwd-admin: cwd-admin
