@@ -83,10 +83,10 @@ public class CaseWorkerRefController {
 
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
-        caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        List<CaseWorkerProfile> caseWorkerProfileList = caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
         return ResponseEntity
                 .status(201)
-                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
+                .body(caseWorkerProfileList);
 
     }
 

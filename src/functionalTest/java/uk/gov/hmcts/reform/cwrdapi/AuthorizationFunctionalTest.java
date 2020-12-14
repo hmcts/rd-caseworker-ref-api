@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.S2sClient;
 import uk.gov.hmcts.reform.cwrdapi.config.Oauth2;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,8 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class})
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class/*,
+        CaseWorkerRefApiApplication.class*/})
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j

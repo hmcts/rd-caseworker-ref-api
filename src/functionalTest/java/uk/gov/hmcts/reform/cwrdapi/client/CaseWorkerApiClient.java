@@ -25,7 +25,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
 
-
 @Slf4j
 @Component
 public class CaseWorkerApiClient {
@@ -103,14 +102,14 @@ public class CaseWorkerApiClient {
 
 
     public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String... email) {
-        List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest.builder()
+        List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest.caseWorkersLocationRequest()
             .location("test location")
             .locationId(2).isPrimaryFlag(true).build());
 
-        List<CaseWorkerRoleRequest> roleRequests = ImmutableList.of(CaseWorkerRoleRequest.builder()
+        List<CaseWorkerRoleRequest> roleRequests = ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest()
             .role("senior-tribunal-caseworker").isPrimaryFlag(true).build());
 
-        List<CaseWorkerWorkAreaRequest> areaRequests = ImmutableList.of(CaseWorkerWorkAreaRequest.builder()
+        List<CaseWorkerWorkAreaRequest> areaRequests = ImmutableList.of(CaseWorkerWorkAreaRequest.caseWorkerWorkAreaRequest()
             .serviceCode("BAA1").areaOfWork("Non-Money Claims").build());
 
         Set<String> idamRoles = new HashSet<>();
@@ -118,8 +117,8 @@ public class CaseWorkerApiClient {
         String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
         setEmailsTobeDeleted(emailToUsed);
         return ImmutableList.of(
-            CaseWorkersProfileCreationRequest
-                .builder().firstName("cwr-test")
+            CaseWorkersProfileCreationRequest.caseWorkersProfileCreationRequest()
+                    .firstName("cwr-test")
                 .lastName("cwr-test")
                 .emailId(emailToUsed)
                 .regionId(1)
