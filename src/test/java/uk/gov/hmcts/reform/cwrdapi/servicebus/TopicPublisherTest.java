@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.jms.IllegalStateException;
-import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.TopicCaseWorkerData;
@@ -28,8 +27,7 @@ public class TopicPublisherTest {
 
     private static final String DESTINATION = "Bermuda";
     private final JmsTemplate jmsTemplate = mock(JmsTemplate.class);
-    private final CachingConnectionFactory connectionFactory = mock(CachingConnectionFactory.class);
-    private TopicPublisher topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
+    private TopicPublisher topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION);
 
     @Test
     public void sendMessageCallsTheJmsTemplate() {
@@ -38,18 +36,10 @@ public class TopicPublisherTest {
         verify(jmsTemplate).convertAndSend(DESTINATION, topicCaseWorkerData);
     }
 
-    @Test(expected = NoRouteToHostException.class)
+    @Test(expected = CaseworkerMessageFailedException.class)
     public void recoverMessageThrowsThePassedException() throws Throwable {
         Exception exception = new NoRouteToHostException("");
         topicPublisher.recoverMessage(exception);
-    }
-
-    @Test(expected = CaseworkerMessageFailedException.class)
-    public void sendMessageWhenThrowException() {
-
-        doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION,topicCaseWorkerData);
-
-        topicPublisher.sendMessage(topicCaseWorkerData);
     }
 
     @Test
@@ -57,7 +47,7 @@ public class TopicPublisherTest {
         SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
         doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION, topicCaseWorkerData);
 
-        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, connectionFactory);
+        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION);
 
         try {
             topicPublisher.sendMessage(topicCaseWorkerData);

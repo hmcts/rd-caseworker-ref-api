@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
@@ -84,14 +85,16 @@ public class CaseWorkerRefController {
 
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
-        ResponseEntity<Object> objectResponseEntity =
+
+        List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-        CaseWorkerProfileCreationResponse  responseBody =
-                (CaseWorkerProfileCreationResponse) objectResponseEntity.getBody();
-        if (responseBody != null && !responseBody.getCaseWorkerIds().isEmpty()) {
-            caseWorkerService.sendCaseWorkerIdsToTopic(responseBody.getCaseWorkerIds());
+
+        if (!processedCwProfiles.isEmpty()) {
+            caseWorkerService.publishCaseWorkerDataToTopic(processedCwProfiles);
         }
-        return objectResponseEntity;
+        return ResponseEntity
+                .status(201)
+                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
     }
 
     @ApiOperation(

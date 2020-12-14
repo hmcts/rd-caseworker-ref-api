@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
@@ -61,7 +60,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
-    @Value("${cwrd.caseWorkerDataPerMessage}")
+    @Value("${crd.publisher.caseWorkerDataPerMessage}")
     private int caseWorkerDataPerMessage;
 
     @Autowired
@@ -91,11 +90,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
     @Override
-    public ResponseEntity<Object> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
+    public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        List<CaseWorkerProfile> createdCwProfiles = new ArrayList<>();
-        List<String> caseWorkerIds = new ArrayList<>();
+        List<CaseWorkerProfile> processedCwProfiles = new ArrayList<>();
         try {
             getRolesAndUserTypes();
             cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
@@ -127,7 +125,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
             if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
-                createdCwProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+                processedCwProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
             }
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
@@ -135,16 +133,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
-        if (!createdCwProfiles.isEmpty()) {
-            caseWorkerIds = createdCwProfiles
-                    .stream()
-                    .map(CaseWorkerProfile::getCaseWorkerId)
-                    .collect(Collectors.toList());
-        }
-        return ResponseEntity
-                .status(201)
-                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.",
-                        caseWorkerIds));
+        return processedCwProfiles;
     }
 
     /**
@@ -186,7 +175,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     @Override
-    public void sendCaseWorkerIdsToTopic(List<String> caseWorkerIds) {
+    public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
+        List<String> caseWorkerIds = caseWorkerData.stream()
+                .map(CaseWorkerProfile::getCaseWorkerId)
+                .collect(Collectors.toUnmodifiableList());
+
         ListUtils.partition(caseWorkerIds, caseWorkerDataPerMessage)
                 .forEach(data -> {
                     TopicCaseWorkerData topicCaseWorkerData = new TopicCaseWorkerData();

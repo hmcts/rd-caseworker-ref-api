@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
@@ -133,13 +132,11 @@ public class CaseWorkerServiceImplTest {
         when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(201).build());
 
-        ResponseEntity<Object> objectResponseEntity = caseWorkerServiceImpl
+        caseWorkerServiceImpl
                 .processCaseWorkerProfiles(
                         Collections.singletonList(caseWorkersProfileCreationRequest));
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
-
-        assertThat(objectResponseEntity.getStatusCodeValue()).isEqualTo(201);
     }
 
     @Test
@@ -162,14 +159,13 @@ public class CaseWorkerServiceImplTest {
                 .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                         null)).body(body, Charset.defaultCharset()).status(200).build());
 
-        ResponseEntity<Object> objectResponseEntity = caseWorkerServiceImpl
+        caseWorkerServiceImpl
                 .processCaseWorkerProfiles(
                         Collections.singletonList(caseWorkersProfileCreationRequest));
 
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(),any(),any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
-        assertThat(objectResponseEntity.getStatusCodeValue()).isEqualTo(201);
     }
 
     @Test
@@ -200,12 +196,18 @@ public class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void test_sendCaseWorkerIdsToTopic() throws JsonProcessingException {
+    public void test_publishCaseWorkerDataToTopic() {
         ReflectionTestUtils.setField(caseWorkerServiceImpl, "caseWorkerDataPerMessage", 1);
-        List<String> cwIds = new ArrayList<>();
-        cwIds.add("1234");
-        cwIds.add("2345");
-        caseWorkerServiceImpl.sendCaseWorkerIdsToTopic(cwIds);
+        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("1234");
+
+        CaseWorkerProfile secondCaseWorkerProfile = new CaseWorkerProfile();
+        secondCaseWorkerProfile.setCaseWorkerId("1234");
+
+        caseWorkerProfiles.add(caseWorkerProfile);
+        caseWorkerProfiles.add(secondCaseWorkerProfile);
+        caseWorkerServiceImpl.publishCaseWorkerDataToTopic(caseWorkerProfiles);
         verify(topicPublisher, times(2)).sendMessage(any());
     }
 

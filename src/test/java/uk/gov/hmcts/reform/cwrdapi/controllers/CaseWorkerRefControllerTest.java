@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.ArrayList;
@@ -46,12 +47,8 @@ public class CaseWorkerRefControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        List<String> cwIds = new ArrayList<>();
-        cwIds.add("1234");
-        cwIds.add("4567");
         caseWorkerServiceMock = mock(CaseWorkerService.class);
-        cwResponse = new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.",
-                cwIds);
+        cwResponse = new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.");
         responseEntity = new ResponseEntity<>(
                 cwResponse,
                 null,
@@ -79,8 +76,7 @@ public class CaseWorkerRefControllerTest {
                 "lastName","test@gmail.com",1,"userType","region",
                 false,roles,caseWorkerRoleRequests,caseWorkeLocationRequests,caseWorkeAreaRequests);
         caseWorkersProfileCreationRequest.add(cwRequest);
-        cwProfileCreationResponse = new CaseWorkerProfileCreationResponse("",
-                Collections.emptyList());
+        cwProfileCreationResponse = new CaseWorkerProfileCreationResponse("");
         MockitoAnnotations.openMocks(this);
 
     }
@@ -89,7 +85,7 @@ public class CaseWorkerRefControllerTest {
     public void createCaseWorkerProfilesTest() {
 
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-             .thenReturn(responseEntity);
+             .thenReturn(Collections.emptyList());
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         assertNotNull(actual);
@@ -99,37 +95,30 @@ public class CaseWorkerRefControllerTest {
 
     @Test
     public void test_sendCwDataToTopic_called_when_ids_exists() {
-
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("1234");
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-                .thenReturn(responseEntity);
+                .thenReturn(Collections.singletonList(caseWorkerProfile));
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
                 .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
         verify(caseWorkerServiceMock,times(1))
-                .sendCaseWorkerIdsToTopic(any());
+                .publishCaseWorkerDataToTopic(any());
     }
 
     @Test
     public void test_sendCwDataToTopic_not_called_when_no_ids_exists() {
-        CaseWorkerProfileCreationResponse cwResponse = new
-                CaseWorkerProfileCreationResponse("testMessage",
-                Collections.emptyList());
-        responseEntity = new ResponseEntity<>(
-                cwResponse,
-                null,
-                HttpStatus.OK
-        );
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-                .thenReturn(responseEntity);
+                .thenReturn(Collections.emptyList());
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
                 .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
         verify(caseWorkerServiceMock,times(0))
-                .sendCaseWorkerIdsToTopic(any());
+                .publishCaseWorkerDataToTopic(any());
     }
 
     @Test(expected = InvalidRequestException.class)

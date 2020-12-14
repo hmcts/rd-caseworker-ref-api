@@ -55,6 +55,12 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
+    @ExceptionHandler(CaseworkerMessageFailedException.class)
+    public ResponseEntity<Object> handleCaseWorkerPublishMessageError(
+            CaseworkerMessageFailedException ex) {
+        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
     private String getTimeStamp() {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());
     }
