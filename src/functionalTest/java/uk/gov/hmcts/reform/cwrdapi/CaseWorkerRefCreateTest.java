@@ -95,6 +95,9 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 .statusCode(201);
 
         List<CaseWorkerProfile> caseWorkerProfileList = Arrays.asList(response.getBody().as(CaseWorkerProfile[].class));
+        for (CaseWorkerProfile profile : caseWorkerProfileList) {
+            log.info("shouldGetCaseWorkerDetails : " + profile.getCaseWorkerId());
+        }
         caseWorkerProfileList.forEach(caseWorkerProfile -> caseWorkerIds.add(caseWorkerProfile.getCaseWorkerId()));
 
         assertEquals(2, caseWorkerIds.size());

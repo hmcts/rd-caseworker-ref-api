@@ -85,6 +85,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        List<CaseWorkerProfile> listSavedCaseWorkers = new ArrayList<>();
         try {
             getRolesAndUserTypes();
             for (CaseWorkersProfileCreationRequest cwrProfileCreationRequest : cwrsProfilesCreationRequest) {
@@ -115,16 +116,20 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              saving it automatically saves data in the sub entities like cwlocation, cwWorkArea,cwRole and
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
-            if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
-                caseWorkerProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
-            }
-            log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
+            if (!CollectionUtils.isEmpty(caseWorkerProfiles)) {
+                listSavedCaseWorkers = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+            }
+
+            log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
+            for (CaseWorkerProfile caseWorkerProfile : listSavedCaseWorkers) {
+                log.info("Saved the Case worker profile with id: " + caseWorkerProfile.getCaseWorkerId());
+            }
         } catch (Exception exp) {
 
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
-        return caseWorkerProfiles;
+        return listSavedCaseWorkers;
     }
 
     /**
