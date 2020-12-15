@@ -7,3 +7,4 @@ spring:
         s2s.microservicekey-caseworker-ref-api-S2S-SECRET: S2S_SECRET
         rd.caseworker-ref-api-POSTGRES-PASS: POSTGRES_PASSWORD
         rd.AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        rd.caseworker-topic-primary-send-listen-shared-access-key: CWRD_MQ_PASSWORD
