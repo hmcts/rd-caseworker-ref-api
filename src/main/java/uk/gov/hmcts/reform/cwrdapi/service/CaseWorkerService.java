@@ -19,6 +19,10 @@ public interface CaseWorkerService {
      */
     IdamRolesMappingResponse buildIdamRoleMappings(List<ServiceRoleMapping> serviceRoleMappings);
 
+    /**
+     * Prepare caseworker data to be published as a message to topic
+     * @param caseWorkerData list containing caseworker data
+     */
     void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData);
 }
 

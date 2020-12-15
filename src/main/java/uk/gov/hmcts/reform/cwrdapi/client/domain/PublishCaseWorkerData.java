@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Setter
-public class TopicCaseWorkerData {
+public class PublishCaseWorkerData {
     @JsonProperty
     private List<String> userIds;
 }

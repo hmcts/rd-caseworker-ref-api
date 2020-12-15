@@ -39,8 +39,6 @@ public class CaseWorkerRefController {
 
     @Autowired
     CaseWorkerService caseWorkerService;
-    @Autowired
-    TopicPublisher topicPublisher;
 
     @ApiOperation(
             value = "This API creates caseworker profiles",

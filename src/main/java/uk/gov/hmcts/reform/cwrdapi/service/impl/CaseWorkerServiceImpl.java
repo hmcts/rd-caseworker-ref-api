@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.TopicCaseWorkerData;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
@@ -174,6 +174,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
     }
 
+    /**
+     * Prepare caseworker data to be published as a message to topic
+     * @param caseWorkerData list containing caseworker data
+     */
     @Override
     public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
         List<String> caseWorkerIds = caseWorkerData.stream()
@@ -182,9 +186,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         ListUtils.partition(caseWorkerIds, caseWorkerDataPerMessage)
                 .forEach(data -> {
-                    TopicCaseWorkerData topicCaseWorkerData = new TopicCaseWorkerData();
-                    topicCaseWorkerData.setUserIds(data);
-                    topicPublisher.sendMessage(topicCaseWorkerData);
+                    PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
+                    publishCaseWorkerData.setUserIds(data);
+                    topicPublisher.sendMessage(publishCaseWorkerData);
                 });
     }
 

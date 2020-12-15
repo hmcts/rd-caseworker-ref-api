@@ -7,13 +7,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.jms.IllegalStateException;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.TopicCaseWorkerData;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 
 import java.net.NoRouteToHostException;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -23,7 +21,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class TopicPublisherTest {
     @Mock
-    TopicCaseWorkerData topicCaseWorkerData;
+    PublishCaseWorkerData publishCaseWorkerData;
 
     private static final String DESTINATION = "Bermuda";
     private final JmsTemplate jmsTemplate = mock(JmsTemplate.class);
@@ -31,9 +29,9 @@ public class TopicPublisherTest {
 
     @Test
     public void sendMessageCallsTheJmsTemplate() {
-        topicPublisher.sendMessage(topicCaseWorkerData);
+        topicPublisher.sendMessage(publishCaseWorkerData);
 
-        verify(jmsTemplate).convertAndSend(DESTINATION, topicCaseWorkerData);
+        verify(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
     }
 
     @Test(expected = CaseworkerMessageFailedException.class)
@@ -45,24 +43,16 @@ public class TopicPublisherTest {
     @Test
     public void sendMessageWhenThrowExceptionWhenConnectionFactoryInstanceDifferent() {
         SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
-        doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION, topicCaseWorkerData);
+        doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
 
         topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION);
 
         try {
-            topicPublisher.sendMessage(topicCaseWorkerData);
+            topicPublisher.sendMessage(publishCaseWorkerData);
         } catch (Exception e) {
             verify(connectionFactory, never()).resetConnection();
-            verify(jmsTemplate, times(1)).convertAndSend(DESTINATION, topicCaseWorkerData);
+            verify(jmsTemplate, times(1)).convertAndSend(DESTINATION, publishCaseWorkerData);
         }
-
-    }
-
-    @Test(expected = Exception.class)
-    public void sendMessageWhenOtherThrowException() {
-        doThrow(Exception.class).when(jmsTemplate).send(anyString(), any());
-
-        topicPublisher.sendMessage("a message");
     }
 }
 
