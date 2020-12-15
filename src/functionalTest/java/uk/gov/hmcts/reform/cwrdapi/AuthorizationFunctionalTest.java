@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
-
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.rest.SerenityRest;
 import org.junit.AfterClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +19,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.S2sClient;
 import uk.gov.hmcts.reform.cwrdapi.config.Oauth2;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,13 +90,13 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S URL: " + s2sUrl);
 
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);
+        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
+        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
         //Single S2S & Sidam call
         s2sToken = isNull(s2sToken) ? new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S() : s2sToken;
 
-        sidamToken = isNull(sidamToken) ? idamOpenIdClient.getInternalOpenIdToken() : sidamToken;
+        sidamToken = isNull(sidamToken) ? idamOpenIdClient.getInternalOpenIdToken("cwd-admin") : sidamToken;
 
 
         caseWorkerApiClient = new CaseWorkerApiClient(

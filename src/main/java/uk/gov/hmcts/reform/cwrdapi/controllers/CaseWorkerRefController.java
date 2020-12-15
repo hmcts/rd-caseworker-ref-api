@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
@@ -83,7 +82,8 @@ public class CaseWorkerRefController {
 
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
-        List<CaseWorkerProfile> caseWorkerProfileList = caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        List<CaseWorkerProfile> caseWorkerProfileList =
+                caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
         return ResponseEntity
                 .status(201)
                 .body(caseWorkerProfileList);

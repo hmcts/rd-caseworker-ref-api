@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -203,8 +202,10 @@ public class CaseWorkerServiceImplTest {
     @Test
     public void test_should_return_caseworker_profile() {
         doReturn(Collections.singletonList(buildCaseWorkerProfile()))
-                .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(Collections.singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
-        caseWorkerServiceImpl.fetchCaseworkersById(Collections.singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
+                .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(Collections.singletonList(
+                        "27fbd198-552e-4c32-9caf-37be1545caaf"));
+        caseWorkerServiceImpl.fetchCaseworkersById(
+                Collections.singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
         verify(caseWorkerProfileRepository, times(1)).findByCaseWorkerIdIn(any());
     }
 

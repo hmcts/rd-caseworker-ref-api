@@ -85,10 +85,9 @@ public class CaseWorkerApiClient {
             .header("Accepts", APPLICATION_JSON_VALUE);
     }
 
-    public RequestSpecification getMultipleAuthHeadersInternal(String... role) {
+    public RequestSpecification getMultipleAuthHeadersInternal(String role) {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
     }
-
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {
         return SerenityRest.with()
@@ -102,15 +101,18 @@ public class CaseWorkerApiClient {
 
 
     public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String... email) {
-        List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest.caseWorkersLocationRequest()
+        List<CaseWorkerLocationRequest> locationRequestList =
+                ImmutableList.of(CaseWorkerLocationRequest.caseWorkersLocationRequest()
             .location("test location")
             .locationId(2).isPrimaryFlag(true).build());
 
-        List<CaseWorkerRoleRequest> roleRequests = ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest()
+        List<CaseWorkerRoleRequest> roleRequests = ImmutableList.of(
+                CaseWorkerRoleRequest.caseWorkerRoleRequest()
             .role("senior-tribunal-caseworker").isPrimaryFlag(true).build());
 
-        List<CaseWorkerWorkAreaRequest> areaRequests = ImmutableList.of(CaseWorkerWorkAreaRequest.caseWorkerWorkAreaRequest()
-            .serviceCode("BAA1").areaOfWork("Non-Money Claims").build());
+        List<CaseWorkerWorkAreaRequest> areaRequests = ImmutableList.of(
+                CaseWorkerWorkAreaRequest.caseWorkerWorkAreaRequest()
+                .serviceCode("BAA1").areaOfWork("Non-Money Claims").build());
 
         Set<String> idamRoles = new HashSet<>();
 

@@ -247,26 +247,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return cwLocations;
     }
 
-    public  List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
-                                                CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+    public List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
+                                                                CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
         cwrdProfileRequest.getRoles().forEach(role -> roleTypes.forEach(roleType -> {
-            if(roleType.getDescription().trim().equalsIgnoreCase(role.getRole())) {
+            if (roleType.getDescription().trim().equalsIgnoreCase(role.getRole())) {
                 CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
-                        roleType.getRoleId(),role.isPrimaryFlag());
+                        roleType.getRoleId(), role.isPrimaryFlag());
                 caseWorkerRoles.add(workerRole);
             }
         }));
-
-
-       /* cwrdProfileRequest.getRoles().forEach(role -> roleTypes.stream()
-                .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                .map(roleType -> {
-                    CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
-                            roleType.getRoleId(),role.isPrimaryFlag());
-                    return caseWorkerRoles.add(workerRole);
-
-                }));*/
         return caseWorkerRoles;
     }
 

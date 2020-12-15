@@ -143,7 +143,8 @@ public class CaseWorkerRefControllerTest {
         when(caseWorkerServiceMock.fetchCaseworkersById(any()))
                 .thenReturn(responseEntity);
 
-        List<String> caseWorkerIds = new ArrayList<>(Arrays.asList("185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
+        List<String> caseWorkerIds = new ArrayList<>(Arrays.asList(
+                "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
         ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(caseWorkerIds);
 
         assertNotNull(actual);
