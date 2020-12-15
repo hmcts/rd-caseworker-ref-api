@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -45,7 +47,6 @@ public class CaseWorkerRefControllerTest {
 
     @Before
     public void setUp() throws Exception {
-
         caseWorkerServiceMock = mock(CaseWorkerService.class);
         cwResponse = new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.");
         responseEntity = new ResponseEntity<>(
@@ -84,12 +85,40 @@ public class CaseWorkerRefControllerTest {
     public void createCaseWorkerProfilesTest() {
 
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-             .thenReturn(responseEntity);
+             .thenReturn(Collections.emptyList());
         ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
                 .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+    }
+
+    @Test
+    public void test_sendCwDataToTopic_called_when_ids_exists() {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("1234");
+        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
+                .thenReturn(Collections.singletonList(caseWorkerProfile));
+        ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+
+        assertNotNull(actual);
+        verify(caseWorkerServiceMock,times(1))
+                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        verify(caseWorkerServiceMock,times(1))
+                .publishCaseWorkerDataToTopic(any());
+    }
+
+    @Test
+    public void test_sendCwDataToTopic_not_called_when_no_ids_exists() {
+        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
+                .thenReturn(Collections.emptyList());
+        ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+
+        assertNotNull(actual);
+        verify(caseWorkerServiceMock,times(1))
+                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        verify(caseWorkerServiceMock,times(0))
+                .publishCaseWorkerDataToTopic(any());
     }
 
     @Test(expected = InvalidRequestException.class)

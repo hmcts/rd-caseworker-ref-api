@@ -9,8 +9,14 @@ java:
     POSTGRES_DB_NAME: dbrdcaseworker
     POSTGRES_PORT: 5432
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    CWRD_MQ_HOST: rd-servicebus-{{ .Values.global.environment }}.servicebus.windows.net
+    CWRD_MQ_USERNAME: SendAndListenSharedAccessKey
+    CWRD_MQ_TOPIC_NAME: rd-caseworker-topic-{{ .Values.global.environment }}
+    CWRD_MQ_TRUST_ALL_CERTS: false
+    CWRD_DATA_PER_MESSAGE: 50
   keyVaults:
     rd:
       secrets:
         - caseworker-ref-api-POSTGRES-PASS
         - AppInsightsInstrumentationKey
+        - caseworker-topic-primary-send-listen-shared-access-key

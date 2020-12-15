@@ -99,14 +99,19 @@ feign:
       - authorization
       - serviceauthorization
 userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
-cwrd:
-  host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
-  username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
-  password: ${CWRD_MQ_PASSWORD:AAAAAAAAAAAAA}
-  topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
-  subscription: ${CWRD_MQ_SUBSCRIPTION_NAME:rd-caseworker-subscription-sandbox}
-  # DO NOT SET THIS 'true' IN PRODUCTION!
-  trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
+
+crd:
+  publisher:
+    azure:
+      service:
+        bus:
+          host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
+          username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
+          password: ${CWRD_MQ_PASSWORD:AAAAAAAAAA}
+          topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
+          # DO NOT SET THIS 'true' IN PRODUCTION!
+          trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
+    caseWorkerDataPerMessage: ${CWRD_DATA_PER_MESSAGE:50}
 
 excel:
   password: ${EXCEL_PASSWORD:1234}

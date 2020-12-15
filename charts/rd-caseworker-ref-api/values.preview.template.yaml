@@ -7,6 +7,11 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     POSTGRES_PORT: "{{ .Values.postgresql.postgresqlPort}}"
+    CWRD_MQ_HOST: rd-servicebus-aat.servicebus.windows.net
+    CWRD_MQ_USERNAME: SendAndListenSharedAccessKey
+    CWRD_MQ_TOPIC_NAME: rd-caseworker-topic-aat
+    CWRD_MQ_TRUST_ALL_CERTS: false
+    CWRD_DATA_PER_MESSAGE: 50
   postgresql:
     enabled: true
     postgresqlUsername: dbrdcaseworker
@@ -17,3 +22,4 @@ java:
     rd:
       secrets:
         - AppInsightsInstrumentationKey
+        - caseworker-topic-primary-send-listen-shared-access-key
