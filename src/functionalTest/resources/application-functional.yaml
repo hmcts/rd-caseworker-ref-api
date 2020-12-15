@@ -10,11 +10,3 @@ idam.auth.clientId: ${CA_REF_OAUTH2_CLIENT_ID:}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/oauth2redirect}
 s2s-secret: ${S2S_SECRET:}
 
-cwrd:
-  host: rd-servicebus-sandbox.servicebus.windows.net
-  username: SendAndListenSharedAccessKey
-  password: 5ZXxCOCaJsvA/8uojXxqPfk6oJZr/xkyJe47vevc48s=
-  topic: rd-caseworker-topic-sandbox
-  subscription: rd-caseworker-subscription-sandbox
-  trustAllCerts: false
-
