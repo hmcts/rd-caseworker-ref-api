@@ -193,6 +193,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         //User Profile Call
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
+        log.info("User Profile Service response: " + responseEntity.getStatusCodeValue());
         if (Objects.nonNull(responseEntity) && responseEntity.getStatusCode().is2xxSuccessful()
                 && Objects.nonNull(responseEntity.getBody())) {
 
