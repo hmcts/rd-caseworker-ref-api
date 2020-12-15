@@ -30,7 +30,6 @@ public class TopicPublisher {
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 2000, multiplier = 3))
     public void sendMessage(Object message) {
         log.info("{}:: Publishing message to service bus topic.", loggingComponentName);
-        log.info("destinationTest.... {}:: ", destination);
         jmsTemplate.convertAndSend(destination, message);
         log.info("{}:: Message published to service bus topic", loggingComponentName);
     }
