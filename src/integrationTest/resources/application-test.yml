@@ -113,10 +113,9 @@ crd:
         bus:
           host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
           username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
-          password: ${CWRD_MQ_PASSWORD:97E6uvE6xHcqHAVlxufN1PH75tMHoZUe78FhsCbLLLQ=}
+          password: ${CWRD_MQ_PASSWORD:AAAAAAAAA}
           topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
-          # DO NOT SET THIS 'true' IN PRODUCTION!
-          trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
+          trustAllCerts: false
     caseWorkerDataPerMessage: 3
   security:
     roles:
