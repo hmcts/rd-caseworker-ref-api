@@ -21,3 +21,4 @@ java:
     rd:
       secrets:
         - AppInsightsInstrumentationKey
+        - caseworker-topic-primary-send-listen-shared-access-key

@@ -44,7 +44,7 @@ public class MessagingConfig {
         if (trustAllCerts && jmsSslContext != null) {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
-
+        log.info("username.... {}:: ", username);
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
