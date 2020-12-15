@@ -85,7 +85,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        List<CaseWorkerProfile> listSavedCaseWorkers = new ArrayList<>();
         try {
             getRolesAndUserTypes();
             for (CaseWorkersProfileCreationRequest cwrProfileCreationRequest : cwrsProfilesCreationRequest) {
@@ -118,18 +117,15 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              */
 
             if (!CollectionUtils.isEmpty(caseWorkerProfiles)) {
-                listSavedCaseWorkers = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+                caseWorkerProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
             }
 
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
-            for (CaseWorkerProfile caseWorkerProfile : listSavedCaseWorkers) {
-                log.info("Saved the Case worker profile with id: " + caseWorkerProfile.getCaseWorkerId());
-            }
         } catch (Exception exp) {
 
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
-        return listSavedCaseWorkers;
+        return caseWorkerProfiles;
     }
 
     /**

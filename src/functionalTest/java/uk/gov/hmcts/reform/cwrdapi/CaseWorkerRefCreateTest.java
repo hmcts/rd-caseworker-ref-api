@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import com.google.common.collect.ImmutableList;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -11,10 +10,8 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
@@ -22,19 +19,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
 @TestPropertySource(properties = {"spring.config.location=classpath:application-functional.yml"})
-//@ContextConfiguration(classes = {CaseWorkerServiceImpl.class})
 public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     @Test
@@ -49,30 +43,6 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         response.then()
                 .assertThat()
                 .statusCode(201);
-    }
-
-    //@Test
-    public void whenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() throws Exception {
-        Map<String, String> userDetail = idamOpenIdClient.createUser("crd-admin");
-        String userEmail = userDetail.get(EMAIL);
-
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-                .createCaseWorkerProfiles(userEmail.toLowerCase());
-
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(caseWorkersProfileCreationRequests)
-                .post("/refdata/case-worker/users/")
-                .andReturn();
-        response.then()
-                .assertThat()
-                .statusCode(201);
-
-        UserProfileResponse upResponse = funcTestRequestHandler.sendGet(HttpStatus.OK,
-                "/v1/userprofile/roles?email="
-                        + userEmail.toLowerCase() + "",
-                UserProfileResponse.class, baseUrlUserProfile);
-        List<String> exceptedRoles = ImmutableList.of("cwd-user", "caseworker-iac-bulkscan");
-        assertEquals(exceptedRoles, upResponse.getRoles());
     }
 
     @Test
