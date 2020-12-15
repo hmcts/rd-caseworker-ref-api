@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
-import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
 import java.util.List;
 

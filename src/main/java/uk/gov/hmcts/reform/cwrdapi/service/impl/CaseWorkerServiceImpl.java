@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
@@ -175,7 +175,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     /**
-     * Prepare caseworker data to be published as a message to topic
+     * Prepare caseworker data to be published as a message to topic.
      * @param caseWorkerData list containing caseworker data
      */
     @Override
