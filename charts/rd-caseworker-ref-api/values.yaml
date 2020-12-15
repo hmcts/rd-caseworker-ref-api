@@ -13,6 +13,7 @@ java:
     CWRD_MQ_USERNAME: SendAndListenSharedAccessKey
     CWRD_MQ_TOPIC_NAME: rd-caseworker-topic-{{ .Values.global.environment }}
     CWRD_MQ_TRUST_ALL_CERTS: false
+    CWRD_DATA_PER_MESSAGE: 50
   keyVaults:
     rd:
       secrets:

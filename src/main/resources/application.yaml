@@ -111,7 +111,7 @@ crd:
           topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
           # DO NOT SET THIS 'true' IN PRODUCTION!
           trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
-    caseWorkerDataPerMessage: 50
+    caseWorkerDataPerMessage: ${CWRD_DATA_PER_MESSAGE:50}
 
 excel:
   password: ${EXCEL_PASSWORD:1234}

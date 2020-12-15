@@ -11,6 +11,7 @@ java:
     CWRD_MQ_USERNAME: SendAndListenSharedAccessKey
     CWRD_MQ_TOPIC_NAME: rd-caseworker-topic-aat
     CWRD_MQ_TRUST_ALL_CERTS: false
+    CWRD_DATA_PER_MESSAGE: 50
   postgresql:
     enabled: true
     postgresqlUsername: dbrdcaseworker

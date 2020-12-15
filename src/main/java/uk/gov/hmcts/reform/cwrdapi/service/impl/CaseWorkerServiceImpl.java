@@ -184,9 +184,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .map(CaseWorkerProfile::getCaseWorkerId)
                 .collect(Collectors.toUnmodifiableList());
 
+        PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
         ListUtils.partition(caseWorkerIds, caseWorkerDataPerMessage)
                 .forEach(data -> {
-                    PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
                     publishCaseWorkerData.setUserIds(data);
                     topicPublisher.sendMessage(publishCaseWorkerData);
                 });
