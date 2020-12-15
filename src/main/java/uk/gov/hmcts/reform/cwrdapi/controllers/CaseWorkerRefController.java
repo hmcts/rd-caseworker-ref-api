@@ -181,13 +181,10 @@ public class CaseWorkerRefController {
     )
     @Secured("cwd-admin")
     public ResponseEntity<Object> fetchCaseworkersById(@RequestBody List<String> caseWorkerIds) {
-        long currentTimeMillis = System.currentTimeMillis();
+
         if (CollectionUtils.isEmpty(caseWorkerIds)) {
             throw new InvalidRequestException("Caseworker request is empty");
         }
-        ResponseEntity<Object> response = caseWorkerService.fetchCaseworkersById(caseWorkerIds);
-        log.info("Time taken by fetchCaseworkersById method in Controller = "
-                + (System.currentTimeMillis() - currentTimeMillis));
-        return response;
+        return caseWorkerService.fetchCaseworkersById(caseWorkerIds);
     }
 }
