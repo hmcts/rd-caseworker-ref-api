@@ -26,8 +26,7 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 
-@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class/*,
-        CaseWorkerRefApiApplication.class*/})
+@ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class})
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j

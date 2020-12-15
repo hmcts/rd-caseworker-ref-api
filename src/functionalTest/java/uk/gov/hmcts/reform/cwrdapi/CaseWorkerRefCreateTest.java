@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -30,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
-//@ActiveProfiles("functional")
+@ActiveProfiles("functional")
 @Slf4j
 @TestPropertySource(properties = {"spring.config.location=classpath:application-functional.yml"})
 //@ContextConfiguration(classes = {CaseWorkerServiceImpl.class})
@@ -50,7 +51,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 .statusCode(201);
     }
 
-    @Test
+    //@Test
     public void whenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() throws Exception {
         Map<String, String> userDetail = idamOpenIdClient.createUser("crd-admin");
         String userEmail = userDetail.get(EMAIL);
