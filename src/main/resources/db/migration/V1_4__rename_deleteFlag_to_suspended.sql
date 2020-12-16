@@ -1,0 +1,1 @@
+ALTER TABLE case_worker_profile RENAME COLUMN delete_flag TO suspended;
