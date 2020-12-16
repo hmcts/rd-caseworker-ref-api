@@ -95,7 +95,7 @@ public class CaseWorkerServiceImplTest {
 
         caseWorkersProfileCreationRequest = CaseWorkersProfileCreationRequest
                 .caseWorkersProfileCreationRequest()
-                .deleteFlag(false)
+                .suspended(false)
                 .emailId("test@test.com")
                 .idamRoles(idamRoles)
                 .firstName("testFN")
@@ -144,7 +144,7 @@ public class CaseWorkerServiceImplTest {
 
         CaseWorkerProfile profile = new CaseWorkerProfile();
         profile.setCaseWorkerId("1");
-        profile.setDeleteFlag(true);
+        profile.setSuspended(true);
         profile.setEmailId(caseWorkersProfileCreationRequest.getEmailId());
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
