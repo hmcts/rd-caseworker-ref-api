@@ -43,10 +43,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toList;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
 
 @Service
 @Slf4j
@@ -86,20 +89,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
                 CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                     .findByEmailId(cwrProfileCreationRequest.getEmailId().toLowerCase());
-                if (Objects.isNull(caseWorkerProfile)) {
+                if (isNull(caseWorkerProfile) || (nonNull(caseWorkerProfile) &&
+                        negate(caseWorkerProfile.getDeleteFlag()))) {
 
                     caseWorkerProfile = createCaseWorkerProfile(cwrProfileCreationRequest);
-                    if (Objects.nonNull(caseWorkerProfile)) {
+                    if (nonNull(caseWorkerProfile)) {
                         // collecting all the successfully case worker profiles to save in caseworker db.
                         caseWorkerProfiles.add(caseWorkerProfile);
 
                     }
-
-
-                } else if (Objects.nonNull(caseWorkerProfile) && !caseWorkerProfile.getDeleteFlag()) {
-                    //update the existing case worker profile logic
-
-                } else if (Objects.nonNull(caseWorkerProfile) && caseWorkerProfile.getDeleteFlag()) {
+                } else if (nonNull(caseWorkerProfile) && caseWorkerProfile.getDeleteFlag()) {
 
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
                         .idamStatus("SUSPENDED").build();
@@ -134,9 +133,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         CaseWorkerProfile caseWorkerProfile = null;
 
         //User Profile Call
-        ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
-        if (Objects.nonNull(responseEntity) && responseEntity.getStatusCode().is2xxSuccessful()
-            && Objects.nonNull(responseEntity.getBody())) {
+            ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
+        if (nonNull(responseEntity) && responseEntity.getStatusCode().is2xxSuccessful()
+            && nonNull(responseEntity.getBody())) {
 
             UserProfileCreationResponse userProfileCreationResponse
                 = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
@@ -160,8 +159,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             //caseWorkerWorkAreas setting to case worker profile
             caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
-        } else if(Objects.nonNull(responseEntity) && responseEntity.getStatusCode().equals(HttpStatus.CONFLICT)
-            && Objects.nonNull(responseEntity.getBody())) {
+        } else if(nonNull(responseEntity) && responseEntity.getStatusCode().equals(HttpStatus.CONFLICT)
+            && nonNull(responseEntity.getBody())) {
 
             updateUserRolesWhenUserExistsInUpAndIdam(cwrdProfileRequest, responseEntity);
 
