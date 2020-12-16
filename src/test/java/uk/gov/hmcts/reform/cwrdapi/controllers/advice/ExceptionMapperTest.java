@@ -67,4 +67,18 @@ public class ExceptionMapperTest {
                 .getErrorDescription());
 
     }
+
+    @Test
+    public void test_handle_case_worker_publish_message_exception() {
+        CaseworkerMessageFailedException caseworkerMessageFailedException =
+                new CaseworkerMessageFailedException("Case worker publish message error");
+
+        ResponseEntity<Object> responseEntity = exceptionMapper
+                .handleCaseWorkerPublishMessageError(caseworkerMessageFailedException);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals(caseworkerMessageFailedException.getMessage(), ((ErrorResponse) responseEntity.getBody())
+                .getErrorDescription());
+
+    }
 }

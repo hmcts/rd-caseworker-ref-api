@@ -12,7 +12,6 @@ public class CaseWorkerProfileCreationResponse {
     private String caseWorkerRegistrationResponse;
 
     public CaseWorkerProfileCreationResponse(String caseWorkerRegistrationResponse) {
-
         this.caseWorkerRegistrationResponse = caseWorkerRegistrationResponse;
     }
 }

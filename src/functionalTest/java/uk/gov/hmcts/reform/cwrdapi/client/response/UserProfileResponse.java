@@ -24,4 +24,3 @@ public class UserProfileResponse {
     private List<String> roles;
     private String idamStatusCode;
 }
-

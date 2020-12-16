@@ -5,11 +5,13 @@ import feign.FeignException;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
@@ -36,6 +38,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
+import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
@@ -58,6 +61,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+    @Value("${crd.publisher.caseWorkerDataPerMessage}")
+    private int caseWorkerDataPerMessage;
+
     @Autowired
     CaseWorkerProfileRepository caseWorkerProfileRepo;
 
@@ -76,6 +82,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
 
+    @Autowired
+    private TopicPublisher topicPublisher;
+
     List<RoleType> roleTypes = new ArrayList<>();
 
     List<UserType> userTypes = new ArrayList<>();
@@ -85,9 +94,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        List<CaseWorkerProfile> processedCwProfiles = new ArrayList<>();
         try {
             getRolesAndUserTypes();
-            for (CaseWorkersProfileCreationRequest cwrProfileCreationRequest : cwrsProfilesCreationRequest) {
+            cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
                 CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                         .findByEmailId(cwrProfileCreationRequest.getEmailId().toLowerCase());
                 if (Objects.isNull(caseWorkerProfile)) {
@@ -107,7 +117,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     // updating the status in idam to suspend.
                     modifyCaseWorkerUserStatus(usrProfileStatusUpdate,caseWorkerProfile.getCaseWorkerId(),"EXUI");
                 }
-            }
+            });
 
 
             /**  caseworker profile batch save
@@ -115,17 +125,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              saving it automatically saves data in the sub entities like cwlocation, cwWorkArea,cwRole and
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
-
-            if (!CollectionUtils.isEmpty(caseWorkerProfiles)) {
-                caseWorkerProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+            if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
+                processedCwProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
             }
-
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
+
         } catch (Exception exp) {
 
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
-        return caseWorkerProfiles;
+        return processedCwProfiles;
     }
 
     /**
@@ -167,6 +176,24 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     /**
+     * Prepare caseworker data to be published as a message to topic.
+     * @param caseWorkerData list containing caseworker data
+     */
+    @Override
+    public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
+        List<String> caseWorkerIds = caseWorkerData.stream()
+                .map(CaseWorkerProfile::getCaseWorkerId)
+                .collect(Collectors.toUnmodifiableList());
+
+        PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
+        ListUtils.partition(caseWorkerIds, caseWorkerDataPerMessage)
+                .forEach(data -> {
+                    publishCaseWorkerData.setUserIds(data);
+                    topicPublisher.sendMessage(publishCaseWorkerData);
+                });
+    }
+
+    /**
      * Returns the caseworker details based on the id's.
      * @param caseWorkerIds list
      * @return CaseWorkerProfile
@@ -187,7 +214,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         //User Profile Call
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
-        log.info("User Profile Service response: " + responseEntity.getStatusCodeValue());
         if (Objects.nonNull(responseEntity) && responseEntity.getStatusCode().is2xxSuccessful()
                 && Objects.nonNull(responseEntity.getBody())) {
 

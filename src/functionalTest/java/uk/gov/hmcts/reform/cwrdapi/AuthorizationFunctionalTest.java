@@ -31,8 +31,8 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
 @TestExecutionListeners(listeners = {
-    AuthorizationFunctionalTest.class,
-    DependencyInjectionTestExecutionListener.class})
+        AuthorizationFunctionalTest.class,
+        DependencyInjectionTestExecutionListener.class})
 public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @Value("${s2s-url}")
@@ -78,8 +78,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Override
     public void beforeTestClass(TestContext testContext) {
         testContext.getApplicationContext()
-            .getAutowireCapableBeanFactory()
-            .autowireBean(this);
+                .getAutowireCapableBeanFactory()
+                .autowireBean(this);
 
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.defaultParser = Parser.JSON;
@@ -89,18 +89,17 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S URL: " + s2sUrl);
 
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
-        /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
-        RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
+
 
         //Single S2S & Sidam call
         s2sToken = isNull(s2sToken) ? new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S() : s2sToken;
 
-        sidamToken = isNull(sidamToken) ? idamOpenIdClient.getInternalOpenIdToken("cwd-admin") : sidamToken;
+        sidamToken = isNull(sidamToken) ? idamOpenIdClient.getInternalOpenIdToken() : sidamToken;
 
 
         caseWorkerApiClient = new CaseWorkerApiClient(
-            caseWorkerApiUrl,
-            s2sToken, idamOpenIdClient);
+                caseWorkerApiUrl,
+                s2sToken, idamOpenIdClient);
     }
 
     public static String generateRandomEmail() {

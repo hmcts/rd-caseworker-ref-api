@@ -33,18 +33,18 @@ public class S2sClient {
      */
     public String signIntoS2S() {
         Map<String, Object> params = ImmutableMap.of("microservice",
-            this.microserviceName,
-            "oneTimePassword",
-            authenticator.getTotpPassword(this.microserviceKey));
+                this.microserviceName,
+                "oneTimePassword",
+                authenticator.getTotpPassword(this.microserviceKey));
 
         Response response = RestAssured
-            .given()
-            .relaxedHTTPSValidation()
-            .baseUri(this.s2sUrl)
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .body(params)
-            .post("/lease")
-            .andReturn();
+                .given()
+                .relaxedHTTPSValidation()
+                .baseUri(this.s2sUrl)
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .body(params)
+                .post("/lease")
+                .andReturn();
 
         assertThat(response.getStatusCode()).isEqualTo(200);
 
