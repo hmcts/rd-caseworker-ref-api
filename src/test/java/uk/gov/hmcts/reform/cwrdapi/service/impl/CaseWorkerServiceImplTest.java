@@ -11,7 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
@@ -235,6 +238,7 @@ public class CaseWorkerServiceImplTest {
     }
 
     public CaseWorkerProfile buildCaseWorkerProfile() {
+
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
         caseWorkerRole.setCaseWorkerRoleId(1L);
         caseWorkerRole.setCaseWorkerId("CWID1");
@@ -242,6 +246,7 @@ public class CaseWorkerServiceImplTest {
         caseWorkerRole.setPrimaryFlag(false);
         caseWorkerRole.setCreatedDate(LocalDateTime.now());
         caseWorkerRole.setLastUpdate(LocalDateTime.now());
+        caseWorkerRole.setRoleType(roleType);
 
         CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
         caseWorkerLocation.setCaseWorkerId("CWID1");
@@ -251,10 +256,70 @@ public class CaseWorkerServiceImplTest {
         caseWorkerLocation.setLocationId(11112);
         caseWorkerLocation.setPrimaryFlag(true);
 
+        UserType userType = new UserType();
+        userType.setDescription("userTypeId");
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+
+        caseWorkerProfile.setFirstName("firstName");
+        caseWorkerProfile.setLastName("Last`name");
+        caseWorkerProfile.setEmailId("a@b.com");
+        caseWorkerProfile.setRegion("region");
+        caseWorkerProfile.setRegionId(111122222);
+        caseWorkerProfile.setUserTypeId(112L);
+        caseWorkerProfile.setUserType(userType);
+        caseWorkerProfile.setDeleteFlag(true);
+        caseWorkerProfile.setCreatedDate(LocalDateTime.now());
+        caseWorkerProfile.setLastUpdate(LocalDateTime.now());
+
         caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
         caseWorkerProfile.setCaseWorkerRoles(Collections.singletonList(caseWorkerRole));
         caseWorkerProfile.setCaseWorkerLocations(Collections.singletonList(caseWorkerLocation));
+        return caseWorkerProfile;
+    }
+
+
+    public uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
+        Role
+                role = Role.builder()
+                .roleId(1L)
+                .roleName("roleName")
+                .createdTime(LocalDateTime.now())
+                .lastUpdatedTime(LocalDateTime.now())
+                .isPrimary(true)
+                .build();
+        Location location = Location
+                .builder()
+                .baseLocationId(11111)
+                .locationName("LocationName")
+                .isPrimary(true)
+                .createdTime(LocalDateTime.now())
+                .lastUpdatedTime(LocalDateTime.now())
+                .build();
+        WorkArea workArea = WorkArea.builder()
+                .areaOfWork("areaOfWork")
+                .serviceCode("serviceCode")
+                .createdTime(LocalDateTime.now())
+                .lastUpdatedTime(LocalDateTime.now())
+                .build();
+
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
+                uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
+                        .id("27fbd198-552e-4c32-9caf-37be1545caaf")
+                        .firstName("firstName")
+                        .lastName("lastName")
+                        .officialEmail("a@b.com")
+                        .regionName("regionName")
+                        .regionId(1)
+                        .userType("userType")
+                        .userId(11111L)
+                        .deleteFlag("false")
+                        .createdTime(LocalDateTime.now())
+                        .lastUpdatedTime(LocalDateTime.now())
+                        .roles(Collections.singletonList(role))
+                        .locations(Collections.singletonList(location))
+                        .workAreas(Collections.singletonList(workArea))
+                        .build();
+
         return caseWorkerProfile;
     }
 }

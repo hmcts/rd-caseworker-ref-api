@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
@@ -204,7 +207,80 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         if (CollectionUtils.isEmpty(caseWorkerProfileList)) {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
         }
-        return ResponseEntity.ok().body(caseWorkerProfileList);
+
+        return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
+    }
+
+    private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
+            List<CaseWorkerProfile> caseWorkerProfileList) {
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfilesDto =
+                new ArrayList<>();
+        for (CaseWorkerProfile profile : caseWorkerProfileList) {
+
+            caseWorkerProfilesDto.add(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
+                    .id(profile.getCaseWorkerId())
+                    .firstName(profile.getFirstName())
+                    .lastName(profile.getLastName())
+                    .officialEmail(profile.getEmailId())
+                    .regionId(profile.getRegionId())
+                    .regionName(profile.getRegion())
+                    .userType(profile.getUserType().getDescription())
+                    .userId(profile.getUserTypeId())
+                    .deleteFlag(profile.getDeleteFlag().toString())
+                    .createdTime(profile.getCreatedDate())
+                    .lastUpdatedTime(profile.getLastUpdate())
+                    .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
+                    .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
+                    .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
+                    .build());
+        }
+        return caseWorkerProfilesDto;
+    }
+
+    private List<WorkArea> mapWorkAreasToDto(List<CaseWorkerWorkArea> caseWorkerWorkAreas) {
+        List<WorkArea> workAreasDtoList = new ArrayList<>();
+        for (CaseWorkerWorkArea area : caseWorkerWorkAreas) {
+            WorkArea workAreaDto = WorkArea.builder()
+                    .areaOfWork(area.getAreaOfWork())
+                    .serviceCode(area.getServiceCode())
+                    .createdTime(area.getCreatedDate())
+                    .lastUpdatedTime(area.getLastUpdate())
+                    .build();
+
+            workAreasDtoList.add(workAreaDto);
+        }
+        return workAreasDtoList;
+    }
+
+    private List<Location> mapLocationsToDto(List<CaseWorkerLocation> caseWorkerLocations) {
+        List<Location> locationsDto = new ArrayList<>();
+        for (CaseWorkerLocation location : caseWorkerLocations) {
+            Location locationDto = Location.builder()
+                    .baseLocationId(location.getLocationId())
+                    .locationName(location.getLocation())
+                    .createdTime(location.getCreatedDate())
+                    .lastUpdatedTime(location.getLastUpdate())
+                    .isPrimary(location.getPrimaryFlag())
+                    .build();
+
+            locationsDto.add(locationDto);
+        }
+        return locationsDto;
+    }
+
+    private List<Role> mapRolesToDto(List<CaseWorkerRole> caseWorkerRoles) {
+        List<Role> rolesDto = new ArrayList<>();
+        for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
+            Role roleDto = Role.builder()
+                    .roleId(caseWorkerRole.getRoleId())
+                    .roleName(caseWorkerRole.getRoleType().getDescription())
+                    .isPrimary(caseWorkerRole.getPrimaryFlag())
+                    .createdTime(caseWorkerRole.getCreatedDate())
+                    .lastUpdatedTime(caseWorkerRole.getLastUpdate()).build();
+            rolesDto.add(roleDto);
+
+        }
+        return rolesDto;
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {

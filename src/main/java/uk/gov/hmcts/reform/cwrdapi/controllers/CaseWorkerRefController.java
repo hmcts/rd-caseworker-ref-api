@@ -180,7 +180,7 @@ public class CaseWorkerRefController {
             )
     })
     @PostMapping(
-            path = "/users/fetchUsersById/",
+            path = "/users/fetchUsersById",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
