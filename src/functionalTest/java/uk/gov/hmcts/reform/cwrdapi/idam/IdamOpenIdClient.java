@@ -104,7 +104,6 @@ public class IdamOpenIdClient {
         tokenParams.put("client_secret", testConfig.getClientSecret());
         tokenParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
-        tokenParams.forEach((key, value) -> log.info("Key is : " + key + "   value is: " + value));
         Response openIdTokenResponse = RestAssured
                 .given()
                 .relaxedHTTPSValidation()
