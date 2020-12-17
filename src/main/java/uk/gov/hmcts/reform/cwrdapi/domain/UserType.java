@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,15 +8,15 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity(name = "user_type")
@@ -43,7 +42,6 @@ public class UserType implements Serializable {
     private LocalDateTime lastUpdate;
 
     @Fetch(FetchMode.SUBSELECT)
-    @JsonIgnore
     @OneToMany(targetEntity = CaseWorkerProfile.class, mappedBy = "userType")
     private List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
 
