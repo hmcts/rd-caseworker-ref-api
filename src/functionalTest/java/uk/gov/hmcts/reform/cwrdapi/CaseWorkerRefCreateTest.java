@@ -18,7 +18,6 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,10 +95,12 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 .assertThat()
                 .statusCode(200);
 
-        List<CaseWorkerProfile> fetchedList = Arrays.asList(fetchResponse.getBody().as(CaseWorkerProfile[].class));
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                                uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(2, fetchedList.size());
         fetchedList.forEach(caseWorkerProfile ->
-                assertTrue(caseWorkerIds.contains(caseWorkerProfile.getCaseWorkerId())));
+                assertTrue(caseWorkerIds.contains(caseWorkerProfile.getId())));
     }
 
     @Test
@@ -139,18 +140,21 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 .assertThat()
                 .statusCode(200);
 
-        List<CaseWorkerProfile> fetchedList = Arrays.asList(fetchResponse.getBody().as(CaseWorkerProfile[].class));
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
-        CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
+                fetchedList.get(0);
 
-        assertTrue(caseWorkerIds.contains(caseWorkerProfile.getCaseWorkerId()));
+        assertTrue(caseWorkerIds.contains(caseWorkerProfile.getId()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getFirstName()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getLastName()));
-        assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getEmailId()));
+        assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getOfficialEmail()));
 
-        assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getCaseWorkerLocations()));
-        assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getCaseWorkerRoles()));
-        assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getCaseWorkerWorkAreas()));
+        assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getLocations()));
+        assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getRoles()));
+        assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getWorkAreas()));
 
     }
 
