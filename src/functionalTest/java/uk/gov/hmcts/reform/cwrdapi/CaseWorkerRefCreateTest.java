@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     @Autowired
-    protected FuncTestRequestHandler testRequestHandler;
+    public FuncTestRequestHandler testRequestHandler;
 
     @Value("${userProfUrl}")
     protected String userProfUrl;
