@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -26,4 +28,7 @@ public class Location {
 
     @JsonProperty("is_primary")
     private boolean isPrimary;
+
+    private LocalDateTime createdTime;
+    private LocalDateTime lastUpdatedTime;
 }

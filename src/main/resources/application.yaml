@@ -87,7 +87,7 @@ idam:
     microservice: rd_caseworker_ref_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
-    services: ${CRD_S2S_AUTHORISED_SERVICES:rd_caseworker_ref_api,rd_professional_api}
+    services: ${CRD_S2S_AUTHORISED_SERVICES:rd_caseworker_ref_api,rd_professional_api,am_org_role_mapping_service}
   api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
 oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}

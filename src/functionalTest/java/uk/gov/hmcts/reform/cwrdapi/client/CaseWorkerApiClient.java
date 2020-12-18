@@ -7,6 +7,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
@@ -87,7 +88,7 @@ public class CaseWorkerApiClient {
                 .header("Accepts", APPLICATION_JSON_VALUE);
     }
 
-    public RequestSpecification getMultipleAuthHeadersInternal(String... role) {
+    public RequestSpecification getMultipleAuthHeadersInternal(String role) {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
     }
 
@@ -143,7 +144,7 @@ public class CaseWorkerApiClient {
     }
 
     public void createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
-        Response response = getMultipleAuthHeadersInternal()
+        Response response = getMultipleAuthHeadersInternal(StringUtils.EMPTY)
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/")
                 .andReturn();

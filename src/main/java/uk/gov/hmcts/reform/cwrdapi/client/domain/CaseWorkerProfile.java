@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
 import javax.validation.constraints.NotEmpty;
 
 @Builder
@@ -17,6 +19,8 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseWorkerProfile extends CaseWorkerDomain {
+
+    private String id;
 
     @MappingField(columnName = "FIRST NAME")
     @NotEmpty
@@ -36,11 +40,15 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
 
     @MappingField(columnName = "Region")
     @NotEmpty
+    @JsonProperty("region")
     private String regionName;
 
     @MappingField(clazz = Location.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary location exists")
+    @JsonProperty("base_location")
     private List<Location> locations;
+
+    private Long userId;
 
     @MappingField(columnName = "User type")
     @NotEmpty
@@ -60,4 +68,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
 
     @MappingField(columnName = "Delete Flag")
     private String deleteFlag;
+
+    private LocalDateTime createdTime;
+    private LocalDateTime lastUpdatedTime;
 }

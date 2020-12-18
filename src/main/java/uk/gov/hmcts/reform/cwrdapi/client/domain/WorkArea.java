@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -24,4 +26,7 @@ public class WorkArea {
         + "Area of Work7,Area of Work8")
     @JsonProperty("service_code")
     String areaOfWork;
+
+    private LocalDateTime createdTime;
+    private LocalDateTime lastUpdatedTime;
 }
