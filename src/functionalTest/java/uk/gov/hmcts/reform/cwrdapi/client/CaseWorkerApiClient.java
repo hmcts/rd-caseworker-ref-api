@@ -87,7 +87,7 @@ public class CaseWorkerApiClient {
     }
 
 
-    private RequestSpecification withUnauthenticatedRequest() {
+    public RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(caseWorkerApiUrl)
@@ -99,7 +99,7 @@ public class CaseWorkerApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
     }
 
-    public RequestSpecification getMultiPartMultipleAuthHeaders(String... role) {
+    public RequestSpecification getMultiPartWithAuthHeaders(String... role) {
         return withAuthenticatedMultipartRequestHeader(idamOpenIdClient.getInternalOpenIdToken(role));
     }
 
@@ -107,23 +107,9 @@ public class CaseWorkerApiClient {
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(caseWorkerApiUrl)
-                //.header("Content-Disposition", "\"formdata; " +
-                        //"name=\"WithCorrectPassword\"; filename=\"WithCorrectPassword.xlsx")
                 .header(SERVICE_HEADER, "Bearer " + s2sToken)
-                //.header("Content-Type",
-                       // "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
-    }
-
-    public MultiPartSpecification getMultipartFile(String filePath) throws IOException {
-        File file = getFile(filePath);
-        FileInputStream input = new FileInputStream(file);
-        MultiPartSpecBuilder multiPartSpecBuilder =  new MultiPartSpecBuilder(IOUtils.toByteArray(input))
-                .fileName(file.getName())
-                .header("Content-Type",
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        return multiPartSpecBuilder.build();
     }
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {

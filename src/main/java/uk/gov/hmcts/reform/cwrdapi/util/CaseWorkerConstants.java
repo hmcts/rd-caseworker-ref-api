@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 public final class CaseWorkerConstants {
 
+    public static final String REQUEST_COMPLETED_SUCCESSFULLY = "Request Completed Successfully";
+
     private CaseWorkerConstants() {
         super();
     }
