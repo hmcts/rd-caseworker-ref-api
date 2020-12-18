@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
-        "USER_PROFILE_URL:http://127.0.0.1:8091"})
+        "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
 @DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -52,12 +52,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @ClassRule
     public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000)
-            .extensions(CaseWorkerTransformer.class));
+            .extensions(new CaseWorkerTransformer()));
 
     @ClassRule
     public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
 
-    @Value("${cwrd.security.roles.cwd-admin}")
+    @Value("${crd.security.roles.cwd-admin}")
     public String cwdAdmin;
 
     @Value("${oidc.issuer}")

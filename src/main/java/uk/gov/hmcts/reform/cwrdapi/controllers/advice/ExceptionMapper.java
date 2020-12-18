@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants;
 
 import java.text.SimpleDateFormat;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -39,6 +41,24 @@ public class ExceptionMapper {
     public ResponseEntity<Object> customValidationError(
         InvalidRequestException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, ErrorConstants.INVALID_REQUEST_EXCEPTION.getErrorMessage());
+    }
+
+    @ExceptionHandler(ExcelValidationException.class)
+    public ResponseEntity<Object> excelValidationExceptionHandler(
+            ExcelValidationException ex) {
+        return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
+    }
+
+    @ExceptionHandler(IdamRolesMappingException.class)
+    public ResponseEntity<Object> handleIdamRolesMappingError(
+            IdamRolesMappingException ex) {
+        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
+    @ExceptionHandler(CaseworkerMessageFailedException.class)
+    public ResponseEntity<Object> handleCaseWorkerPublishMessageError(
+            CaseworkerMessageFailedException ex) {
+        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     private String getTimeStamp() {

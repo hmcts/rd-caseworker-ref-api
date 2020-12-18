@@ -179,7 +179,9 @@ pitest {
   excludedClasses = [
     'uk.gov.hmcts.reform.cwrdapi.config.*',
     'uk.gov.hmcts.reform.cwrdapi.controller.*',
-    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
+    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
+    'uk.gov.hmcts.reform.cwrdapi.client.domain.*',
+    'uk.gov.hmcts.reform.cwrdapi.domain.*'
   ]
   threads = 10
   enableDefaultIncrementalAnalysis = true
@@ -223,6 +225,8 @@ repositories {
 
 dependencies {
 
+  compile group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+  compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
@@ -260,14 +264,51 @@ dependencies {
   compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
   implementation "io.github.openfeign:feign-httpclient:10.7.0"
   implementation 'org.springframework.boot:spring-boot-starter-validation'
-
+  implementation('org.apache.httpcomponents:httpclient:4.5.13') {
+    because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
+            'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
+  }
+  implementation('org.hibernate:hibernate-core:5.4.24.Final') {
+    because 'A flaw was found in hibernate-core in versions prior to and including 5.4.23.Final. ' +
+            'A SQL injection in the implementation of the JPA Criteria API can permit unsanitized literals when a ' +
+            'literal is used in the SQL comments of the query. This flaw could allow an attacker to access unauthorized ' +
+            'information or possibly conduct further attacks. The highest threat from this vulnerability is to data ' +
+            'confidentiality and integrity.'
+  }
+  implementation('org.apache.tomcat.embed:tomcat-embed-core:9.0.40') {
+    because 'Apache Tomcat 10.0.0-M1 to 10.0.0-M9, 9.0.0-M1 to 9.0.39 and 8.5.0 to 8.5.59 could re-use an HTTP ' +
+            'request header value from the previous stream received on an HTTP/2 connection for the request associated ' +
+            'with the subsequent stream. While this would most likely lead to an error and the closure of the HTTP/2 connection, ' +
+            'it is possible that information could leak between requests'
+  }
+  implementation('org.apache.tomcat.embed:tomcat-embed-websocket:9.0.40') {
+    because 'Apache Tomcat 10.0.0-M1 to 10.0.0-M9, 9.0.0-M1 to 9.0.39 and 8.5.0 to 8.5.59 could re-use an HTTP ' +
+            'request header value from the previous stream received on an HTTP/2 connection for the request associated ' +
+            'with the subsequent stream. While this would most likely lead to an error and the closure of the HTTP/2 connection, ' +
+            'it is possible that information could leak between requests'
+  }
+  implementation('org.codehaus.groovy:groovy:2.5.14') {
+    because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+            'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+            'Java JDK method call that is potentially not secure on some operating systems in some contexts'
+  }
+  implementation('org.codehaus.groovy:groovy-json:2.5.14') {
+    because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+            'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+            'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+  }
+  implementation('org.codehaus.groovy:groovy-xml:2.5.14') {
+    because 'Apache Groovy provides extension methods to aid with creating temporary directories. ' +
+            'Prior to this fix, Groovy\'s implementation of those extension methods was using a now superseded ' +
+            'Java JDK method call that is potentially not secure on some operating systems in some contexts.'
+  }
   compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
 
   compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
   compile group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
 
-  compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+  compile group: 'com.google.guava', name: 'guava', version: '30.0-jre'
   compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
   compile group:"org.yaml", name: "snakeyaml", version:"1.27"
@@ -317,6 +358,10 @@ dependencies {
   testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+
+  testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+  testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
+  testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
 
   compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 

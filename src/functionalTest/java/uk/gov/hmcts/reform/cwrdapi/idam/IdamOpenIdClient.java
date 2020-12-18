@@ -65,13 +65,13 @@ public class IdamOpenIdClient {
         String serializedUser = gson.toJson(user);
 
         Response createdUserResponse = RestAssured
-            .given()
-            .relaxedHTTPSValidation()
-            .baseUri(testConfig.getIdamApiUrl())
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .body(serializedUser)
-            .post("/testing-support/accounts")
-            .andReturn();
+                .given()
+                .relaxedHTTPSValidation()
+                .baseUri(testConfig.getIdamApiUrl())
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .body(serializedUser)
+                .post("/testing-support/accounts")
+                .andReturn();
 
 
         log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
@@ -85,9 +85,9 @@ public class IdamOpenIdClient {
         return userCreds;
     }
 
-    public String getInternalOpenIdToken() {
+    public String getInternalOpenIdToken(String... role) {
         if (internalOpenIdTokenPrdAdmin == null) {
-            Map<String, String> userCreds = createUser("cwd-admin");
+            Map<String, String> userCreds = role.length > 0 ? createUser(role[0]) : createUser("cwd-admin");
             internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }
         return internalOpenIdTokenPrdAdmin;
@@ -105,20 +105,20 @@ public class IdamOpenIdClient {
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
 
         Response openIdTokenResponse = RestAssured
-            .given()
-            .relaxedHTTPSValidation()
-            .baseUri(testConfig.getIdamApiUrl())
-            .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-            .params(tokenParams)
-            .post("/o/token")
-            .andReturn();
+                .given()
+                .relaxedHTTPSValidation()
+                .baseUri(testConfig.getIdamApiUrl())
+                .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
+                .params(tokenParams)
+                .post("/o/token")
+                .andReturn();
 
         log.info("getOpenIdToken response: " + openIdTokenResponse.getStatusCode());
 
         assertThat(openIdTokenResponse.getStatusCode()).isEqualTo(200);
 
         BearerTokenResponse accessTokenResponse = gson.fromJson(openIdTokenResponse.getBody()
-            .asString(), BearerTokenResponse.class);
+                .asString(), BearerTokenResponse.class);
         return accessTokenResponse.getAccessToken();
 
     }
@@ -126,11 +126,11 @@ public class IdamOpenIdClient {
     public void deleteSidamUser(String email) {
         try {
             RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(testConfig.getIdamApiUrl())
-                .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-                .post("/testing-support/accounts/" + email);
+                    .given()
+                    .relaxedHTTPSValidation()
+                    .baseUri(testConfig.getIdamApiUrl())
+                    .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
+                    .post("/testing-support/accounts/" + email);
         } catch (Exception ex) {
             log.error("unable to delete sidam user with email");
         }

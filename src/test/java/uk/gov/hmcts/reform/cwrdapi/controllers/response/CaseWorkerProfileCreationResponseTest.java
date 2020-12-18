@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CaseWorkerProfileCreationResponseTest {
 
     @Test
-    public void test_has_mandatory_fields_specified_not_null() {
+    public void testCaseWorkerProfileCreationResponse() {
         CaseWorkerProfileCreationResponse response = new CaseWorkerProfileCreationResponse();
         response.setCaseWorkerRegistrationResponse("response");
 
@@ -18,6 +18,10 @@ public class CaseWorkerProfileCreationResponseTest {
                 new CaseWorkerProfileCreationResponse("response");
         assertThat(response1).isNotNull();
         assertThat(response1.getCaseWorkerRegistrationResponse()).isEqualTo("response");
+
+        CaseWorkerProfileCreationResponse response2 = new CaseWorkerProfileCreationResponse("response", "1");
+        assertThat(response2.getCaseWorkerRegistrationResponse()).isEqualTo("response");
+        assertThat(response2.getId()).isEqualTo("1");
     }
 }
 

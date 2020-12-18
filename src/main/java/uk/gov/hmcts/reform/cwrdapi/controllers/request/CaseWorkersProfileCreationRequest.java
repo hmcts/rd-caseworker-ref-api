@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Builder
+@Builder(builderMethodName = "caseWorkersProfileCreationRequest")
 public class CaseWorkersProfileCreationRequest {
 
     @JsonProperty("first_name")

@@ -6,11 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MappingField {
 
-    String[]  columnName() default "";
+    String columnName() default "";
+
+    String isPrimary() default "";
 
     Class clazz() default Object.class;
 
-    int noOfCollectionProperties() default 0;
-
-    String[] childes()  default "";
+    int objectCount() default 0;
 }

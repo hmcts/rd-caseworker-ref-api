@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+@Builder(builderMethodName = "caseWorkerWorkAreaRequest")
 public class CaseWorkerWorkAreaRequest {
 
     @JsonProperty("area_of_work")

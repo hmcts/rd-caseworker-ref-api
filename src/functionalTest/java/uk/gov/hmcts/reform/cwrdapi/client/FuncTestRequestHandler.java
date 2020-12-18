@@ -26,28 +26,27 @@ public class FuncTestRequestHandler {
 
     public void sendPut(Object data, HttpStatus expectedStatus, String path) throws JsonProcessingException {
         sendPut(objectMapper.writeValueAsString(data),
-            expectedStatus,
-            path);
+                expectedStatus,
+                path);
     }
 
-    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz, String baseUrl) throws Exception {
+    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz, String baseUrl) {
         return sendGet(httpStatus, urlPath, baseUrl).as(clazz);
     }
 
     public Response sendGet(HttpStatus httpStatus, String urlPath, String baseUrl) {
 
         return SerenityRest
-            .given()
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .baseUri(baseUrl)
-            .header("ServiceAuthorization", getS2sToken())
-            .header("Authorization", BEARER + getSidamToken())
-            .when()
-            .get(urlPath)
-            .then()
-            .log().all(true)
-            .statusCode(httpStatus.value()).extract().response();
+                .given()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .baseUri(baseUrl)
+                .header("ServiceAuthorization", getS2sToken())
+                .header("Authorization", BEARER + getSidamToken())
+                .when()
+                .get(urlPath)
+                .then()
+                .log().all(true)
+                .statusCode(httpStatus.value()).extract().response();
     }
-
 
 }

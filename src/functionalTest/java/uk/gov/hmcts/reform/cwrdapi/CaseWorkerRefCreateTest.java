@@ -1,23 +1,22 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
-import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpStatus.OK;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
@@ -25,43 +24,75 @@ import static org.junit.Assert.assertEquals;
 @Slf4j
 public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
-
-
     @Test
     public void whenUserNotExistsInCwrAndSidamAndUp_Ac1() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-            .createCaseWorkerProfiles();
+                .createCaseWorkerProfiles();
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal()
-            .body(caseWorkersProfileCreationRequests)
-            .post("/refdata/case-worker/users/")
-            .andReturn();
-        response.then()
-            .assertThat()
-            .statusCode(201);
+        caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
     }
 
     @Test
-    public void whenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() throws Exception {
-        Map<String, String> userDetail = idamOpenIdClient.createUser("caseworker-iac-bulkscan");
+    public void whenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() {
+        List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
+        UserProfileResponse upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        assertEquals(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN), upResponse.getRoles());
+    }
+
+    @Test
+    public void whenUserExistsInCwrAndUpAndExistsInSidam_Ac3() {
+
+        List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
+
+        CaseWorkersProfileCreationRequest request = profileCreateRequests.get(0);
+        Set<String> idamRole = request.getIdamRoles();
+        idamRole.add(CASEWORKER_IAC);
+        idamRole.add(CASEWORKER_IAC_BULKSCAN);
+        request.setIdamRoles(idamRole);
+
+        caseWorkerApiClient.createUserProfiles(profileCreateRequests);
+
+        UserProfileResponse upResponseForExistingUser = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        assertEquals(ImmutableList.of(CASEWORKER_IAC,CWD_USER,CASEWORKER_IAC_BULKSCAN),
+                upResponseForExistingUser.getRoles());
+    }
+
+    @Test
+    public void whenUserExistsInCwrAndUpAndExistsInSidamAndDeleteFlagTrue_Ac4() {
+
+        List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
+        profileCreateRequests.get(0).setDeleteFlag(true);
+        caseWorkerApiClient.createUserProfiles(profileCreateRequests);
+
+        UserProfileResponse upResponseForExistingUser = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        assertEquals(upResponseForExistingUser.getIdamStatus(), USER_STATUS_SUSPENDED);
+    }
+
+    @Test
+    public void whenUserExistsInCwrAndUpAndExistsInSidamAndRolesAreSame_Ac5() {
+
+        List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
+
+        caseWorkerApiClient.createUserProfiles(profileCreateRequests);
+
+        UserProfileResponse upResponseForExistingUser = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        assertEquals(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN), upResponseForExistingUser.getRoles());
+    }
+
+    public List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
+        Map<String, String> userDetail = idamOpenIdClient.createUser(CASEWORKER_IAC_BULKSCAN);
         String userEmail = userDetail.get(EMAIL);
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-            .createCaseWorkerProfiles(userEmail.toLowerCase());
+                .createCaseWorkerProfiles(userEmail);
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal()
-            .body(caseWorkersProfileCreationRequests)
-            .post("/refdata/case-worker/users/")
-            .andReturn();
-        response.then()
-            .assertThat()
-            .statusCode(201);
+        caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
-        UserProfileResponse upResponse = funcTestRequestHandler.sendGet(HttpStatus.OK,
-            "/v1/userprofile/roles?email="
-                + userEmail.toLowerCase() +"",
-            UserProfileResponse.class, baseUrlUserProfile);
-        List<String> exceptedRoles = ImmutableList.of("cwd-user","caseworker-iac-bulkscan");
-        assertEquals(exceptedRoles, upResponse.getRoles());
+        return caseWorkersProfileCreationRequests;
+    }
+
+    public UserProfileResponse getUserProfileFromUp(String email) {
+        return funcTestRequestHandler.sendGet(OK,
+                "/v1/userprofile/roles?email=" + email, UserProfileResponse.class, baseUrlUserProfile);
     }
 }
