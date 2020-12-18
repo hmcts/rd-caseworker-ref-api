@@ -27,6 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 
 @RequestMapping(
@@ -142,5 +143,53 @@ public class CaseWorkerRefController {
         return ResponseEntity
                 .status(idamRolesMappingResponse.getStatusCode())
                 .body(idamRolesMappingResponse);
+    }
+
+    @ApiOperation(
+            value = "This API gets the User details from Caseworker Profile",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "Successfully fetched the Caseworker profile(s)",
+                    response = CaseWorkerProfile.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = BAD_REQUEST
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = NO_DATA_FOUND
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @PostMapping(
+            path = "/users/fetchUsersById",
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("cwd-admin")
+    public ResponseEntity<Object> fetchCaseworkersById(@RequestBody List<String> caseWorkerIds) {
+
+        if (CollectionUtils.isEmpty(caseWorkerIds)) {
+            throw new InvalidRequestException("Caseworker request is empty");
+        }
+        return caseWorkerService.fetchCaseworkersById(caseWorkerIds);
     }
 }

@@ -8,6 +8,7 @@ import io.restassured.response.Response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 
 import java.util.ArrayList;
@@ -85,9 +86,9 @@ public class IdamOpenIdClient {
         return userCreds;
     }
 
-    public String getInternalOpenIdToken(String... role) {
-        if (internalOpenIdTokenPrdAdmin == null) {
-            Map<String, String> userCreds = role.length > 0 ? createUser(role[0]) : createUser("cwd-admin");
+    public String getInternalOpenIdToken(String role) {
+        if (internalOpenIdTokenPrdAdmin == null || StringUtils.isNotEmpty(role)) {
+            Map<String, String> userCreds = StringUtils.isNotEmpty(role) ? createUser(role) : createUser("cwd-admin");
             internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }
         return internalOpenIdTokenPrdAdmin;
@@ -103,7 +104,6 @@ public class IdamOpenIdClient {
         tokenParams.put("client_secret", testConfig.getClientSecret());
         tokenParams.put("redirect_uri", testConfig.getOauthRedirectUrl());
         tokenParams.put("scope", "openid profile roles manage-user create-user search-user");
-
         Response openIdTokenResponse = RestAssured
                 .given()
                 .relaxedHTTPSValidation()

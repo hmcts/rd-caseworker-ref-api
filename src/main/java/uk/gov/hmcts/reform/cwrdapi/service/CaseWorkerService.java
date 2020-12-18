@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
@@ -24,5 +25,14 @@ public interface CaseWorkerService {
      * @param caseWorkerData list containing caseworker data
      */
     void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData);
+
+    /**
+     * Returns the caseworker details.
+     * @param caseWorkerIds list
+     * @return CaseWorkerProfile
+     */
+    ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds);
+
+
 }
 

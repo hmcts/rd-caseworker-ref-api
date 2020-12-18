@@ -94,8 +94,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         //Single S2S & Sidam call
         s2sToken = isNull(s2sToken) ? new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S() : s2sToken;
 
-        sidamToken = isNull(sidamToken) ? idamOpenIdClient.getInternalOpenIdToken() : sidamToken;
-
+        sidamToken = isNull(sidamToken) ? idamOpenIdClient.getInternalOpenIdToken(null) : sidamToken;
 
         caseWorkerApiClient = new CaseWorkerApiClient(
                 caseWorkerApiUrl,
