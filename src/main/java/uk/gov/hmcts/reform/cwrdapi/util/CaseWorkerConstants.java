@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 public final class CaseWorkerConstants {
 
-    public static final String REQUEST_COMPLETED_SUCCESSFULLY = "Request Completed Successfully";
-
     private CaseWorkerConstants() {
         super();
     }
@@ -47,5 +45,7 @@ public final class CaseWorkerConstants {
     public static final String BAD_REQUEST = "Bad Request";
 
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+
+    public static final String REQUEST_COMPLETED_SUCCESSFULLY = "Request Completed Successfully";
 
 }
