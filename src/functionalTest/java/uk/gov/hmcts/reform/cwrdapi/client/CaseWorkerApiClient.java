@@ -3,12 +3,9 @@ package uk.gov.hmcts.reform.cwrdapi.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import io.restassured.builder.MultiPartSpecBuilder;
-import io.restassured.specification.MultiPartSpecification;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
-import org.apache.poi.util.IOUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -17,8 +14,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +23,6 @@ import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
 
@@ -41,8 +35,6 @@ public class CaseWorkerApiClient {
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static String TYPE_XLS = "application/vnd.ms-excel";
 
     private final String caseWorkerApiUrl;
     private final String s2sToken;
@@ -99,7 +91,7 @@ public class CaseWorkerApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
     }
 
-    public RequestSpecification getMultiPartWithAuthHeaders(String... role) {
+    public RequestSpecification getMultiPartWithAuthHeaders(String role) {
         return withAuthenticatedMultipartRequestHeader(idamOpenIdClient.getInternalOpenIdToken(role));
     }
 

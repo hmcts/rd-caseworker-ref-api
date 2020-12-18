@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
@@ -55,8 +54,8 @@ public class CaseWorkerRefController {
     ExcelAdaptorService excelAdaptorService;
 
     @ApiOperation(
-            value = "This API upload excel file which contain case worker user information and " +
-                    "will be saved in the case worker reference database.",
+            value = "This API upload excel file which contain case worker user information and "
+                    + "will be saved in the case worker reference database.",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")

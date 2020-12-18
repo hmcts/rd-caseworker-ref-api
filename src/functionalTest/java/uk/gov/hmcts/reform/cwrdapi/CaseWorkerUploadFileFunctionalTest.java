@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +25,7 @@ import static org.springframework.util.ResourceUtils.getFile;
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
-public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalTest{
+public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CWD_ADMIN = "cwd-admin";
 
@@ -102,12 +103,12 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     }
 
     @Test
-    public void shouldReturn403WhenRoleISInvalid() throws IOException {
+    public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
-                403, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                403, null,
                 CaseWorkerConstants.TYPE_XLSX, "Invalid");
     }
-    //TO-DO 403
+
     private void uploadCaseWorkerFile(String filePath,
                                       int statusCode,
                                       String messageBody,
@@ -124,7 +125,9 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
                 .statusCode(statusCode)
                 .extract()
                 .asString();
-        assertTrue(responseBody.contains(messageBody));
+        if (StringUtils.isNotBlank(messageBody)) {
+            assertTrue(responseBody.contains(messageBody));
+        }
     }
 
 

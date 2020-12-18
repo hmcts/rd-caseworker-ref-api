@@ -11,7 +11,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
@@ -195,11 +195,13 @@ public class CaseWorkerRefControllerTest {
         verify(caseWorkerServiceMock,times(1))
                 .fetchCaseworkersById(caseWorkerIds);
     }
+
     @Test
     public void test_upload_caseworker_file_success() {
         when(excelValidatorService.validateExcelFile(multipartFile))
                 .thenReturn(workbook);
-        when(excelAdaptorService.parseExcel(workbook, uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class))
+        when(excelAdaptorService
+                .parseExcel(workbook, uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class))
                 .thenReturn(any());
 
         ResponseEntity<Object> actual = caseWorkerRefController
