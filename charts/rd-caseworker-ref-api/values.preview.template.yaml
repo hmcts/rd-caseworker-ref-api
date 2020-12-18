@@ -23,3 +23,4 @@ java:
       secrets:
         - AppInsightsInstrumentationKey
         - caseworker-topic-primary-send-listen-shared-access-key
+        - caseworker-ref-api-s2s-secret

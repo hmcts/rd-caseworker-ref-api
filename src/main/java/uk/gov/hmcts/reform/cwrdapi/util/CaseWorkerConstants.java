@@ -42,6 +42,8 @@ public final class CaseWorkerConstants {
 
     public static final String FORBIDDEN_ERROR = "Forbidden Error: Access denied for invalid permissions";
 
+    public static final String NO_DATA_FOUND = "The Caseworker data could not be found";
+
     public static final String BAD_REQUEST = "Bad Request";
 
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";

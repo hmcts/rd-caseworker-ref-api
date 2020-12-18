@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -107,6 +108,7 @@ public class CaseWorkerRefControllerTest {
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
                 .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+
     }
 
     @Test
@@ -174,6 +176,25 @@ public class CaseWorkerRefControllerTest {
                 .buildIdamRoleMappings(anyList());
     }
 
+    @Test(expected = InvalidRequestException.class)
+    public void fetchCaseworkersByIdShouldThrow400() {
+        caseWorkerRefController.fetchCaseworkersById(Collections.emptyList());
+    }
+
+    @Test
+    public void shouldFetchCaseworkerDetails() {
+        responseEntity = ResponseEntity.ok().body(null);
+        when(caseWorkerServiceMock.fetchCaseworkersById(any()))
+                .thenReturn(responseEntity);
+
+        List<String> caseWorkerIds = new ArrayList<>(Arrays.asList(
+                "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
+        ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(caseWorkerIds);
+
+        assertNotNull(actual);
+        verify(caseWorkerServiceMock,times(1))
+                .fetchCaseworkersById(caseWorkerIds);
+    }
     @Test
     public void test_upload_caseworker_file_success() {
         when(excelValidatorService.validateExcelFile(multipartFile))
@@ -186,4 +207,5 @@ public class CaseWorkerRefControllerTest {
         assertThat(actual.getStatusCodeValue()).isEqualTo(201);
 
     }
+
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -14,10 +16,13 @@ import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 @AllArgsConstructor
 public class Role {
 
-    private Integer roleId;
+    private Long roleId;
 
     @MappingField(columnName = "Primary Role,Secondary Role", isPrimary = "Primary Role")
     private String roleName;
 
     private boolean isPrimary;
+
+    private LocalDateTime createdTime;
+    private LocalDateTime lastUpdatedTime;
 }
