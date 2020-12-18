@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -21,4 +23,7 @@ public class WorkArea {
     @MappingField(columnName = "Area of Work1,Area of Work2,Area of Work3,Area of Work4,Area of Work5,Area of Work6,"
         + "Area of Work7,Area of Work8")
     String areaOfWork;
+
+    private LocalDateTime createdTime;
+    private LocalDateTime lastUpdatedTime;
 }
