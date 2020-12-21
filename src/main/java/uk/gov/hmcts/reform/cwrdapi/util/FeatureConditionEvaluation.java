@@ -1,11 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.auth0.jwt.JWT;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +11,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ForbiddenException;
 import uk.gov.hmcts.reform.cwrdapi.service.FeatureToggleService;
 
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.BooleanUtils.isNotTrue;

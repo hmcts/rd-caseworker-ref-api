@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import com.launchdarkly.sdk.LDUser;
 import com.launchdarkly.sdk.server.LDClient;
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.service.FeatureToggleService;
+
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.PostConstruct;
 
 @Service
 public class FeatureToggleServiceImpl implements FeatureToggleService {

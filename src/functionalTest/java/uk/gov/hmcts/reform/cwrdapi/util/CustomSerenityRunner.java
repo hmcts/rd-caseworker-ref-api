@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-
 import com.launchdarkly.sdk.server.LDClient;
+
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
@@ -47,7 +47,7 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
             flagName = featureToggleService.getLaunchDarklyMap()
                     .get(toggleEnable.mapKey());
 
-            boolean isEnabledLD = featureToggleService.isFlagEnabled("rd_professional_api", flagName);
+            boolean isEnabledLD = featureToggleService.isFlagEnabled("rd_caseworker_ref_api", flagName);
 
             if (isEnabledLD) {
                 if (isNotTrue(toggleEnable.withFeature())) {

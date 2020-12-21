@@ -1,16 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -21,6 +13,13 @@ import org.springframework.web.method.HandlerMethod;
 import uk.gov.hmcts.reform.cwrdapi.controllers.WelcomeController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ForbiddenException;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
+
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -57,7 +56,8 @@ public class FeatureConditionEvaluationTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
         String token = generateDummyS2SToken("rd_professional_api");
-        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION)).thenReturn(FeatureConditionEvaluation.BEARER + token);
+        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION))
+                .thenReturn(FeatureConditionEvaluation.BEARER + token);
         when(featureToggleService.isFlagEnabled(anyString(),anyString())).thenReturn(true);
         assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));
         verify(featureConditionEvaluation, times(1))
@@ -71,7 +71,8 @@ public class FeatureConditionEvaluationTest {
         when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
         String token = generateDummyS2SToken("rd_professional_api");
-        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION)).thenReturn(FeatureConditionEvaluation.BEARER + token);
+        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION))
+                .thenReturn(FeatureConditionEvaluation.BEARER + token);
         when(featureToggleService.isFlagEnabled(anyString(),anyString())).thenReturn(false);
         assertThrows(ForbiddenException.class,() -> featureConditionEvaluation.preHandle(httpRequest,
                 httpServletResponse, handlerMethod));

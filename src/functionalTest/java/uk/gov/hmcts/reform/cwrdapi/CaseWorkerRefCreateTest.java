@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.collections.CollectionUtils;
@@ -18,17 +17,21 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
+import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
+import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
-@RunWith(SpringIntegrationSerenityRunner.class)
+@RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 @Slf4j
@@ -37,6 +40,8 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     @Autowired
     public FuncTestRequestHandler testRequestHandler;
+
+    public static final String mapKey = "CaseWorkerRefController.fetchCaseworkersById";
 
     @Value("${userProfUrl}")
     protected String userProfUrl;
@@ -56,6 +61,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void shouldGetCaseWorkerDetails() throws Exception {
         //Create 2 Caseworker Users
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
@@ -104,6 +110,23 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = false)
+    public void should_retrieve_403_when_Api_toggled_off() {
+
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(
+                caseWorkerApiClient.createCaseWorkerProfiles());
+        String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
+                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                .body(caseWorkersProfileCreationRequests)
+                .post("/refdata/case-worker/users/fetchUsersById")
+                .andReturn();
+        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
+        assertThat(response.getBody().asString()).contains(exceptionMessage);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() throws Exception {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(caseWorkerApiClient
@@ -160,6 +183,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
 
     @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("dummyRole")
                 .body(Collections.singletonList("someUUID"))
