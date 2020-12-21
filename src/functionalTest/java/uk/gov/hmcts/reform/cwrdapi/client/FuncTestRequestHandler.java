@@ -48,6 +48,4 @@ public class FuncTestRequestHandler {
                 .log().all(true)
                 .statusCode(httpStatus.value()).extract().response();
     }
-
-
 }
