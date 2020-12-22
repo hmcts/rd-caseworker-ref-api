@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -46,7 +47,10 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
     @MockBean
-    protected FeatureToggleServiceImpl featureToggleService;
+    protected FeatureToggleServiceImpl featureToggleServiceImpl;
+
+    @MockBean
+    LDClient ldClient;
 
     protected CaseWorkerReferenceDataClient caseworkerReferenceDataClient;
 
@@ -78,7 +82,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Before
     public void setUpClient() {
         caseworkerReferenceDataClient = new CaseWorkerReferenceDataClient(port, issuer, expiration);
-        when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
+        when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
     }
 
     @Before
