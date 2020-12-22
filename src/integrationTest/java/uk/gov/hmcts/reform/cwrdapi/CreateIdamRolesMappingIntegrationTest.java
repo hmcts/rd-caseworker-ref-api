@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -38,7 +40,7 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
 
     @Test
     public void returns_400_when_request_invalid() {
-
+        when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.emptyList(), cwdAdmin);
 

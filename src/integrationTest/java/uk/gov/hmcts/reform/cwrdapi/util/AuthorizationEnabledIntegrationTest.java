@@ -14,10 +14,12 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 
 import java.util.LinkedList;
 import java.util.UUID;
@@ -29,6 +31,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.decodeJwtToken;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
 import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse;
@@ -40,6 +44,9 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
         "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
 @DirtiesContext
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
+
+    @MockBean
+    protected FeatureToggleServiceImpl featureToggleService;
 
     protected CaseWorkerReferenceDataClient caseworkerReferenceDataClient;
 
@@ -71,6 +78,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Before
     public void setUpClient() {
         caseworkerReferenceDataClient = new CaseWorkerReferenceDataClient(port, issuer, expiration);
+        when(featureToggleService.isFlagEnabled(anyString(), anyString())).thenReturn(true);
     }
 
     @Before
