@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import com.launchdarkly.sdk.LDUser;
 import com.launchdarkly.sdk.server.LDClient;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,9 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 
-
 @Service
-@Slf4j
 public class FeatureToggleServiceImpl implements FeatureToggleService {
 
     @Autowired
@@ -43,8 +40,6 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
 
     @Override
     public boolean isFlagEnabled(String serviceName, String flagName) {
-        log.info("ServiceName: " + serviceName);
-        log.info("environment : " + environment);
         LDUser user = new LDUser.Builder(userName)
                 .firstName(userName)
                 .custom("servicename", serviceName)

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.config;
 
 import com.launchdarkly.sdk.server.LDClient;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,12 +10,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 
 @Configuration
-@Slf4j
 public class LaunchDarklyConfiguration implements WebMvcConfigurer {
 
     @Bean
     public LDClient ldClient(@Value("${launchdarkly.sdk.key}") String sdkKey) {
-        log.info("The SDK Key is: " + sdkKey);
         return new LDClient(sdkKey);
     }
 
