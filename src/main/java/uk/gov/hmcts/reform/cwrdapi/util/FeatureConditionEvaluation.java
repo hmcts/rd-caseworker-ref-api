@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.auth0.jwt.JWT;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -22,6 +23,7 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class FeatureConditionEvaluation implements HandlerInterceptor {
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
@@ -42,14 +44,15 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
         String restMethod = ((HandlerMethod) handler).getMethod().getName();
         String clazz = ((HandlerMethod) handler).getMethod().getDeclaringClass().getSimpleName();
         boolean flagStatus = Boolean.TRUE;
-
+        log.info("CLass: " + clazz + " method : " + restMethod);
         String flagName = launchDarklyUrlMap.get(clazz + "." + restMethod);
 
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
-
+            log.info("FlagName  is : " + flagName);
+            log.info("ServiceName  is : " + getServiceName(flagName));
             flagStatus = featureToggleService
                     .isFlagEnabled(getServiceName(flagName), launchDarklyUrlMap.get(clazz + "." + restMethod));
-
+            log.info("flagStatus  is : " + flagStatus);
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
             }
