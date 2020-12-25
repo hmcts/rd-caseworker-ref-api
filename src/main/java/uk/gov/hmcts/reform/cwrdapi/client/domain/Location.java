@@ -26,6 +26,6 @@ public class Location {
     private boolean isPrimary;
 
     private LocalDateTime createdTime;
-    private LocalDateTime lastUpdatedTime;
+    private LocalDateTime lastUpdateTime;
 }
 

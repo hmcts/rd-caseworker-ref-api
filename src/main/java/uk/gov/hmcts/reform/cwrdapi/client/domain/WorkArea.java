@@ -25,5 +25,5 @@ public class WorkArea {
     String areaOfWork;
 
     private LocalDateTime createdTime;
-    private LocalDateTime lastUpdatedTime;
+    private LocalDateTime lastUpdateTime;
 }

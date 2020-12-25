@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseWorkerProfile extends CaseWorkerDomain {
+public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable {
 
     private String id;
 
@@ -32,7 +33,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
 
     @MappingField(columnName = "Official Email")
     @NotEmpty
-    @JsonProperty("email_id")
+    @JsonProperty("emailId")
     private String officialEmail;
 
     @MappingField(columnName = "Region Id")
@@ -48,6 +49,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
     @JsonProperty("base_location")
     private List<Location> locations;
 
+    @JsonProperty("userTypeId")
     private Long userId;
 
     @MappingField(columnName = "User type")
@@ -69,5 +71,5 @@ public class CaseWorkerProfile extends CaseWorkerDomain {
     private String deleteFlag;
 
     private LocalDateTime createdTime;
-    private LocalDateTime lastUpdatedTime;
+    private LocalDateTime lastUpdateTime;
 }

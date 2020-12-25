@@ -50,6 +50,7 @@ public class CaseWorkersProfileCreationRequest {
         this.roles = roles;
         this.baseLocations = baseLocations;
         this.workerWorkAreaRequests = workerWorkAreaRequests;
+        this.region = region;
     }
 
 
