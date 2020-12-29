@@ -17,6 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
@@ -94,7 +95,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
         assertEquals(2, caseWorkerIds.size());
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(caseWorkerIds)
+                .body(UserRequest.builder().userIds(caseWorkerIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
         fetchResponse.then()
@@ -156,7 +157,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
         assertEquals(2, caseWorkerIds.size());
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(caseWorkerIds)
+                .body(UserRequest.builder().userIds(caseWorkerIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
         fetchResponse.then()
@@ -181,12 +182,11 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     }
 
-
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("dummyRole")
-                .body(Collections.singletonList("someUUID"))
+                .body(UserRequest.builder().userIds(Collections.singletonList("someUUID")).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
         response.then()
