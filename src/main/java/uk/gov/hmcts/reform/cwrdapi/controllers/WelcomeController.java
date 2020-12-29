@@ -90,11 +90,12 @@ public class WelcomeController {
     @ResponseBody
     //@Secured("cwd-admin")
     public ResponseEntity<String> welcomeWithToken() {
-        log.info("{}:: Welcome '{}' from running instance: {}", loggingComponentName, MESSAGE, INSTANCE_ID);
+        log.info("{}:: Welcome '{}' from running instance: {}. Tokens have been validated",
+                loggingComponentName, MESSAGE, INSTANCE_ID);
         return ResponseEntity
                 .ok()
                 .cacheControl(CacheControl.noCache())
-                .body("{\"message\": \"" + MESSAGE + "\"}");
+                .body("{\"message is\": \"" + MESSAGE + "\"}");
     }
 }
 
