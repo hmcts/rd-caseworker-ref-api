@@ -272,7 +272,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         List<Role> rolesDto = new ArrayList<>();
         for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
             Role roleDto = Role.builder()
-                    .roleId(caseWorkerRole.getRoleId())
+                    .roleId(caseWorkerRole.getRoleId().toString())
                     .roleName(caseWorkerRole.getRoleType().getDescription())
                     .isPrimary(caseWorkerRole.getPrimaryFlag())
                     .createdTime(caseWorkerRole.getCreatedDate())

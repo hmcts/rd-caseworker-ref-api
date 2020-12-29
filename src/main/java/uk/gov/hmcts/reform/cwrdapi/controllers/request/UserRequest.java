@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.request;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

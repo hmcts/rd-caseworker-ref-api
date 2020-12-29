@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import javax.validation.constraints.NotEmpty;
 
 @Builder
@@ -20,6 +19,8 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable {
+
+    private static final long serialVersionUID = 2019L;
 
     private String id;
 
@@ -46,7 +47,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
 
     @MappingField(clazz = Location.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary location exists")
-    @JsonProperty("base_location")
+    @JsonProperty("baseLocation")
     private List<Location> locations;
 
     @JsonProperty("userTypeId")

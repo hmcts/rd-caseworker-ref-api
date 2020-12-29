@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Builder
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkArea {
+public class WorkArea implements Serializable {
+
+    private static final long serialVersionUID = 2021L;
 
     @MappingField(columnName = "Aow1 Service Code,Aow2 Service Code,Aow3 Service Code,Aow4 Service Code,"
         + "Aow5 Service Code, Aow6 Service Code,Aow7 Service Code,Aow8 Service Code")
