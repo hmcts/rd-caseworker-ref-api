@@ -33,7 +33,7 @@ spring:
             issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
         registration:
           oidc:
-            client-id: microservicekey-rd-caseworker-ref-api
+            client-id: ${IDAM_CLIENT_ID:microservicekey-rd-caseworker-ref-api}
             client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
