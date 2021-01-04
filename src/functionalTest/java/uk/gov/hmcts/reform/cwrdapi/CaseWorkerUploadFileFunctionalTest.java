@@ -52,14 +52,14 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
 
     @Test
     public void shouldReturn400WhenXlsFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithInCorrectPassword.xls",
+        uploadCaseWorkerFile("src/functionalTest/resources/WithInCorrectPasswordSet.xls",
                 400, CaseWorkerConstants.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithInCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/WithInCorrectPasswordSet.xlsx",
                 400, CaseWorkerConstants.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
                 CWD_ADMIN);
     }
