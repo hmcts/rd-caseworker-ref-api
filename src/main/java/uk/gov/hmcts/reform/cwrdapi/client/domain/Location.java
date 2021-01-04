@@ -21,7 +21,7 @@ public class Location implements Serializable {
     private static final long serialVersionUID = 2019L;
 
     @MappingField(columnName = "Base location 1 id,Base location 2 id")
-    @JsonProperty("locationId")
+    @JsonProperty("location_id")
     private Integer baseLocationId;
 
     @MappingField(columnName = "Primary Base Location Name,Secondary Location",
@@ -29,10 +29,12 @@ public class Location implements Serializable {
     @JsonProperty("location")
     private String locationName;
 
-    @JsonProperty("primary")
+    @JsonProperty("is_primary")
     private boolean isPrimary;
 
+    @JsonProperty("created_time")
     private LocalDateTime createdTime;
+    @JsonProperty("last_updated_time")
     private LocalDateTime lastUpdateTime;
 }
 

@@ -20,14 +20,19 @@ public class Role implements Serializable {
 
     private static final long serialVersionUID = 2020L;
 
+    @JsonProperty("role_id")
     private String roleId;
 
     @MappingField(columnName = "Primary Role,Secondary Role", isPrimary = "Primary Role")
+    @JsonProperty("role")
     private String roleName;
 
-    @JsonProperty("primary")
+    @JsonProperty("is_primary")
     private boolean isPrimary;
 
+    @JsonProperty("created_time")
     private LocalDateTime createdTime;
+
+    @JsonProperty("last_updated_time")
     private LocalDateTime lastUpdateTime;
 }

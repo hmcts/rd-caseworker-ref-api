@@ -26,18 +26,21 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
 
     @MappingField(columnName = "FIRST NAME")
     @NotEmpty
+    @JsonProperty("first_name")
     private String firstName;
 
     @MappingField(columnName = "LAST NAME")
     @NotEmpty
+    @JsonProperty("last_name")
     private String lastName;
 
     @MappingField(columnName = "Official Email")
     @NotEmpty
-    @JsonProperty("emailId")
+    @JsonProperty("email_id")
     private String officialEmail;
 
     @MappingField(columnName = "Region Id")
+    @JsonProperty("region_id")
     private int regionId;
 
     @MappingField(columnName = "Region")
@@ -47,30 +50,36 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
 
     @MappingField(clazz = Location.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary location exists")
-    @JsonProperty("baseLocation")
+    @JsonProperty("base_location")
     private List<Location> locations;
 
-    @JsonProperty("userTypeId")
+    @JsonProperty("user_type_id")
     private Long userId;
 
     @MappingField(columnName = "User type")
     @NotEmpty
+    @JsonProperty("user_type")
     private String userType;
 
     @MappingField(clazz = Role.class, objectCount = 2)
     @NotEmpty(message = "no primary or secondary roles exists")
+    @JsonProperty("role")
     private List<Role> roles;
 
     @MappingField(clazz = WorkArea.class, objectCount = 8)
     @NotEmpty(message = "no area of works exists")
+    @JsonProperty("work_area")
     private List<WorkArea> workAreas;
 
     @MappingField(columnName = "IDAM Roles")
     private String idamRoles;
 
     @MappingField(columnName = "Delete Flag")
+    @JsonProperty("delete_flag")
     private String deleteFlag;
 
+    @JsonProperty("created_time")
     private LocalDateTime createdTime;
+    @JsonProperty("last_updated_time")
     private LocalDateTime lastUpdateTime;
 }
