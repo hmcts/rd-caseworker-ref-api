@@ -226,7 +226,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     .regionName(profile.getRegion())
                     .userType(profile.getUserType().getDescription())
                     .userId(profile.getUserTypeId())
-                    .deleteFlag(profile.getDeleteFlag().toString())
+                    .suspended(profile.getSuspended().toString())
                     .createdTime(profile.getCreatedDate())
                     .lastUpdatedTime(profile.getLastUpdate())
                     .roles(mapRolesToDto(profile.getCaseWorkerRoles()))

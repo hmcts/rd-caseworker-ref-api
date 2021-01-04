@@ -267,7 +267,7 @@ public class CaseWorkerServiceImplTest {
         caseWorkerProfile.setRegionId(111122222);
         caseWorkerProfile.setUserTypeId(112L);
         caseWorkerProfile.setUserType(userType);
-        caseWorkerProfile.setDeleteFlag(true);
+        caseWorkerProfile.setSuspended(true);
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
@@ -312,7 +312,7 @@ public class CaseWorkerServiceImplTest {
                         .regionId(1)
                         .userType("userType")
                         .userId(11111L)
-                        .deleteFlag("false")
+                        .suspended("false")
                         .createdTime(LocalDateTime.now())
                         .lastUpdatedTime(LocalDateTime.now())
                         .roles(Collections.singletonList(role))
