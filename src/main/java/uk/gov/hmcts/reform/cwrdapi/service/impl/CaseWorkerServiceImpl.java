@@ -11,10 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
@@ -119,7 +123,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             });
 
 
-            /**  caseworker profile bacth save
+            /**  caseworker profile batch save
              in caseWorkerProfile request contains all the associated entities information and while
              saving it automatically saves data in the sub entities like cwlocation, cwWorkArea,cwRole and
              caseworker profile and no need to explicitly invoke the save method for each entities.
@@ -192,6 +196,93 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 });
     }
 
+    /**
+     * Returns the caseworker details based on the id's.
+     * @param caseWorkerIds list
+     * @return CaseWorkerProfile
+     */
+    @Override
+    public ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds) {
+        List<CaseWorkerProfile> caseWorkerProfileList = caseWorkerProfileRepo.findByCaseWorkerIdIn(caseWorkerIds);
+        if (CollectionUtils.isEmpty(caseWorkerProfileList)) {
+            throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+        }
+
+        return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
+    }
+
+    private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
+            List<CaseWorkerProfile> caseWorkerProfileList) {
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfilesDto =
+                new ArrayList<>();
+        for (CaseWorkerProfile profile : caseWorkerProfileList) {
+
+            caseWorkerProfilesDto.add(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
+                    .id(profile.getCaseWorkerId())
+                    .firstName(profile.getFirstName())
+                    .lastName(profile.getLastName())
+                    .officialEmail(profile.getEmailId())
+                    .regionId(profile.getRegionId())
+                    .regionName(profile.getRegion())
+                    .userType(profile.getUserType().getDescription())
+                    .userId(profile.getUserTypeId())
+                    .deleteFlag(profile.getDeleteFlag().toString())
+                    .createdTime(profile.getCreatedDate())
+                    .lastUpdatedTime(profile.getLastUpdate())
+                    .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
+                    .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
+                    .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
+                    .build());
+        }
+        return caseWorkerProfilesDto;
+    }
+
+    private List<WorkArea> mapWorkAreasToDto(List<CaseWorkerWorkArea> caseWorkerWorkAreas) {
+        List<WorkArea> workAreasDtoList = new ArrayList<>();
+        for (CaseWorkerWorkArea area : caseWorkerWorkAreas) {
+            WorkArea workAreaDto = WorkArea.builder()
+                    .areaOfWork(area.getAreaOfWork())
+                    .serviceCode(area.getServiceCode())
+                    .createdTime(area.getCreatedDate())
+                    .lastUpdatedTime(area.getLastUpdate())
+                    .build();
+
+            workAreasDtoList.add(workAreaDto);
+        }
+        return workAreasDtoList;
+    }
+
+    private List<Location> mapLocationsToDto(List<CaseWorkerLocation> caseWorkerLocations) {
+        List<Location> locationsDto = new ArrayList<>();
+        for (CaseWorkerLocation location : caseWorkerLocations) {
+            Location locationDto = Location.builder()
+                    .baseLocationId(location.getLocationId())
+                    .locationName(location.getLocation())
+                    .createdTime(location.getCreatedDate())
+                    .lastUpdatedTime(location.getLastUpdate())
+                    .isPrimary(location.getPrimaryFlag())
+                    .build();
+
+            locationsDto.add(locationDto);
+        }
+        return locationsDto;
+    }
+
+    private List<Role> mapRolesToDto(List<CaseWorkerRole> caseWorkerRoles) {
+        List<Role> rolesDto = new ArrayList<>();
+        for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
+            Role roleDto = Role.builder()
+                    .roleId(caseWorkerRole.getRoleId())
+                    .roleName(caseWorkerRole.getRoleType().getDescription())
+                    .isPrimary(caseWorkerRole.getPrimaryFlag())
+                    .createdTime(caseWorkerRole.getCreatedDate())
+                    .lastUpdatedTime(caseWorkerRole.getLastUpdate()).build();
+            rolesDto.add(roleDto);
+
+        }
+        return rolesDto;
+    }
+
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
@@ -258,17 +349,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return cwLocations;
     }
 
-    public  List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
-                                                CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+    public List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(UserProfileCreationResponse userProfileCreationResp,
+                                                                CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
-        cwrdProfileRequest.getRoles().forEach(role -> {
-            roleTypes.stream().filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                    .map(roleType -> {
-                        CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
-                            roleType.getRoleId(),role.isPrimaryFlag());
-                        return caseWorkerRoles.add(workerRole);
-                    });
-        });
+        cwrdProfileRequest.getRoles().forEach(role -> roleTypes.forEach(roleType -> {
+            if (roleType.getDescription().trim().equalsIgnoreCase(role.getRole())) {
+                CaseWorkerRole workerRole = new CaseWorkerRole(userProfileCreationResp.getIdamId(),
+                        roleType.getRoleId(), role.isPrimaryFlag());
+                caseWorkerRoles.add(workerRole);
+            }
+        }));
         return caseWorkerRoles;
     }
 

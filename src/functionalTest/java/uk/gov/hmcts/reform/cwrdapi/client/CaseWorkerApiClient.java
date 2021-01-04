@@ -86,7 +86,7 @@ public class CaseWorkerApiClient {
                 .header("Accepts", APPLICATION_JSON_VALUE);
     }
 
-    public RequestSpecification getMultipleAuthHeadersInternal(String... role) {
+    public RequestSpecification getMultipleAuthHeadersInternal(String role) {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
     }
 
