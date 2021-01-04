@@ -63,7 +63,7 @@ public class CustomSerenityRunner extends SpringIntegrationSerenityRunner {
     }
 
     private void initialize() {
-        ldClient = new LDClient(getenv("LD_SDK_KEY"));
+        ldClient = new LDClient(getenv("RD_LD_SDK_KEY"));
         featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
         String executionEnvironment = getenv("execution_environment");
         ReflectionTestUtils.setField(featureToggleService, "environment", executionEnvironment);

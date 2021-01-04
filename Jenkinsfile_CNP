@@ -15,7 +15,7 @@ def secrets = [
   'rd-${env}': [
     secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
     secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID'),
-    secret('LD-SDK-KEY', 'LD_SDK_KEY')
+    secret('LD-SDK-KEY', 'RD_LD_SDK_KEY')
 
   ]
 ]
