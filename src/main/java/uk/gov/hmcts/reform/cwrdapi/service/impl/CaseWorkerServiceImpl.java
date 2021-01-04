@@ -228,7 +228,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     .userId(profile.getUserTypeId())
                     .deleteFlag(profile.getDeleteFlag().toString())
                     .createdTime(profile.getCreatedDate())
-                    .lastUpdateTime(profile.getLastUpdate())
+                    .lastUpdatedTime(profile.getLastUpdate())
                     .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
                     .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
                     .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
@@ -244,7 +244,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     .areaOfWork(area.getAreaOfWork())
                     .serviceCode(area.getServiceCode())
                     .createdTime(area.getCreatedDate())
-                    .lastUpdateTime(area.getLastUpdate())
+                    .lastUpdatedTime(area.getLastUpdate())
                     .build();
 
             workAreasDtoList.add(workAreaDto);
@@ -259,7 +259,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     .baseLocationId(location.getLocationId())
                     .locationName(location.getLocation())
                     .createdTime(location.getCreatedDate())
-                    .lastUpdateTime(location.getLastUpdate())
+                    .lastUpdatedTime(location.getLastUpdate())
                     .isPrimary(location.getPrimaryFlag())
                     .build();
 
@@ -276,7 +276,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     .roleName(caseWorkerRole.getRoleType().getDescription())
                     .isPrimary(caseWorkerRole.getPrimaryFlag())
                     .createdTime(caseWorkerRole.getCreatedDate())
-                    .lastUpdateTime(caseWorkerRole.getLastUpdate()).build();
+                    .lastUpdatedTime(caseWorkerRole.getLastUpdate()).build();
             rolesDto.add(roleDto);
 
         }

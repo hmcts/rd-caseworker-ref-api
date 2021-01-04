@@ -284,7 +284,7 @@ public class CaseWorkerServiceImplTest {
                 .roleId("1")
                 .roleName("roleName")
                 .createdTime(LocalDateTime.now())
-                .lastUpdateTime(LocalDateTime.now())
+                .lastUpdatedTime(LocalDateTime.now())
                 .isPrimary(true)
                 .build();
         Location location = Location
@@ -293,13 +293,13 @@ public class CaseWorkerServiceImplTest {
                 .locationName("LocationName")
                 .isPrimary(true)
                 .createdTime(LocalDateTime.now())
-                .lastUpdateTime(LocalDateTime.now())
+                .lastUpdatedTime(LocalDateTime.now())
                 .build();
         WorkArea workArea = WorkArea.builder()
                 .areaOfWork("areaOfWork")
                 .serviceCode("serviceCode")
                 .createdTime(LocalDateTime.now())
-                .lastUpdateTime(LocalDateTime.now())
+                .lastUpdatedTime(LocalDateTime.now())
                 .build();
 
         uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
@@ -314,7 +314,7 @@ public class CaseWorkerServiceImplTest {
                         .userId(11111L)
                         .deleteFlag("false")
                         .createdTime(LocalDateTime.now())
-                        .lastUpdateTime(LocalDateTime.now())
+                        .lastUpdatedTime(LocalDateTime.now())
                         .roles(Collections.singletonList(role))
                         .locations(Collections.singletonList(location))
                         .workAreas(Collections.singletonList(workArea))

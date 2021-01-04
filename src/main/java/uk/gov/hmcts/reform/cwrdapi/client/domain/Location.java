@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Location implements Serializable {
 
     private static final long serialVersionUID = 2019L;
@@ -28,13 +31,9 @@ public class Location implements Serializable {
             isPrimary = "Primary Base Location Name")
     @JsonProperty("location")
     private String locationName;
-
-    @JsonProperty("is_primary")
     private boolean isPrimary;
 
-    @JsonProperty("created_time")
     private LocalDateTime createdTime;
-    @JsonProperty("last_updated_time")
-    private LocalDateTime lastUpdateTime;
+    private LocalDateTime lastUpdatedTime;
 }
 

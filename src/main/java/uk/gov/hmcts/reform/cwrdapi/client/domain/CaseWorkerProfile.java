@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable {
 
     private static final long serialVersionUID = 2019L;
@@ -26,12 +29,10 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
 
     @MappingField(columnName = "FIRST NAME")
     @NotEmpty
-    @JsonProperty("first_name")
     private String firstName;
 
     @MappingField(columnName = "LAST NAME")
     @NotEmpty
-    @JsonProperty("last_name")
     private String lastName;
 
     @MappingField(columnName = "Official Email")
@@ -40,7 +41,6 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String officialEmail;
 
     @MappingField(columnName = "Region Id")
-    @JsonProperty("region_id")
     private int regionId;
 
     @MappingField(columnName = "Region")
@@ -58,7 +58,6 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
 
     @MappingField(columnName = "User type")
     @NotEmpty
-    @JsonProperty("user_type")
     private String userType;
 
     @MappingField(clazz = Role.class, objectCount = 2)
@@ -75,11 +74,9 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String idamRoles;
 
     @MappingField(columnName = "Delete Flag")
-    @JsonProperty("delete_flag")
     private String deleteFlag;
 
-    @JsonProperty("created_time")
     private LocalDateTime createdTime;
     @JsonProperty("last_updated_time")
-    private LocalDateTime lastUpdateTime;
+    private LocalDateTime lastUpdatedTime;
 }
