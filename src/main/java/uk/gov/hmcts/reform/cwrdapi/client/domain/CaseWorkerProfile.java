@@ -77,6 +77,5 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String deleteFlag;
 
     private LocalDateTime createdTime;
-    @JsonProperty("last_updated_time")
     private LocalDateTime lastUpdatedTime;
 }

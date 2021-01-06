@@ -23,16 +23,5 @@ public class WelcomeControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertThat(responseEntity.getBody()).contains(expectedMessage);
     }
-
-    @Test
-    public void test_should_return_welcome_response_with_token() throws Exception {
-
-        ResponseEntity<String> responseEntity = welcomeController.welcomeWithToken();
-        String expectedMessage = "Message for the Caseworker Ref Data API";
-
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertThat(responseEntity.getBody()).contains(expectedMessage);
-    }
 }
 

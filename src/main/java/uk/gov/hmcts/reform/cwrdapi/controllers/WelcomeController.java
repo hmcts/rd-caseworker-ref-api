@@ -4,7 +4,6 @@ package uk.gov.hmcts.reform.cwrdapi.controllers;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -67,35 +66,6 @@ public class WelcomeController {
             .ok()
             .cacheControl(CacheControl.noCache())
             .body("{\"message\": \"" + MESSAGE + "\"}");
-    }
-
-    @ApiOperation(
-            value = "Welcome message for the Caseworker Ref Data API",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "Welcome message",
-                    response = String.class
-            )
-    })
-    @GetMapping(
-            path = "/welcome",
-            produces = APPLICATION_JSON_VALUE
-    )
-    @ResponseBody
-    //@Secured("cwd-admin")
-    public ResponseEntity<String> welcomeWithToken() {
-        log.info("{}:: Welcome '{}' from running instance: {}. Tokens have been validated",
-                loggingComponentName, MESSAGE, INSTANCE_ID);
-        return ResponseEntity
-                .ok()
-                .cacheControl(CacheControl.noCache())
-                .body("{\"message is\": \"" + MESSAGE + "\"}");
     }
 }
 
