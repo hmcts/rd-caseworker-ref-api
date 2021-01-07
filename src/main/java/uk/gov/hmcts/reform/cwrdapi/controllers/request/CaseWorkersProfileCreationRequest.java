@@ -34,7 +34,7 @@ public class CaseWorkersProfileCreationRequest {
             @JsonProperty("region_id") Integer regionId,
             @JsonProperty("user_type") String userType,
             @JsonProperty("region") String region,
-            @JsonProperty("suspeded") boolean suspended,
+            @JsonProperty("suspended") boolean suspended,
             @JsonProperty("idam_roles") Set<String> idamRoles,
             @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
             @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
