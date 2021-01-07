@@ -119,4 +119,4 @@ excel:
 token:
   cache:
     ttl:
-      secs: 25200000
+      secs: 60000
