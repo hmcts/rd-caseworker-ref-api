@@ -132,13 +132,13 @@ public class CaseWorkerApiClient {
         Set<String> idamRoles = new HashSet<>();
 
         String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
-        setEmailsTobeDeleted(emailToUsed);
+        setEmailsTobeDeleted(emailToUsed.toLowerCase());
         return ImmutableList.of(
                 CaseWorkersProfileCreationRequest
                         .caseWorkersProfileCreationRequest()
                         .firstName("cwr-test")
                         .lastName("cwr-test")
-                        .emailId(emailToUsed)
+                        .emailId(emailToUsed.toLowerCase())
                         .regionId(1)
                         .region("National")
                         .userType("CTSC")
