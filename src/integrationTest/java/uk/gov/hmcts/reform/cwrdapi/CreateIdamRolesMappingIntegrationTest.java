@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 
@@ -11,7 +9,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
 public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
@@ -38,7 +35,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
 
     @Test
     public void returns_400_when_request_invalid() {
-
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.emptyList(), cwdAdmin);
 

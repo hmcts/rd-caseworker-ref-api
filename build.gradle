@@ -39,7 +39,7 @@ def versions = [
   springHystrix      : '2.1.6.RELEASE',
   springfoxSwagger   : '2.9.2',
   pact_version       : '3.5.24',
-  launchDarklySdk    : "5.0.5"
+  launchDarklySdk    : "5.2.1"
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -308,7 +308,7 @@ dependencies {
 
   compile group: 'com.google.guava', name: 'guava', version: '30.0-jre'
   compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
-
+  compile group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
   compile group:"org.yaml", name: "snakeyaml", version:"1.27"
 
   compile group: 'org.springframework', name: 'spring-jms', version: '5.2.9.RELEASE'

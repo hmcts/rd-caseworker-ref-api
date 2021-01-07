@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UploadCaseWorkerFileResponse;
@@ -245,11 +246,11 @@ public class CaseWorkerRefController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("cwd-admin")
-    public ResponseEntity<Object> fetchCaseworkersById(@RequestBody List<String> caseWorkerIds) {
+    public ResponseEntity<Object> fetchCaseworkersById(@RequestBody UserRequest userRequest) {
 
-        if (CollectionUtils.isEmpty(caseWorkerIds)) {
+        if (CollectionUtils.isEmpty(userRequest.getUserIds())) {
             throw new InvalidRequestException("Caseworker request is empty");
         }
-        return caseWorkerService.fetchCaseworkersById(caseWorkerIds);
+        return caseWorkerService.fetchCaseworkersById(userRequest.getUserIds());
     }
 }

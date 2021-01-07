@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
@@ -178,7 +179,7 @@ public class CaseWorkerRefControllerTest {
 
     @Test(expected = InvalidRequestException.class)
     public void fetchCaseworkersByIdShouldThrow400() {
-        caseWorkerRefController.fetchCaseworkersById(Collections.emptyList());
+        caseWorkerRefController.fetchCaseworkersById(UserRequest.builder().userIds(Collections.emptyList()).build());
     }
 
     @Test
@@ -186,14 +187,15 @@ public class CaseWorkerRefControllerTest {
         responseEntity = ResponseEntity.ok().body(null);
         when(caseWorkerServiceMock.fetchCaseworkersById(any()))
                 .thenReturn(responseEntity);
-
-        List<String> caseWorkerIds = new ArrayList<>(Arrays.asList(
-                "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
-        ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(caseWorkerIds);
+        UserRequest userRequest =  UserRequest.builder().userIds(Arrays.asList(
+                "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"))
+                .build();
+        ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(userRequest);
 
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
-                .fetchCaseworkersById(caseWorkerIds);
+                .fetchCaseworkersById(Arrays.asList(
+                        "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
     }
 
     @Test
