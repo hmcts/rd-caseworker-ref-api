@@ -14,6 +14,8 @@ import javax.annotation.PostConstruct;
 @Service
 public class FeatureToggleServiceImpl implements FeatureToggleService {
 
+    public static final String CWD_UPLOAD_FILE_FLAG = "cwd-upload-file-flag";
+
     @Autowired
     private final LDClient ldClient;
 
@@ -34,7 +36,11 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     public void mapServiceToFlag() {
         launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("CaseWorkerRefController.fetchCaseworkersById",
-                "crd-fetch-caseworker-profile-by-id");
+                CWD_UPLOAD_FILE_FLAG);
+        launchDarklyMap.put("CaseWorkerRefController.createCaseWorkerProfiles",
+                CWD_UPLOAD_FILE_FLAG);
+        launchDarklyMap.put("CaseWorkerRefController.buildIdamRoleMappings",
+                CWD_UPLOAD_FILE_FLAG);
 
     }
 
