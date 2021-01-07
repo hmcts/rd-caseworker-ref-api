@@ -38,7 +38,7 @@ public class ExcelAdaptorServiceImplTest {
         assertThat(caseWorkerProfile.getRegionName()).isNotBlank();
         assertThat(caseWorkerProfile.getUserType()).isNotBlank();
         assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
-        assertThat(caseWorkerProfile.getDeleteFlag()).isNotBlank();
+        assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
         assertThat(caseWorkerProfile.getLocations()).hasSize(2);
         assertThat(caseWorkerProfile.getRoles()).hasSize(2);
         assertThat(caseWorkerProfile.getWorkAreas()).hasSize(8);

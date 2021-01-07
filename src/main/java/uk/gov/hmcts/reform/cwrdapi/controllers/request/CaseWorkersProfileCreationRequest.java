@@ -20,7 +20,7 @@ public class CaseWorkersProfileCreationRequest {
     private Integer regionId;
     private String userType;
     private String region;
-    private boolean deleteFlag;
+    private boolean suspended;
     private Set<String> idamRoles;
     private List<CaseWorkerRoleRequest> roles;
     private List<CaseWorkerLocationRequest> baseLocations;
@@ -34,7 +34,7 @@ public class CaseWorkersProfileCreationRequest {
             @JsonProperty("region_id") Integer regionId,
             @JsonProperty("user_type") String userType,
             @JsonProperty("region") String region,
-            @JsonProperty("delete_flag") boolean deleteFlag,
+            @JsonProperty("suspended") boolean suspended,
             @JsonProperty("idam_roles") Set<String> idamRoles,
             @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
             @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
@@ -45,7 +45,7 @@ public class CaseWorkersProfileCreationRequest {
         this.emailId = emailId;
         this.regionId = regionId;
         this.userType = userType;
-        this.deleteFlag = deleteFlag;
+        this.suspended = suspended;
         this.idamRoles = idamRoles;
         this.roles = roles;
         this.baseLocations = baseLocations;
