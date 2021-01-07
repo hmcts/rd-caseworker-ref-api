@@ -43,6 +43,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     public FuncTestRequestHandler testRequestHandler;
 
     public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefController.createCaseWorkerProfiles";
+    public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefController.fetchCaseworkersById";
 
     @Value("${userProfUrl}")
     protected String userProfUrl;
@@ -78,7 +79,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetCaseWorkerDetails() throws Exception {
         //Create 2 Caseworker Users
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
@@ -127,7 +128,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = false)
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = false)
     public void should_retrieve_403_when_Api_toggled_off() {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(
@@ -143,7 +144,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() throws Exception {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(caseWorkerApiClient
@@ -199,7 +200,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("dummyRole")
                 .body(UserRequest.builder().userIds(Collections.singletonList("someUUID")).build())
