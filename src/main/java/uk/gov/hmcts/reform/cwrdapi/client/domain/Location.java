@@ -31,6 +31,7 @@ public class Location implements Serializable {
             isPrimary = "Primary Base Location Name")
     @JsonProperty("location")
     private String locationName;
+    @JsonProperty("is_primary")
     private boolean isPrimary;
 
     private LocalDateTime createdTime;

@@ -29,6 +29,7 @@ public class Role implements Serializable {
     @JsonProperty("role")
     private String roleName;
 
+    @JsonProperty("is_primary")
     private boolean isPrimary;
 
     private LocalDateTime createdTime;
