@@ -42,12 +42,14 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     @Autowired
     public FuncTestRequestHandler testRequestHandler;
 
-    public static final String mapKey = "CaseWorkerRefController.fetchCaseworkersById";
+    public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefController.createCaseWorkerProfiles";
+    public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefController.fetchCaseworkersById";
 
     @Value("${userProfUrl}")
     protected String userProfUrl;
 
     @Test
+    @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
     public void whenUserNotExistsInCwrAndSidamAndUp_Ac1() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
@@ -62,7 +64,22 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = false)
+    public void whenUserNotExistsInCwrAndSidamAndUp_Ac1_LD_disabled() {
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
+                .createCaseWorkerProfiles();
+
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                .body(caseWorkersProfileCreationRequests)
+                .post("/refdata/case-worker/users/")
+                .andReturn();
+        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
+        assertThat(response.getBody().asString()).contains(CustomSerenityRunner.getFeatureFlagName().concat(" ")
+                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetCaseWorkerDetails() throws Exception {
         //Create 2 Caseworker Users
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
@@ -111,7 +128,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = false)
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = false)
     public void should_retrieve_403_when_Api_toggled_off() {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(
@@ -127,7 +144,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() throws Exception {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(caseWorkerApiClient
@@ -183,7 +200,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("dummyRole")
                 .body(UserRequest.builder().userIds(Collections.singletonList("someUUID")).build())

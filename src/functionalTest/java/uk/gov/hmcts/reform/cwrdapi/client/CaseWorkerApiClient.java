@@ -142,7 +142,7 @@ public class CaseWorkerApiClient {
                         .regionId(1)
                         .region("National")
                         .userType("CTSC")
-                        .deleteFlag(false)
+                        .suspended(false)
                         .idamRoles(idamRoles)
                         .baseLocations(locationRequestList)
                         .roles(roleRequests)
