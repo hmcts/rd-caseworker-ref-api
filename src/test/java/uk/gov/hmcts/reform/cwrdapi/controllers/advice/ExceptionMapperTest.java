@@ -81,4 +81,13 @@ public class ExceptionMapperTest {
                 .getErrorDescription());
 
     }
+
+    @Test
+    public void test_handle_launchDarkly_exception() {
+        ForbiddenException forbiddenException = new ForbiddenException("LD Forbidden Exception");
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleLaunchDarklyException(forbiddenException);
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals(forbiddenException.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
+    }
 }

@@ -14,7 +14,9 @@ def secrets = [
   ],
   'rd-${env}': [
     secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
-    secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID')
+    secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID'),
+    secret('LD-SDK-KEY', 'RD_LD_SDK_KEY')
+
   ]
 ]
 
@@ -43,6 +45,13 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     enableAksStagingDeployment()
 
+    before('functionalTest:preview') {
+      env.execution_environment = "preview"
+    }
+
+    before('functionalTest:aat') {
+      env.execution_environment = "aat"
+    }
     // Sync demo and perftest with master branch
     syncBranchesWithMaster(branchesToSync)
 
@@ -65,4 +74,5 @@ withPipeline(type, product, component) {
     after('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
+
 }

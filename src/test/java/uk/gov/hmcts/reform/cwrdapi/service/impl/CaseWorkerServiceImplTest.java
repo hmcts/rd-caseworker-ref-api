@@ -103,7 +103,7 @@ public class CaseWorkerServiceImplTest {
 
         caseWorkersProfileCreationRequest = CaseWorkersProfileCreationRequest
                 .caseWorkersProfileCreationRequest()
-                .deleteFlag(false)
+                .suspended(false)
                 .emailId("test@test.com")
                 .idamRoles(idamRoles)
                 .firstName("testFN")
@@ -152,7 +152,7 @@ public class CaseWorkerServiceImplTest {
 
         CaseWorkerProfile profile = new CaseWorkerProfile();
         profile.setCaseWorkerId("1");
-        profile.setDeleteFlag(true);
+        profile.setSuspended(true);
         profile.setEmailId(caseWorkersProfileCreationRequest.getEmailId());
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
@@ -267,7 +267,7 @@ public class CaseWorkerServiceImplTest {
         caseWorkerProfile.setRegionId(111122222);
         caseWorkerProfile.setUserTypeId(112L);
         caseWorkerProfile.setUserType(userType);
-        caseWorkerProfile.setDeleteFlag(true);
+        caseWorkerProfile.setSuspended(true);
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
@@ -281,7 +281,7 @@ public class CaseWorkerServiceImplTest {
     public uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
         Role
                 role = Role.builder()
-                .roleId(1L)
+                .roleId("1")
                 .roleName("roleName")
                 .createdTime(LocalDateTime.now())
                 .lastUpdatedTime(LocalDateTime.now())
@@ -312,7 +312,7 @@ public class CaseWorkerServiceImplTest {
                         .regionId(1)
                         .userType("userType")
                         .userId(11111L)
-                        .deleteFlag("false")
+                        .suspended("false")
                         .createdTime(LocalDateTime.now())
                         .lastUpdatedTime(LocalDateTime.now())
                         .roles(Collections.singletonList(role))

@@ -121,7 +121,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
         assertThat(caseWorkerProfile.getRegionName()).isNotBlank();
         assertThat(caseWorkerProfile.getUserType()).isNotBlank();
         assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
-        assertThat(caseWorkerProfile.getDeleteFlag()).isNotBlank();
+        assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
     }
 
     @Test

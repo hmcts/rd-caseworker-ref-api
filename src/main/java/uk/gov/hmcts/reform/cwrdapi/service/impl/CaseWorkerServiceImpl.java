@@ -111,10 +111,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         caseWorkerProfiles.add(caseWorkerProfile);
 
                     }
-                } else if (Objects.nonNull(caseWorkerProfile) && !caseWorkerProfile.getDeleteFlag()) {
+                } else if (Objects.nonNull(caseWorkerProfile) && !caseWorkerProfile.getSuspended()) {
 
                     //update the existing case worker profile logic
-                } else if (Objects.nonNull(caseWorkerProfile) && caseWorkerProfile.getDeleteFlag()) {
+                } else if (Objects.nonNull(caseWorkerProfile) && caseWorkerProfile.getSuspended()) {
 
                     UserProfileUpdatedData usrProfileStatusUpdate = new UserProfileUpdatedData("SUSPENDED");
                     // updating the status in idam to suspend.
@@ -226,7 +226,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     .regionName(profile.getRegion())
                     .userType(profile.getUserType().getDescription())
                     .userId(profile.getUserTypeId())
-                    .deleteFlag(profile.getDeleteFlag().toString())
+                    .suspended(profile.getSuspended().toString())
                     .createdTime(profile.getCreatedDate())
                     .lastUpdatedTime(profile.getLastUpdate())
                     .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
@@ -272,7 +272,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         List<Role> rolesDto = new ArrayList<>();
         for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
             Role roleDto = Role.builder()
-                    .roleId(caseWorkerRole.getRoleId())
+                    .roleId(caseWorkerRole.getRoleId().toString())
                     .roleName(caseWorkerRole.getRoleType().getDescription())
                     .isPrimary(caseWorkerRole.getPrimaryFlag())
                     .createdTime(caseWorkerRole.getCreatedDate())
@@ -330,7 +330,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         caseWorkerProfile.setFirstName(cwrdProfileRequest.getFirstName());
         caseWorkerProfile.setLastName(cwrdProfileRequest.getLastName());
         caseWorkerProfile.setEmailId(cwrdProfileRequest.getEmailId().toLowerCase());
-        caseWorkerProfile.setDeleteFlag(false);
+        caseWorkerProfile.setSuspended(false);
         caseWorkerProfile.setUserTypeId(getUserTypeIdByDesc(cwrdProfileRequest.getUserType()));
         caseWorkerProfile.setRegionId(cwrdProfileRequest.getRegionId());
         caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());
