@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -17,6 +18,7 @@ public class IdamRepository {
         this.idamClient = idamClient;
     }
 
+    @Cacheable(value = "token")
     public UserInfo getUserInfo(String jwtToken) {
         return idamClient.getUserInfo("Bearer " + jwtToken);
     }

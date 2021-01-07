@@ -115,3 +115,8 @@ crd:
 
 excel:
   password: ${EXCEL_PASSWORD:1234}
+
+token:
+  cache:
+    ttl:
+      secs: 25200000

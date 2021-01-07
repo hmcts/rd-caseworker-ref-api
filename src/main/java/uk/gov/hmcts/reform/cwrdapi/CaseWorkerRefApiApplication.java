@@ -2,17 +2,21 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.Scheduled;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @EnableJpaAuditing
 @EnableJpaRepositories
 @SpringBootApplication
 @EnableCircuitBreaker
+@EnableCaching
 @EnableRetry
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.cwrdapi" },
@@ -23,5 +27,10 @@ public class CaseWorkerRefApiApplication {
 
     public static void main(final String[] args) {
         SpringApplication.run(CaseWorkerRefApiApplication.class, args);
+    }
+
+    @CacheEvict(allEntries = true, cacheNames = "token")
+    @Scheduled(fixedDelayString = "${token.cache.ttl.secs}")
+    public void cacheEvict() {
     }
 }
