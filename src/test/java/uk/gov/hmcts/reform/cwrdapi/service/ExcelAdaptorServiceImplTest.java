@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExcelAdaptorServiceImplTest {
@@ -52,5 +53,15 @@ public class ExcelAdaptorServiceImplTest {
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void parseXlsxShouldThrowExceptionWhenNoValidSheetNamePresentTest() throws IOException {
+        Workbook workbook = WorkbookFactory
+                .create(new File("src/test/resources/WithNoValidSheetName.xlsx"), "1234");
+
+        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
+                .isExactlyInstanceOf(ExcelValidationException.class)
+                .hasMessage(FILE_NO_VALID_SHEET_ERROR_MESSAGE);
     }
 }

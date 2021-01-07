@@ -86,6 +86,13 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     }
 
     @Test
+    public void shouldReturn400WhenFileHasNoValidSheetName() throws IOException {
+        uploadCaseWorkerFile("src/functionalTest/resources/WithInvalidSheetName.xlsx",
+                400, CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
+                CWD_ADMIN);
+    }
+
+    @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
         uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
                 400, CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE,

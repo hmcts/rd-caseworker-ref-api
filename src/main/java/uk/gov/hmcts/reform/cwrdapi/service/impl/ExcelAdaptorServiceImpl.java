@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.lang.reflect.Field;
@@ -30,16 +31,20 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COM
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IS_PRIMARY_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 
 @Service
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
+
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
-        Sheet sheet = workbook.getSheetAt(1);
-        if (nonNull(sheet) && sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
+        Sheet sheet = workbook.getSheet(CaseWorkerConstants.REQUIRED_SHEET_NAME);
+        if (null == sheet) {
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_VALID_SHEET_ERROR_MESSAGE);
+        } else if (sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
         return mapToPojo(sheet, classType);

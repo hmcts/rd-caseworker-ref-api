@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
@@ -57,11 +59,25 @@ public class CaseWorkerReferenceDataClient {
         return postRequest(baseUrl + "/idam-roles-mapping/", serviceRoleMapping, role, null);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <T> Map<String, Object> uploadCwFile(MultiValueMap<String, Object> body, String role) {
+        String uriPath = baseUrl + "/upload-file/";
+        HttpHeaders httpHeaders = getMultipleAuthHeaders(role);
+        httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>>  request =
+                new HttpEntity<>(body, httpHeaders);
+        return getResponse(uriPath, request);
+    }
+
+
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
         HttpEntity<T>    request = new HttpEntity<>(requestBody, getMultipleAuthHeaders(role, userId));
 
+        return getResponse(uriPath, request);
+    }
+
+    private <T> Map<String, Object> getResponse(String uriPath, HttpEntity<T> request) {
         ResponseEntity<Map> responseEntity;
 
         try {
