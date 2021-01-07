@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import java.lang.annotation.Retention;
-
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.METHOD;

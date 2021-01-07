@@ -66,7 +66,7 @@ public class CaseWorkerReferenceDataClient {
 
         HttpEntity<MultiValueMap<String, Object>>  request =
                 new HttpEntity<>(body, httpHeaders);
-        return getResponse(uriPath, request);
+        return sendRequest(uriPath, request);
     }
 
 
@@ -74,10 +74,10 @@ public class CaseWorkerReferenceDataClient {
 
         HttpEntity<T>    request = new HttpEntity<>(requestBody, getMultipleAuthHeaders(role, userId));
 
-        return getResponse(uriPath, request);
+        return sendRequest(uriPath, request);
     }
 
-    private <T> Map<String, Object> getResponse(String uriPath, HttpEntity<T> request) {
+    private <T> Map<String, Object> sendRequest(String uriPath, HttpEntity<T> request) {
         ResponseEntity<Map> responseEntity;
 
         try {
@@ -120,12 +120,6 @@ public class CaseWorkerReferenceDataClient {
         return getMultipleAuthHeaders(role, null);
     }
 
-    private final String getBearerToken(String userId, String role) {
-
-        return generateToken(issuer, expiration, userId, role);
-
-    }
-
     private Map getResponse(ResponseEntity<Map> responseEntity) {
 
         Map response = objectMapper
@@ -137,6 +131,12 @@ public class CaseWorkerReferenceDataClient {
         response.put("headers", responseEntity.getHeaders().toString());
 
         return response;
+    }
+
+    private final String getBearerToken(String userId, String role) {
+
+        return generateToken(issuer, expiration, userId, role);
+
     }
 
     public static String generateS2SToken(String serviceName) {
