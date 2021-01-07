@@ -12,6 +12,7 @@ java:
     CWRD_MQ_TOPIC_NAME: rd-caseworker-topic-aat
     CWRD_MQ_TRUST_ALL_CERTS: false
     CWRD_DATA_PER_MESSAGE: 50
+    LAUNCH_DARKLY_ENV: "preview"
   postgresql:
     enabled: true
     postgresqlUsername: dbrdcaseworker
@@ -24,3 +25,4 @@ java:
         - AppInsightsInstrumentationKey
         - caseworker-topic-primary-send-listen-shared-access-key
         - caseworker-ref-api-s2s-secret
+        - LD-SDK-KEY
