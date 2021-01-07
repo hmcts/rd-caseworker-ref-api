@@ -21,7 +21,7 @@ public class CaseWorkerProfileTest {
         caseWorkerProfile.setUserTypeId(1L);
         caseWorkerProfile.setRegion("Region");
         caseWorkerProfile.setRegionId(12);
-        caseWorkerProfile.setDeleteFlag(true);
+        caseWorkerProfile.setSuspended(true);
         caseWorkerProfile.setDeleteDate(LocalDateTime.now());
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
@@ -41,7 +41,7 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getUserTypeId(), is(1L));
         assertThat(caseWorkerProfile.getRegion(), is("Region"));
         assertThat(caseWorkerProfile.getRegionId(), is(12));
-        assertThat(caseWorkerProfile.getDeleteFlag(), is(true));
+        assertThat(caseWorkerProfile.getSuspended(), is(true));
         assertNotNull(caseWorkerProfile.getDeleteDate());
         assertNotNull(caseWorkerProfile.getCreatedDate());
         assertNotNull(caseWorkerProfile.getLastUpdate());
@@ -118,10 +118,10 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingDeleteFlag() {
+    public void testCaseWorkerProfileContainingSuspended() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setDeleteFlag(false);
-        assertFalse(caseWorkerProfile.getDeleteFlag());
+        caseWorkerProfile.setSuspended(false);
+        assertFalse(caseWorkerProfile.getSuspended());
     }
 
     @Test
@@ -137,6 +137,6 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getUserTypeId(), is(1L));
         assertThat(caseWorkerProfile.getRegion(), is("region"));
         assertThat(caseWorkerProfile.getRegionId(), is(1));
-        assertThat(caseWorkerProfile.getDeleteFlag(), is(false));
+        assertThat(caseWorkerProfile.getSuspended(), is(false));
     }
 }

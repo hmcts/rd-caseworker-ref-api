@@ -61,8 +61,8 @@ public class CaseWorkerProfile implements Serializable {
     @NotNull
     private Integer regionId;
 
-    @Column(name = "delete_flag")
-    private Boolean deleteFlag;
+    @Column(name = "suspended")
+    private Boolean suspended;
 
     @Column(name = "delete_date")
     private LocalDateTime deleteDate;
@@ -93,7 +93,7 @@ public class CaseWorkerProfile implements Serializable {
     private UserType userType;
 
     public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
-                             Integer regionId, String region, boolean deleteFlag) {
+                             Integer regionId, String region, boolean suspended) {
         this.caseWorkerId = caseWorkerId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -101,6 +101,6 @@ public class CaseWorkerProfile implements Serializable {
         this.userTypeId = userTypeId;
         this.regionId = regionId;
         this.region = region;
-        this.deleteFlag = deleteFlag;
+        this.suspended = suspended;
     }
 }

@@ -73,8 +73,8 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @MappingField(columnName = "IDAM Roles")
     private String idamRoles;
 
-    @MappingField(columnName = "Delete Flag")
-    private String deleteFlag;
+    @MappingField(columnName = "Suspended")
+    private String suspended;
 
     private LocalDateTime createdTime;
     private LocalDateTime lastUpdatedTime;
