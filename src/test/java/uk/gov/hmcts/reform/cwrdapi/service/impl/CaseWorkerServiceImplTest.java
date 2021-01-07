@@ -281,7 +281,7 @@ public class CaseWorkerServiceImplTest {
     public uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
         Role
                 role = Role.builder()
-                .roleId(1L)
+                .roleId("1")
                 .roleName("roleName")
                 .createdTime(LocalDateTime.now())
                 .lastUpdatedTime(LocalDateTime.now())
