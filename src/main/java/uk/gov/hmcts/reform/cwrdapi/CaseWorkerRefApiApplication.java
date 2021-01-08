@@ -30,7 +30,7 @@ public class CaseWorkerRefApiApplication {
     }
 
     @CacheEvict(allEntries = true, cacheNames = "token")
-    @Scheduled(fixedDelayString = "${token.cache.ttl.secs}")
+    @Scheduled(fixedDelayString = "${token.cache.ttl.millisecs}")
     public void cacheEvict() {
         // empty method annotated with @CacheEvict & @Scheduled for cache eviction
     }

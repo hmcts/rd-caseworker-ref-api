@@ -125,4 +125,4 @@ launchdarkly:
 token:
   cache:
     ttl:
-      secs: 60000
+      millisecs: 60000
