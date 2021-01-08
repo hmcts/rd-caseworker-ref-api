@@ -16,9 +16,12 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.util.ResourceUtils.getFile;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -75,6 +78,17 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("WithXlsxOnlyHeader.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
+    }
+
+    @Test
+    public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
+        Map<String, String> launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
+                "test-flag-1");
+        when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
+        when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        uploadCaseWorkerFile("WithCorrectPassword.xlsx",
+                CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
     }
 
     private void uploadCaseWorkerFile(String fileName,
