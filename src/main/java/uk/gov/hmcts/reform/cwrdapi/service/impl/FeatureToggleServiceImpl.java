@@ -41,7 +41,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 CWD_UPLOAD_FILE_FLAG);
         launchDarklyMap.put("CaseWorkerRefController.buildIdamRoleMappings",
                 CWD_UPLOAD_FILE_FLAG);
-
+        launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
+                CWD_UPLOAD_FILE_FLAG);
     }
 
     @Override
