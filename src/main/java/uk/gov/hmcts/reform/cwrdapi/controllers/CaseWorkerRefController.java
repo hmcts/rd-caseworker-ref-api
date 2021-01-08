@@ -55,7 +55,7 @@ public class CaseWorkerRefController {
     ExcelAdaptorService excelAdaptorService;
 
     @ApiOperation(
-            value = "This API uploads excel file which contain case worker user information and "
+            value = "This API uploads an excel file which contains case worker user information and "
                     + "will be saved in the case worker reference database.",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
