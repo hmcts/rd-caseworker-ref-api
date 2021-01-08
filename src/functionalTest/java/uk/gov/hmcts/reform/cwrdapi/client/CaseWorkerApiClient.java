@@ -92,10 +92,8 @@ public class CaseWorkerApiClient {
     }
 
     public RequestSpecification getMultiPartWithAuthHeaders(String role) {
-        return withAuthenticatedMultipartRequestHeader(idamOpenIdClient.getInternalOpenIdToken(role));
-    }
+        String userToken = idamOpenIdClient.getInternalOpenIdToken(role);
 
-    private RequestSpecification withAuthenticatedMultipartRequestHeader(String userToken) {
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(caseWorkerApiUrl)

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi;
 import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.MultiPartSpecification;
-import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +25,6 @@ import static org.springframework.util.ResourceUtils.getFile;
 @RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
-@Slf4j
 public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CWD_ADMIN = "cwd-admin";
@@ -134,7 +132,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = false)
-    public void should_retrieve_403_when_upload_file_api_toggled_off() throws IOException {
+    public void shouldReturn403WhenUploadFileApiToggledOff() throws IOException {
 
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
