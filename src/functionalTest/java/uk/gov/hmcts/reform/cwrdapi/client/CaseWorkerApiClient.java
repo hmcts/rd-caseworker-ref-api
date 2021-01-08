@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
@@ -78,7 +79,7 @@ public class CaseWorkerApiClient {
     }
 
 
-    private RequestSpecification withUnauthenticatedRequest() {
+    public RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(caseWorkerApiUrl)
@@ -90,6 +91,16 @@ public class CaseWorkerApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
     }
 
+    public RequestSpecification getMultiPartWithAuthHeaders(String role) {
+        String userToken = idamOpenIdClient.getInternalOpenIdToken(role);
+
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(caseWorkerApiUrl)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+                .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {
         return SerenityRest.with()
