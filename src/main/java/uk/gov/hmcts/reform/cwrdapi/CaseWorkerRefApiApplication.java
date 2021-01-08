@@ -9,7 +9,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.scheduling.annotation.Scheduled;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @EnableJpaAuditing
@@ -30,7 +29,6 @@ public class CaseWorkerRefApiApplication {
     }
 
     @CacheEvict(allEntries = true, cacheNames = "token")
-    @Scheduled(fixedDelayString = "${token.cache.ttl.millisecs}")
     public void cacheEvict() {
         // empty method annotated with @CacheEvict & @Scheduled for cache eviction
     }
