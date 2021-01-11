@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -26,10 +25,5 @@ public class CaseWorkerRefApiApplication {
 
     public static void main(final String[] args) {
         SpringApplication.run(CaseWorkerRefApiApplication.class, args);
-    }
-
-    @CacheEvict(allEntries = true, cacheNames = "token")
-    public void cacheEvict() {
-        // empty method annotated with @CacheEvict & @Scheduled for cache eviction
     }
 }
