@@ -15,9 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
-import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
@@ -61,6 +61,11 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         response.then()
                 .assertThat()
                 .statusCode(201);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                response.getBody().as(CaseWorkerProfileCreationResponse.class);
+        List<String> caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
+        assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
 
     @Test
@@ -89,8 +94,6 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
                 .createCaseWorkerProfiles());
 
-        List<String> caseWorkerIds = new ArrayList<>();
-
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/")
@@ -99,17 +102,9 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 .assertThat()
                 .statusCode(201);
 
-        for (CaseWorkersProfileCreationRequest request : caseWorkersProfileCreationRequests) {
-            UserProfileResponse resource =
-                    testRequestHandler.sendGet(HttpStatus.OK,
-                            "?email=" + request.getEmailId(),
-                            UserProfileResponse.class, userProfUrl + "/v1/userprofile"
-                    );
-
-            caseWorkerIds.add(resource.getIdamId());
-
-        }
-
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                response.getBody().as(CaseWorkerProfileCreationResponse.class);
+        List<String> caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
         assertEquals(2, caseWorkerIds.size());
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .body(UserRequest.builder().userIds(caseWorkerIds).build())
@@ -150,8 +145,6 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(caseWorkerApiClient
                 .createCaseWorkerProfiles());
 
-        List<String> caseWorkerIds = new ArrayList<>();
-
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/")
@@ -160,16 +153,9 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 .assertThat()
                 .statusCode(201);
 
-        for (CaseWorkersProfileCreationRequest request : caseWorkersProfileCreationRequests) {
-            UserProfileResponse resource =
-                    testRequestHandler.sendGet(HttpStatus.OK,
-                            "?email=" + request.getEmailId(),
-                            UserProfileResponse.class, userProfUrl + "/v1/userprofile"
-                    );
-
-            caseWorkerIds.add(resource.getIdamId());
-
-        }
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                response.getBody().as(CaseWorkerProfileCreationResponse.class);
+        List<String> caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
         caseWorkerIds.add("randomId");
 
         assertEquals(2, caseWorkerIds.size());
