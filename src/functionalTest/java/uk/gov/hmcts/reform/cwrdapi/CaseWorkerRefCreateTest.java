@@ -44,6 +44,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefController.createCaseWorkerProfiles";
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefController.fetchCaseworkersById";
+    public static List<String> caseWorkerIds = new ArrayList<>();
 
     @Value("${userProfUrl}")
     protected String userProfUrl;
@@ -86,26 +87,28 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetCaseWorkerDetails() throws Exception {
-        //Create 2 Caseworker Users
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
+        if (caseWorkerIds.isEmpty()) {
+            //Create 2 Caseworker Users
+            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
-        caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
-        caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                    .createCaseWorkerProfiles());
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                    .createCaseWorkerProfiles());
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(caseWorkersProfileCreationRequests)
-                .post("/refdata/case-worker/users/")
-                .andReturn();
-        response.then()
-                .assertThat()
-                .statusCode(201);
+            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                    .body(caseWorkersProfileCreationRequests)
+                    .post("/refdata/case-worker/users/")
+                    .andReturn();
+            response.then()
+                    .assertThat()
+                    .statusCode(201);
 
-        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
-                response.getBody().as(CaseWorkerProfileCreationResponse.class);
-        List<String> caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
-        assertEquals(2, caseWorkerIds.size());
+            CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                    response.getBody().as(CaseWorkerProfileCreationResponse.class);
+            caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
+            assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
+        }
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .body(UserRequest.builder().userIds(caseWorkerIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
@@ -117,7 +120,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
                 Arrays.asList(fetchResponse.getBody().as(
                                 uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
-        assertEquals(2, fetchedList.size());
+        assertEquals(caseWorkerIds.size(), fetchedList.size());
         fetchedList.forEach(caseWorkerProfile ->
                 assertTrue(caseWorkerIds.contains(caseWorkerProfile.getId())));
     }
@@ -141,26 +144,26 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() throws Exception {
+        if (caseWorkerIds.isEmpty()) {
+            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
+                    new ArrayList<>(caseWorkerApiClient.createCaseWorkerProfiles());
 
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                    .body(caseWorkersProfileCreationRequests)
+                    .post("/refdata/case-worker/users/")
+                    .andReturn();
+            response.then()
+                    .assertThat()
+                    .statusCode(201);
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(caseWorkersProfileCreationRequests)
-                .post("/refdata/case-worker/users/")
-                .andReturn();
-        response.then()
-                .assertThat()
-                .statusCode(201);
-
-        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
-                response.getBody().as(CaseWorkerProfileCreationResponse.class);
-        List<String> caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
-        caseWorkerIds.add("randomId");
-
-        assertEquals(2, caseWorkerIds.size());
+            CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                    response.getBody().as(CaseWorkerProfileCreationResponse.class);
+            caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
+        }
+        List<String> tempCwIds = new ArrayList<>(caseWorkerIds);
+        tempCwIds.add("randomId");
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(UserRequest.builder().userIds(caseWorkerIds).build())
+                .body(UserRequest.builder().userIds(tempCwIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
         fetchResponse.then()
