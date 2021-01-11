@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 @EnableJpaAuditing
 @EnableJpaRepositories
 @SpringBootApplication
-@EnableCircuitBreaker
 @EnableCaching
 @EnableRetry
 @EnableFeignClients(basePackages = {
