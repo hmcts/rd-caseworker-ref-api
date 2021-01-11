@@ -41,7 +41,7 @@ spring:
   cache:
     cache-names: token
     caffeine:
-      spec: expireAfterWrite=1m
+      spec: maximumSize=50,expireAfterWrite=1m
 
   ### database configuration
   datasource:
