@@ -65,7 +65,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
-        List<String> caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
+        caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
 

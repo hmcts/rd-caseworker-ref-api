@@ -158,8 +158,8 @@ public class CaseWorkerRefController {
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
             caseWorkerProfileCreationResponse
-                            .caseWorkerRegistrationResponse("Case Worker Profiles Created")
-                            .caseWorkerIds(caseWorkerIds);
+                    .caseWorkerRegistrationResponse("Case Worker Profiles Created")
+                    .caseWorkerIds(caseWorkerIds);
         }
         return ResponseEntity
                 .status(201)
