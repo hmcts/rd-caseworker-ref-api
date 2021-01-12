@@ -15,9 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
-import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
@@ -44,13 +44,14 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefController.createCaseWorkerProfiles";
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefController.fetchCaseworkersById";
+    public static List<String> caseWorkerIds = new ArrayList<>();
 
     @Value("${userProfUrl}")
     protected String userProfUrl;
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
-    public void whenUserNotExistsInCwrAndSidamAndUp_Ac1() {
+    public void whenUserNotExistsInCrdAndSidamAndUp_Ac1() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
@@ -61,6 +62,11 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         response.then()
                 .assertThat()
                 .statusCode(201);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                response.getBody().as(CaseWorkerProfileCreationResponse.class);
+        caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+        assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
 
     @Test
@@ -81,36 +87,28 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetCaseWorkerDetails() throws Exception {
-        //Create 2 Caseworker Users
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
+        if (caseWorkerIds.isEmpty()) {
+            //Create 2 Caseworker Users
+            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
-        caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
-        caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                    .createCaseWorkerProfiles());
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                    .createCaseWorkerProfiles());
 
-        List<String> caseWorkerIds = new ArrayList<>();
+            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                    .body(caseWorkersProfileCreationRequests)
+                    .post("/refdata/case-worker/users/")
+                    .andReturn();
+            response.then()
+                    .assertThat()
+                    .statusCode(201);
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(caseWorkersProfileCreationRequests)
-                .post("/refdata/case-worker/users/")
-                .andReturn();
-        response.then()
-                .assertThat()
-                .statusCode(201);
-
-        for (CaseWorkersProfileCreationRequest request : caseWorkersProfileCreationRequests) {
-            UserProfileResponse resource =
-                    testRequestHandler.sendGet(HttpStatus.OK,
-                            "?email=" + request.getEmailId(),
-                            UserProfileResponse.class, userProfUrl + "/v1/userprofile"
-                    );
-
-            caseWorkerIds.add(resource.getIdamId());
-
+            CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                    response.getBody().as(CaseWorkerProfileCreationResponse.class);
+            caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+            assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
         }
-
-        assertEquals(2, caseWorkerIds.size());
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .body(UserRequest.builder().userIds(caseWorkerIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
@@ -122,7 +120,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
                 Arrays.asList(fetchResponse.getBody().as(
                                 uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
-        assertEquals(2, fetchedList.size());
+        assertEquals(caseWorkerIds.size(), fetchedList.size());
         fetchedList.forEach(caseWorkerProfile ->
                 assertTrue(caseWorkerIds.contains(caseWorkerProfile.getId())));
     }
@@ -146,35 +144,26 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() throws Exception {
+        if (caseWorkerIds.isEmpty()) {
+            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
+                    caseWorkerApiClient.createCaseWorkerProfiles();
 
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                    .body(caseWorkersProfileCreationRequests)
+                    .post("/refdata/case-worker/users/")
+                    .andReturn();
+            response.then()
+                    .assertThat()
+                    .statusCode(201);
 
-        List<String> caseWorkerIds = new ArrayList<>();
-
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(caseWorkersProfileCreationRequests)
-                .post("/refdata/case-worker/users/")
-                .andReturn();
-        response.then()
-                .assertThat()
-                .statusCode(201);
-
-        for (CaseWorkersProfileCreationRequest request : caseWorkersProfileCreationRequests) {
-            UserProfileResponse resource =
-                    testRequestHandler.sendGet(HttpStatus.OK,
-                            "?email=" + request.getEmailId(),
-                            UserProfileResponse.class, userProfUrl + "/v1/userprofile"
-                    );
-
-            caseWorkerIds.add(resource.getIdamId());
-
+            CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                    response.getBody().as(CaseWorkerProfileCreationResponse.class);
+            caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
         }
-        caseWorkerIds.add("randomId");
-
-        assertEquals(2, caseWorkerIds.size());
+        List<String> tempCwIds = new ArrayList<>(caseWorkerIds);
+        tempCwIds.add("randomId");
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .body(UserRequest.builder().userIds(caseWorkerIds).build())
+                .body(UserRequest.builder().userIds(tempCwIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
         fetchResponse.then()
