@@ -65,7 +65,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
-        caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
+        caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
 
@@ -106,7 +106,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
             CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                     response.getBody().as(CaseWorkerProfileCreationResponse.class);
-            caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
+            caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
             assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
         }
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
@@ -146,7 +146,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     public void shouldGetOnlyFewCaseWorkerDetails() throws Exception {
         if (caseWorkerIds.isEmpty()) {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                    new ArrayList<>(caseWorkerApiClient.createCaseWorkerProfiles());
+                    caseWorkerApiClient.createCaseWorkerProfiles();
 
             Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                     .body(caseWorkersProfileCreationRequests)
@@ -158,7 +158,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
             CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                     response.getBody().as(CaseWorkerProfileCreationResponse.class);
-            caseWorkerIds = new ArrayList<>(caseWorkerProfileCreationResponse.getCaseWorkerIds());
+            caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
         }
         List<String> tempCwIds = new ArrayList<>(caseWorkerIds);
         tempCwIds.add("randomId");
