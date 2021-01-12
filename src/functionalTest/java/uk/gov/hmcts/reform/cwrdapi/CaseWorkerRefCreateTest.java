@@ -51,7 +51,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
-    public void whenUserNotExistsInCwrAndSidamAndUp_Ac1() {
+    public void whenUserNotExistsInCrdAndSidamAndUp_Ac1() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
