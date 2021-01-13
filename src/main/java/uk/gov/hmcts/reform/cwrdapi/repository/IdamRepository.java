@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.Objects;
-
 import static java.util.Objects.requireNonNull;
 
 @Component
