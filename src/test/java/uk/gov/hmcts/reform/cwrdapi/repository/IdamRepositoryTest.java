@@ -49,7 +49,11 @@ public class IdamRepositoryTest {
         when(cache.estimatedSize()).thenReturn(anyLong());
 
         UserInfo returnedUserInfo = idamRepository.getUserInfo("Test");
+
         assertNotNull(returnedUserInfo);
-        verify(idamClient,times(1)).getUserInfo(any());
+        verify(idamClient, times(1)).getUserInfo(any());
+        verify(cacheManager, times(1)).getCache(any());
+        verify(caffeineCacheMock, times(1)).getNativeCache();
+        verify(cache, times(1)).estimatedSize();
     }
 }
