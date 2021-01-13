@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
@@ -145,15 +146,24 @@ public class CaseWorkerRefController {
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
 
+        CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
+                CaseWorkerProfileCreationResponse
+                        .builder();
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         if (!processedCwProfiles.isEmpty()) {
             caseWorkerService.publishCaseWorkerDataToTopic(processedCwProfiles);
+            List<String> caseWorkerIds = processedCwProfiles.stream()
+                    .map(CaseWorkerProfile::getCaseWorkerId)
+                    .collect(Collectors.toUnmodifiableList());
+            caseWorkerProfileCreationResponse
+                    .caseWorkerRegistrationResponse("Case Worker Profiles Created")
+                    .caseWorkerIds(caseWorkerIds);
         }
         return ResponseEntity
                 .status(201)
-                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
+                .body(caseWorkerProfileCreationResponse.build());
     }
 
     @ApiOperation(

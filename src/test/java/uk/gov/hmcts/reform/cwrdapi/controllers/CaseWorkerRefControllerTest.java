@@ -66,7 +66,11 @@ public class CaseWorkerRefControllerTest {
     @Before
     public void setUp() throws Exception {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
-        cwResponse = new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.");
+        cwResponse = CaseWorkerProfileCreationResponse
+                .builder()
+                .caseWorkerRegistrationResponse("Case Worker Profiles Created.")
+                .caseWorkerIds(Collections.emptyList())
+                .build();
         responseEntity = new ResponseEntity<>(
                 cwResponse,
                 null,
@@ -94,7 +98,11 @@ public class CaseWorkerRefControllerTest {
                 "lastName","test@gmail.com",1,"userType","region",
                 false,roles,caseWorkerRoleRequests,caseWorkeLocationRequests,caseWorkeAreaRequests);
         caseWorkersProfileCreationRequest.add(cwRequest);
-        cwProfileCreationResponse = new CaseWorkerProfileCreationResponse("");
+        cwProfileCreationResponse = CaseWorkerProfileCreationResponse
+                .builder()
+                .caseWorkerRegistrationResponse("")
+                .caseWorkerIds(Collections.emptyList())
+                .build();
         MockitoAnnotations.openMocks(this);
 
     }
