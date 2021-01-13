@@ -10,6 +10,7 @@ import org.apache.poi.util.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.UploadCaseWorkerFileResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
@@ -19,7 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.util.ResourceUtils.getFile;
 
 @RunWith(CustomSerenityRunner.class)
@@ -34,15 +36,17 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        UploadCaseWorkerFileResponse uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xlsx",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
+        assertFalse(uploadCaseWorkerFileResponse.getCaseWorkerIds().isEmpty());
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xls",
+        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xls",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
     }
@@ -61,7 +65,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xlsx",
                 403, null,
                 CaseWorkerConstants.TYPE_XLSX, "Invalid");
     }
@@ -73,30 +77,31 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xlsx",
                 403, exceptionMessage,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
 
-    private void uploadCaseWorkerFile(String filePath,
-                                      int statusCode,
-                                      String messageBody,
-                                      String header,
-                                      String role) throws IOException {
+    private UploadCaseWorkerFileResponse uploadCaseWorkerFile(String filePath,
+                                                              int statusCode,
+                                                              String messageBody,
+                                                              String header,
+                                                              String role) throws IOException {
         MultiPartSpecification multiPartSpec =  getMultipartFile(filePath, header);
 
         Response response = caseWorkerApiClient.getMultiPartWithAuthHeaders(role)
                 .multiPart(multiPartSpec)
                 .post("/refdata/case-worker/upload-file/")
                 .andReturn();
-        String responseBody = response.then()
+        UploadCaseWorkerFileResponse responseBody = response.then()
                 .assertThat()
                 .statusCode(statusCode)
                 .extract()
-                .asString();
+                .as(UploadCaseWorkerFileResponse.class);
         if (StringUtils.isNotBlank(messageBody)) {
-            assertTrue(responseBody.contains(messageBody));
+            assertEquals(responseBody.getMessage(), messageBody);
         }
+        return responseBody;
     }
 
 
