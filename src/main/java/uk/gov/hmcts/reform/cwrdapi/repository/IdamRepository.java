@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
+
 @Component
 @Slf4j
 public class IdamRepository {
@@ -32,7 +34,7 @@ public class IdamRepository {
     @Cacheable(value = "token")
     public UserInfo getUserInfo(String jwtToken) {
         CaffeineCache caffeineCache = (CaffeineCache) cacheManager.getCache("token");
-        Cache<Object, Object> nativeCache = Objects.requireNonNull(caffeineCache).getNativeCache();
+        Cache<Object, Object> nativeCache = requireNonNull(caffeineCache).getNativeCache();
 
         log.info("{}:: generating Bearer Token, current size of cache: "
                 + nativeCache.estimatedSize(), loggingComponentName);
