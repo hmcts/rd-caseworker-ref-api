@@ -1,22 +1,17 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.crypt.Decryptor;
 import org.apache.poi.poifs.filesystem.DirectoryNode;
-import org.apache.poi.poifs.filesystem.DocumentFactoryHelper;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.util.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.apache.poi.hssf.record.crypto.Biff8EncryptionKey.setCurrentUserPassword;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CLASS_HSSF_WORKBOOK_FACTORY;
@@ -45,6 +40,7 @@ public class WorkBookCustomFactory extends WorkbookFactory {
             case OLE2:
                 return createWorkBook(is);
             case OOXML:
+                System.out.println("Case: OOXML");
                 throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
             default:
                 throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
@@ -55,27 +51,18 @@ public class WorkBookCustomFactory extends WorkbookFactory {
         POIFSFileSystem fs = new POIFSFileSystem(is);
         DirectoryNode directoryNode = fs.getRoot();
         if (directoryNode.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
-            InputStream stream = null;
             try {
                 initXssf();
                 return createXssfByStream.apply(is);
             } finally {
-                IOUtils.closeQuietly(stream);
                 fs.getRoot().getFileSystem().close();
             }
         } else {
-            try {
-                new HSSFWorkbook(fs).isWriteProtected();
-            } catch (EncryptedDocumentException ede) {
-                try {
-                    initHssf();
-                    return createHssfByNode.apply(directoryNode);
-                } finally {
-                    setCurrentUserPassword(null);
-                }
-            }
-            throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
+            initHssf();
+            return createHssfByNode.apply(directoryNode);
+
         }
+        // throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
     }
 
 
