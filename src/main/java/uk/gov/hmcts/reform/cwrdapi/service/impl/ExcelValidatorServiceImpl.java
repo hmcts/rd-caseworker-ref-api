@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
@@ -21,14 +20,11 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PRES
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
-import static uk.gov.hmcts.reform.cwrdapi.util.WorkBookCustomFactory.validatePasswordAndGetWorkBook;
+import static uk.gov.hmcts.reform.cwrdapi.util.WorkBookCustomFactory.validateAndGetWorkBook;
 
 @Slf4j
 @Service
 public class ExcelValidatorServiceImpl implements ExcelValidatorService {
-
-    @Value("${excel.password}")
-    private String excelPassword;
 
     /**
      * Validates multipart excel file for extension and password first and then creates Workbook object for
@@ -39,7 +35,7 @@ public class ExcelValidatorServiceImpl implements ExcelValidatorService {
     public Workbook validateExcelFile(MultipartFile excelFile) {
         isTypeExcel(excelFile);
         try {
-            return validatePasswordAndGetWorkBook(excelFile, excelPassword);
+            return validateAndGetWorkBook(excelFile);
         } catch (IOException exception) {
             throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE);
         } catch (EncryptedDocumentException exception) {

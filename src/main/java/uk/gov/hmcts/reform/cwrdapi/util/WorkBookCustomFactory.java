@@ -35,16 +35,15 @@ public class WorkBookCustomFactory extends WorkbookFactory {
      * If xls file is not password protected then it doesn't throw EncryptedDocumentException.
      *
      * @param file for processing
-     * @param password for authenticate excel file
      * @return Workbook converted after file password authentication done
      * @throws IOException while file parsing failed
      */
-    public static Workbook validatePasswordAndGetWorkBook(MultipartFile file, String password) throws IOException {
+    public static Workbook validateAndGetWorkBook(MultipartFile file) throws IOException {
         InputStream is = FileMagic.prepareToCheckMagic(file.getInputStream());
         FileMagic fm = FileMagic.valueOf(is);
         switch (fm) {
             case OLE2:
-                return createWorkBook(password, is);
+                return createWorkBook(is);
             case OOXML:
                 throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
             default:
@@ -52,15 +51,14 @@ public class WorkBookCustomFactory extends WorkbookFactory {
         }
     }
 
-    private static Workbook createWorkBook(String password, InputStream is) throws IOException {
+    private static Workbook createWorkBook(InputStream is) throws IOException {
         POIFSFileSystem fs = new POIFSFileSystem(is);
         DirectoryNode directoryNode = fs.getRoot();
         if (directoryNode.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
             InputStream stream = null;
             try {
-                stream = DocumentFactoryHelper.getDecryptedStream(directoryNode, password);
                 initXssf();
-                return createXssfByStream.apply(stream);
+                return createXssfByStream.apply(is);
             } finally {
                 IOUtils.closeQuietly(stream);
                 fs.getRoot().getFileSystem().close();
@@ -69,7 +67,6 @@ public class WorkBookCustomFactory extends WorkbookFactory {
             try {
                 new HSSFWorkbook(fs).isWriteProtected();
             } catch (EncryptedDocumentException ede) {
-                setCurrentUserPassword(password);
                 try {
                     initHssf();
                     return createHssfByNode.apply(directoryNode);
