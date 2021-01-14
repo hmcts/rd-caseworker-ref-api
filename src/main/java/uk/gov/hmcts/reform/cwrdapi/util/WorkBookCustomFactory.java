@@ -38,10 +38,11 @@ public class WorkBookCustomFactory extends WorkbookFactory {
         FileMagic fm = FileMagic.valueOf(is);
         switch (fm) {
             case OLE2:
+                System.out.println("Case: OLE2");
                 return createWorkBook(is);
             case OOXML:
                 System.out.println("Case: OOXML");
-                throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                throw new ExcelValidationException(BAD_REQUEST, "Case: OOXML");
             default:
                 throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
         }
@@ -50,6 +51,8 @@ public class WorkBookCustomFactory extends WorkbookFactory {
     private static Workbook createWorkBook(InputStream is) throws IOException {
         POIFSFileSystem fs = new POIFSFileSystem(is);
         DirectoryNode directoryNode = fs.getRoot();
+/*        WorkbookFactory.create(fs);
+        return WorkbookFactory.create(fs);*/
         if (directoryNode.hasEntry(Decryptor.DEFAULT_POIFS_ENTRY)) {
             try {
                 initXssf();
@@ -63,6 +66,7 @@ public class WorkBookCustomFactory extends WorkbookFactory {
 
         }
         // throw new ExcelValidationException(BAD_REQUEST, FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
+        //return null;
     }
 
 
