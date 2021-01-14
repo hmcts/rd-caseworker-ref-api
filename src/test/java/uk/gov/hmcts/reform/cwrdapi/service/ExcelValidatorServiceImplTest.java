@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_EXCE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PRESENT_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExcelValidatorServiceImplTest {
@@ -36,7 +37,7 @@ public class ExcelValidatorServiceImplTest {
 
     @Before
     public void setUpField() {
-        ReflectionTestUtils.setField(excelValidatorServiceImpl, "excelPassword", "1234");
+        //ReflectionTestUtils.setField(excelValidatorServiceImpl, "excelPassword", "1234");
     }
 
     public MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
@@ -47,52 +48,35 @@ public class ExcelValidatorServiceImplTest {
     }
 
     @Test
-    public void sendXlsWithCorrectPasswordTest() throws IOException {
+    public void sendXlsTest() throws IOException {
         Workbook workbook = excelValidatorServiceImpl
                 .validateExcelFile(
-                        getMultipartFile("src/test/resources/WithCorrectPassword.xls", TYPE_XLS));
+                        getMultipartFile("src/test/resources/WithNoPasswordSet.xls", TYPE_XLS));
         assertThat(workbook).isNotNull();
     }
 
     @Test
-    public void sendXlsWithIncorrectPasswordSetTest() throws IOException {
+    public void sendXlsWithPasswordTest() throws IOException {
 
         MultipartFile file = getMultipartFile("src/test/resources/WithIncorrectPassword.xls", TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_PASSWORD_INCORRECT_ERROR_MESSAGE);
+                .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
-    public void sendXlsWithNoPasswordSetTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/integrationTest/resources/WithNoPasswordSet.xls", TYPE_XLS);
-        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl
-                .validateExcelFile(file))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
-    }
-
-    @Test
-    public void sendXlsxWithCorrectPasswordTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/test/resources/WithCorrectPassword.xlsx", TYPE_XLSX);
+    public void sendXlsxTest() throws IOException {
+        MultipartFile file = getMultipartFile("src/test/resources/WithNoPasswordSet.xlsx", TYPE_XLSX);
         Workbook workbook = excelValidatorServiceImpl.validateExcelFile(file);
         assertThat(workbook).isNotNull();
     }
 
     @Test
-    public void sendXlsxWithIncorrectPasswordSetTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/test/resources/WithIncorrectPassword.xlsx", TYPE_XLSX);
+    public void sendXlsxWithPasswordTest() throws IOException {
+        MultipartFile file = getMultipartFile("src/test/resources/WithCorrectPassword.xlsx", TYPE_XLSX);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_PASSWORD_INCORRECT_ERROR_MESSAGE);
-    }
-
-    @Test
-    public void sendXlsxWithNoPasswordSetTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/test/resources/WithNoPasswordSet.xlsx", TYPE_XLSX);
-        Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
