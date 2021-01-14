@@ -64,9 +64,6 @@ public class CaseWorkerProfile implements Serializable {
     @Column(name = "suspended")
     private Boolean suspended;
 
-    @Column(name = "delete_date")
-    private LocalDateTime deleteDate;
-
     @CreationTimestamp
     @Column(name = "created_date")
     private LocalDateTime createdDate;
