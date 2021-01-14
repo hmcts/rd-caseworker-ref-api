@@ -22,7 +22,6 @@ public class CaseWorkerProfileTest {
         caseWorkerProfile.setRegion("Region");
         caseWorkerProfile.setRegionId(12);
         caseWorkerProfile.setSuspended(true);
-        caseWorkerProfile.setDeleteDate(LocalDateTime.now());
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
@@ -42,7 +41,6 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getRegion(), is("Region"));
         assertThat(caseWorkerProfile.getRegionId(), is(12));
         assertThat(caseWorkerProfile.getSuspended(), is(true));
-        assertNotNull(caseWorkerProfile.getDeleteDate());
         assertNotNull(caseWorkerProfile.getCreatedDate());
         assertNotNull(caseWorkerProfile.getLastUpdate());
 
