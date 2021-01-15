@@ -21,9 +21,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EXCEL
 public class WorkBookCustomFactory extends WorkbookFactory {
 
     /**
-     * Authenticate password file and if successful the returns Workbook object.
-     * Authentication for xls and xlsx files happens differently.
-     * If both type of files are password protected then those are OLE2 type.
+     * Returns Workbook object.
+     * If xls file is not password protected then those are OLE2 type.
      * If xlsx file is not password protected then it is of type OOXML.
      * If xls file is not password protected then it doesn't throw EncryptedDocumentException.
      *
