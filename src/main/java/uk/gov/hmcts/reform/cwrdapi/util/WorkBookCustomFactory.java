@@ -24,7 +24,6 @@ public class WorkBookCustomFactory extends WorkbookFactory {
      * Returns Workbook object.
      * If xls file is not password protected then those are OLE2 type.
      * If xlsx file is not password protected then it is of type OOXML.
-     * If xls file is not password protected then it doesn't throw EncryptedDocumentException.
      *
      * @param file for processing
      * @return Workbook converted after file password authentication done
