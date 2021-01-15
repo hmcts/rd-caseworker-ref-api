@@ -7,7 +7,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
@@ -88,8 +87,12 @@ public class CaseWorkerApiClient {
                 .header("Accepts", APPLICATION_JSON_VALUE);
     }
 
+    public RequestSpecification getMultipleAuthHeadersInternal() {
+        return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken());
+    }
+
     public RequestSpecification getMultipleAuthHeadersInternal(String role) {
-        return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
+        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenByRole(role));
     }
 
 
@@ -138,13 +141,66 @@ public class CaseWorkerApiClient {
                         .workerWorkAreaRequests(areaRequests).build());
     }
 
+    public List<CaseWorkersProfileCreationRequest> updateCaseWorkerProfileRequest(String... email) {
+        List<CaseWorkerLocationRequest> locationRequestList = List.of(
+                CaseWorkerLocationRequest
+                        .caseWorkersLocationRequest()
+                        .location("updated location")
+                        .locationId(3)
+                        .isPrimaryFlag(true).build(),
+                CaseWorkerLocationRequest
+                        .caseWorkersLocationRequest()
+                        .location("updated added new location")
+                        .locationId(1).isPrimaryFlag(false).build());
+
+        List<CaseWorkerRoleRequest> roleRequests = List.of(
+                CaseWorkerRoleRequest
+                        .caseWorkerRoleRequest()
+                        .role("senior-tribunal-caseworker")
+                        .isPrimaryFlag(true).build(),
+                CaseWorkerRoleRequest
+                        .caseWorkerRoleRequest()
+                        .role("tribunal-caseworker")
+                        .isPrimaryFlag(false).build());
+
+
+        List<CaseWorkerWorkAreaRequest> areaRequests = List.of(
+                CaseWorkerWorkAreaRequest
+                        .caseWorkerWorkAreaRequest()
+                        .serviceCode("BAA1")
+                        .areaOfWork("Non-Money Claims").build(),
+                CaseWorkerWorkAreaRequest
+                        .caseWorkerWorkAreaRequest()
+                        .serviceCode("BAA9")
+                        .areaOfWork("Possession Claims").build());
+
+        Set<String> idamRoles = new HashSet<>();
+
+        String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
+        setEmailsTobeDeleted(emailToUsed);
+        return ImmutableList.of(
+                CaseWorkersProfileCreationRequest
+                        .caseWorkersProfileCreationRequest()
+                        .firstName("updatedFirstName")
+                        .lastName("updatedLastName")
+                        .emailId(emailToUsed)
+                        .regionId(2)
+                        .region("County")
+                        .userType("CTRT")
+                        .deleteFlag(false)
+                        .idamRoles(idamRoles)
+                        .baseLocations(locationRequestList)
+                        .roles(roleRequests)
+                        .workerWorkAreaRequests(areaRequests).build());
+    }
+
     @SuppressWarnings("unused")
     private JsonNode parseJson(String jsonString) throws IOException {
         return mapper.readTree(jsonString);
     }
 
     public void createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
-        Response response = getMultipleAuthHeadersInternal(StringUtils.EMPTY)
+        Response response = getMultipleAuthHeadersInternal()
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/")
                 .andReturn();

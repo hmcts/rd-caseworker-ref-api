@@ -34,7 +34,7 @@ public class IdamOpenIdClient {
 
     private Gson gson = new Gson();
 
-    private static String internalOpenIdTokenPrdAdmin;
+    public static String crdAdminToken;
 
     private static String sidamPassword;
 
@@ -86,12 +86,21 @@ public class IdamOpenIdClient {
         return userCreds;
     }
 
-    public String getInternalOpenIdToken(String role) {
-        if (internalOpenIdTokenPrdAdmin == null || StringUtils.isNotEmpty(role)) {
-            Map<String, String> userCreds = StringUtils.isNotEmpty(role) ? createUser(role) : createUser("cwd-admin");
-            internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
+    public String getcwdAdminOpenIdToken() {
+        if (crdAdminToken == null) {
+            Map<String, String> userCreds = createUser("cwd-admin");
+            crdAdminToken = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }
-        return internalOpenIdTokenPrdAdmin;
+        return crdAdminToken;
+    }
+
+    public String getOpenIdTokenByRole(String role) {
+        if (StringUtils.isNotEmpty(role) && "cwd-admin".equals(role)) {
+            return getcwdAdminOpenIdToken();
+        } else {
+            Map<String, String> userCreds = createUser(role);
+            return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
+        }
     }
 
     public String getOpenIdToken(String userEmail, String password) {

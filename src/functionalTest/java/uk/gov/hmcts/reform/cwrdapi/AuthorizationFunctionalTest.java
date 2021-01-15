@@ -65,8 +65,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static final String CASEWORKER_IAC = "caseworker-iac";
     public static final String USER_STATUS_SUSPENDED = "SUSPENDED";
 
-    public static String sidamToken;
-
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
 
@@ -90,11 +88,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
 
-
         //Single S2S & Sidam call
         s2sToken = isNull(s2sToken) ? new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S() : s2sToken;
-
-        sidamToken = isNull(sidamToken) ? idamOpenIdClient.getInternalOpenIdToken(null) : sidamToken;
 
         caseWorkerApiClient = new CaseWorkerApiClient(
                 caseWorkerApiUrl,
@@ -115,10 +110,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static String getS2sToken() {
         return s2sToken;
-    }
-
-    public static String getSidamToken() {
-        return sidamToken;
     }
 
     public static void setEmailsTobeDeleted(String emailTobeDeleted) {
