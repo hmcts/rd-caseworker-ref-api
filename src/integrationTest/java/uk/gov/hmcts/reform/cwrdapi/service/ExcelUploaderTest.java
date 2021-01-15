@@ -48,7 +48,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void sendXlsWithPasswordSetTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/integrationTest/resources/WithCorrectPassword.xls",
+        MultipartFile file = getMultipartFile("src/integrationTest/resources/WithPassword.xls",
                 TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorService.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
@@ -66,7 +66,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void sendXlsxWithPasswordSetTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/integrationTest/resources/WithCorrectPassword.xlsx",
+        MultipartFile file = getMultipartFile("src/integrationTest/resources/WithPassword.xlsx",
                 TYPE_XLSX);
         Assertions.assertThatThrownBy(() -> excelValidatorService.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)

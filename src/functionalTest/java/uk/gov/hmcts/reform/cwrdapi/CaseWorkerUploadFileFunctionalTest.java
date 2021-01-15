@@ -59,7 +59,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xls",
+        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xls",
                 400, CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE,
                 CaseWorkerConstants.TYPE_XLS, CWD_ADMIN);
     }
@@ -67,7 +67,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
                 400, CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
@@ -91,7 +91,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
                 400, CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE,
                 "application/octet-stream", CWD_ADMIN);
     }
@@ -110,7 +110,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
                 403, null,
                 CaseWorkerConstants.TYPE_XLSX, "Invalid");
     }

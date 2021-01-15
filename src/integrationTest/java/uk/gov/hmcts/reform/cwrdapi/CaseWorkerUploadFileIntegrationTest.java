@@ -41,13 +41,13 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     @Test
     public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithCorrectPassword.xls",
+        uploadCaseWorkerFile("WithPassword.xls",
                 CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("WithPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
@@ -76,7 +76,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
                 "test-flag-1");
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
-        uploadCaseWorkerFile("WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("WithPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
     }
 
