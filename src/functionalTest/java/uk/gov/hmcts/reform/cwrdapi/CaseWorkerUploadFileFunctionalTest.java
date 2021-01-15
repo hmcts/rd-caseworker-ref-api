@@ -34,7 +34,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
@@ -42,7 +42,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xls",
+        uploadCaseWorkerFile("src/functionalTest/resources/xlsWithNoPassword.xls",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
     }
@@ -55,42 +55,27 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
                 CWD_ADMIN);
     }
 
-    @Test
-    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenXlsFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithInCorrectPasswordSet.xls",
-                400, CaseWorkerConstants.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLS,
-                CWD_ADMIN);
-    }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenXlsxFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithInCorrectPasswordSet.xlsx",
-                400, CaseWorkerConstants.FILE_PASSWORD_INCORRECT_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
-                CWD_ADMIN);
-    }
-
-    @Test
-    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenXlsFileIsNotPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithNoPasswordSet.xls",
-                400, CaseWorkerConstants.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE,
+    public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
+        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xls",
+                400, CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE,
                 CaseWorkerConstants.TYPE_XLS, CWD_ADMIN);
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenXlsxFileIsNotPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithNoPasswordSet.xlsx",
-                400, CaseWorkerConstants.FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE,
+    public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
+        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+                400, CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithXlsxOnlyHeader.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithOnlyHeader.xlsx",
                 400, CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
                 CWD_ADMIN);
     }
@@ -98,7 +83,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn400WhenFileHasNoValidSheetName() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithInvalidSheetName.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithInvalidSheetName.xlsx",
                 400, CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
                 CWD_ADMIN);
     }
@@ -137,7 +122,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
-        uploadCaseWorkerFile("src/functionalTest/resources/WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
                 403, exceptionMessage,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
