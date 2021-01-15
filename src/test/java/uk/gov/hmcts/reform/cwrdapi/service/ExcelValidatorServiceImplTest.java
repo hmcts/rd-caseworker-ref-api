@@ -54,8 +54,7 @@ public class ExcelValidatorServiceImplTest {
 
     @Test
     public void sendXlsWithPasswordTest() throws IOException {
-
-        MultipartFile file = getMultipartFile("src/test/resources/WithIncorrectPassword.xls", TYPE_XLS);
+        MultipartFile file = getMultipartFile("src/test/resources/WithCorrectPassword.xlsx", TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
