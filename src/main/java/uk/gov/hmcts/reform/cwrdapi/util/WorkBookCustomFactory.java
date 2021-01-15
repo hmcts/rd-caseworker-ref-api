@@ -36,10 +36,8 @@ public class WorkBookCustomFactory extends WorkbookFactory {
         FileMagic fm = FileMagic.valueOf(is);
         switch (fm) {
             case OLE2:
-                System.out.println("Case: OLE2");
                 return createWorkBookForOldXls(is);
             case OOXML:
-                System.out.println("Case: OOXML");
                 return createWorkBookForNewXlsx(is);
             default:
                 throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);

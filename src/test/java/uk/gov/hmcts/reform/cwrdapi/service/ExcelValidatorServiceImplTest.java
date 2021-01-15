@@ -34,7 +34,6 @@ public class ExcelValidatorServiceImplTest {
 
     @Before
     public void setUpField() {
-        //ReflectionTestUtils.setField(excelValidatorServiceImpl, "excelPassword", "1234");
     }
 
     public MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
