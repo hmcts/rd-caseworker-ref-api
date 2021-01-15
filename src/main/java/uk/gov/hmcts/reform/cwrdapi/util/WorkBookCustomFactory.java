@@ -47,6 +47,9 @@ public class WorkBookCustomFactory extends WorkbookFactory {
     }
 
     private static Workbook createWorkBookForOldXls(InputStream is) throws IOException {
+        //Let's use the streams to return the workbook.
+        //Converting the Multipart file to normal file will require additional permissions on server
+        //Therefore 2 different methods are required to handle the file based on type.
         POIFSFileSystem fs = new POIFSFileSystem(is);
         DirectoryNode directoryNode = fs.getRoot();
         initHssf();

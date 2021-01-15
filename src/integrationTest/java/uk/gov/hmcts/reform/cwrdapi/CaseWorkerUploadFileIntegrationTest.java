@@ -26,9 +26,10 @@ import static org.springframework.util.ResourceUtils.getFile;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
+
     @Test
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("xlsxWithNoPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
     }
 
@@ -39,44 +40,32 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     }
 
     @Test
-    public void shouldReturn400WhenXlsFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("WithIncorrectPassword.xls",
+    public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
+        uploadCaseWorkerFile("WithCorrectPassword.xls",
                 CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
-    public void shouldReturn400WhenXlsxFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("WithIncorrectPassword.xlsx",
-                CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
-    }
-
-    @Test
-    public void shouldReturn400WhenXlsFileIsNotPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithNoPasswordSet.xls",
-                CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
-    }
-
-    @Test
-    public void shouldReturn400WhenXlsxFileIsNotPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithNoPasswordSet.xlsx",
+    public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
+        uploadCaseWorkerFile("WithCorrectPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("WithXlsxOnlyHeader.xlsx",
+        uploadCaseWorkerFile("xlsxWithOnlyHeader.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("WithXlsxOnlyHeader.xlsx",
+        uploadCaseWorkerFile("xlsxWithOnlyHeader.xlsx",
                 "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("WithXlsxOnlyHeader.xlsx",
+        uploadCaseWorkerFile("xlsxWithOnlyHeader.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
