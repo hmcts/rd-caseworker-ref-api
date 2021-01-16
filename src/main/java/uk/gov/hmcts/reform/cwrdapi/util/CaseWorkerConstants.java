@@ -52,4 +52,8 @@ public final class CaseWorkerConstants {
 
     public static final String REQUIRED_SHEET_NAME = "Case Worker Data";
 
+    public static final String CASE_WORKER_FILE_NAME = "CaseWorker";
+    public static final String SERVICE_ROLE_MAPPING_FILE_NAME = "ServiceRoleMapping";
+
+
 }
