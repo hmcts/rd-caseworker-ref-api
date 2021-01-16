@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,8 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceFacadeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,13 +47,9 @@ public class CaseWorkerRefControllerTest {
 
     CaseWorkerService caseWorkerServiceMock;
     @Mock
-    ExcelAdaptorService excelAdaptorService;
-    @Mock
-    ExcelValidatorService excelValidatorService;
-    @Mock
     MultipartFile multipartFile;
     @Mock
-    Workbook workbook;
+    CaseWorkerServiceFacadeImpl caseWorkerServiceFacade;
 
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequest = new ArrayList<>();
     CaseWorkersProfileCreationRequest cwRequest;
@@ -208,11 +202,8 @@ public class CaseWorkerRefControllerTest {
 
     @Test
     public void test_upload_caseworker_file_success() {
-        when(excelValidatorService.validateExcelFile(multipartFile))
-                .thenReturn(workbook);
-        when(excelAdaptorService
-                .parseExcel(workbook, uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class))
-                .thenReturn(any());
+        when(caseWorkerServiceFacade.processFile(multipartFile))
+                .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
         ResponseEntity<Object> actual = caseWorkerRefController
                 .caseWorkerFileUpload(multipartFile);
