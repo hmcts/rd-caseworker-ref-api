@@ -1,16 +1,17 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.builder.MultiPartSpecBuilder;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.MultiPartSpecification;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.UploadCaseWorkerFileResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
@@ -22,6 +23,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.util.ResourceUtils.getFile;
 
 @RunWith(CustomSerenityRunner.class)
@@ -36,19 +38,58 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
-        UploadCaseWorkerFileResponse uploadCaseWorkerFileResponse =
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xlsx",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
-        assertFalse(uploadCaseWorkerFileResponse.getCaseWorkerIds().isEmpty());
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerProfileCreationResponse.class);
+        assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
+        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xls",
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xls",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerProfileCreationResponse.class);
+        assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
+        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    public void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
+                201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
+                CWD_ADMIN);
+
+        IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(IdamRolesMappingResponse.class);
+        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+                .contains(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    public void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
+                201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
+                CWD_ADMIN);
+
+        IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(IdamRolesMappingResponse.class);
+        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+                .contains(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS));
     }
 
     @Test
@@ -82,26 +123,23 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
 
-    private UploadCaseWorkerFileResponse uploadCaseWorkerFile(String filePath,
-                                                              int statusCode,
-                                                              String messageBody,
-                                                              String header,
-                                                              String role) throws IOException {
+    private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
+                                                               int statusCode,
+                                                               String messageBody,
+                                                               String header,
+                                                               String role) throws IOException {
         MultiPartSpecification multiPartSpec =  getMultipartFile(filePath, header);
 
         Response response = caseWorkerApiClient.getMultiPartWithAuthHeaders(role)
                 .multiPart(multiPartSpec)
-                .post("/refdata/case-worker/upload-file/")
+                .post("/refdata/case-worker/upload-file")
                 .andReturn();
-        UploadCaseWorkerFileResponse responseBody = response.then()
+        response.then()
                 .assertThat()
-                .statusCode(statusCode)
-                .extract()
-                .as(UploadCaseWorkerFileResponse.class);
-        if (StringUtils.isNotBlank(messageBody)) {
-            assertEquals(responseBody.getMessage(), messageBody);
-        }
-        return responseBody;
+                .statusCode(statusCode);
+
+        return response.then()
+                .extract();
     }
 
 
