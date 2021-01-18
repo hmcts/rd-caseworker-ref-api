@@ -120,7 +120,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Before
     public void userProfileGetUserWireMock() {
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(200)

@@ -4,12 +4,13 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.cwrdapi.TestSupport;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
 
 public class CaseWorkerProfileConverterTest {
 

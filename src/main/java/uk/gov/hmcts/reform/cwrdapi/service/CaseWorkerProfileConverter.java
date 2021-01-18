@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
@@ -11,18 +12,16 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-
 @Component
 public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDomain>,
         List<CaseWorkersProfileCreationRequest>> {
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@cwrfunctestuser.com";
     public static final String COMMA = ",";
 
     /**
@@ -51,7 +50,8 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
                             .regionId(obj.getRegionId())
                             .suspended(Boolean.parseBoolean(obj.getSuspended()))
                             .userType(obj.getUserType())
-                            .idamRoles(generateIdamRoles(obj.getIdamRoles()))
+                            .idamRoles(null == obj.getIdamRoles() ? null :
+                                    generateIdamRoles(obj.getIdamRoles()))
                             .baseLocations(generateCaseWorkerLocations(obj.getLocations()))
                             .roles(generateCaseWorkerRoles(obj.getRoles()))
                             .workerWorkAreaRequests(generateCaseWorkerWorkAreaRequests(obj.getWorkAreas()))
@@ -76,14 +76,17 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
 
     private List<CaseWorkerRoleRequest> generateCaseWorkerRoles(List<Role> roles) {
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = new ArrayList<>();
-        roles.forEach( (r -> {
-            CaseWorkerRoleRequest caseWorkerRoleRequest = CaseWorkerRoleRequest
-                    .caseWorkerRoleRequest()
-                    .role(r.getRoleName())
-                    .isPrimaryFlag(r.isPrimary())
-                    .build();
-            caseWorkerRoleRequests.add(caseWorkerRoleRequest);
-        }));
+        roles
+            .stream()
+            .filter(r -> StringUtils.isNotBlank(r.getRoleName()))
+            .forEach((r -> {
+                CaseWorkerRoleRequest caseWorkerRoleRequest = CaseWorkerRoleRequest
+                        .caseWorkerRoleRequest()
+                        .role(r.getRoleName())
+                        .isPrimaryFlag(r.isPrimary())
+                        .build();
+                caseWorkerRoleRequests.add(caseWorkerRoleRequest);
+            }));
         return caseWorkerRoleRequests;
     }
 
@@ -102,13 +105,9 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
     }
 
     private Set<String> generateIdamRoles(String idamRoles) {
-        return idamRoles.contains(COMMA) ?
-                Stream.of(idamRoles.split(COMMA))
-                        .collect(Collectors.toUnmodifiableSet()) :
-                Set.of(idamRoles);
-    }
-
-    public static String generateRandomEmail() {
-        return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
+        return idamRoles.contains(COMMA)
+                ? Stream.of(idamRoles.split(COMMA))
+                        .collect(Collectors.toUnmodifiableSet())
+                : Set.of(idamRoles);
     }
 }

@@ -22,7 +22,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.util.ResourceUtils.getFile;
 
@@ -46,7 +45,6 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
                 .as(CaseWorkerProfileCreationResponse.class);
         assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
-        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
     }
 
     @Test
@@ -61,7 +59,6 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
                 .as(CaseWorkerProfileCreationResponse.class);
         assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
-        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
     }
 
     @Test

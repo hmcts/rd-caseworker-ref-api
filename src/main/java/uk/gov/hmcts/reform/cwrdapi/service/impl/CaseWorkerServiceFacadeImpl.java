@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileConverter;
-import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
@@ -19,12 +18,8 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.util.List;
 
-import static java.util.Objects.nonNull;
-
 @Service
 public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
-    @Autowired
-    CaseWorkerService caseWorkerService;
 
     @Autowired
     ExcelValidatorService excelValidatorService;
@@ -48,7 +43,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     public ResponseEntity<Object> processFile(MultipartFile file) {
         Workbook workbook = excelValidatorService.validateExcelFile(file);
 
-        Class<? extends CaseWorkerDomain> ob = nonNull(file.getOriginalFilename())
+        Class<? extends CaseWorkerDomain> ob = file.getOriginalFilename() != null
                         && file.getOriginalFilename().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
                         ? CaseWorkerProfile.class : ServiceRoleMapping.class;
 

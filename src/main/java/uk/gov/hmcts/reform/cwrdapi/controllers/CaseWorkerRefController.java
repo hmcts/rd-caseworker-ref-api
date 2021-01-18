@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.UploadCaseWorkerFileResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
@@ -74,8 +73,7 @@ public class CaseWorkerRefController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = REQUEST_COMPLETED_SUCCESSFULLY,
-                    response = UploadCaseWorkerFileResponse.class
+                    message = REQUEST_COMPLETED_SUCCESSFULLY
             ),
             @ApiResponse(
                     code = 400,
@@ -147,7 +145,8 @@ public class CaseWorkerRefController {
 
         CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
                 CaseWorkerProfileCreationResponse
-                        .builder();
+                        .builder()
+                        .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY);
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
@@ -157,7 +156,6 @@ public class CaseWorkerRefController {
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
             caseWorkerProfileCreationResponse
-                    .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY)
                     .caseWorkerIds(caseWorkerIds);
         }
         return ResponseEntity
