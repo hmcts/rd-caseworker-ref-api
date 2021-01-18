@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.RestAssured;
 import io.restassured.parsing.Parser;
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.AfterClass;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +17,20 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import uk.gov.hmcts.reform.cwrdapi.client.CaseWorkerApiClient;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
 import uk.gov.hmcts.reform.cwrdapi.client.S2sClient;
+import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.Oauth2;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.springframework.http.HttpStatus.OK;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class})
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -114,6 +120,42 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static void setEmailsTobeDeleted(String emailTobeDeleted) {
         emailsTobeDeleted.add(emailTobeDeleted);
+    }
+
+    public List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
+        Map<String, String> userDetail = idamOpenIdClient.createUser(CASEWORKER_IAC_BULKSCAN);
+        String userEmail = userDetail.get(EMAIL);
+
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
+                .createCaseWorkerProfiles(userEmail);
+
+        caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+
+        return caseWorkersProfileCreationRequests;
+    }
+
+    public List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> getUserProfilesFromCw(
+            List<String> caseWorkerIds, int expectedResponse) {
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal()
+                .body(caseWorkerIds).log().body(true)
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .then()
+                .log().body(true)
+                .and()
+                .extract().response();
+
+        log.info("CW get user response: ", fetchResponse.getStatusCode());
+
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(expectedResponse);
+        return asList(fetchResponse.getBody().as(
+                uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+    }
+
+    public UserProfileResponse getUserProfileFromUp(String email) {
+        return funcTestRequestHandler.sendGet(OK,
+                "/v1/userprofile/roles?email=" + email, UserProfileResponse.class, baseUrlUserProfile);
     }
 
 }

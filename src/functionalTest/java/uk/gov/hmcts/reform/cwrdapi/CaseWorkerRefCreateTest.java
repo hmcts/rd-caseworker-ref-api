@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.OK;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -148,39 +146,6 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
         UserProfileResponse upResponseForExistingUser = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         assertEquals(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN), upResponseForExistingUser.getRoles());
-    }
-
-    public List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
-        Map<String, String> userDetail = idamOpenIdClient.createUser(CASEWORKER_IAC_BULKSCAN);
-        String userEmail = userDetail.get(EMAIL);
-
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-                .createCaseWorkerProfiles(userEmail);
-
-        caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
-
-        return caseWorkersProfileCreationRequests;
-    }
-
-    public List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> getUserProfilesFromCw(
-            List<String> caseWorkerIds, int expectedResponse) {
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal()
-                .body(caseWorkerIds).log().body(true)
-                .post("/refdata/case-worker/users/fetchUsersById/")
-                .then()
-                .log().body(true)
-                .and()
-                .extract().response();
-        fetchResponse.then()
-                .assertThat()
-                .statusCode(expectedResponse);
-        return asList(fetchResponse.getBody().as(
-                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
-    }
-
-    public UserProfileResponse getUserProfileFromUp(String email) {
-        return funcTestRequestHandler.sendGet(OK,
-                "/v1/userprofile/roles?email=" + email, UserProfileResponse.class, baseUrlUserProfile);
     }
 
     @Test

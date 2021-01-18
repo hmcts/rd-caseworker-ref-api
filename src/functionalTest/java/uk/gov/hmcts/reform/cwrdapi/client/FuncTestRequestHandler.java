@@ -36,15 +36,16 @@ public class FuncTestRequestHandler {
 
     public Response sendGet(HttpStatus httpStatus, String urlPath, String baseUrl) {
 
-        return SerenityRest
+        Response response =  SerenityRest
                 .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .baseUri(baseUrl)
                 .header("ServiceAuthorization", getS2sToken())
                 .header("Authorization", BEARER + crdAdminToken)
                 .when()
-                .get(urlPath)
-                .then()
+                .get(urlPath);
+        log.info("UP get user response status code: {}", response.getStatusCode());
+        return response.then()
                 .log().all(true)
                 .statusCode(httpStatus.value()).extract().response();
     }
