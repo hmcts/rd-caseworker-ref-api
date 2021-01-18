@@ -70,18 +70,18 @@ public class FetchCaseworkersByIdProviderTest {
                 new CaseWorkerRefController(caseWorkerServiceImpl, excelValidatorService, excelAdaptorService));
         context.setTarget(testTarget);
         MockitoAnnotations.openMocks(this);
-        setInitiMock();
     }
 
     @State({"A list of users for CRD request"})
     public void fetchListOfUsersById() {
         //state
+        setInitiMock();
     }
 
-    @State({"A list of multiple users for CRD request"})
-    public void fetchListOfMultipleUsersById() {
-        //state
-    }
+//    @State({"A list of multiple users for CRD request"})
+//    public void fetchListOfMultipleUsersById() {
+//        //state
+//    }
 
     private void setInitiMock() {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
