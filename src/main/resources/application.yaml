@@ -117,9 +117,6 @@ crd:
           trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
     caseWorkerDataPerMessage: ${CWRD_DATA_PER_MESSAGE:50}
 
-excel:
-  password: ${EXCEL_PASSWORD:1234}
-
 launchdarkly:
   sdk:
     key: ${RD_LD_SDK_KEY:}
