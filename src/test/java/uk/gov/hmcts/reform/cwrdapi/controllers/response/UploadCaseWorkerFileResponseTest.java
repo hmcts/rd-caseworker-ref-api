@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.controllers.response;
 
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UploadCaseWorkerFileResponseTest {
@@ -20,7 +22,8 @@ public class UploadCaseWorkerFileResponseTest {
     @Test
     public void test_all_args_constructor() {
         UploadCaseWorkerFileResponse uploadCaseWorkerFileResponse =
-                new UploadCaseWorkerFileResponse("testMessage", "testMessageDetails");
+                new UploadCaseWorkerFileResponse("testMessage", "testMessageDetails",
+                        Collections.emptyList());
 
         assertThat(uploadCaseWorkerFileResponse.getMessage()).isEqualTo("testMessage");
         assertThat(uploadCaseWorkerFileResponse.getMessageDetails()).isEqualTo("testMessageDetails");

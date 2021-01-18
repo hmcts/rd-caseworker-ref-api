@@ -26,11 +26,17 @@ import static org.springframework.util.ResourceUtils.getFile;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
-    @Test
-    public void shouldUploadXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("WithCorrectPassword.xlsx",
-                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
-    }
+//    @Test
+//    public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
+//        uploadCaseWorkerFile("CaseWorkerUsers_WithCorrectPassword.xlsx",
+//                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
+//    }
+//
+//    @Test
+//    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
+//        uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
+//                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
+//    }
 
     @Test
     public void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
@@ -40,43 +46,43 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     @Test
     public void shouldReturn400WhenXlsFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("WithIncorrectPassword.xls",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithIncorrectPassword.xls",
                 CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileHasIncorrectPasswordSet() throws IOException {
-        uploadCaseWorkerFile("WithIncorrectPassword.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithIncorrectPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsFileIsNotPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithNoPasswordSet.xls",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithNoPasswordSet.xls",
                 CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileIsNotPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithNoPasswordSet.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithNoPasswordSet.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("WithXlsxOnlyHeader.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithXlsxOnlyHeader.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("WithXlsxOnlyHeader.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithXlsxOnlyHeader.xlsx",
                 "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("WithXlsxOnlyHeader.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithXlsxOnlyHeader.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
@@ -87,7 +93,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
                 "test-flag-1");
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
-        uploadCaseWorkerFile("WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithCorrectPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
     }
 

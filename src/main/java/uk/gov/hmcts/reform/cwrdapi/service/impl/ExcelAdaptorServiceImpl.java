@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
@@ -41,7 +42,12 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
-        Sheet sheet = workbook.getSheet(CaseWorkerConstants.REQUIRED_SHEET_NAME);
+        Sheet sheet;
+        if (classType.isAssignableFrom(CaseWorkerProfile.class)) {
+            sheet = workbook.getSheet(CaseWorkerConstants.REQUIRED_SHEET_NAME);
+        } else {
+            sheet = workbook.getSheetAt(0);
+        }
         if (null == sheet) {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_VALID_SHEET_ERROR_MESSAGE);
         } else if (sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row

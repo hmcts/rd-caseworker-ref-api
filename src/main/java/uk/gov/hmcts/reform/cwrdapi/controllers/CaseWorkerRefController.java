@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
@@ -25,9 +25,9 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UploadCaseWorkerFileResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
-import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 
 @RequestMapping(
@@ -55,6 +56,13 @@ public class CaseWorkerRefController {
     @Autowired
     ExcelAdaptorService excelAdaptorService;
 
+    @Autowired
+    CaseWorkerInternalApiClientImpl caseWorkerInternalClient;
+
+    @Autowired
+    CaseWorkerServiceFacade caseWorkerServiceFacade;
+
+
     @ApiOperation(
             value = "This API uploads an excel file which contains case worker user information and "
                     + "will be saved in the case worker reference database.",
@@ -66,7 +74,7 @@ public class CaseWorkerRefController {
     @ApiResponses({
             @ApiResponse(
                     code = 201,
-                    message = CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                    message = REQUEST_COMPLETED_SUCCESSFULLY,
                     response = UploadCaseWorkerFileResponse.class
             ),
             @ApiResponse(
@@ -90,16 +98,7 @@ public class CaseWorkerRefController {
             consumes = "multipart/form-data")
     @Secured("cwd-admin")
     public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam("file")  MultipartFile file) {
-        Workbook workbook = excelValidatorService.validateExcelFile(file);
-        excelAdaptorService.parseExcel(workbook, uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class);
-
-        UploadCaseWorkerFileResponse uploadCaseWorkerFileResponse = UploadCaseWorkerFileResponse.builder()
-                .message(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY)
-                .build();
-
-        return ResponseEntity
-                .status(201)
-                .body(uploadCaseWorkerFileResponse);
+        return caseWorkerServiceFacade.processFile(file);
     }
 
     @ApiOperation(
@@ -134,7 +133,7 @@ public class CaseWorkerRefController {
             )
     })
     @PostMapping(
-            path = "/users/",
+            path = "/users",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
@@ -158,7 +157,7 @@ public class CaseWorkerRefController {
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
             caseWorkerProfileCreationResponse
-                    .caseWorkerRegistrationResponse("Case Worker Profiles Created")
+                    .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY)
                     .caseWorkerIds(caseWorkerIds);
         }
         return ResponseEntity
@@ -197,7 +196,7 @@ public class CaseWorkerRefController {
             )
     })
     @PostMapping(
-            path = "/idam-roles-mapping/",
+            path = "/idam-roles-mapping",
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
