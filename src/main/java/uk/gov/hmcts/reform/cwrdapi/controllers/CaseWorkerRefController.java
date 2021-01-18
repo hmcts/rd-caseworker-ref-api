@@ -145,7 +145,8 @@ public class CaseWorkerRefController {
 
         CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
                 CaseWorkerProfileCreationResponse
-                        .builder();
+                        .builder()
+                        .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY);
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
@@ -155,7 +156,6 @@ public class CaseWorkerRefController {
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
             caseWorkerProfileCreationResponse
-                    .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY)
                     .caseWorkerIds(caseWorkerIds);
         }
         return ResponseEntity

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
