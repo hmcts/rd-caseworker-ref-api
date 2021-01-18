@@ -5,5 +5,5 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface CaseWorkerInternalApiClient {
-    <T> ResponseEntity<Object> postRequest(List<T> caseWorkersProfile, String path);
+    <T> ResponseEntity<Object> postRequest(List<T> requestBody, String path);
 }

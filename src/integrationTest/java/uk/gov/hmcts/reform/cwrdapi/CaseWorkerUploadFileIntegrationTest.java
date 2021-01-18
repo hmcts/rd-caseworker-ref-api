@@ -26,17 +26,17 @@ import static org.springframework.util.ResourceUtils.getFile;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
-//    @Test
-//    public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
-//        uploadCaseWorkerFile("CaseWorkerUsers_WithCorrectPassword.xlsx",
-//                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
-//    }
-//
-//    @Test
-//    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
-//        uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
-//                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
-//    }
+    @Test
+    public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
+        uploadCaseWorkerFile("CaseWorkerUsers_WithCorrectPassword.xlsx",
+                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
+    }
+
+    @Test
+    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
+        uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
+                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
+    }
 
     @Test
     public void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
