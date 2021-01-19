@@ -41,7 +41,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xlsx",
+                uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
@@ -56,7 +56,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xls",
+                uploadCaseWorkerFile("src/functionalTest/resources/xlsWithNoPassword.xls",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
 
@@ -109,7 +109,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
                 403, null,
                 CaseWorkerConstants.TYPE_XLSX, "Invalid");
     }
@@ -121,7 +121,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
-        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUsers_WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
                 403, exceptionMessage,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
