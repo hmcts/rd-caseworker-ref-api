@@ -1,21 +1,29 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,12 +41,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CaseWorkerRefControllerTest {
 
     @InjectMocks
     private CaseWorkerRefController caseWorkerRefController;
 
     CaseWorkerService caseWorkerServiceMock;
+    @Mock
+    ExcelAdaptorService excelAdaptorService;
+    @Mock
+    ExcelValidatorService excelValidatorService;
+    @Mock
+    MultipartFile multipartFile;
+    @Mock
+    Workbook workbook;
 
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequest = new ArrayList<>();
     CaseWorkersProfileCreationRequest cwRequest;
@@ -49,7 +66,11 @@ public class CaseWorkerRefControllerTest {
     @Before
     public void setUp() throws Exception {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
-        cwResponse = new CaseWorkerProfileCreationResponse("Case Worker Profiles Created.");
+        cwResponse = CaseWorkerProfileCreationResponse
+                .builder()
+                .caseWorkerRegistrationResponse("Case Worker Profiles Created.")
+                .caseWorkerIds(Collections.emptyList())
+                .build();
         responseEntity = new ResponseEntity<>(
                 cwResponse,
                 null,
@@ -77,7 +98,11 @@ public class CaseWorkerRefControllerTest {
                 "lastName","test@gmail.com",1,"userType","region",
                 false,roles,caseWorkerRoleRequests,caseWorkeLocationRequests,caseWorkeAreaRequests);
         caseWorkersProfileCreationRequest.add(cwRequest);
-        cwProfileCreationResponse = new CaseWorkerProfileCreationResponse("");
+        cwProfileCreationResponse = CaseWorkerProfileCreationResponse
+                .builder()
+                .caseWorkerRegistrationResponse("")
+                .caseWorkerIds(Collections.emptyList())
+                .build();
         MockitoAnnotations.openMocks(this);
 
     }
@@ -161,7 +186,7 @@ public class CaseWorkerRefControllerTest {
 
     @Test(expected = InvalidRequestException.class)
     public void fetchCaseworkersByIdShouldThrow400() {
-        caseWorkerRefController.fetchCaseworkersById(Collections.emptyList());
+        caseWorkerRefController.fetchCaseworkersById(UserRequest.builder().userIds(Collections.emptyList()).build());
     }
 
     @Test
@@ -169,14 +194,29 @@ public class CaseWorkerRefControllerTest {
         responseEntity = ResponseEntity.ok().body(null);
         when(caseWorkerServiceMock.fetchCaseworkersById(any()))
                 .thenReturn(responseEntity);
-
-        List<String> caseWorkerIds = new ArrayList<>(Arrays.asList(
-                "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
-        ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(caseWorkerIds);
+        UserRequest userRequest =  UserRequest.builder().userIds(Arrays.asList(
+                "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"))
+                .build();
+        ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(userRequest);
 
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
-                .fetchCaseworkersById(caseWorkerIds);
+                .fetchCaseworkersById(Arrays.asList(
+                        "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
+    }
+
+    @Test
+    public void test_upload_caseworker_file_success() {
+        when(excelValidatorService.validateExcelFile(multipartFile))
+                .thenReturn(workbook);
+        when(excelAdaptorService
+                .parseExcel(workbook, uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class))
+                .thenReturn(any());
+
+        ResponseEntity<Object> actual = caseWorkerRefController
+                .caseWorkerFileUpload(multipartFile);
+        assertThat(actual.getStatusCodeValue()).isEqualTo(201);
+
     }
 
 }

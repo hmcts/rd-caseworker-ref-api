@@ -67,6 +67,8 @@ import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 
 @Service
@@ -130,17 +132,17 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     //when profile is new then create new user profile
                     caseWorkerProfile = createCaseWorkerProfile(cwrRequest);
                     newCaseWorkerProfiles.add(caseWorkerProfile);
-                } else if (caseWorkerProfile.getDeleteFlag()) {
+                } else if (caseWorkerProfile.getSuspended()) {
                     //when existing profile with delete flag is true then log exception
                     // add entry in exception table
-                } else if (cwrRequest.isDeleteFlag()) {
+                } else if (cwrRequest.isSuspended()) {
                     //when existing profile with delete flag is true in request then suspend user
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-                            .idamStatus("SUSPENDED").build();
-                    modifyCaseWorkerUser(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(), "EXUI");
-                    caseWorkerProfile.setDeleteFlag(true);
+                            .idamStatus(IDAM_STATUS_SUSPENDED).build();
+                    modifyCaseWorkerUser(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(), ORIGIN_EXUI);
+                    caseWorkerProfile.setSuspended(true);
                     newCaseWorkerProfiles.add(caseWorkerProfile);
-                } else if (!(caseWorkerProfile.getDeleteFlag())) {
+                } else if (!(caseWorkerProfile.getSuspended())) {
                     //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
                     requestMap.put(caseWorkerProfile.getEmailId(), cwrRequest);
                     updateCaseWorkerProfiles.add(caseWorkerProfile);
@@ -161,9 +163,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            for (CaseWorkerProfile updatedProfile : updateCaseWorkerProfiles) {
-                updateUserProfile(requestMap.get(updatedProfile.getEmailId()), updatedProfile);
-            }
+            updateCaseWorkerProfiles.forEach(updatedProfile ->
+                updateUserProfile(requestMap.get(updatedProfile.getEmailId()), updatedProfile)
+            );
             newCaseWorkerProfiles.addAll(updateCaseWorkerProfiles);
         }
         if (isNotEmpty(newCaseWorkerProfiles)) {
@@ -259,7 +261,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     .regionName(profile.getRegion())
                     .userType(profile.getUserType().getDescription())
                     .userId(profile.getUserTypeId())
-                    .deleteFlag(profile.getDeleteFlag().toString())
+                    .suspended(profile.getSuspended().toString())
                     .createdTime(profile.getCreatedDate())
                     .lastUpdatedTime(profile.getLastUpdate())
                     .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
@@ -305,7 +307,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         List<Role> rolesDto = new ArrayList<>();
         for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
             Role roleDto = Role.builder()
-                    .roleId(caseWorkerRole.getRoleId())
+                    .roleId(caseWorkerRole.getRoleId().toString())
                     .roleName(caseWorkerRole.getRoleType().getDescription())
                     .isPrimary(caseWorkerRole.getPrimaryFlag())
                     .createdTime(caseWorkerRole.getCreatedDate())
@@ -405,7 +407,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         caseWorkerProfile.setFirstName(cwrdProfileRequest.getFirstName());
         caseWorkerProfile.setLastName(cwrdProfileRequest.getLastName());
         caseWorkerProfile.setEmailId(cwrdProfileRequest.getEmailId().toLowerCase());
-        caseWorkerProfile.setDeleteFlag(false);
+        caseWorkerProfile.setSuspended(false);
         caseWorkerProfile.setUserTypeId(getUserTypeIdByDesc(cwrdProfileRequest.getUserType()));
         caseWorkerProfile.setRegionId(cwrdProfileRequest.getRegionId());
         caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());

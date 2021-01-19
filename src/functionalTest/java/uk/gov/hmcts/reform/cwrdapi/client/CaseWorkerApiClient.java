@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
@@ -14,14 +13,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
@@ -30,8 +27,6 @@ import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsT
 @Slf4j
 @Component
 public class CaseWorkerApiClient {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
@@ -50,36 +45,7 @@ public class CaseWorkerApiClient {
         this.idamOpenIdClient = idamOpenIdClient;
     }
 
-    public IdamOpenIdClient getidamOpenIdClient() {
-        return idamOpenIdClient;
-    }
-
-    public String getWelcomePage() {
-        return withUnauthenticatedRequest()
-                .get("/")
-                .then()
-                .statusCode(OK.value())
-                .and()
-                .extract()
-                .response()
-                .body()
-                .asString();
-    }
-
-    public String getHealthPage() {
-        return withUnauthenticatedRequest()
-                .get("/health")
-                .then()
-                .statusCode(OK.value())
-                .and()
-                .extract()
-                .response()
-                .body()
-                .asString();
-    }
-
-
-    private RequestSpecification withUnauthenticatedRequest() {
+    public RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
                 .baseUri(caseWorkerApiUrl)
@@ -95,6 +61,15 @@ public class CaseWorkerApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenByRole(role));
     }
 
+    public RequestSpecification getMultiPartWithAuthHeaders(String role) {
+        String userToken = idamOpenIdClient.getOpenIdTokenByRole(role);
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(caseWorkerApiUrl)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+                .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
 
     public RequestSpecification getMultipleAuthHeaders(String userToken) {
         return SerenityRest.with()
@@ -124,17 +99,17 @@ public class CaseWorkerApiClient {
         Set<String> idamRoles = new HashSet<>();
 
         String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
-        setEmailsTobeDeleted(emailToUsed);
+        setEmailsTobeDeleted(emailToUsed.toLowerCase());
         return ImmutableList.of(
                 CaseWorkersProfileCreationRequest
                         .caseWorkersProfileCreationRequest()
                         .firstName("cwr-test")
                         .lastName("cwr-test")
-                        .emailId(emailToUsed)
+                        .emailId(emailToUsed.toLowerCase())
                         .regionId(1)
                         .region("National")
                         .userType("CTSC")
-                        .deleteFlag(false)
+                        .suspended(false)
                         .idamRoles(idamRoles)
                         .baseLocations(locationRequestList)
                         .roles(roleRequests)
@@ -187,19 +162,14 @@ public class CaseWorkerApiClient {
                         .regionId(2)
                         .region("County")
                         .userType("CTRT")
-                        .deleteFlag(false)
+                        .suspended(false)
                         .idamRoles(idamRoles)
                         .baseLocations(locationRequestList)
                         .roles(roleRequests)
                         .workerWorkAreaRequests(areaRequests).build());
     }
 
-    @SuppressWarnings("unused")
-    private JsonNode parseJson(String jsonString) throws IOException {
-        return mapper.readTree(jsonString);
-    }
-
-    public void createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
+    public Response createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/")
@@ -209,5 +179,7 @@ public class CaseWorkerApiClient {
         response.then()
                 .assertThat()
                 .statusCode(201);
+
+        return response;
     }
 }

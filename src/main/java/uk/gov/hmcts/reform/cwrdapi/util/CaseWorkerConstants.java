@@ -22,6 +22,8 @@ public final class CaseWorkerConstants {
     public static final String FILE_PASSWORD_INCORRECT_ERROR_MESSAGE =
             "Failed to open the file. Please provide the file with a valid password.";
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "No data in Excel File";
+    public static final String FILE_NO_VALID_SHEET_ERROR_MESSAGE = "The uploaded file does not contain "
+            + "the worksheet named Case Worker Data";
     public static final String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
     public static final String FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE = "File is not password protected";
     public static final String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
@@ -45,5 +47,13 @@ public final class CaseWorkerConstants {
     public static final String BAD_REQUEST = "Bad Request";
 
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+
+    public static final String REQUEST_COMPLETED_SUCCESSFULLY = "Request Completed Successfully";
+
+    public static final String REQUIRED_SHEET_NAME = "Case Worker Data";
+
+    public static final String IDAM_STATUS_SUSPENDED = "SUSPENDED";
+
+    public static final String ORIGIN_EXUI = "EXUI";
 
 }

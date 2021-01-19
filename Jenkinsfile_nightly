@@ -21,7 +21,8 @@ def secrets = [
   ],
   'rd-${env}': [
     secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
-    secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID')
+    secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID'),
+    secret('LD-SDK-KEY', 'RD_LD_SDK_KEY')
   ]
 ]
 
@@ -45,6 +46,7 @@ withNightlyPipeline(type, product, component) {
   env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
   env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
   env.Rules = params.SecurityRules
+  env.execution_environment = "aat"
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)

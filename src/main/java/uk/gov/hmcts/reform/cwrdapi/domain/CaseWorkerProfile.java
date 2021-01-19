@@ -62,11 +62,8 @@ public class CaseWorkerProfile implements Serializable {
     @NotNull
     private Integer regionId;
 
-    @Column(name = "delete_flag")
-    private Boolean deleteFlag;
-
-    @Column(name = "delete_date")
-    private LocalDateTime deleteDate;
+    @Column(name = "suspended")
+    private Boolean suspended;
 
     @CreationTimestamp
     @Column(name = "created_date")
@@ -94,16 +91,4 @@ public class CaseWorkerProfile implements Serializable {
     @JoinColumn(name = "user_type_id", referencedColumnName = "user_type_id",
             insertable = false, updatable = false, nullable = false)
     private UserType userType;
-
-    public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
-                             Integer regionId, String region, boolean deleteFlag) {
-        this.caseWorkerId = caseWorkerId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailId = emailId;
-        this.userTypeId = userTypeId;
-        this.regionId = regionId;
-        this.region = region;
-        this.deleteFlag = deleteFlag;
-    }
 }

@@ -14,24 +14,15 @@ import java.util.Set;
 @Builder(builderMethodName = "caseWorkersProfileCreationRequest")
 public class CaseWorkersProfileCreationRequest {
 
-    @JsonProperty("first_name")
     private String firstName;
-    @JsonProperty("last_name")
     private String lastName;
     private String emailId;
-    @JsonProperty("region_id")
     private Integer regionId;
-    @JsonProperty("user_type")
     private String userType;
-    @JsonProperty("region")
     private String region;
-    @JsonProperty("delete_flag")
-    private boolean deleteFlag;
-    @JsonProperty("idam_roles")
+    private boolean suspended;
     private Set<String> idamRoles;
-    @JsonProperty("roles")
     private List<CaseWorkerRoleRequest> roles;
-    @JsonProperty("base_location")
     private List<CaseWorkerLocationRequest> baseLocations;
 
     private List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests;
@@ -43,7 +34,7 @@ public class CaseWorkersProfileCreationRequest {
             @JsonProperty("region_id") Integer regionId,
             @JsonProperty("user_type") String userType,
             @JsonProperty("region") String region,
-            @JsonProperty("delete_flag") boolean deleteFlag,
+            @JsonProperty("suspended") boolean suspended,
             @JsonProperty("idam_roles") Set<String> idamRoles,
             @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
             @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
@@ -54,11 +45,12 @@ public class CaseWorkersProfileCreationRequest {
         this.emailId = emailId;
         this.regionId = regionId;
         this.userType = userType;
-        this.deleteFlag = deleteFlag;
+        this.suspended = suspended;
         this.idamRoles = idamRoles;
         this.roles = roles;
         this.baseLocations = baseLocations;
         this.workerWorkAreaRequests = workerWorkAreaRequests;
+        this.region = region;
     }
 
 

@@ -21,8 +21,7 @@ public class CaseWorkerProfileTest {
         caseWorkerProfile.setUserTypeId(1L);
         caseWorkerProfile.setRegion("Region");
         caseWorkerProfile.setRegionId(12);
-        caseWorkerProfile.setDeleteFlag(true);
-        caseWorkerProfile.setDeleteDate(LocalDateTime.now());
+        caseWorkerProfile.setSuspended(true);
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
@@ -41,8 +40,7 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getUserTypeId(), is(1L));
         assertThat(caseWorkerProfile.getRegion(), is("Region"));
         assertThat(caseWorkerProfile.getRegionId(), is(12));
-        assertThat(caseWorkerProfile.getDeleteFlag(), is(true));
-        assertNotNull(caseWorkerProfile.getDeleteDate());
+        assertThat(caseWorkerProfile.getSuspended(), is(true));
         assertNotNull(caseWorkerProfile.getCreatedDate());
         assertNotNull(caseWorkerProfile.getLastUpdate());
 
@@ -118,25 +116,9 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingDeleteFlag() {
+    public void testCaseWorkerProfileContainingSuspended() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setDeleteFlag(false);
-        assertFalse(caseWorkerProfile.getDeleteFlag());
-    }
-
-    @Test
-    public void testCaseWorkerProfileAllArgsConstructor() {
-        CaseWorkerProfile caseWorkerProfile = new
-                CaseWorkerProfile("CWID1", "testFN", "testLN", "test@test.com",
-                1L,  1, "region", false);
-        assertNotNull(caseWorkerProfile);
-        assertThat(caseWorkerProfile.getCaseWorkerId(), is("CWID1"));
-        assertThat(caseWorkerProfile.getFirstName(), is("testFN"));
-        assertThat(caseWorkerProfile.getLastName(), is("testLN"));
-        assertThat(caseWorkerProfile.getEmailId(), is("test@test.com"));
-        assertThat(caseWorkerProfile.getUserTypeId(), is(1L));
-        assertThat(caseWorkerProfile.getRegion(), is("region"));
-        assertThat(caseWorkerProfile.getRegionId(), is(1));
-        assertThat(caseWorkerProfile.getDeleteFlag(), is(false));
+        caseWorkerProfile.setSuspended(false);
+        assertFalse(caseWorkerProfile.getSuspended());
     }
 }

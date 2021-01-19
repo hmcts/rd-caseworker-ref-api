@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.Oauth2;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
 import java.util.ArrayList;
@@ -109,9 +110,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     @AfterClass
     public static void destroy() {
-        emailsTobeDeleted.forEach(email -> {
-            idamOpenIdClient.deleteSidamUser(email);
-        });
+        emailsTobeDeleted.forEach(email -> idamOpenIdClient.deleteSidamUser(email));
     }
 
     public static String getS2sToken() {
@@ -134,17 +133,17 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         return caseWorkersProfileCreationRequests;
     }
 
-    public List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> getUserProfilesFromCw(
-            List<String> caseWorkerIds, int expectedResponse) {
+    public List getUserProfilesFromCw(
+            UserRequest userRequest, int expectedResponse) {
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal()
-                .body(caseWorkerIds).log().body(true)
+                .body(userRequest).log().body(true)
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .then()
                 .log().body(true)
                 .and()
                 .extract().response();
 
-        log.info("CW get user response: ", fetchResponse.getStatusCode());
+        log.info("CW get user response: {}", fetchResponse.getStatusCode());
 
         fetchResponse.then()
                 .assertThat()

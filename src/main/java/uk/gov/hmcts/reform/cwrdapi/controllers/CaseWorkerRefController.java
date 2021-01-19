@@ -6,23 +6,33 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.UploadCaseWorkerFileResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
+import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
@@ -39,6 +49,59 @@ public class CaseWorkerRefController {
 
     @Autowired
     CaseWorkerService caseWorkerService;
+
+    @Autowired
+    ExcelValidatorService excelValidatorService;
+
+    @Autowired
+    ExcelAdaptorService excelAdaptorService;
+
+    @ApiOperation(
+            value = "This API uploads an excel file which contains case worker user information and "
+                    + "will be saved in the case worker reference database.",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                    response = UploadCaseWorkerFileResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = BAD_REQUEST
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @PostMapping(value = "/upload-file",
+            consumes = "multipart/form-data")
+    @Secured("cwd-admin")
+    public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam("file")  MultipartFile file) {
+        Workbook workbook = excelValidatorService.validateExcelFile(file);
+        excelAdaptorService.parseExcel(workbook, uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class);
+
+        UploadCaseWorkerFileResponse uploadCaseWorkerFileResponse = UploadCaseWorkerFileResponse.builder()
+                .message(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY)
+                .build();
+
+        return ResponseEntity
+                .status(201)
+                .body(uploadCaseWorkerFileResponse);
+    }
 
     @ApiOperation(
             value = "This API creates caseworker profiles",
@@ -84,15 +147,24 @@ public class CaseWorkerRefController {
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
 
+        CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
+                CaseWorkerProfileCreationResponse
+                        .builder();
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
-        if (!processedCwProfiles.isEmpty()) {
+        if (isNotEmpty(processedCwProfiles)) {
             caseWorkerService.publishCaseWorkerDataToTopic(processedCwProfiles);
+            List<String> caseWorkerIds = processedCwProfiles.stream()
+                    .map(CaseWorkerProfile::getCaseWorkerId)
+                    .collect(Collectors.toUnmodifiableList());
+            caseWorkerProfileCreationResponse
+                    .caseWorkerRegistrationResponse("Case Worker Profiles Created")
+                    .caseWorkerIds(caseWorkerIds);
         }
         return ResponseEntity
                 .status(201)
-                .body(new CaseWorkerProfileCreationResponse("Case Worker Profiles Created."));
+                .body(caseWorkerProfileCreationResponse.build());
     }
 
     @ApiOperation(
@@ -185,11 +257,11 @@ public class CaseWorkerRefController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("cwd-admin")
-    public ResponseEntity<Object> fetchCaseworkersById(@RequestBody List<String> caseWorkerIds) {
+    public ResponseEntity<Object> fetchCaseworkersById(@RequestBody UserRequest userRequest) {
 
-        if (CollectionUtils.isEmpty(caseWorkerIds)) {
+        if (CollectionUtils.isEmpty(userRequest.getUserIds())) {
             throw new InvalidRequestException("Caseworker request is empty");
         }
-        return caseWorkerService.fetchCaseworkersById(caseWorkerIds);
+        return caseWorkerService.fetchCaseworkersById(userRequest.getUserIds());
     }
 }

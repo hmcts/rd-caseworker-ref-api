@@ -1,25 +1,22 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CaseWorkerProfileCreationResponse {
-
+    @JsonProperty("message")
     private String caseWorkerRegistrationResponse;
-
-    private String id;
-
-    public CaseWorkerProfileCreationResponse(String caseWorkerRegistrationResponse) {
-        this.caseWorkerRegistrationResponse = caseWorkerRegistrationResponse;
-    }
-
-    public CaseWorkerProfileCreationResponse(String caseWorkerRegistrationResponse, String id) {
-
-        this.caseWorkerRegistrationResponse = caseWorkerRegistrationResponse;
-        this.id = id;
-    }
+    @JsonProperty("case_worker_ids")
+    private List<String> caseWorkerIds;
 }
