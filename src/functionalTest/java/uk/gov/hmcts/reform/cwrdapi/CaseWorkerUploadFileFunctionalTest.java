@@ -37,11 +37,13 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
 
     @Test
-    @Ignore
+    @Ignore(value = "Need to delete the case worker ids in IDAM, UP and in CRD so that next time when the test runs "
+            + "it would create new users instead of updating. Deleting the ids requires a lot of effort. "
+            + "So ignoring the test for now and it will be worked as a separate task")
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
+                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
@@ -52,11 +54,13 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     }
 
     @Test
-    @Ignore
+    @Ignore(value = "Need to delete the case worker ids in IDAM, UP and in CRD so that when the test runs next time,"
+            + " it would create new users instead of updating. Deleting the ids requires a lot of effort. "
+            + "So ignoring the test for now and it will be worked as a separate task")
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                uploadCaseWorkerFile("src/functionalTest/resources/xlsWithNoPassword.xls",
+                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsWithNoPassword.xls",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
 
@@ -109,7 +113,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithPassword.xlsx",
                 403, null,
                 CaseWorkerConstants.TYPE_XLSX, "Invalid");
     }
@@ -121,7 +125,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
-        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
                 403, exceptionMessage,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
