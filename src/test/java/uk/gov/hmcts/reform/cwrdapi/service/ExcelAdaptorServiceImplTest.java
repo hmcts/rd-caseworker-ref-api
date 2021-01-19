@@ -28,7 +28,7 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void parseXlsxShouldReturnWorkbookObjectTest() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUsers_WithCorrectPassword.xlsx"), "1234");
+                .create(new File("src/test/resources/CaseWorkerUserWithPassword.xlsx"), "1234");
 
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
@@ -48,7 +48,8 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void parseXlsxShouldThrowExceptionWhenOnlyHeaderPresentTest() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUsers_WithXlsxOnlyHeader.xlsx"), "1234");
+                .create(new File("src/test/resources/CaseWorkerUsers_WithXlsxOnlyHeader.xlsx"),
+                        "1234");
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
                 .isExactlyInstanceOf(ExcelValidationException.class)
@@ -58,7 +59,8 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void parseXlsxShouldThrowExceptionWhenNoValidSheetNamePresentTest() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUsers_WithNoValidSheetName.xlsx"), "1234");
+                .create(new File("src/test/resources/CaseWorkerUsers_WithNoValidSheetName.xlsx"),
+                        "1234");
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
                 .isExactlyInstanceOf(ExcelValidationException.class)

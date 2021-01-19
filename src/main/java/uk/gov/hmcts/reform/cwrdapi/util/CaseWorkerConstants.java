@@ -19,13 +19,12 @@ public final class CaseWorkerConstants {
     //excel adapter related error messages
     public static final String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "File provided in request is not in xls(x) format";
     public static final String FILE_NOT_PRESENT_ERROR_MESSAGE = "File not present";
-    public static final String FILE_PASSWORD_INCORRECT_ERROR_MESSAGE =
-            "Failed to open the file. Please provide the file with a valid password.";
+    public static final String FILE_PASSWORD_PROTECTED_ERROR_MESSAGE =
+            "The file is password protected. Please provide a file without password.";
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "No data in Excel File";
     public static final String FILE_NO_VALID_SHEET_ERROR_MESSAGE = "The uploaded file does not contain "
             + "the worksheet named Case Worker Data";
     public static final String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
-    public static final String FILE_NOT_PASSWORD_PROTECTED_ERROR_MESSAGE = "File is not password protected";
     public static final String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
     public static final String ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
 
@@ -50,7 +49,8 @@ public final class CaseWorkerConstants {
 
     public static final String REQUEST_COMPLETED_SUCCESSFULLY = "Request Completed Successfully";
 
-    public static final String REQUIRED_SHEET_NAME = "Case Worker Data";
+    public static final String REQUIRED_CW_SHEET_NAME = "Case Worker Data";
+    public static final String REQUIRED_ROLE_MAPPING_SHEET_NAME = "IDAM Mapping";
 
     public static final String CASE_WORKER_FILE_NAME = "CaseWorker";
     public static final String SERVICE_ROLE_MAPPING_FILE_NAME = "ServiceRoleMapping";

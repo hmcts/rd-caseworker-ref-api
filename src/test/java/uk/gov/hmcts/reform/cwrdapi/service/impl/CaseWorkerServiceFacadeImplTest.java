@@ -68,7 +68,7 @@ public class CaseWorkerServiceFacadeImplTest {
                 .firstName("first name")
                 .build();
         MultipartFile multipartFile =
-                getMultipartFile("src/test/resources/CaseWorkerUsers_WithCorrectPassword.xls", TYPE_XLS);
+                getMultipartFile("src/test/resources/CaseWorkerUserXlsWithNoPassword.xls", TYPE_XLS);
         when(excelValidatorService.validateExcelFile(multipartFile))
                 .thenReturn(workbook);
         when(caseWorkerInternalApiClient.postRequest(any(), anyString()))

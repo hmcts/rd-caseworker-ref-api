@@ -36,8 +36,6 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     @Autowired
     CaseWorkerProfileConverter caseWorkerProfileConverter;
 
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@cwrfunctestuser.com";
-
     @Override
     @SuppressWarnings("unchecked")
     public ResponseEntity<Object> processFile(MultipartFile file) {
