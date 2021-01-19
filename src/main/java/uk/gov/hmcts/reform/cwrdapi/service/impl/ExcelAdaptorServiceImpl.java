@@ -148,7 +148,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void setFieldValue(Field field, Object bean, Object value) {
-        if (nonNull(field)) {
+        if (nonNull(field) && nonNull(value)) {
             makeAccessible(field);
             setField(field, bean, value);
         }
