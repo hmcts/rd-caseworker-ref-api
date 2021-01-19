@@ -112,7 +112,6 @@ public class FetchCaseworkersByIdProviderTest {
                 1,
                 "National",
                 false,
-                timeNow.plusDays(45L),
                 timeNow,
                 timeNow,
                 caseWorkerLocations,

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -101,7 +100,7 @@ public class CaseWorkerProfile implements Serializable {
     }
 
     public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
-                             Integer regionId, String region, boolean suspended, LocalDateTime deleteDate,
+                             Integer regionId, String region, boolean suspended,
                              LocalDateTime createdDate, LocalDateTime lastUpdate,
                              List<CaseWorkerLocation> caseWorkerLocations,
                              List<CaseWorkerWorkArea> caseWorkerWorkAreas,
@@ -114,7 +113,6 @@ public class CaseWorkerProfile implements Serializable {
         this.regionId = regionId;
         this.region = region;
         this.suspended = suspended;
-        this.deleteDate = deleteDate;
         this.createdDate = createdDate;
         this.lastUpdate = lastUpdate;
         this.caseWorkerLocations = caseWorkerLocations;
