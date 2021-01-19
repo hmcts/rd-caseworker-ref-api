@@ -40,9 +40,9 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     @SuppressWarnings("unchecked")
     public ResponseEntity<Object> processFile(MultipartFile file) {
         Workbook workbook = excelValidatorService.validateExcelFile(file);
-
-        Class<? extends CaseWorkerDomain> ob = file.getOriginalFilename() != null
-                        && file.getOriginalFilename().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
+        String fileName = file.getOriginalFilename();
+        Class<? extends CaseWorkerDomain> ob = fileName != null
+                        && fileName.startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
                         ? CaseWorkerProfile.class : ServiceRoleMapping.class;
 
         List<CaseWorkerDomain> caseWorkerRequest = ( List<CaseWorkerDomain>) excelAdaptorService

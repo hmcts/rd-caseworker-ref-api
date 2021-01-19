@@ -38,7 +38,7 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
         caseWorkerProfiles
                 .stream()
-                .map(obj -> (CaseWorkerProfile) obj)
+                .map(CaseWorkerProfile.class::cast)
                 .forEach(obj -> {
                     CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest =
                             CaseWorkersProfileCreationRequest
