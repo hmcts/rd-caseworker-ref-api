@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 @Builder
@@ -36,6 +37,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String lastName;
 
     @MappingField(columnName = "Official Email")
+    @Email(message = "The email must not be empty")
     @NotEmpty
     @JsonProperty("email_id")
     private String officialEmail;
