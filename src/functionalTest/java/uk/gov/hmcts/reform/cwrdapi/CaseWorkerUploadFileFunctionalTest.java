@@ -7,6 +7,7 @@ import io.restassured.specification.MultiPartSpecification;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.poi.util.IOUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.util.ResourceUtils.getFile;
 
@@ -35,6 +37,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
 
     @Test
+    @Ignore
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
@@ -45,9 +48,11 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
                 .as(CaseWorkerProfileCreationResponse.class);
         assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
+        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
     }
 
     @Test
+    @Ignore
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
@@ -59,6 +64,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
                 .as(CaseWorkerProfileCreationResponse.class);
         assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
+        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
     }
 
     @Test

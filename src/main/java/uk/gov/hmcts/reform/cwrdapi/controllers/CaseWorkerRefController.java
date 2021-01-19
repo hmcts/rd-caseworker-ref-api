@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
-import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
@@ -25,8 +24,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,15 +45,6 @@ public class CaseWorkerRefController {
 
     @Autowired
     CaseWorkerService caseWorkerService;
-
-    @Autowired
-    ExcelValidatorService excelValidatorService;
-
-    @Autowired
-    ExcelAdaptorService excelAdaptorService;
-
-    @Autowired
-    CaseWorkerInternalApiClientImpl caseWorkerInternalClient;
 
     @Autowired
     CaseWorkerServiceFacade caseWorkerServiceFacade;

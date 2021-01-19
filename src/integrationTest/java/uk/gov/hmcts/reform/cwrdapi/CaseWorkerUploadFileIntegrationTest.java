@@ -28,7 +28,7 @@ import static org.springframework.util.ResourceUtils.getFile;
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUsers_WithCorrectPassword.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUsers_WithCorrectPassword_Test.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
     }
 
