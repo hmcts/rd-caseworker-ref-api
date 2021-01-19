@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
+import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
@@ -14,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import au.com.dius.pact.provider.junitsupport.Provider;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefController;
-import uk.gov.hmcts.reform.cwrdapi.controllers.WelcomeController;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -28,13 +27,13 @@ import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(SpringExtension.class)
 @Provider("crd_case_worker_ref_service")
@@ -73,7 +72,6 @@ public class FetchCaseworkersByIdProviderTest {
                 new CaseWorkerRefController(caseWorkerServiceImpl, excelValidatorService, excelAdaptorService));
         context.setTarget(testTarget);
         MockitoAnnotations.openMocks(this);
-        //setInitiMock();
     }
 
     @State({"A list of users for CRD request"})
@@ -81,19 +79,15 @@ public class FetchCaseworkersByIdProviderTest {
         List<CaseWorkerProfile> caseWorkerProfile = Collections.singletonList(getCaseWorkerProfile(USER_ID));
         List<String> userRequest = Collections.singletonList(USER_ID);
         doReturn(caseWorkerProfile).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(userRequest);
-//        when(caseWorkerProfileRepo.findByCaseWorkerIdIn(Collections.singletonList(USER_ID)))
-//                .thenReturn(Collections.singletonList(getCaseWorkerProfile(USER_ID)));
-
     }
 
-//    @State({"A list of multiple users for CRD request"})
-//    public void fetchListOfMultipleUsersById() {
-//        //state
-//    }
-
-    private void setInitiMock() {
-
-
+    @State({"A list of multiple users for CRD request"})
+    public void fetchListOfMultipleUsersById() {
+        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        caseWorkerProfiles.add(getCaseWorkerProfile(USER_ID));
+        caseWorkerProfiles.add(getCaseWorkerProfile(USER_ID2));
+        List<String> userRequest = Arrays.asList(USER_ID, USER_ID2);
+        doReturn(caseWorkerProfiles).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(userRequest);
     }
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
