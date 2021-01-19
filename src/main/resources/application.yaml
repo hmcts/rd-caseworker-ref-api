@@ -102,7 +102,7 @@ feign:
     headers:
       - authorization
       - serviceauthorization
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-pr-575.service.core-compute-preview.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
 
 crd:
   publisher:
@@ -118,7 +118,6 @@ crd:
     caseWorkerDataPerMessage: ${CWRD_DATA_PER_MESSAGE:50}
 
 excel:
-  password: ${EXCEL_PASSWORD:1234}
   acceptableHeaders: ${EXCEL_ACCEPTABLE_HEADERS:FIRST NAME,LAST NAME,Official Email,Region,User type}
 
 launchdarkly:
