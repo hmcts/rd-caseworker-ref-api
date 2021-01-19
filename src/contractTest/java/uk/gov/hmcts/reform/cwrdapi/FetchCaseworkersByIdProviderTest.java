@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.WelcomeController;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -27,7 +28,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -55,6 +56,8 @@ public class FetchCaseworkersByIdProviderTest {
     @Mock
     ExcelAdaptorService excelAdaptorService;
 
+    private static final String USER_ID = "234873";
+    private static final String USER_ID2 = "234879";
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
@@ -70,12 +73,17 @@ public class FetchCaseworkersByIdProviderTest {
                 new CaseWorkerRefController(caseWorkerServiceImpl, excelValidatorService, excelAdaptorService));
         context.setTarget(testTarget);
         MockitoAnnotations.openMocks(this);
+        //setInitiMock();
     }
 
     @State({"A list of users for CRD request"})
     public void fetchListOfUsersById() {
-        //state
-        setInitiMock();
+        List<CaseWorkerProfile> caseWorkerProfile = Collections.singletonList(getCaseWorkerProfile(USER_ID));
+        List<String> userRequest = Collections.singletonList(USER_ID);
+        doReturn(caseWorkerProfile).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(userRequest);
+//        when(caseWorkerProfileRepo.findByCaseWorkerIdIn(Collections.singletonList(USER_ID)))
+//                .thenReturn(Collections.singletonList(getCaseWorkerProfile(USER_ID)));
+
     }
 
 //    @State({"A list of multiple users for CRD request"})
@@ -84,12 +92,7 @@ public class FetchCaseworkersByIdProviderTest {
 //    }
 
     private void setInitiMock() {
-        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        caseWorkerProfiles.add(getCaseWorkerProfile("21334a2b-79ce-44eb-9168-2d49a744be9c"));
-        caseWorkerProfiles.add(getCaseWorkerProfile("21334a2b-79ce-44eb-9168-2d49a799be9d"));
 
-        when(caseWorkerProfileRepo.findByCaseWorkerIdIn(anyList()))
-                .thenReturn(caseWorkerProfiles);
 
     }
 
@@ -98,14 +101,14 @@ public class FetchCaseworkersByIdProviderTest {
 
         List<CaseWorkerLocation> caseWorkerLocations =
                 Collections.singletonList(new CaseWorkerLocation(caseWorkerId, 1,
-                        "location", true));
+                        "National", true));
 
         List<CaseWorkerWorkArea> caseWorkerWorkAreas =
                 Collections.singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
 
         List<CaseWorkerRole> caseWorkerRoles =
-                Collections.singletonList(new CaseWorkerRole(1L, caseWorkerId, 1L, false, timeNow, timeNow,
-                        new CaseWorkerProfile(), new RoleType()));
+                Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
+        caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
 
         return new CaseWorkerProfile(caseWorkerId,
                 "firstName",
@@ -121,7 +124,7 @@ public class FetchCaseworkersByIdProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType());
+                new UserType(1L, "HMCTS"));
     }
 
 }
