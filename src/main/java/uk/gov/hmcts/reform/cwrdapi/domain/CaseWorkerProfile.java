@@ -28,7 +28,6 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class CaseWorkerProfile implements Serializable {
 
     @Id
@@ -102,5 +101,28 @@ public class CaseWorkerProfile implements Serializable {
         this.regionId = regionId;
         this.region = region;
         this.suspended = suspended;
+    }
+
+    public CaseWorkerProfile(String caseWorkerId, String firstName, String lastName, String emailId, Long userTypeId,
+                             Integer regionId, String region, boolean suspended, LocalDateTime deleteDate,
+                             LocalDateTime createdDate, LocalDateTime lastUpdate,
+                             List<CaseWorkerLocation> caseWorkerLocations,
+                             List<CaseWorkerWorkArea> caseWorkerWorkAreas,
+                             List<CaseWorkerRole> caseWorkerRoles, UserType userType) {
+        this.caseWorkerId = caseWorkerId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailId = emailId;
+        this.userTypeId = userTypeId;
+        this.regionId = regionId;
+        this.region = region;
+        this.suspended = suspended;
+        this.deleteDate = deleteDate;
+        this.createdDate = createdDate;
+        this.lastUpdate = lastUpdate;
+        this.caseWorkerLocations = caseWorkerLocations;
+        this.caseWorkerWorkAreas = caseWorkerWorkAreas;
+        this.caseWorkerRoles = caseWorkerRoles;
+        this.userType = userType;
     }
 }
