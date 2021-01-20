@@ -437,7 +437,7 @@ public class CaseWorkerServiceImplTest {
         assertThat(caseWorkerProfile.getLastName()).isEqualTo(cwProfileCreationRequest.getLastName());
         assertThat(caseWorkerProfile.getEmailId()).isEqualTo(cwProfileCreationRequest.getEmailId());
         assertThat(caseWorkerProfile.getSuspended()).isFalse();
-        assertThat(caseWorkerProfile.getUserTypeId()).isEqualTo(0L);
+        assertThat(caseWorkerProfile.getUserTypeId()).isZero();
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(cwProfileCreationRequest.getRegionId());
         assertThat(caseWorkerProfile.getRegion()).isEqualTo(cwProfileCreationRequest.getRegion());
     }

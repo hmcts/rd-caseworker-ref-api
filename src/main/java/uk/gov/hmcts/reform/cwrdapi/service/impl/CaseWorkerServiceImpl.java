@@ -61,7 +61,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -142,7 +141,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     modifyCaseWorkerUser(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(), ORIGIN_EXUI);
                     caseWorkerProfile.setSuspended(true);
                     newCaseWorkerProfiles.add(caseWorkerProfile);
-                } else if (!(caseWorkerProfile.getSuspended())) {
+                } else if (!caseWorkerProfile.getSuspended()) {
                     //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
                     requestMap.put(caseWorkerProfile.getEmailId(), cwrRequest);
                     updateCaseWorkerProfiles.add(caseWorkerProfile);
@@ -429,14 +428,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(String idamId,
                                                                 CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
-        cwrdProfileRequest.getRoles().forEach(role -> {
-            roleTypes.stream().filter(roleType ->
-                role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                .forEach(roleType -> {
-                    CaseWorkerRole workerRole = new CaseWorkerRole(idamId, roleType.getRoleId(), role.isPrimaryFlag());
-                    caseWorkerRoles.add(workerRole);
-                });
-        });
+        cwrdProfileRequest.getRoles().forEach(role -> roleTypes.stream().filter(roleType ->
+            role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+            .forEach(roleType -> {
+                CaseWorkerRole workerRole = new CaseWorkerRole(idamId, roleType.getRoleId(), role.isPrimaryFlag());
+                caseWorkerRoles.add(workerRole);
+            }));
         return caseWorkerRoles;
     }
 
@@ -520,11 +517,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             roleTypes.stream()
                     .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
                     .map(roleType -> idamRolesInRequest.addAll(cwIdamRoleAssocRepository.findByRoleType(roleType)))
-                    .collect(toList())
         );
 
         return idamRolesInRequest.stream()
-                .map(idamRole -> idamRole.getIdamRole())
+                .map(CaseWorkerIdamRoleAssociation::getIdamRole)
                 .collect(Collectors.toSet());
     }
 
@@ -534,7 +530,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public Long getUserTypeIdByDesc(String userTypeReq) {
         Optional<Long> userTypeId = userTypes.stream().filter(userType ->
             userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
-            .map(userType -> userType.getUserTypeId()).findFirst();
+            .map(UserType::getUserTypeId).findFirst();
         return userTypeId.orElse(0L);
     }
 
