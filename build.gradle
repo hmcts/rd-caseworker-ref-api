@@ -179,9 +179,7 @@ pitest {
   excludedClasses = [
     'uk.gov.hmcts.reform.cwrdapi.config.*',
     'uk.gov.hmcts.reform.cwrdapi.controller.*',
-    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
-    'uk.gov.hmcts.reform.cwrdapi.client.domain.*',
-    'uk.gov.hmcts.reform.cwrdapi.domain.*'
+    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
   ]
   threads = 10
   enableDefaultIncrementalAnalysis = true
@@ -199,6 +197,7 @@ sonarqube {
   properties {
     property "sonar.projectName", "reform::rd-caseworker-ref-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:reform::rd-caseworker-ref-api"
+    property "sonar.exclusions", "src/main/java/uk/**"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.pitest.mode", "reuseReport"
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
@@ -206,7 +205,6 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/request/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/service/impl/CaseWorkerServiceImpl.java" + //@TO do removed
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
   }
 }
