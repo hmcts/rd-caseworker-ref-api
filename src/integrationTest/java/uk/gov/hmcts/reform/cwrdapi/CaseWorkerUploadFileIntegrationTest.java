@@ -26,10 +26,21 @@ import static org.springframework.util.ResourceUtils.getFile;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
+    @Test
+    public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
+        uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
+    }
 
     @Test
-    public void shouldUploadXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("xlsxWithNoPassword.xlsx",
+    public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
+        uploadCaseWorkerFile("CaseWorkerUserXlsWithNoPassword.xls",
+                CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
+    }
+
+    @Test
+    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
+        uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "201 CREATED", cwdAdmin);
     }
 
@@ -41,31 +52,31 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     @Test
     public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithPassword.xls",
+        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xls",
                 CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("WithPassword.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("xlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("xlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
                 "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("xlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
@@ -76,7 +87,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
                 "test-flag-1");
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
-        uploadCaseWorkerFile("WithPassword.xlsx",
+        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
     }
 

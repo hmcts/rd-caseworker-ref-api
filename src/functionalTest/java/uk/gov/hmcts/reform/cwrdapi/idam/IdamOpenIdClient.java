@@ -130,7 +130,7 @@ public class IdamOpenIdClient {
                     .relaxedHTTPSValidation()
                     .baseUri(testConfig.getIdamApiUrl())
                     .header(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-                    .post("/testing-support/accounts/" + email);
+                    .delete("/testing-support/accounts/" + email);
         } catch (Exception ex) {
             log.error("unable to delete sidam user with email");
         }

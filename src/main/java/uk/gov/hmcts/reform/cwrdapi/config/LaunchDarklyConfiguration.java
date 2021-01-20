@@ -24,9 +24,9 @@ public class LaunchDarklyConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(featureConditionEvaluation)
                 .addPathPatterns("/refdata/case-worker/users/fetchUsersById",
-                        "/refdata/case-worker/idam-roles-mapping/",
-                        "/refdata/case-worker/users/",
-                        "/refdata/case-worker/upload-file/");
+                        "/refdata/case-worker/idam-roles-mapping",
+                        "/refdata/case-worker/users",
+                        "/refdata/case-worker/upload-file");
 
     }
 }

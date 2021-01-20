@@ -60,7 +60,7 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public <T> Map<String, Object> uploadCwFile(MultiValueMap<String, Object> body, String role) {
-        String uriPath = baseUrl + "/upload-file/";
+        String uriPath = baseUrl + "/upload-file";
         HttpHeaders httpHeaders = getMultipleAuthHeaders(role);
         httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 
