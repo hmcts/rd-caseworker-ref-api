@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
@@ -52,7 +53,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         } else {
             sheet = workbook.getSheet(REQUIRED_ROLE_MAPPING_SHEET_NAME);
         }
-        if (null == sheet) {
+        if (Objects.isNull(sheet)) {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_VALID_SHEET_ERROR_MESSAGE);
         } else if (sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);

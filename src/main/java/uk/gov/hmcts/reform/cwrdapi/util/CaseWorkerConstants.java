@@ -55,6 +55,8 @@ public final class CaseWorkerConstants {
     public static final String CASE_WORKER_FILE_NAME = "caseworker";
     public static final String RECORDS_UPLOADED =
             "%s record(s) uploaded";
+    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    public static final String AUTHORIZATION = "Authorization";
 
 
 }

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,9 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_
 @RestController
 @Slf4j
 public class CaseWorkerRefController {
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
     @Autowired
     CaseWorkerService caseWorkerService;
@@ -88,8 +92,8 @@ public class CaseWorkerRefController {
     public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam("file")  MultipartFile file) {
         long time1 = System.currentTimeMillis();
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(file);
-        log.info("----Time taken to upload the given file "
-                + (System.currentTimeMillis() - time1));
+        log.info("{}::Total Time taken to upload the given file is {}", loggingComponentName,
+                (System.currentTimeMillis() - time1));
         return responseEntity;
     }
 
@@ -144,13 +148,13 @@ public class CaseWorkerRefController {
         long time1 = System.currentTimeMillis();
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-        log.info("----Time taken to process the given file "
-                + (System.currentTimeMillis() - time1));
+        log.info("{}:: Time taken to process the given file is {}", loggingComponentName,
+                (System.currentTimeMillis() - time1));
         if (!processedCwProfiles.isEmpty()) {
             long time2 = System.currentTimeMillis();
             caseWorkerService.publishCaseWorkerDataToTopic(processedCwProfiles);
-            log.info("----Time taken to publish the message "
-                    + (System.currentTimeMillis() - time2));
+            log.info("{}:: Time taken to publish the message is {}", loggingComponentName,
+                    (System.currentTimeMillis() - time2));
             List<String> caseWorkerIds = processedCwProfiles.stream()
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());

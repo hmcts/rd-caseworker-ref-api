@@ -131,8 +131,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
                 long time1 = System.currentTimeMillis();
                 processedCwProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
-                log.info("----Time taken to save cw data in crd "
-                        + (System.currentTimeMillis() - time1));
+                log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
+                        (System.currentTimeMillis() - time1));
             }
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
@@ -154,7 +154,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Set<String> serviceCodes = new HashSet<>();
         serviceRoleMappings.forEach(serviceRoleMapping -> {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
-            caseWorkerIdamRoleAssociation.setRoleId((long) serviceRoleMapping.getRoleId());
+            caseWorkerIdamRoleAssociation.setRoleId(serviceRoleMapping.getRoleId().longValue());
             caseWorkerIdamRoleAssociation.setIdamRole(serviceRoleMapping.getIdamRoles());
             caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getSerivceId());
             serviceCodes.add(serviceRoleMapping.getSerivceId());
@@ -375,8 +375,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         try {
             long time1 = System.currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
-            log.info("----Time taken to call UP "
-                    + (System.currentTimeMillis() - time1));
+            log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
             if (response.status() == 201 || response.status() == 409) {
                 clazz = UserProfileCreationResponse.class;
             } else {
