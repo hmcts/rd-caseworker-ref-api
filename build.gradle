@@ -368,10 +368,6 @@ dependencies {
     endorseStrictVersions()
   }
 
-  contractTestCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
-    endorseStrictVersions()
-  }
-
   contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.6.2")
   contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.2")
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')

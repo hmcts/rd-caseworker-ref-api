@@ -107,7 +107,7 @@ public class FetchCaseworkersByIdProviderTest {
         return new CaseWorkerProfile(caseWorkerId,
                 "firstName",
                 "lastName",
-                "email@email.gov",
+                "sam.test@justice.gov.uk",
                 1L,
                 1,
                 "National",
