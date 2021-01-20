@@ -66,4 +66,24 @@ public class ExcelAdaptorServiceImplTest {
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NO_VALID_SHEET_ERROR_MESSAGE);
     }
+
+    @Test
+    public void parseXlsxWhichHasFormula() throws IOException {
+        Workbook workbook = WorkbookFactory
+                .create(new File("src/test/resources/CaseWorkerUserXlsWithFormula.xls"), "1234");
+
+        List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
+        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
+        CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
+        assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
+        assertThat(caseWorkerProfile.getLastName()).isNotBlank();
+        assertThat(caseWorkerProfile.getOfficialEmail()).isNotBlank();
+        assertThat(caseWorkerProfile.getRegionName()).isNotBlank();
+        assertThat(caseWorkerProfile.getUserType()).isNotBlank();
+        assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
+        assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
+        assertThat(caseWorkerProfile.getLocations()).hasSize(2);
+        assertThat(caseWorkerProfile.getRoles()).hasSize(2);
+        assertThat(caseWorkerProfile.getWorkAreas()).hasSize(8);
+    }
 }

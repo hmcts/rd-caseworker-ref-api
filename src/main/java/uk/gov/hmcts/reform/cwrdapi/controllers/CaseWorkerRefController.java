@@ -28,11 +28,13 @@ import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 
@@ -84,7 +86,11 @@ public class CaseWorkerRefController {
             consumes = "multipart/form-data")
     @Secured("cwd-admin")
     public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam("file")  MultipartFile file) {
-        return caseWorkerServiceFacade.processFile(file);
+        long time1 = System.currentTimeMillis();
+        ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(file);
+        log.info("----Time taken to upload the given file "
+                + (System.currentTimeMillis() - time1));
+        return responseEntity;
     }
 
     @ApiOperation(
@@ -135,15 +141,21 @@ public class CaseWorkerRefController {
                 CaseWorkerProfileCreationResponse
                         .builder()
                         .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY);
+        long time1 = System.currentTimeMillis();
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-
+        log.info("----Time taken to process the given file "
+                + (System.currentTimeMillis() - time1));
         if (!processedCwProfiles.isEmpty()) {
+            long time2 = System.currentTimeMillis();
             caseWorkerService.publishCaseWorkerDataToTopic(processedCwProfiles);
+            log.info("----Time taken to publish the message "
+                    + (System.currentTimeMillis() - time2));
             List<String> caseWorkerIds = processedCwProfiles.stream()
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
             caseWorkerProfileCreationResponse
+                    .messageDetails(format(RECORDS_UPLOADED, caseWorkerIds.size()))
                     .caseWorkerIds(caseWorkerIds);
         }
         return ResponseEntity

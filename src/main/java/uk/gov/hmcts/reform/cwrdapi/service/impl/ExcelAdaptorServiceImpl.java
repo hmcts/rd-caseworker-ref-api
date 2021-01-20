@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -38,8 +39,10 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE
 @Service
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
+    private FormulaEvaluator formulaEvaluator = null;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
+        formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
@@ -177,6 +180,23 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                 return cell.getStringCellValue();
             case NUMERIC:
                 return Integer.valueOf((int)cell.getNumericCellValue());
+            case FORMULA:
+                return getValueFromFormula(cell);
+            default:
+                return null;
+        }
+    }
+    //This method has been added for functional test purpose.
+    //It should be removed before deploying to production
+
+    private Object getValueFromFormula(Cell cell) {
+        switch (formulaEvaluator.evaluateFormulaCell(cell)) {
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
+            case NUMERIC:
+                return cell.getNumericCellValue();
+            case STRING:
+                return cell.getStringCellValue();
             default:
                 return null;
         }
@@ -185,4 +205,5 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private void throwFileParsingException() {
         throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
     }
+
 }

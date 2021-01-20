@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import java.util.List;
 
 @Service
+@Slf4j
 public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
     @Autowired
@@ -39,16 +41,23 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     @Override
     @SuppressWarnings("unchecked")
     public ResponseEntity<Object> processFile(MultipartFile file) {
+        long time1 = System.currentTimeMillis();
         Workbook workbook = excelValidatorService.validateExcelFile(file);
+        log.info("----Time taken to validate the given file "
+                        + (System.currentTimeMillis() - time1));
         String fileName = file.getOriginalFilename();
         Class<? extends CaseWorkerDomain> ob = fileName != null
-                        && fileName.startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
+                        && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
                         ? CaseWorkerProfile.class : ServiceRoleMapping.class;
-
+        long time2 = System.currentTimeMillis();
         List<CaseWorkerDomain> caseWorkerRequest = ( List<CaseWorkerDomain>) excelAdaptorService
                             .parseExcel(workbook, ob);
-
+        log.info("----Time taken to parse the given file "
+                + (System.currentTimeMillis() - time2));
+        long time3 = System.currentTimeMillis();
         List<CaseWorkerDomain> invalidRecords = validationService.getInvalidRecords(caseWorkerRequest);
+        log.info("----Time taken to validate the records "
+                + (System.currentTimeMillis() - time3));
         if (!invalidRecords.isEmpty()) {
             caseWorkerRequest.removeAll(invalidRecords);
         }

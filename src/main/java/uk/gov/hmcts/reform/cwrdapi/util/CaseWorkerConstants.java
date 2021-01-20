@@ -52,8 +52,9 @@ public final class CaseWorkerConstants {
     public static final String REQUIRED_CW_SHEET_NAME = "Case Worker Data";
     public static final String REQUIRED_ROLE_MAPPING_SHEET_NAME = "IDAM Mapping";
 
-    public static final String CASE_WORKER_FILE_NAME = "CaseWorker";
-    public static final String SERVICE_ROLE_MAPPING_FILE_NAME = "ServiceRoleMapping";
+    public static final String CASE_WORKER_FILE_NAME = "caseworker";
+    public static final String RECORDS_UPLOADED =
+            "%s record(s) uploaded";
 
 
 }

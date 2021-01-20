@@ -7,7 +7,6 @@ import io.restassured.specification.MultiPartSpecification;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.poi.util.IOUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -37,9 +37,6 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
 
     @Test
-    @Ignore(value = "Need to delete the case worker ids in IDAM, UP and in CRD so that next time when the test runs "
-            + "it would create new users instead of updating. Deleting the ids requires a lot of effort. "
-            + "So ignoring the test for now and it will be worked as a separate task")
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
@@ -51,12 +48,12 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
         assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
+        assertEquals(format(CaseWorkerConstants.RECORDS_UPLOADED,
+                caseWorkerProfileCreationResponse.getCaseWorkerIds().size()),
+                caseWorkerProfileCreationResponse.getMessageDetails());
     }
 
     @Test
-    @Ignore(value = "Need to delete the case worker ids in IDAM, UP and in CRD so that when the test runs next time,"
-            + " it would create new users instead of updating. Deleting the ids requires a lot of effort. "
-            + "So ignoring the test for now and it will be worked as a separate task")
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
@@ -69,6 +66,9 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
         assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
+        assertEquals(format(CaseWorkerConstants.RECORDS_UPLOADED,
+                caseWorkerProfileCreationResponse.getCaseWorkerIds().size()),
+                caseWorkerProfileCreationResponse.getMessageDetails());
     }
 
     @Test
