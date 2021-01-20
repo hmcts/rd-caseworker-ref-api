@@ -54,7 +54,8 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
-    public void whenUserNotExistsInCrdAndSidamAndUp_Ac1() {
+    //this test verifies new User profile is created
+    public void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
@@ -68,7 +69,8 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = false)
-    public void whenUserNotExistsInCwrAndSidamAndUp_Ac1_LD_disabled() {
+    //this test verifies new User profile is created is prohibited when api is toggled off
+    public void createCwWhenUserNotExistsInCwrAndSidamAndUp_Ac1_LD_disabled() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
@@ -82,14 +84,16 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void whenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() {
+    //this test verifies new User profile is created when user is already present in SIDAM
+    public void createCwWhenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() {
         List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
         UserProfileResponse upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         assertEquals(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN), upResponse.getRoles());
     }
 
     @Test
-    public void whenUserExistsInCwrAndUpAndExistsInSidam_Ac3() {
+    //this test verifies User profile is updated when user is already present in CW, UP and SIDAM
+    public void createCwWhenUserExistsInCwrAndUpAndExistsInSidam_Ac3() {
 
         List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
         String email = profileCreateRequests.get(0).getEmailId();
@@ -142,7 +146,9 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void whenUserExistsInCwrAndUpAndExistsInSidamAndDeleteFlagTrue_Ac4() {
+    // this test verifies User profile is updated when user is already present in CW, UP , SIDAM and delete
+    // flag is sent is request then user should be suspended in UP and SIDAM
+    public void createCwWhenUserExistsInCwrAndUpAndExistsInSidamAndDeleteFlagTrue_Ac4() {
 
         List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
         profileCreateRequests.get(0).setSuspended(true);
@@ -159,7 +165,9 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void whenUserExistsInCwrAndUpAndExistsInSidamAndRolesAreSame_Ac5() {
+    // this test verifies User profile is updated when user is already present in CW, UP , SIDAM and roles are same as
+    // SIDAM, then just update user in CWR
+    public void createCwWhenUserExistsInCwrAndUpAndExistsInSidamAndRolesAreSame_Ac5() {
 
         List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
 
@@ -170,6 +178,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    // this test verifies User profile are fetched from CWR
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetCaseWorkerDetails() {
         if (caseWorkerIds.isEmpty()) {
@@ -211,6 +220,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    // this test verifies User profile are not fetched from CWR when toggled off
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = false)
     public void should_retrieve_403_when_Api_toggled_off() {
 
@@ -227,6 +237,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() {
         if (caseWorkerIds.isEmpty()) {
@@ -274,6 +285,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    // this test verifies User profile are not fetched from CWR when user is invalid
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("dummyRole")

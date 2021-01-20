@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -87,7 +88,7 @@ public class IdamOpenIdClient {
     }
 
     public String getcwdAdminOpenIdToken() {
-        if (crdAdminToken == null) {
+        if (isNull(crdAdminToken)) {
             Map<String, String> userCreds = createUser("cwd-admin");
             crdAdminToken = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
         }

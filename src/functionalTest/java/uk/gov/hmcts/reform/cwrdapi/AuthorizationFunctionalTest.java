@@ -66,7 +66,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@cwrfunctestuser.com";
+    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@@justice.gov.uk";
     public static final String CWD_USER = "cwd-user";
     public static final String CASEWORKER_IAC_BULKSCAN = "caseworker-iac-bulkscan";
     public static final String CASEWORKER_IAC = "caseworker-iac";
