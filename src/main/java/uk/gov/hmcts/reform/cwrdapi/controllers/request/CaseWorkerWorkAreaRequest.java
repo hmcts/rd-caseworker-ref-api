@@ -11,9 +11,7 @@ import lombok.Setter;
 @Builder(builderMethodName = "caseWorkerWorkAreaRequest")
 public class CaseWorkerWorkAreaRequest {
 
-    @JsonProperty("area_of_work")
     private String areaOfWork;
-    @JsonProperty("service_code")
     private String serviceCode;
 
     @JsonCreator

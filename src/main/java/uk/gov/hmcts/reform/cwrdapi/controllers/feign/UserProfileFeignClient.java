@@ -31,9 +31,8 @@ public interface UserProfileFeignClient {
                              @RequestParam(value = "origin") String origin);
 
 
-    @GetMapping(
-        value = "/v1/userprofile/{id}/roles")
-    @RequestLine("PUT /v1/userprofile/{id}/roles")
+    @GetMapping(value = "/v1/userprofile/{id}/roles")
+    @RequestLine("GET /v1/userprofile/{id}/roles")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
         "Content-Type: application/json"})
     Response getUserProfileWithRolesById(@PathVariable String id);
