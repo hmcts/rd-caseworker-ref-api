@@ -182,7 +182,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void setIsPrimaryField(Object childDomainObject, MappingField mappingField, String domainObjectColumnName) {
-        if (StringUtils.isNotEmpty(mappingField.isPrimary()) && domainObjectColumnName.equals(mappingField.isPrimary())) {
+        if (StringUtils.isNotEmpty(mappingField.isPrimary())
+                && domainObjectColumnName.equals(mappingField.isPrimary())) {
             try {
                 Field primaryField = childDomainObject.getClass().getDeclaredField(IS_PRIMARY_FIELD);
                 setFieldValue(primaryField, childDomainObject, true);
