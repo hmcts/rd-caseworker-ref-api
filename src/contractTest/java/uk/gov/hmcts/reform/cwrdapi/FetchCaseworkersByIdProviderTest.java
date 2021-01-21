@@ -23,8 +23,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
-import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
 import java.time.LocalDateTime;
@@ -50,10 +49,7 @@ public class FetchCaseworkersByIdProviderTest {
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
 
     @Mock
-    ExcelValidatorService excelValidatorService;
-
-    @Mock
-    ExcelAdaptorService excelAdaptorService;
+    CaseWorkerServiceFacade caseWorkerServiceFacade;
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -69,7 +65,8 @@ public class FetchCaseworkersByIdProviderTest {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
-                new CaseWorkerRefController(caseWorkerServiceImpl, excelValidatorService, excelAdaptorService));
+                new CaseWorkerRefController(
+                        "RD-Caseworker-Ref-Api", caseWorkerServiceImpl, caseWorkerServiceFacade));
         context.setTarget(testTarget);
         MockitoAnnotations.openMocks(this);
     }
