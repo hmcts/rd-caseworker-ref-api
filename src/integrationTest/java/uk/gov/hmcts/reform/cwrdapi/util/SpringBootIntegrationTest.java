@@ -7,7 +7,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = CaseWorkerRefApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = CaseWorkerRefApiApplication.class, webEnvironment =
+        SpringBootTest.WebEnvironment.DEFINED_PORT)
 public abstract class SpringBootIntegrationTest {
 
     @LocalServerPort

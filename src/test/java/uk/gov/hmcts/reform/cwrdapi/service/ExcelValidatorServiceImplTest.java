@@ -47,13 +47,13 @@ public class ExcelValidatorServiceImplTest {
     public void sendXlsTest() throws IOException {
         Workbook workbook = excelValidatorServiceImpl
                 .validateExcelFile(
-                        getMultipartFile("src/test/resources/WithNoPasswordSet.xls", TYPE_XLS));
+                        getMultipartFile("src/test/resources/CaseWorkerUserXlsWithNoPassword.xls", TYPE_XLS));
         assertThat(workbook).isNotNull();
     }
 
     @Test
     public void sendXlsWithPasswordTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/test/resources/WithPassword.xlsx", TYPE_XLS);
+        MultipartFile file = getMultipartFile("src/test/resources/CaseWorkerUserWithPassword.xlsx", TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
@@ -61,14 +61,14 @@ public class ExcelValidatorServiceImplTest {
 
     @Test
     public void sendXlsxTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/test/resources/WithNoPasswordSet.xlsx", TYPE_XLSX);
+        MultipartFile file = getMultipartFile("src/test/resources/CaseWorkerUserXlsxWithNoPassword.xlsx", TYPE_XLSX);
         Workbook workbook = excelValidatorServiceImpl.validateExcelFile(file);
         assertThat(workbook).isNotNull();
     }
 
     @Test
     public void sendXlsxWithPasswordTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/test/resources/WithPassword.xlsx", TYPE_XLSX);
+        MultipartFile file = getMultipartFile("src/test/resources/CaseWorkerUserWithPassword.xlsx", TYPE_XLSX);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);

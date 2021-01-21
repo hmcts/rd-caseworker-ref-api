@@ -168,8 +168,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             newCaseWorkerProfiles.addAll(updateCaseWorkerProfiles);
         }
         if (isNotEmpty(newCaseWorkerProfiles)) {
+            long time1 = System.currentTimeMillis();
             processedCwProfiles = caseWorkerProfileRepo.saveAll(newCaseWorkerProfiles);
             log.info("{}:: case worker profiles inserted ::{}", loggingComponentName, processedCwProfiles.size());
+            log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
+                    (System.currentTimeMillis() - time1));
         }
         return processedCwProfiles;
     }
@@ -185,7 +188,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Set<String> serviceCodes = new HashSet<>();
         serviceRoleMappings.forEach(serviceRoleMapping -> {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
-            caseWorkerIdamRoleAssociation.setRoleId((long) serviceRoleMapping.getRoleId());
+            caseWorkerIdamRoleAssociation.setRoleId(serviceRoleMapping.getRoleId().longValue());
             caseWorkerIdamRoleAssociation.setIdamRole(serviceRoleMapping.getIdamRoles());
             caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getSerivceId());
             serviceCodes.add(serviceRoleMapping.getSerivceId());
@@ -437,15 +440,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return caseWorkerRoles;
     }
 
-    /**
-     * Idam_UP call.
-     */
+
+    // Idam_UP call.
     private ResponseEntity<Object> createUserProfileInIdamUP(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Response response = null;
         Object clazz;
         try {
+            long time1 = System.currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
+            log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
             if (response.status() == 201 || response.status() == 409) {
                 clazz = UserProfileCreationResponse.class;
             } else {
@@ -470,9 +474,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
     }
 
-    /**
-     * creating user profile request.
-     */
+    // creating user profile request
     public UserProfileCreationRequest createUserProfileRequest(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
@@ -494,9 +496,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             false);
     }
 
-    /**
-     * get the roleTypes and userTypes.
-     */
+
+    // get the roleTypes and userTypes.
     public void getRolesAndUserTypes() {
 
         if (roleTypes.isEmpty()) {
@@ -508,9 +509,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
     }
 
-    /**
-     * get the roles that needs to send to idam based on the roleType in the request.
-     */
+
+    // get the roles that needs to send to idam based on the roleType in the request.
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerIdamRoleAssociation> idamRolesInRequest = new ArrayList<>();
         cwrdProfileRequest.getRoles().forEach(role ->
@@ -524,9 +524,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * get the userTypeId by description.
-     */
+    // get the userTypeId by description.
     public Long getUserTypeIdByDesc(String userTypeReq) {
         Optional<Long> userTypeId = userTypes.stream().filter(userType ->
             userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
@@ -535,4 +533,3 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
 }
-

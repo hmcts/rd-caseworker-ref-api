@@ -59,7 +59,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
-        Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+            Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
@@ -76,7 +76,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .body(caseWorkersProfileCreationRequests)
-                .post("/refdata/case-worker/users/")
+                .post("/refdata/case-worker/users")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
         assertThat(response.getBody().asString()).contains(CustomSerenityRunner.getFeatureFlagName().concat(" ")
@@ -192,7 +192,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
             Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                     .body(caseWorkersProfileCreationRequests)
-                    .post("/refdata/case-worker/users/")
+                    .post("/refdata/case-worker/users")
                     .andReturn();
             response.then()
                     .assertThat()
@@ -246,7 +246,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
 
             Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                     .body(caseWorkersProfileCreationRequests)
-                    .post("/refdata/case-worker/users/")
+                    .post("/refdata/case-worker/users")
                     .andReturn();
             response.then()
                     .assertThat()

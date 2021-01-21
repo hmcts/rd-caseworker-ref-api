@@ -172,7 +172,7 @@ public class CaseWorkerApiClient {
     public Response createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(caseWorkersProfileCreationRequests)
-                .post("/refdata/case-worker/users/")
+                .post("/refdata/case-worker/users")
                 .andReturn();
         log.info(":: Create user profile response status code :: " + response.statusCode());
 

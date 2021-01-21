@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
 import java.util.LinkedList;
 import java.util.UUID;
@@ -32,7 +33,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.decodeJwtToken;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
@@ -48,6 +51,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @MockBean
     protected FeatureToggleServiceImpl featureToggleServiceImpl;
+    @MockBean
+    TopicPublisher topicPublisher;
 
     @MockBean
     LDClient ldClient;
@@ -83,6 +88,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void setUpClient() {
         caseworkerReferenceDataClient = new CaseWorkerReferenceDataClient(port, issuer, expiration);
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
+        doNothing().when(topicPublisher).sendMessage(any());
     }
 
     @Before
@@ -120,15 +126,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Before
     public void userProfileGetUserWireMock() {
-        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
-                        .withStatus(200)
+                        .withStatus(201)
                         .withBody("{"
-                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"prashanth\","
-                                + "  \"lastName\": \"rao\","
-                                + "  \"email\": \"super.user@hmcts.net\""
+                                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"idamRegistrationResponse\":\"201\""
                                 + "}")));
     }
 
