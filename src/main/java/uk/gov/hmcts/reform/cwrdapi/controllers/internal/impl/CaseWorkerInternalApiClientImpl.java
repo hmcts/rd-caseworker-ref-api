@@ -18,12 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AUTHORIZATION;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SERVICE_AUTHORIZATION;
 
 @Service
 public class CaseWorkerInternalApiClientImpl implements CaseWorkerInternalApiClient {
 
-    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
-    public static final String AUTHORIZATION = "Authorization";
     @Autowired
     RestTemplate restTemplate;
     @Value("${server.port}")

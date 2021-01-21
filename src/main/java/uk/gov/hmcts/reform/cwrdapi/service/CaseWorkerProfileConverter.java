@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,9 +49,9 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
                             .emailId(obj.getOfficialEmail())
                             .region(obj.getRegionName())
                             .regionId(obj.getRegionId())
-                            .suspended(Boolean.parseBoolean(obj.getSuspended()))
+                            .suspended("Y".equals(obj.getSuspended()))
                             .userType(obj.getUserType())
-                            .idamRoles(null == obj.getIdamRoles() ? null :
+                            .idamRoles(Objects.isNull(obj.getIdamRoles()) ? null :
                                     generateIdamRoles(obj.getIdamRoles()))
                             .baseLocations(generateCaseWorkerLocations(obj.getLocations()))
                             .roles(generateCaseWorkerRoles(obj.getRoles()))

@@ -129,7 +129,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
              caseworker profile and no need to explicitly invoke the save method for each entities.
              */
             if (! CollectionUtils.isEmpty(caseWorkerProfiles)) {
+                long time1 = System.currentTimeMillis();
                 processedCwProfiles = caseWorkerProfileRepo.saveAll(caseWorkerProfiles);
+                log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
+                        (System.currentTimeMillis() - time1));
             }
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
@@ -151,7 +154,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Set<String> serviceCodes = new HashSet<>();
         serviceRoleMappings.forEach(serviceRoleMapping -> {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
-            caseWorkerIdamRoleAssociation.setRoleId((long) serviceRoleMapping.getRoleId());
+            caseWorkerIdamRoleAssociation.setRoleId(serviceRoleMapping.getRoleId().longValue());
             caseWorkerIdamRoleAssociation.setIdamRole(serviceRoleMapping.getIdamRoles());
             caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getSerivceId());
             serviceCodes.add(serviceRoleMapping.getSerivceId());
@@ -292,7 +295,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(cwrdProfileRequest);
         if (Objects.nonNull(responseEntity) && responseEntity.getStatusCode().is2xxSuccessful()
                 && Objects.nonNull(responseEntity.getBody())) {
-
             UserProfileCreationResponse userProfileCreationResponse
                     = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
 
@@ -371,7 +373,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Response response = null;
         Object clazz = null;
         try {
+            long time1 = System.currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
+            log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
             if (response.status() == 201 || response.status() == 409) {
                 clazz = UserProfileCreationResponse.class;
             } else {

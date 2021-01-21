@@ -20,9 +20,11 @@ public class CaseWorkerProfileCreationResponseTest {
         assertThat(response.getCaseWorkerRegistrationResponse()).isEqualTo("response");
 
         CaseWorkerProfileCreationResponse response1 =
-                new CaseWorkerProfileCreationResponse("response", ids);
+                new CaseWorkerProfileCreationResponse("response",
+                        "response details", ids);
         assertThat(response1).isNotNull();
         assertThat(response1.getCaseWorkerRegistrationResponse()).isEqualTo("response");
+        assertThat(response1.getMessageDetails()).isEqualTo("response details");
         assertThat(response1.getCaseWorkerIds().get(0)).isEqualTo("1234");
     }
 }

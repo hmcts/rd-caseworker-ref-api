@@ -26,7 +26,7 @@ public class ServiceRoleMapping extends CaseWorkerDomain {
     @MappingField(columnName = "Roles")
     @NotNull
     @JsonProperty(value = "role")
-    int roleId;
+    Integer roleId;
 
     @MappingField(columnName = "Idam Roles")
     @NotEmpty

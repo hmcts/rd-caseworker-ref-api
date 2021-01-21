@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
@@ -44,11 +45,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE
 @SuppressWarnings("unchecked")
 @Slf4j
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
+    private FormulaEvaluator formulaEvaluator = null;
 
     @Value("${excel.acceptableHeaders}")
     private List<String> acceptableHeaders;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
+        formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
@@ -58,7 +61,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         } else {
             sheet = workbook.getSheet(REQUIRED_ROLE_MAPPING_SHEET_NAME);
         }
-        if (null == sheet) {
+        if (Objects.isNull(sheet)) {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_VALID_SHEET_ERROR_MESSAGE);
         } else if (sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
@@ -155,7 +158,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void setFieldValue(Field field, Object bean, Object value) {
-        if (nonNull(field) && nonNull(value)) {
+        if (nonNull(field)) {
             makeAccessible(field);
             setField(field, bean, value);
         }
@@ -182,8 +185,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void setIsPrimaryField(Object childDomainObject, MappingField mappingField, String domainObjectColumnName) {
-        if (StringUtils.isNotEmpty(mappingField.isPrimary())
-                && domainObjectColumnName.equals(mappingField.isPrimary())) {
+        if (nonNull(mappingField.isPrimary()) && domainObjectColumnName.equals(mappingField.isPrimary())) {
             try {
                 Field primaryField = childDomainObject.getClass().getDeclaredField(IS_PRIMARY_FIELD);
                 setFieldValue(primaryField, childDomainObject, true);
@@ -199,6 +201,23 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                 return cell.getStringCellValue();
             case NUMERIC:
                 return Integer.valueOf((int)cell.getNumericCellValue());
+            case FORMULA:
+                return getValueFromFormula(cell);
+            default:
+                return null;
+        }
+    }
+    //This method has been added for functional test purpose.
+    //It should be removed before deploying to production
+
+    private Object getValueFromFormula(Cell cell) {
+        switch (formulaEvaluator.evaluateFormulaCell(cell)) {
+            case BOOLEAN:
+                return cell.getBooleanCellValue();
+            case NUMERIC:
+                return cell.getNumericCellValue();
+            case STRING:
+                return cell.getStringCellValue();
             default:
                 return null;
         }
@@ -207,4 +226,5 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private void throwFileParsingException() {
         throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
     }
+
 }
