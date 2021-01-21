@@ -15,6 +15,9 @@ public final class CaseWorkerConstants {
     public static final String CLASS_HSSF_WORKBOOK_FACTORY = "org.apache.poi.hssf.usermodel.HSSFWorkbookFactory";
     public static final String IS_PRIMARY_FIELD = "isPrimary";
     public static final String DELIMITER_COMMA = ",";
+    public static final String DOMAIN_JUSTICE_GOV_UK = "justice.gov.uk";
+    public static final String USER_NAME_PATTERN = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
+    public static final String INVALID_EMAIL = "Please provide a valid email.";
 
     //excel adapter related error messages
     public static final String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "File provided in request is not in xls(x) format";
@@ -59,6 +62,6 @@ public final class CaseWorkerConstants {
 
     public static final String CASE_WORKER_FILE_NAME = "CaseWorker";
     public static final String SERVICE_ROLE_MAPPING_FILE_NAME = "ServiceRoleMapping";
-
+    public static final String EMAIL_DOMAIN_INVALID = "The email id should have domain: justice.gov.uk";
 
 }
