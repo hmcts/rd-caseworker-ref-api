@@ -59,7 +59,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
-            Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+        Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
