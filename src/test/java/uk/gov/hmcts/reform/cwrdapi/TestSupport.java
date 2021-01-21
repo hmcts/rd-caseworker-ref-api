@@ -38,6 +38,7 @@ public class TestSupport {
             .workAreas(workAreas)
             .locations(locations)
             .roles(roles)
+            .idamRoles("role1, role2")
             .build());
     }
 }

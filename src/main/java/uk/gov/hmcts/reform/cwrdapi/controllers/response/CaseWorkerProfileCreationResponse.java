@@ -17,6 +17,8 @@ import java.util.List;
 public class CaseWorkerProfileCreationResponse {
     @JsonProperty("message")
     private String caseWorkerRegistrationResponse;
+    @JsonProperty("message_details")
+    private String messageDetails;
     @JsonProperty("case_worker_ids")
     private List<String> caseWorkerIds;
 }

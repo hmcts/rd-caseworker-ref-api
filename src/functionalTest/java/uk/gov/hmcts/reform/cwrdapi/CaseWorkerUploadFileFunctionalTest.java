@@ -1,15 +1,17 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.builder.MultiPartSpecBuilder;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.MultiPartSpecification;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
@@ -19,6 +21,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import static java.lang.String.format;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.util.ResourceUtils.getFile;
 
@@ -34,66 +39,64 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerProfileCreationResponse.class);
+        assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
+        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
+        assertEquals(format(CaseWorkerConstants.RECORDS_UPLOADED,
+                caseWorkerProfileCreationResponse.getCaseWorkerIds().size()),
+                caseWorkerProfileCreationResponse.getMessageDetails());
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/xlsWithNoPassword.xls",
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsWithNoPassword.xls",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerProfileCreationResponse.class);
+        assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
+        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
+        assertEquals(format(CaseWorkerConstants.RECORDS_UPLOADED,
+                caseWorkerProfileCreationResponse.getCaseWorkerIds().size()),
+                caseWorkerProfileCreationResponse.getMessageDetails());
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/test.txt", 400,
-                CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
+    public void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
+                201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
-    }
 
-
-    @Test
-    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xls",
-                400, CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE,
-                CaseWorkerConstants.TYPE_XLS, CWD_ADMIN);
+        IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(IdamRolesMappingResponse.class);
+        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+                .contains(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS));
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
-                400, CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE,
-                CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
-    }
-
-    @Test
-    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithOnlyHeader.xlsx",
-                400, CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
+    public void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
+                201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
                 CWD_ADMIN);
-    }
 
-    @Test
-    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenFileHasNoValidSheetName() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithInvalidSheetName.xlsx",
-                400, CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE, CaseWorkerConstants.TYPE_XLSX,
-                CWD_ADMIN);
-    }
-
-    @Test
-    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
-                400, CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE,
-                "application/octet-stream", CWD_ADMIN);
+        IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(IdamRolesMappingResponse.class);
+        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+                .contains(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS));
     }
 
     @Test
@@ -110,7 +113,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/WithPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithPassword.xlsx",
                 403, null,
                 CaseWorkerConstants.TYPE_XLSX, "Invalid");
     }
@@ -122,30 +125,28 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
-        uploadCaseWorkerFile("src/functionalTest/resources/xlsxWithNoPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
                 403, exceptionMessage,
                 CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
     }
 
-    private void uploadCaseWorkerFile(String filePath,
-                                      int statusCode,
-                                      String messageBody,
-                                      String header,
-                                      String role) throws IOException {
+    private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
+                                                               int statusCode,
+                                                               String messageBody,
+                                                               String header,
+                                                               String role) throws IOException {
         MultiPartSpecification multiPartSpec =  getMultipartFile(filePath, header);
 
         Response response = caseWorkerApiClient.getMultiPartWithAuthHeaders(role)
                 .multiPart(multiPartSpec)
-                .post("/refdata/case-worker/upload-file/")
+                .post("/refdata/case-worker/upload-file")
                 .andReturn();
-        String responseBody = response.then()
+        response.then()
                 .assertThat()
-                .statusCode(statusCode)
-                .extract()
-                .asString();
-        if (StringUtils.isNotBlank(messageBody)) {
-            assertTrue(responseBody.contains(messageBody));
-        }
+                .statusCode(statusCode);
+
+        return response.then()
+                .extract();
     }
 
 
