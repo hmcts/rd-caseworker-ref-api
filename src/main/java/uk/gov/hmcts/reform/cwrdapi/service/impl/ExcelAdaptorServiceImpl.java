@@ -68,7 +68,9 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         }
         List<String> headers = new LinkedList<>();
         collectHeaderList(headers, sheet);
-        validateHeaders(headers);
+        if (classType.equals(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class)) {
+            validateHeaders(headers);
+        }
         return mapToPojo(sheet, classType, headers);
     }
 
