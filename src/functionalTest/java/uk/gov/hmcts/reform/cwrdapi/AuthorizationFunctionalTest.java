@@ -113,6 +113,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @AfterClass
     public static void destroy() {
         emailsTobeDeleted.forEach(email -> idamOpenIdClient.deleteSidamUser(email));
+        log.info("delete idam user called");
     }
 
     public static String getS2sToken() {
