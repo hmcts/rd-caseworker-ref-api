@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -27,7 +28,9 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
+import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,16 +55,25 @@ public class FetchCaseworkersByIdProviderTest {
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
 
     @Autowired
-    RoleTypeRepository roleTypeRepository;
+    private RoleTypeRepository roleTypeRepository;
 
     @Autowired
-    UserTypeRepository userTypeRepository;
+    private UserTypeRepository userTypeRepository;
 
     @Autowired
-    CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
+    private CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
+
+    @Autowired
+    private IdamRoleMappingService idamRoleMappingService;
+
+    @Autowired
+    private UserProfileFeignClient userProfileFeignClient;
+
+    @Autowired
+    private TopicPublisher topicPublisher;
 
     @Mock
-    CaseWorkerServiceFacade caseWorkerServiceFacade;
+    private CaseWorkerServiceFacade caseWorkerServiceFacade;
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -80,7 +92,6 @@ public class FetchCaseworkersByIdProviderTest {
                 new CaseWorkerRefController(
                         "RD-Caseworker-Ref-Api", caseWorkerServiceImpl, caseWorkerServiceFacade));
         context.setTarget(testTarget);
-        MockitoAnnotations.openMocks(this);
     }
 
     @State({"A list of users for CRD request"})
