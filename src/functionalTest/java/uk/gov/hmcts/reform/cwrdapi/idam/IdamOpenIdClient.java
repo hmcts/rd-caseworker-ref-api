@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -24,19 +25,23 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.CREDS;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.EMAIL;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_SYSTEM_USER;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
 
 @Slf4j
 public class IdamOpenIdClient {
 
-    private TestConfigProperties testConfig;
+    private final TestConfigProperties testConfig;
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
-    private static String internalOpenIdTokenPrdAdmin;
+    public static String crdAdminToken;
 
     private static String sidamPassword;
+
+    public static String cwdSystemUserToken;
 
     public IdamOpenIdClient(TestConfigProperties testConfig) {
         this.testConfig = testConfig;
@@ -86,12 +91,38 @@ public class IdamOpenIdClient {
         return userCreds;
     }
 
-    public String getInternalOpenIdToken(String role) {
-        if (internalOpenIdTokenPrdAdmin == null || StringUtils.isNotEmpty(role)) {
-            Map<String, String> userCreds = StringUtils.isNotEmpty(role) ? createUser(role) : createUser("cwd-admin");
-            internalOpenIdTokenPrdAdmin = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
+    public String getcwdAdminOpenIdToken() {
+        if (isNull(crdAdminToken)) {
+            crdAdminToken = getToken(ROLE_CWD_ADMIN);
         }
-        return internalOpenIdTokenPrdAdmin;
+        return crdAdminToken;
+    }
+
+    public String getCwdSystemUserOpenIdToken() {
+        if (isNull(cwdSystemUserToken)) {
+            cwdSystemUserToken = getToken(ROLE_CWD_SYSTEM_USER);
+        }
+        return cwdSystemUserToken;
+    }
+
+    public String getOpenIdTokenByRole(String role) {
+        if (StringUtils.isNotEmpty(role)) {
+            if (ROLE_CWD_ADMIN.equals(role)) {
+                return getcwdAdminOpenIdToken();
+            } else if (ROLE_CWD_SYSTEM_USER.equals(role)) {
+                return getCwdSystemUserOpenIdToken();
+            } else {
+                return getToken(role);
+            }
+        } else {
+            getToken(ROLE_CWD_ADMIN);
+        }
+        return null;
+    }
+
+    public String getToken(String role) {
+        Map<String, String> userCreds = createUser(role);
+        return getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
     }
 
     public String getOpenIdToken(String userEmail, String password) {
@@ -138,13 +169,13 @@ public class IdamOpenIdClient {
 
     @AllArgsConstructor
     class User {
-        private String email;
-        private String forename;
-        private String id;
-        private String surname;
-        private String password;
-        private List<Role> roles;
-        private Group group;
+        private final String email;
+        private final String forename;
+        private final String id;
+        private final String surname;
+        private final String password;
+        private final List<Role> roles;
+        private final Group group;
     }
 
     @AllArgsConstructor

@@ -9,7 +9,7 @@ public class UserProfileUpdatedDataTest {
     @Test
     public void test_should_add_roles_add_when_modified() {
 
-        UserProfileUpdatedData userProfileUpdatedData = new UserProfileUpdatedData("ACTIVE");
+        UserProfileUpdatedData userProfileUpdatedData =  UserProfileUpdatedData.builder().idamStatus("ACTIVE").build();
         assertThat(userProfileUpdatedData.getIdamStatus()).isEqualTo("ACTIVE");
     }
 }

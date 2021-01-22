@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -21,6 +20,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import static javax.persistence.CascadeType.ALL;
 
 
 @Entity(name = "case_worker_profile")
@@ -71,15 +72,17 @@ public class CaseWorkerProfile implements Serializable {
     private LocalDateTime lastUpdate;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile", cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile", cascade = ALL,
+            orphanRemoval = true)
     private List<CaseWorkerLocation> caseWorkerLocations = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerWorkArea.class, mappedBy = "caseWorkerProfile", cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = CaseWorkerWorkArea.class, mappedBy = "caseWorkerProfile", cascade = ALL,
+            orphanRemoval = true)
     private List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = CaseWorkerRole.class, mappedBy = "caseWorkerProfile", cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = CaseWorkerRole.class, mappedBy = "caseWorkerProfile", cascade = ALL, orphanRemoval = true)
     private List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
 
     @ManyToOne

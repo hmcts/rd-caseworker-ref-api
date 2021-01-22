@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.getS2sToken;
-import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.getSidamToken;
+import static uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient.crdAdminToken;
 
 @Slf4j
 @Service
@@ -30,24 +30,24 @@ public class FuncTestRequestHandler {
                 path);
     }
 
-    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz, String baseUrl) throws Exception {
+    public <T> T sendGet(HttpStatus httpStatus, String urlPath, Class<T> clazz, String baseUrl) {
         return sendGet(httpStatus, urlPath, baseUrl).as(clazz);
     }
 
     public Response sendGet(HttpStatus httpStatus, String urlPath, String baseUrl) {
 
-        return SerenityRest
+        Response response =  SerenityRest
                 .given()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .baseUri(baseUrl)
                 .header("ServiceAuthorization", getS2sToken())
-                .header("Authorization", BEARER + getSidamToken())
+                .header("Authorization", BEARER + crdAdminToken)
                 .when()
-                .get(urlPath)
-                .then()
+                .get(urlPath);
+        log.info("UP get user response status code: {}", response.getStatusCode());
+        return response.then()
                 .log().all(true)
                 .statusCode(httpStatus.value()).extract().response();
     }
-
 
 }

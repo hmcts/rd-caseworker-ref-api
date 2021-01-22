@@ -4,6 +4,7 @@ import feign.Headers;
 import feign.RequestLine;
 import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,5 +29,12 @@ public interface UserProfileFeignClient {
             "Content-Type: application/json"})
     Response modifyUserRoles(@RequestBody UserProfileUpdatedData modifyRoles, @PathVariable("userId") String userId,
                              @RequestParam(value = "origin") String origin);
+
+
+    @GetMapping(value = "/v1/userprofile/{id}/roles")
+    @RequestLine("GET /v1/userprofile/{id}/roles")
+    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
+        "Content-Type: application/json"})
+    Response getUserProfileWithRolesById(@PathVariable String id);
 
 }
