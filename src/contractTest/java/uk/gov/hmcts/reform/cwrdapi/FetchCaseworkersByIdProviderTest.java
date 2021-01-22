@@ -22,7 +22,10 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
@@ -47,6 +50,15 @@ public class FetchCaseworkersByIdProviderTest {
 
     @Autowired
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
+
+    @Autowired
+    RoleTypeRepository roleTypeRepository;
+
+    @Autowired
+    UserTypeRepository userTypeRepository;
+
+    @Autowired
+    CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
 
     @Mock
     CaseWorkerServiceFacade caseWorkerServiceFacade;
