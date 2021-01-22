@@ -14,7 +14,6 @@ class SecurityUtilsTest {
     @Mock
     private final AuthTokenGenerator authTokenGenerator = mock(AuthTokenGenerator.class);
 
-    @InjectMocks
     private final SecurityUtils securityUtils = new SecurityUtils(
             authTokenGenerator
     );
