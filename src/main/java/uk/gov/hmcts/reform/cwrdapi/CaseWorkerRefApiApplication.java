@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 @EnableJpaAuditing
@@ -16,7 +17,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 @EnableRetry
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.cwrdapi" },
-    basePackageClasses = { IdamApi.class }
+    basePackageClasses = { IdamApi.class, ServiceAuthorisationApi.class}
 )
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class CaseWorkerRefApiApplication {

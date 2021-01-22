@@ -25,6 +25,8 @@ spring:
           order_inserts: true
   application:
     name: RD Caseworker Ref API
+  main:
+    allow-bean-definition-overriding: true
   security:
     oauth2:
       client:
