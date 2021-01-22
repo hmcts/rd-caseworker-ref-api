@@ -120,6 +120,7 @@ crd:
     caseWorkerDataPerMessage: ${CWRD_DATA_PER_MESSAGE:50}
 
 excel:
+  password: ${EXCEL_PASSWORD:1234}
   acceptableHeaders: ${EXCEL_ACCEPTABLE_HEADERS:FIRST NAME,LAST NAME,Official Email,Region,User type}
 
 launchdarkly:
