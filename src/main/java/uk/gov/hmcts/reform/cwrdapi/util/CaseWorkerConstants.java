@@ -53,11 +53,16 @@ public final class CaseWorkerConstants {
     public static final String REQUIRED_ROLE_MAPPING_SHEET_NAME = "Service to CW Roles Mapping";
 
     public static final String CASE_WORKER_FILE_NAME = "caseworker";
-    public static final String RECORDS_UPLOADED =
-            "%s record(s) uploaded";
+
+    public static final String RECORDS_UPLOADED = "%s record(s) uploaded";
+
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
 
+    public static final String IDAM_STATUS_SUSPENDED = "SUSPENDED";
+
+    public static final String ORIGIN_EXUI = "EXUI";
 
 }

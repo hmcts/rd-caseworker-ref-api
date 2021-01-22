@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
@@ -126,7 +125,22 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Before
     public void userProfileGetUserWireMock() {
-        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile.*"))
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody("{"
+                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"firstName\": \"prashanth\","
+                                + "  \"lastName\": \"rao\","
+                                + "  \"email\": \"super.user@hmcts.net\""
+                                + "}")));
+    }
+
+
+    @Before
+    public void userProfilePostUserWireMock() {
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(201)
@@ -141,6 +155,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     }
 
+    /*@Before
     public void userProfileCreateUserWireMock(HttpStatus status) {
         String body = null;
         int returnHttpStaus = status.value();
@@ -152,13 +167,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             returnHttpStaus = 201;
         }
 
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(body)
-                        .withStatus(returnHttpStaus)
-                ));
-    }
+
+    }*/
 
     public static class CaseWorkerTransformer extends ResponseTransformer {
         @Override

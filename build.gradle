@@ -202,8 +202,8 @@ sonarqube {
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/cwrdapi/config/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**,"
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/util/SecurityUtils.java"
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/util/SecurityUtils.java" +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/request/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
   }
