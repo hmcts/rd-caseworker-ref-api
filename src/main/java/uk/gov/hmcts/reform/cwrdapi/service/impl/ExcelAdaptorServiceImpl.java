@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
@@ -33,8 +31,6 @@ import static org.springframework.util.ReflectionUtils.makeAccessible;
 import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADERS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADER_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IS_PRIMARY_FIELD;
@@ -43,12 +39,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE
 
 @Service
 @SuppressWarnings("unchecked")
-@Slf4j
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private FormulaEvaluator formulaEvaluator = null;
-
-    @Value("${excel.acceptableHeaders}")
-    private List<String> acceptableHeaders;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
@@ -66,30 +58,16 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         } else if (sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
-        List<String> headers = new LinkedList<>();
-        collectHeaderList(headers, sheet);
-        if (classType.equals(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class)) {
-            validateHeaders(headers);
-        }
-        return mapToPojo(sheet, classType, headers);
+        return mapToPojo(sheet, classType);
     }
 
-    private void validateHeaders(List<String> headers) {
-        //below mentioned code can be shortened to headers.containsAll(acceptableHeaders),
-        //but current code is better from debugging standpoint.
-        acceptableHeaders.forEach(acceptableHeader -> {
-            if (!headers.contains(acceptableHeader)) {
-                log.warn(String.format(FILE_MISSING_HEADER_NAME, acceptableHeader));
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_MISSING_HEADERS);
-            }
-        });
-    }
-
-    private <T> List<T> mapToPojo(Sheet sheet, Class<T> classType, List<String> headers) {
+    private <T> List<T> mapToPojo(Sheet sheet, Class<T> classType) {
         List<T> objectList = new ArrayList<>();
         Map<String, Object> childHeaderToCellMap = new HashMap<>();
         Map<String, Field> parentFieldMap = new HashMap<>();
+        List<String> headers = new LinkedList<>();
 
+        collectHeaderList(headers, sheet);
         //scan parent and domain object fields by reflection and make maps
         List<Triple<String,Field, List<Field>>> customObjectFieldsMapping =
                 createBeanFieldMaps(classType, parentFieldMap);

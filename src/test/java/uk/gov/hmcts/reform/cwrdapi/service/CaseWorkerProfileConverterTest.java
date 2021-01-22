@@ -24,7 +24,7 @@ public class CaseWorkerProfileConverterTest {
         CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest = convert.get(0);
         assertNotNull(caseWorkersProfileCreationRequest.getBaseLocations());
         assertNotNull(caseWorkersProfileCreationRequest.getIdamRoles());
-        assertEquals("test@justice.gov.uk", caseWorkersProfileCreationRequest.getEmailId());
+        assertEquals("test@test.com", caseWorkersProfileCreationRequest.getEmailId());
         assertEquals("test", caseWorkersProfileCreationRequest.getFirstName());
         assertEquals("test", caseWorkersProfileCreationRequest.getLastName());
         assertEquals("test", caseWorkersProfileCreationRequest.getRegion());
