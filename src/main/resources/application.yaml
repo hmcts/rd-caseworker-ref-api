@@ -25,6 +25,8 @@ spring:
           order_inserts: true
   application:
     name: RD Caseworker Ref API
+  main:
+    allow-bean-definition-overriding: true
   security:
     oauth2:
       client:
@@ -116,6 +118,10 @@ crd:
           # DO NOT SET THIS 'true' IN PRODUCTION!
           trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
     caseWorkerDataPerMessage: ${CWRD_DATA_PER_MESSAGE:50}
+
+excel:
+  password: ${EXCEL_PASSWORD:1234}
+  acceptableHeaders: ${EXCEL_ACCEPTABLE_HEADERS:FIRST NAME,LAST NAME,Official Email,Region,User type}
 
 launchdarkly:
   sdk:
