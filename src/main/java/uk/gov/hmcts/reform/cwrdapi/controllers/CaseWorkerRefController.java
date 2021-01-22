@@ -257,7 +257,7 @@ public class CaseWorkerRefController {
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured("cwd-admin")
+    @Secured({"cwd-system-user"})
     public ResponseEntity<Object> fetchCaseworkersById(@RequestBody UserRequest userRequest) {
 
         if (CollectionUtils.isEmpty(userRequest.getUserIds())) {
