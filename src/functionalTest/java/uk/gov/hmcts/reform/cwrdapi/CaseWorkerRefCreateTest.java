@@ -109,7 +109,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
             caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
             assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
         }
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-system-user")
                 .body(UserRequest.builder().userIds(caseWorkerIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
@@ -133,7 +133,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 caseWorkerApiClient.createCaseWorkerProfiles());
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-system-user")
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/fetchUsersById")
                 .andReturn();
@@ -162,7 +162,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         }
         List<String> tempCwIds = new ArrayList<>(caseWorkerIds);
         tempCwIds.add("randomId");
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-system-user")
                 .body(UserRequest.builder().userIds(tempCwIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
