@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
