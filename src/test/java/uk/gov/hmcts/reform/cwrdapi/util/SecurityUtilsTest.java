@@ -26,12 +26,6 @@ class SecurityUtilsTest {
             + ".eyJzdWIiOiJjY2RfZ3ciLCJleHAiOjE1OTQ2ODQ5MTF9"
             + ".LH3aiNniHNMlTwuSdzgRic9sD_4inQv5oUqJ0kkRKVasS4RfhIz2tRdttf-sSMkUga1p1teOt2iCq4BQBDS7KA";
 
-
-    @BeforeEach
-    public void setUp() throws IOException {
-    }
-
-
     @Test
     void getServiceAuthorizationHeader() {
         String result = securityUtils.getServiceAuthorizationHeader();

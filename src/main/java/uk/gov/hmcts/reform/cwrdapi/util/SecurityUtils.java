@@ -9,7 +9,6 @@ public class SecurityUtils {
 
     private final AuthTokenGenerator authTokenGenerator;
 
-
     @Autowired
     public SecurityUtils(final AuthTokenGenerator authTokenGenerator) {
         this.authTokenGenerator = authTokenGenerator;
