@@ -11,8 +11,11 @@ import lombok.Setter;
 @Builder(builderMethodName = "caseWorkersLocationRequest")
 public class CaseWorkerLocationRequest {
 
+    @JsonProperty("location_id")
     private Integer locationId;
+    @JsonProperty("location")
     private String location;
+    @JsonProperty("is_primary")
     private boolean isPrimaryFlag;
 
     @JsonCreator

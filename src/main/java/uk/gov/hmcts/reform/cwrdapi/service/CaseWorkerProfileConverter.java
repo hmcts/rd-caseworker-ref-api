@@ -44,7 +44,7 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
                     CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest =
                             CaseWorkersProfileCreationRequest
                             .caseWorkersProfileCreationRequest()
-                            .firstName(obj.getLastName())
+                            .firstName(obj.getFirstName())
                             .lastName(obj.getLastName())
                             .emailId(obj.getOfficialEmail())
                             .region(obj.getRegionName())
