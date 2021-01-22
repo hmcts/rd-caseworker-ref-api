@@ -71,6 +71,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     public static final String CASEWORKER_IAC_BULKSCAN = "caseworker-iac-bulkscan";
     public static final String CASEWORKER_IAC = "caseworker-iac";
     public static final String USER_STATUS_SUSPENDED = "SUSPENDED";
+    public static final String ROLE_CWD_ADMIN = "cwd-admin";
+    public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
 
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
@@ -135,7 +137,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public List getUserProfilesFromCw(
             UserRequest userRequest, int expectedResponse) {
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal()
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
                 .body(userRequest).log().body(true)
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .then()

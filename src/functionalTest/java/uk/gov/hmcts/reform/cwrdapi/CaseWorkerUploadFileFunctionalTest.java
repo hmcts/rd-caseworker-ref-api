@@ -31,9 +31,7 @@ import static org.springframework.util.ResourceUtils.getFile;
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalTest {
-
-    public static final String CWD_ADMIN = "cwd-admin";
-
+    
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
 
     @Test
@@ -42,7 +40,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
-                CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
+                CaseWorkerConstants.TYPE_XLSX, ROLE_CWD_ADMIN);
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerProfileCreationResponse.class);
         assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
@@ -59,7 +57,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsWithNoPassword.xls",
                 201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
-                CWD_ADMIN);
+                ROLE_CWD_ADMIN);
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerProfileCreationResponse.class);
@@ -77,7 +75,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
                 201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
-                CWD_ADMIN);
+                ROLE_CWD_ADMIN);
 
         IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(IdamRolesMappingResponse.class);
@@ -91,7 +89,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
                 201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
-                CWD_ADMIN);
+                ROLE_CWD_ADMIN);
 
         IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(IdamRolesMappingResponse.class);
@@ -101,7 +99,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    public void shouldReturn401WhenAuthenticationInvalid() throws IOException {
+    public void shouldReturn401WhenAuthenticationInvalid() {
         Response response = caseWorkerApiClient.withUnauthenticatedRequest()
                 .post("/refdata/case-worker/upload-file/")
                 .andReturn();
@@ -127,7 +125,7 @@ public class CaseWorkerUploadFileFunctionalTest extends AuthorizationFunctionalT
 
         uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
                 403, exceptionMessage,
-                CaseWorkerConstants.TYPE_XLSX, CWD_ADMIN);
+                CaseWorkerConstants.TYPE_XLSX, ROLE_CWD_ADMIN);
     }
 
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,

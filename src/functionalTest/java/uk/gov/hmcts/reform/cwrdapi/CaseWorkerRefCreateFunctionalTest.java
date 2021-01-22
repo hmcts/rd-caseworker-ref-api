@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 @TestPropertySource(properties = {"spring.config.location=classpath:application-functional.yml"})
 @SuppressWarnings("unchecked")
-public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
+public class CaseWorkerRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefController.createCaseWorkerProfiles";
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefController.fetchCaseworkersById";
@@ -74,7 +74,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users")
                 .andReturn();
@@ -190,7 +190,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
             caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
                     .createCaseWorkerProfiles());
 
-            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
                     .body(caseWorkersProfileCreationRequests)
                     .post("/refdata/case-worker/users")
                     .andReturn();
@@ -203,7 +203,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
             caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
             assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
         }
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-system-user")
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
                 .body(UserRequest.builder().userIds(caseWorkerIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
@@ -228,7 +228,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
                 caseWorkerApiClient.createCaseWorkerProfiles());
         String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-system-user")
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/fetchUsersById")
                 .andReturn();
@@ -244,7 +244,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                     caseWorkerApiClient.createCaseWorkerProfiles();
 
-            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
                     .body(caseWorkersProfileCreationRequests)
                     .post("/refdata/case-worker/users")
                     .andReturn();
@@ -258,7 +258,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
         }
         List<String> tempCwIds = new ArrayList<>(caseWorkerIds);
         tempCwIds.add("randomId");
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-system-user")
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
                 .body(UserRequest.builder().userIds(tempCwIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
@@ -288,7 +288,7 @@ public class CaseWorkerRefCreateTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are not fetched from CWR when user is invalid
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRole() {
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("dummyRole")
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("prd-admin")
                 .body(UserRequest.builder().userIds(Collections.singletonList("someUUID")).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
