@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-class SecurityUtilsTest {
+public class SecurityUtilsTest {
 
     @Mock
     private final AuthTokenGenerator authTokenGenerator = mock(AuthTokenGenerator.class);
