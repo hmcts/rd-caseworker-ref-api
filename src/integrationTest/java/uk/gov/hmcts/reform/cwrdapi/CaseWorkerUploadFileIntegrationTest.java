@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.apache.poi.util.IOUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,18 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
+
+    @Autowired
+    SimpleJpaRepository<CaseWorkerAudit, Long> caseWorkerAuditRepository;
+
+    @Autowired
+    SimpleJpaRepository<ExceptionCaseWorker, Long> caseWorkerExceptionRepository;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    Map<String, Object> response = new HashMap<>();
+
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
@@ -145,5 +158,121 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         assertThat(response).containsEntry("http_status", status);
 
         return response;
+    }
+
+    @Test
+    public void shouldCreateCaseWorkerAuditSuccess() throws IOException {
+
+        String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
+            + "\"message_details\":\"1 record(s) uploaded\"}";
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+
+        String json = getJsonResponse(response);
+        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
+            .isEqualTo(objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class));
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(0);
+    }
+
+
+    @Test
+    public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
+
+        String exceptedResponse = "{\"message\":\"Request completed with partial success. "
+            + "Some records failed during validation and were ignored.\","
+            + "\"message_details\":\"1 record(s) failed validation, 1 record(s) uploaded\","
+            + "\"error_details\":[{\"row_id\":\"2\",\"field_in_error\":\"lastName\","
+            + "\"error_description\":\"must not be empty\"},"
+            + "{\"row_id\":\"2\",\"field_in_error\":\"locations\","
+            + "\"error_description\":\"no primary or secondary location exists\"}]}";
+
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        response = uploadCaseWorkerFile("CaseWorkerUserXlsWithJSR.xls",
+            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+
+        String json = getJsonResponse(response);
+        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
+            .isEqualTo(objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class));
+
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers.size()).isGreaterThanOrEqualTo(1);
+        assertThat(exceptionCaseWorkers.get(0).getFieldInError()).isEqualTo("lastName");
+        assertThat(exceptionCaseWorkers.get(1).getFieldInError()).isEqualTo("locations");
+        assertThat(exceptionCaseWorkers.get(0).getKeyField()).isEqualTo("test1@hmcts.net");
+        assertThat(exceptionCaseWorkers.get(1).getKeyField()).isEqualTo("test1@hmcts.net");
+    }
+
+    @Test
+    public void shouldCreateCaseWorkerAuditFailure() throws IOException {
+        //create invalid stub of UP for Exception validation
+        userProfileService.resetAll();
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(FAILURE.getStatus());
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
+        assertNotNull(exceptionCaseWorkers.get(0).getErrorDescription());
+    }
+
+    @Test
+    public void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
+        String exceptedResponse = "{\"message\":\"Request completed with partial success. Some records "
+            + "failed during validation and were ignored.\","
+            + "\"message_details\":\"1 record(s) failed validation, 0 record(s) uploaded\","
+            + "\"error_details\":[{\"row_id\":\"1\","
+            + "\"error_description\":\"Failed from UP with response status 404\"}]}";
+        userProfileService.resetAll();
+        response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+        String json = getJsonResponse(response);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
+            .isEqualTo(objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class));
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        userProfileService.resetAll();
+    }
+
+    @Test
+    public void shouldUploadServiceRoleMappingsXlsxFileWithJsr() throws IOException {
+
+        String exceptedResponse = "{\"message\":\"Request completed with partial success. "
+            + "Some records failed during validation and were ignored.\","
+            + "\"message_details\":\"2 record(s) failed validation, 2 record(s) uploaded\","
+            + "\"error_details\":[{\"row_id\":\"1\",\"field_in_error\":\"serivceId\",\"error_description\":"
+            + "\"must not be empty\"},{\"row_id\":\"2\",\"field_in_error\":\"idamRoles\","
+            + "\"error_description\":\"must not be empty\"},"
+            + "{\"row_id\":\"2\",\"field_in_error\":\"roleId\",\"error_description\":\"must not be null\"}]}";
+
+        response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9WithJSR.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+
+        //Audit & Exception for service Role Mapping
+        String json = getJsonResponse(response);
+        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
+            .isEqualTo(objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class));
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(3);
+    }
+
+    private String getJsonResponse(Map<String, Object> response) {
+        Gson gson = new Gson();
+        String json = gson.toJson(response.get("body"));
+        return json;
     }
 }

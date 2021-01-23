@@ -6,8 +6,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,25 +36,31 @@ public class CaseWorkerReferenceDataClient {
 
     private static final String APP_BASE_PATH = "/refdata/case-worker";
     private static String JWT_TOKEN = null;
-    private final Integer cwrdApiPort;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private RestTemplate restTemplate;
     private String baseUrl;
+    @Value("${oidc.issuer}")
     private String issuer;
+    @Value("${oidc.expiration}")
     private long expiration;
+    @Autowired
+    Environment environment;
 
-    @Value("${s2s-authorised.services}")
+    @Value("${idam.s2s-authorised.services}")
     private String serviceName;
 
-    public CaseWorkerReferenceDataClient(int port, String issuer, Long tokenExpirationInterval) {
-        this.cwrdApiPort = port;
-        this.baseUrl = "http://localhost:" + cwrdApiPort + APP_BASE_PATH;
-        this.issuer = issuer;
-        this.expiration = tokenExpirationInterval;
+    public CaseWorkerReferenceDataClient(int port) {
+        this.baseUrl = "http://localhost:" + port + APP_BASE_PATH;
     }
 
     public Map<String, Object> createCaseWorkerProfile(CaseWorkersProfileCreationRequest request, String role) {
-        return postRequest(baseUrl + "/users", request, role, null);
+        return postRequest(baseUrl + "/users/", request, role, null);
+    }
+
+    public Map<String, Object> createCaseWorkerProfile(List<CaseWorkersProfileCreationRequest> request, String role) {
+        return postRequest(baseUrl + "/users/", request, role, null);
     }
 
     public Map<String, Object> createIdamRolesAssoc(List<ServiceRoleMapping> serviceRoleMapping, String role) {
@@ -134,18 +142,14 @@ public class CaseWorkerReferenceDataClient {
     }
 
     private final String getBearerToken(String userId, String role) {
-
         return generateToken(issuer, expiration, userId, role);
-
     }
 
     public static String generateS2SToken(String serviceName) {
         return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
-                .compact();
+            .setSubject(serviceName)
+            .setIssuedAt(new Date())
+            .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+            .compact();
     }
-
-
 }
