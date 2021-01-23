@@ -197,7 +197,7 @@ public class CaseWorkerServiceImplTest {
 
     @Test(expected = IdamRolesMappingException.class)
     public void test_buildIdamRoleMappings_exception() {
-        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().build();
+        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().roleId(0).build();
         doThrow(new RuntimeException("Exception message"))
                 .when(idamRoleMappingService).buildIdamRoleAssociation(any());
         caseWorkerServiceImpl.buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));

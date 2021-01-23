@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationService;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,11 +37,11 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCE
 @DataJpaTest
 @TestPropertySource(properties = {"spring.config.location=classpath:application-test.yml"})
 @ContextConfiguration(classes = {CaseWorkerRefApiApplication.class, TestConfig.class, RepositoryConfig.class})
-public class ValidationServiceTest {
+public class ValidationServiceFacadeImplTest {
 
     @Spy
     @Autowired
-    ValidationService validationService;
+    ValidationServiceFacadeImpl validationServiceFacadeImpl;
 
     @Autowired
     JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
@@ -69,14 +69,14 @@ public class ValidationServiceTest {
             .status(PARTIAL_SUCCESS).build();
 
         simpleJpaRepositoryAudit.save(caseWorkerAudit);
-        ValidationService validationServiceSpy = spy(validationService);
-        validationServiceSpy.auditJsr(1);
+        ValidationServiceFacadeImpl validationServiceFacadeImplSpy = spy(validationServiceFacadeImpl);
+        validationServiceFacadeImplSpy.auditJsr(1);
         List<ExceptionCaseWorker> exceptionCaseWorkers = simpleJpaRepositoryException.findAll();
         assertNotNull(exceptionCaseWorkers);
         String error = exceptionCaseWorkers.stream().filter(s -> s.getFieldInError().equalsIgnoreCase("firstName"))
             .map(field -> field.getErrorDescription())
             .collect(Collectors.toList()).get(0);
         assertEquals("must not be empty", error);
-        verify(validationServiceSpy).auditJsr(1);
+        verify(validationServiceFacadeImplSpy).auditJsr(1);
     }
 }

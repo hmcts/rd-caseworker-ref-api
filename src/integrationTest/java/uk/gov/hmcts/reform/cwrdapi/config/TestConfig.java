@@ -2,8 +2,12 @@ package uk.gov.hmcts.reform.cwrdapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditService;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditAndExceptionRepositoryServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationService;
 
@@ -11,8 +15,8 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationService;
 public class TestConfig {
 
     @Bean
-    ValidationService validationService() {
-        return new ValidationService();
+    ValidationServiceFacadeImpl validationServiceFacadeImpl() {
+        return new ValidationServiceFacadeImpl();
     }
 
     @Bean
@@ -21,7 +25,7 @@ public class TestConfig {
     }
 
     @Bean
-    AuditService auditService() {
-        return new AuditService();
+    IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService() {
+        return new AuditAndExceptionRepositoryServiceImpl();
     }
 }

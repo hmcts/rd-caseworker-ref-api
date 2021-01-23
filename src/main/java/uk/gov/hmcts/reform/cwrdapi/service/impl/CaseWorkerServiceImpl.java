@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
+import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -47,12 +49,14 @@ import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -92,12 +96,20 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     List<UserType> userTypes = new ArrayList<>();
 
+    @Autowired
+    ValidationServiceFacadeImpl validationServiceFacade;
+
+    @Autowired
+    IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
+
+    List<ExceptionCaseWorker> upExceptionCaseWorkers;
 
     @Override
     public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
                                                                            cwrsProfilesCreationRequest) {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         List<CaseWorkerProfile> processedCwProfiles = new ArrayList<>();
+        upExceptionCaseWorkers = new LinkedList<>();
         try {
             getRolesAndUserTypes();
             cwrsProfilesCreationRequest.forEach(cwrProfileCreationRequest -> {
@@ -134,9 +146,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             log.info("{}::case worker profiles inserted::{}", loggingComponentName, caseWorkerProfiles.size());
 
         } catch (Exception exp) {
-
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
         }
+
         return processedCwProfiles;
     }
 
@@ -376,13 +388,24 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 clazz = UserProfileCreationResponse.class;
             } else {
                 clazz = ErrorResponse.class;
+                logUpFailures("Failed from UP with response status " + response.status(),
+                    cwrdProfileRequest.getRowId());
             }
 
         } catch (FeignException ex) {
             log.error("{}:: UserProfile api failed:: status code {}", loggingComponentName, ex.status());
             clazz = ErrorResponse.class;
+            //Log UP failures
+            logUpFailures(ex.getMessage(), cwrdProfileRequest.getRowId());
         }
         return JsonFeignResponseUtil.toResponseEntity(response, clazz);
+    }
+
+    private void logUpFailures(String message, long rowId) {
+        long jobId = validationServiceFacade.getJobId();
+        ExceptionCaseWorker exceptionCaseWorker = validationServiceFacade.createException(jobId, message, rowId);
+        upExceptionCaseWorkers.add(exceptionCaseWorker);
+        auditAndExceptionRepositoryService.auditException(exceptionCaseWorker);
     }
 
 
@@ -475,5 +498,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return userTypeId.orElse(0L);
     }
 
+    public List<ExceptionCaseWorker> getUpExceptionCaseWorkers() {
+        return upExceptionCaseWorkers;
+    }
 }
 

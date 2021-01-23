@@ -58,6 +58,7 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
                             .baseLocations(generateCaseWorkerLocations(obj.getLocations()))
                             .roles(generateCaseWorkerRoles(obj.getRoles()))
                             .workerWorkAreaRequests(generateCaseWorkerWorkAreaRequests(obj.getWorkAreas()))
+                            .rowId(obj.getRowId())
                             .build();
                     caseWorkersProfileCreationRequests.add(caseWorkersProfileCreationRequest);
                 });

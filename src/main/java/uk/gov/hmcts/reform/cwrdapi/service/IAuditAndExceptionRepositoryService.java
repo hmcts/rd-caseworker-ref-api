@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 
 import java.util.List;
 
-public interface IAuditService {
+public interface IAuditAndExceptionRepositoryService {
 
     /**
      * Capture and log scheduler details with file status.
@@ -28,4 +28,6 @@ public interface IAuditService {
      * @param exceptionCaseWorker ExceptionCaseWorker
      */
     void auditException(ExceptionCaseWorker exceptionCaseWorker);
+
+    List<ExceptionCaseWorker> getAllExceptions(Long jobId);
 }

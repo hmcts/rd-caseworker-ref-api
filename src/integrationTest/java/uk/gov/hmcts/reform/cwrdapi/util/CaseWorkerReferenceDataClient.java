@@ -129,7 +129,7 @@ public class CaseWorkerReferenceDataClient {
 
         response.put("http_status", responseEntity.getStatusCode().toString());
         response.put("headers", responseEntity.getHeaders().toString());
-
+        response.put("body",       responseEntity.getBody());
         return response;
     }
 

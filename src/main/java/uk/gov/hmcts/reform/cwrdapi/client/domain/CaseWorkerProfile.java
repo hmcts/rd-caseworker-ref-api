@@ -35,7 +35,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @NotEmpty
     private String lastName;
 
-    @MappingField(columnName = "Official Email")
+    @MappingField(columnName = "Official Email", position = 1)
     @NotEmpty
     @JsonProperty("email_id")
     private String officialEmail;
