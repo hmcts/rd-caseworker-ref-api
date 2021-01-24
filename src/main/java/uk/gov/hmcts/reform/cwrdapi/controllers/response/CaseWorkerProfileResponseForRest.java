@@ -20,3 +20,4 @@ public class CaseWorkerProfileResponseForRest {
     @JsonProperty
     List<ExceptionCaseWorker> exceptionCaseWorkers;
 }
+

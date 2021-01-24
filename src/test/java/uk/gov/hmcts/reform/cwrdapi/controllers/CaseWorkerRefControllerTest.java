@@ -125,8 +125,7 @@ public class CaseWorkerRefControllerTest {
         assertNotNull(actual);
         verify(caseWorkerServiceMock,times(1))
                 .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-        verify(caseWorkerServiceMock,times(1))
-                .publishCaseWorkerDataToTopic(any());
+        verify(caseWorkerServiceMock,times(1)).publishCaseWorkerDataToTopic(any());
     }
 
     @Test

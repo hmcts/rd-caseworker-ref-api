@@ -108,13 +108,13 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
-            "application/octet-stream", "400", cwdAdmin);
+                "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
+                CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
     @Test

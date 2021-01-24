@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
@@ -29,8 +30,10 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
@@ -40,12 +43,14 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -60,11 +65,15 @@ public class CaseWorkerServiceImplTest {
     @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepository;
     @Mock
+    CaseWorkerLocationRepository caseWorkerLocationRepository;
+    @Mock
+    CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
+    @Mock
+    CaseWorkerRoleRepository caseWorkerRoleRepository;
+    @Mock
     private RoleTypeRepository roleTypeRepository;
     @Mock
     private UserTypeRepository userTypeRepository;
-    @Mock
-    private CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
     @Mock
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
@@ -72,9 +81,11 @@ public class CaseWorkerServiceImplTest {
     @Mock
     private TopicPublisher topicPublisher;
 
-    private CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest;
+    private CaseWorkersProfileCreationRequest cwProfileCreationRequest;
     private RoleType roleType;
     private UserType userType;
+
+    ObjectMapper mapper = new ObjectMapper();
 
     @InjectMocks
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
@@ -101,7 +112,7 @@ public class CaseWorkerServiceImplTest {
                 .serviceCode("testServiceCode")
                 .build();
 
-        caseWorkersProfileCreationRequest = CaseWorkersProfileCreationRequest
+        cwProfileCreationRequest = CaseWorkersProfileCreationRequest
                 .caseWorkersProfileCreationRequest()
                 .suspended(false)
                 .emailId("test@test.com")
@@ -110,9 +121,9 @@ public class CaseWorkerServiceImplTest {
                 .lastName("testLN")
                 .region("testRegion")
                 .userType("testUser1")
-                .workerWorkAreaRequests(Collections.singletonList(caseWorkerWorkAreaRequest))
-                .baseLocations(Collections.singletonList(caseWorkerLocationRequest))
-                .roles(Collections.singletonList(caseWorkerRoleRequest))
+                .workerWorkAreaRequests(singletonList(caseWorkerWorkAreaRequest))
+                .baseLocations(singletonList(caseWorkerLocationRequest))
+                .roles(singletonList(caseWorkerRoleRequest))
                 .build();
 
         roleType = new RoleType();
@@ -130,36 +141,79 @@ public class CaseWorkerServiceImplTest {
         userProfileCreationResponse.setIdamId("12345678");
         userProfileCreationResponse.setIdamRegistrationResponse(1);
 
-        ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(roleTypeRepository.findAll()).thenReturn(Collections.singletonList(roleType));
-        when(userTypeRepository.findAll()).thenReturn(Collections.singletonList(userType));
-        when(caseWorkerProfileRepository.findByEmailId(caseWorkersProfileCreationRequest.getEmailId()))
+        when(roleTypeRepository.findAll()).thenReturn(singletonList(roleType));
+        when(userTypeRepository.findAll()).thenReturn(singletonList(userType));
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
                 .thenReturn(null);
         when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(201).build());
 
         caseWorkerServiceImpl
                 .processCaseWorkerProfiles(
-                        Collections.singletonList(caseWorkersProfileCreationRequest));
+                        singletonList(cwProfileCreationRequest));
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
     }
 
     @Test
-    public void testDeleteCwUserProfile() throws JsonProcessingException {
+    public void test_409WhileCwUserProfileCreation() throws JsonProcessingException {
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
 
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles =  Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setRoles(roles);
+
+        when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(mapper.writeValueAsString(userProfileCreationResponse),
+                        Charset.defaultCharset())
+                .status(409).build());
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                Charset.defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.modifyUserRoles(any(),any(),any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileCreationResponse),
+                                Charset.defaultCharset())
+                        .status(200).build());
+
+        when(roleTypeRepository.findAll()).thenReturn(singletonList(roleType));
+        when(userTypeRepository.findAll()).thenReturn(singletonList(userType));
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
+                .thenReturn(null);
+        when(caseWorkerProfileRepository.saveAll(any()))
+                .thenReturn(singletonList(new CaseWorkerProfile()));
+
+        List<CaseWorkerProfile> savedProfiles = caseWorkerServiceImpl
+                .processCaseWorkerProfiles(
+                        singletonList(cwProfileCreationRequest));
+
+        assertThat(savedProfiles).isNotEmpty();
+        verify(caseWorkerProfileRepository, times(1)).saveAll(any());
+    }
+
+    @Test
+    public void testSuspendCwUserProfile() throws JsonProcessingException {
+
+        cwProfileCreationRequest.setSuspended(true);
         CaseWorkerProfile profile = new CaseWorkerProfile();
         profile.setCaseWorkerId("1");
-        profile.setSuspended(true);
-        profile.setEmailId(caseWorkersProfileCreationRequest.getEmailId());
+        profile.setSuspended(false);
+        profile.setEmailId(cwProfileCreationRequest.getEmailId());
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(caseWorkerProfileRepository.findByEmailId(caseWorkersProfileCreationRequest.getEmailId()))
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
                 .thenReturn(profile);
 
         when(userProfileFeignClient.modifyUserRoles(any(),any(),any()))
@@ -169,11 +223,12 @@ public class CaseWorkerServiceImplTest {
 
         caseWorkerServiceImpl
                 .processCaseWorkerProfiles(
-                        Collections.singletonList(caseWorkersProfileCreationRequest));
+                        singletonList(cwProfileCreationRequest));
 
-        verify(caseWorkerProfileRepository, times(0)).saveAll(any());
+        verify(caseWorkerProfileRepository, times(1)).saveAll(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(),any(),any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        cwProfileCreationRequest.setSuspended(false);
     }
 
     @Test
@@ -185,7 +240,7 @@ public class CaseWorkerServiceImplTest {
                 .build();
 
         IdamRolesMappingResponse idamRolesMappingResponse = caseWorkerServiceImpl
-                .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
+                .buildIdamRoleMappings(singletonList(serviceRoleMapping));
 
         Set<String> serviceCode = new HashSet<>();
         serviceCode.add(serviceRoleMapping.getSerivceId());
@@ -197,10 +252,10 @@ public class CaseWorkerServiceImplTest {
 
     @Test(expected = IdamRolesMappingException.class)
     public void test_buildIdamRoleMappings_exception() {
-        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().roleId(0).build();
+        ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().roleId(1).build();
         doThrow(new RuntimeException("Exception message"))
                 .when(idamRoleMappingService).buildIdamRoleAssociation(any());
-        caseWorkerServiceImpl.buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
+        caseWorkerServiceImpl.buildIdamRoleMappings(singletonList(serviceRoleMapping));
     }
 
     @Test
@@ -222,18 +277,18 @@ public class CaseWorkerServiceImplTest {
 
     @Test(expected = ResourceNotFoundException.class)
     public void test_shouldThrow404WhenCaseworker_profile_not_found() {
-        doReturn(Collections.emptyList())
+        doReturn(emptyList())
                 .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(any());
-        caseWorkerServiceImpl.fetchCaseworkersById(Collections.singletonList(""));
+        caseWorkerServiceImpl.fetchCaseworkersById(singletonList(""));
     }
 
     @Test
     public void test_should_return_caseworker_profile() {
-        doReturn(Collections.singletonList(buildCaseWorkerProfile()))
-                .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(Collections.singletonList(
+        doReturn(singletonList(buildCaseWorkerProfile()))
+                .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(singletonList(
                         "27fbd198-552e-4c32-9caf-37be1545caaf"));
         caseWorkerServiceImpl.fetchCaseworkersById(
-                Collections.singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
+                singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
         verify(caseWorkerProfileRepository, times(1)).findByCaseWorkerIdIn(any());
     }
 
@@ -272,8 +327,8 @@ public class CaseWorkerServiceImplTest {
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
         caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
-        caseWorkerProfile.setCaseWorkerRoles(Collections.singletonList(caseWorkerRole));
-        caseWorkerProfile.setCaseWorkerLocations(Collections.singletonList(caseWorkerLocation));
+        caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
+        caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
         return caseWorkerProfile;
     }
 
@@ -315,11 +370,76 @@ public class CaseWorkerServiceImplTest {
                         .suspended("false")
                         .createdTime(LocalDateTime.now())
                         .lastUpdatedTime(LocalDateTime.now())
-                        .roles(Collections.singletonList(role))
-                        .locations(Collections.singletonList(location))
-                        .workAreas(Collections.singletonList(workArea))
+                        .roles(singletonList(role))
+                        .locations(singletonList(location))
+                        .workAreas(singletonList(workArea))
                         .build();
 
         return caseWorkerProfile;
     }
+
+    @Test
+    public void testUpdateRole() throws JsonProcessingException {
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("1");
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("1");
+        List<String> roles =  Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setRoles(roles);
+
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setEmailId(cwProfileCreationRequest.getEmailId());
+        profile.setSuspended(false);
+
+        String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
+        when(roleTypeRepository.findAll()).thenReturn(singletonList(roleType));
+        when(userTypeRepository.findAll()).thenReturn(singletonList(userType));
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
+                .thenReturn(profile);
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.modifyUserRoles(any(),any(),any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+        caseWorkerServiceImpl.processCaseWorkerProfiles(singletonList(cwProfileCreationRequest));
+
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(),any(),any());
+        verify(caseWorkerProfileRepository, times(1)).saveAll(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        verify(roleTypeRepository, times(1)).findAll();
+        verify(userTypeRepository, times(1)).findAll();
+        verify(caseWorkerLocationRepository,times(1)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerWorkAreaRepository,times(1)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerRoleRepository,times(1)).deleteByCaseWorkerProfileIn(any());
+
+    }
+
+    @Test
+    public void testMapCaseWorkerProfileRequest() {
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("1");
+        CaseWorkerProfile caseWorkerProfile = caseWorkerServiceImpl.mapCaseWorkerProfileRequest(
+                "1", cwProfileCreationRequest, new CaseWorkerProfile());
+
+        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("1");
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo(cwProfileCreationRequest.getFirstName());
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo(cwProfileCreationRequest.getLastName());
+        assertThat(caseWorkerProfile.getEmailId()).isEqualTo(cwProfileCreationRequest.getEmailId());
+        assertThat(caseWorkerProfile.getSuspended()).isFalse();
+        assertThat(caseWorkerProfile.getUserTypeId()).isZero();
+        assertThat(caseWorkerProfile.getRegionId()).isEqualTo(cwProfileCreationRequest.getRegionId());
+        assertThat(caseWorkerProfile.getRegion()).isEqualTo(cwProfileCreationRequest.getRegion());
+    }
+
 }

@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
@@ -14,14 +13,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
@@ -30,8 +27,6 @@ import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsT
 @Slf4j
 @Component
 public class CaseWorkerApiClient {
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     private static final String SERVICE_HEADER = "ServiceAuthorization";
     private static final String AUTHORIZATION_HEADER = "Authorization";
@@ -50,35 +45,6 @@ public class CaseWorkerApiClient {
         this.idamOpenIdClient = idamOpenIdClient;
     }
 
-    public IdamOpenIdClient getidamOpenIdClient() {
-        return idamOpenIdClient;
-    }
-
-    public String getWelcomePage() {
-        return withUnauthenticatedRequest()
-                .get("/")
-                .then()
-                .statusCode(OK.value())
-                .and()
-                .extract()
-                .response()
-                .body()
-                .asString();
-    }
-
-    public String getHealthPage() {
-        return withUnauthenticatedRequest()
-                .get("/health")
-                .then()
-                .statusCode(OK.value())
-                .and()
-                .extract()
-                .response()
-                .body()
-                .asString();
-    }
-
-
     public RequestSpecification withUnauthenticatedRequest() {
         return SerenityRest.given()
                 .relaxedHTTPSValidation()
@@ -87,13 +53,16 @@ public class CaseWorkerApiClient {
                 .header("Accepts", APPLICATION_JSON_VALUE);
     }
 
+    public RequestSpecification getMultipleAuthHeadersInternal() {
+        return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken());
+    }
+
     public RequestSpecification getMultipleAuthHeadersInternal(String role) {
-        return getMultipleAuthHeaders(idamOpenIdClient.getInternalOpenIdToken(role));
+        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenByRole(role));
     }
 
     public RequestSpecification getMultiPartWithAuthHeaders(String role) {
-        String userToken = idamOpenIdClient.getInternalOpenIdToken(role);
-
+        String userToken = idamOpenIdClient.getOpenIdTokenByRole(role);
         return SerenityRest.with()
                 .relaxedHTTPSValidation()
                 .baseUri(caseWorkerApiUrl)
@@ -147,9 +116,70 @@ public class CaseWorkerApiClient {
                         .workerWorkAreaRequests(areaRequests).build());
     }
 
-    @SuppressWarnings("unused")
-    private JsonNode parseJson(String jsonString) throws IOException {
-        return mapper.readTree(jsonString);
+    public List<CaseWorkersProfileCreationRequest> updateCaseWorkerProfileRequest(String... email) {
+        List<CaseWorkerLocationRequest> locationRequestList = List.of(
+                CaseWorkerLocationRequest
+                        .caseWorkersLocationRequest()
+                        .location("updated location")
+                        .locationId(3)
+                        .isPrimaryFlag(true).build(),
+                CaseWorkerLocationRequest
+                        .caseWorkersLocationRequest()
+                        .location("updated added new location")
+                        .locationId(1).isPrimaryFlag(false).build());
+
+        List<CaseWorkerRoleRequest> roleRequests = List.of(
+                CaseWorkerRoleRequest
+                        .caseWorkerRoleRequest()
+                        .role("senior-tribunal-caseworker")
+                        .isPrimaryFlag(true).build(),
+                CaseWorkerRoleRequest
+                        .caseWorkerRoleRequest()
+                        .role("tribunal-caseworker")
+                        .isPrimaryFlag(false).build());
+
+
+        List<CaseWorkerWorkAreaRequest> areaRequests = List.of(
+                CaseWorkerWorkAreaRequest
+                        .caseWorkerWorkAreaRequest()
+                        .serviceCode("BAA1")
+                        .areaOfWork("Non-Money Claims").build(),
+                CaseWorkerWorkAreaRequest
+                        .caseWorkerWorkAreaRequest()
+                        .serviceCode("BAA9")
+                        .areaOfWork("Possession Claims").build());
+
+        Set<String> idamRoles = new HashSet<>();
+
+        String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
+        setEmailsTobeDeleted(emailToUsed);
+        return ImmutableList.of(
+                CaseWorkersProfileCreationRequest
+                        .caseWorkersProfileCreationRequest()
+                        .firstName("updatedFirstName")
+                        .lastName("updatedLastName")
+                        .emailId(emailToUsed)
+                        .regionId(2)
+                        .region("County")
+                        .userType("CTRT")
+                        .suspended(false)
+                        .idamRoles(idamRoles)
+                        .baseLocations(locationRequestList)
+                        .roles(roleRequests)
+                        .workerWorkAreaRequests(areaRequests).build());
     }
 
+    public Response createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
+        Response response = getMultipleAuthHeadersInternal()
+                .body(caseWorkersProfileCreationRequests)
+                .post("/refdata/case-worker/users")
+                .andReturn();
+        log.info(":: Create user profile response status code :: " + response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(201);
+
+        return response;
+    }
 }

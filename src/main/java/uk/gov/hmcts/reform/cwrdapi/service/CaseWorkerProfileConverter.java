@@ -15,16 +15,14 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-
 @Component
 public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDomain>,
         List<CaseWorkersProfileCreationRequest>> {
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@cwrfunctestuser.com";
     public static final String COMMA = ",";
 
     /**
@@ -41,19 +39,19 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
         caseWorkerProfiles
                 .stream()
-                .map(obj -> (CaseWorkerProfile) obj)
+                .map(CaseWorkerProfile.class::cast)
                 .forEach(obj -> {
                     CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest =
                             CaseWorkersProfileCreationRequest
                             .caseWorkersProfileCreationRequest()
-                            .firstName(obj.getLastName())
+                            .firstName(obj.getFirstName())
                             .lastName(obj.getLastName())
                             .emailId(obj.getOfficialEmail())
                             .region(obj.getRegionName())
                             .regionId(obj.getRegionId())
-                            .suspended(Boolean.parseBoolean(obj.getSuspended()))
+                            .suspended("Y".equals(obj.getSuspended()))
                             .userType(obj.getUserType())
-                            .idamRoles(null == obj.getIdamRoles() ? null :
+                            .idamRoles(Objects.isNull(obj.getIdamRoles()) ? null :
                                     generateIdamRoles(obj.getIdamRoles()))
                             .baseLocations(generateCaseWorkerLocations(obj.getLocations()))
                             .roles(generateCaseWorkerRoles(obj.getRoles()))
@@ -113,9 +111,5 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
                 ? Stream.of(idamRoles.split(COMMA))
                         .collect(Collectors.toUnmodifiableSet())
                 : Set.of(idamRoles);
-    }
-
-    public static String generateRandomEmail() {
-        return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10));
     }
 }

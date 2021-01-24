@@ -62,7 +62,6 @@ public class CaseWorkerServiceFacadeImplTest {
     public void shouldProcessCaseWorkerFile() throws IOException {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
 
-        when(caseWorkerProfileConverter.convert(anyList())).thenReturn(new ArrayList<>());
         when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(new ArrayList<>());
 
         ResponseEntity<Object> responseEntity =
@@ -145,16 +144,10 @@ public class CaseWorkerServiceFacadeImplTest {
         caseWorkerDomains.add(caseWorkerProfile1);
         caseWorkerDomains.add(caseWorkerProfile2);
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(ImmutableList.of(caseWorkerProfile1));
-
         MultipartFile multipartFile =
             getMultipartFile("src/test/resources/" + fileName, TYPE_XLS);
         when(excelValidatorService.validateExcelFile(multipartFile))
             .thenReturn(workbook);
-        when(caseWorkerInternalApiClient.postRequest(any(), anyString()))
-            .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
-        when(excelAdaptorService
-            .parseExcel(workbook, CaseWorkerProfile.class))
-            .thenReturn(caseWorkerDomains);
         return multipartFile;
     }
 }
