@@ -10,8 +10,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.SecurityUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
+import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 public class FeignInterceptorConfiguration {
