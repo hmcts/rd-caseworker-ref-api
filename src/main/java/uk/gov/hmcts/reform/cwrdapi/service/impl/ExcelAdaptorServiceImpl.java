@@ -34,7 +34,6 @@ import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADERS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADER_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IS_PRIMARY_FIELD;
@@ -79,8 +78,9 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         //but current code is better from debugging standpoint.
         acceptableHeaders.forEach(acceptableHeader -> {
             if (!headers.contains(acceptableHeader)) {
-                log.warn(String.format(FILE_MISSING_HEADER_NAME, acceptableHeader));
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_MISSING_HEADERS);
+                log.error(String.format(FILE_MISSING_HEADERS, acceptableHeader));
+                throw new ExcelValidationException(HttpStatus.BAD_REQUEST,
+                        String.format(FILE_MISSING_HEADERS, acceptableHeader));
             }
         });
     }

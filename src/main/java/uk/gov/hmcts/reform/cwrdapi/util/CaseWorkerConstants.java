@@ -69,10 +69,6 @@ public final class CaseWorkerConstants {
 
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the provided file."
             + " Please upload a valid file in xls(x) format.";
-    public static final String FILE_MISSING_HEADERS =  "File is missing the required column headers."
+    public static final String FILE_MISSING_HEADERS =  "File is missing the required column header %s"
             + " Please check the file.";
-    public static final String FILE_MISSING_HEADER_NAME =  "File is missing the required column header %s";
-
-
-
 }
