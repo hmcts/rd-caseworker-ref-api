@@ -64,4 +64,18 @@ public final class CaseWorkerConstants {
 
     public static final String ORIGIN_EXUI = "EXUI";
 
+    public static final String UP_FAILURE_ROLES = "can't modify roles for user in UP";
+
+    public static final String STATUS_ACTIVE = "ACTIVE";
+
+    public static final String ALREADY_SUSPENDED_ERROR_MESSAGE = "user is suspended already";
+
+    public static final String UP_CREATION_FAILED = "Failed to crate in UP with response status %s";
+
+    public static final String REQUEST_FAILED_FILE_UPLOAD_JSR =
+        "Request completed with partial success. Some records failed during validation and were ignored.";
+
+    public static final String RECORDS_FAILED = "%s record(s) failed validation";
+
+    public static final String RECORDS_SUSPENDED = "%s  record(s) suspended";
 }

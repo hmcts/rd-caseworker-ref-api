@@ -27,11 +27,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 
 @Service
 @Slf4j
@@ -69,9 +79,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     @SuppressWarnings("unchecked")
     public ResponseEntity<Object> processFile(MultipartFile file) {
 
-
-        ResponseEntity<Object> responseEntity = ResponseEntity.noContent().build();
         AuditStatus status = SUCCESS;
+
 
         try {
 
@@ -99,7 +108,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             log.info("{}::Time taken to validate the records is {}", loggingComponentName,
                 (System.currentTimeMillis() - time3));
 
-            final int totalRecords = nonNull(caseWorkerRequest) ? caseWorkerRequest.size() : 0;
+            final int totalRecords = isNotEmpty(caseWorkerRequest) ? caseWorkerRequest.size() : 0;
+
             if (isNotEmpty(invalidRecords)) {
                 caseWorkerRequest.removeAll(invalidRecords);
                 //audit exceptions or invalid records
@@ -107,20 +117,16 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 //Inserts JSR exceptions
                 validationServiceFacadeImpl.auditJsr(jobId);
             }
+            boolean isCaseWorker = false;
             if (isNotEmpty(caseWorkerRequest)) {
                 if (caseWorkerRequest.get(0).getClass().isAssignableFrom(CaseWorkerProfile.class)) {
-
-                    //            List<CaseWorkerDomain> suspendedCaseworkers =
-                    //            caseWorkerRequest.stream().filter(s -> ((CaseWorkerProfile) s)
-                    //            .getSuspended().equals("Y"))
-                    //                       .collect(Collectors.toList());
-                    //             suspendedSize = (nonNull(suspendedCaseworkers)) ? suspendedCaseworkers.size()
-                    //             : suspendedSize;
 
                     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests
                         = caseWorkerProfileConverter.convert(caseWorkerRequest);
                     caseWorkerInternalClient
                         .postRequest(caseWorkersProfileCreationRequests, "/users");
+                    isCaseWorker = true;
+
                 } else {
                     caseWorkerInternalClient.postRequest(caseWorkerRequest, "/idam-roles-mapping");
                 }
@@ -135,7 +141,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             validationServiceFacadeImpl.insertAudit(status, file.getName());
 
             CaseWorkerFileCreationResponse caseWorkerFileCreationResponse =
-                createResponse(totalRecords, exceptionCaseWorkerList);
+                createResponse(totalRecords, exceptionCaseWorkerList, isCaseWorker);
 
             return ResponseEntity.ok().body(caseWorkerFileCreationResponse);
 
@@ -154,7 +160,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
      * @return CaseWorkerFileCreationResponse CaseWorkerFileCreationResponse
      */
     private CaseWorkerFileCreationResponse createResponse(int noOfUploadedRecords,
-                                                          List<ExceptionCaseWorker> exceptionCaseWorkerList) {
+                                                          List<ExceptionCaseWorker> exceptionCaseWorkerList,
+                                                          boolean isCaseWorker) {
         var caseWorkerFileCreationResponseBuilder =
             CaseWorkerFileCreationResponse.builder();
 
@@ -176,15 +183,29 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             noOfUploadedRecords = noOfUploadedRecords - failedRecords.size();
 
-            return caseWorkerFileCreationResponseBuilder.message("Request completed with partial success. Some records "
-                + "failed during validation and were ignored.")
-                .detailedMessage(failedRecords.size() + " record(s) failed validation, " + noOfUploadedRecords
-                    + " record(s) uploaded").errorDetails(jsrFileErrors).build();
+            String suspendedRecordMessage = getSuspendedErrorMessage(isCaseWorker, failedRecords);
 
+            return caseWorkerFileCreationResponseBuilder.message(REQUEST_FAILED_FILE_UPLOAD_JSR)
+                .detailedMessage(format(RECORDS_FAILED, failedRecords.size()) + DELIMITER_COMMA + SPACE
+                    + format(RECORDS_UPLOADED, noOfUploadedRecords)
+                    + suspendedRecordMessage).errorDetails(jsrFileErrors).build();
         } else {
             return caseWorkerFileCreationResponseBuilder
-                .message("Request Completed Successfully")
-                .detailedMessage(noOfUploadedRecords + " record(s) uploaded").build();
+                .message(REQUEST_COMPLETED_SUCCESSFULLY)
+                .detailedMessage(format(RECORDS_UPLOADED, noOfUploadedRecords)).build();
         }
+    }
+
+    private String getSuspendedErrorMessage(boolean isCaseWorker,
+                                            Map<String, List<ExceptionCaseWorker>> failedRecords) {
+        String suspendedRecordMessage = EMPTY;
+        if (isCaseWorker && isNotEmpty(caseWorkerProfileConverter.getSuspendedRowIds())) {
+            int suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
+                .filter(s -> failedRecords.containsKey(Long.toString(s))).collect(toList()).size();
+            suspendedRecordMessage = DELIMITER_COMMA + SPACE
+                + format(RECORDS_SUSPENDED,
+                (caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed));
+        }
+        return suspendedRecordMessage;
     }
 }
