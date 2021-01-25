@@ -41,7 +41,6 @@ public class FeignInterceptorConfiguration {
                     log.warn("{}:: FeignHeadConfiguration {}", loggingComponentName, "Failed to get request header!");
                 }
             }
-
             requestTemplate.header(CaseWorkerConstants.SERVICE_AUTHORIZATION, CaseWorkerConstants.BEARER
                     + securityUtils.getServiceAuthorizationHeader());
         };
