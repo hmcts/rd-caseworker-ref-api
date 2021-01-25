@@ -10,8 +10,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.SecurityUtils;
 
-import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 @Slf4j
 public class FeignInterceptorConfiguration {
@@ -41,7 +41,7 @@ public class FeignInterceptorConfiguration {
                     log.warn("{}:: FeignHeadConfiguration {}", loggingComponentName, "Failed to get request header!");
                 }
             }
-            requestTemplate.header(CaseWorkerConstants.SERVICE_AUTHORIZATION, "Bearer "
+            requestTemplate.header(CaseWorkerConstants.SERVICE_AUTHORIZATION, CaseWorkerConstants.BEARER
                     + securityUtils.getServiceAuthorizationHeader());
         };
     }
