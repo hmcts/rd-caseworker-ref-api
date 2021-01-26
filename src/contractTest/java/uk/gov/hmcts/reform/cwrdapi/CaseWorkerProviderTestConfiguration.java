@@ -7,17 +7,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
-import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
 import java.io.IOException;
 import java.sql.Connection;
