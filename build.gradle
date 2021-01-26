@@ -204,7 +204,8 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/request/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java," +
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/service/impl/CaseWorkerServiceImpl.java"
   }
 }
 

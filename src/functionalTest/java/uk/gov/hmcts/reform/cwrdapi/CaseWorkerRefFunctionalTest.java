@@ -11,6 +11,7 @@ import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.ComponentScan;
@@ -106,6 +107,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore
     //this test verifies User profile is updated when user is already present in CW, UP and SIDAM
     public void createCwWhenUserExistsInCwrAndUpAndExistsInSidam_Ac3() {
 
@@ -160,6 +162,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore
     // this test verifies User profile is updated when user is already present in CW, UP , SIDAM and delete
     // flag is sent is request then user should be suspended in UP and SIDAM
     public void createCwWhenUserExistsInCwrAndUpAndExistsInSidamAndDeleteFlagTrue_Ac4() {
@@ -179,6 +182,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @Ignore
     // this test verifies User profile is updated when user is already present in CW, UP , SIDAM and roles are same as
     // SIDAM, then just update user in CWR
     public void createCwWhenUserExistsInCwrAndUpAndExistsInSidamAndRolesAreSame_Ac5() {
