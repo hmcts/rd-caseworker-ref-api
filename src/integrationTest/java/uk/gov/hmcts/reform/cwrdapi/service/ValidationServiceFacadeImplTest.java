@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.cwrdapi.config.RepositoryConfig;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 
@@ -51,6 +53,9 @@ public class ValidationServiceFacadeImplTest {
 
     @Autowired
     SimpleJpaRepository<CaseWorkerAudit, Long> simpleJpaRepositoryAudit;
+
+    @MockBean
+    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     @Test
     public void testAuditJsr() {

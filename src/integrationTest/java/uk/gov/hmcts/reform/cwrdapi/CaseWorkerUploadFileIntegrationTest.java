@@ -11,6 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
@@ -78,7 +80,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
-        assertThat(exceptionCaseWorkers.size()).isEqualTo(0);
+        assertThat(exceptionCaseWorkers).isEmpty();
     }
 
     @Test
@@ -108,13 +110,13 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
-                "application/octet-stream", "400", cwdAdmin);
+            "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
-                CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
+            CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
     @Test
@@ -177,7 +179,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
-        assertThat(exceptionCaseWorkers.size()).isEqualTo(0);
+        assertThat(exceptionCaseWorkers).isEmpty();
     }
 
 
@@ -196,19 +198,20 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         response = uploadCaseWorkerFile("CaseWorkerUserXlsWithJSR.xls",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
-        String json = getJsonResponse(response);
-        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class));
+        CaseWorkerFileCreationResponse resultResponse =
+            objectMapper.readValue(getJsonResponse(response), CaseWorkerFileCreationResponse.class);
+        CaseWorkerFileCreationResponse expectedResponse =
+            objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class);
+
+        assertThat(expectedResponse.getDetailedMessage()).isEqualTo(resultResponse.getDetailedMessage());
+        assertThat(expectedResponse.getErrorDetails()).containsAll(resultResponse.getErrorDetails());
+        assertThat(expectedResponse.getMessage()).isEqualTo(resultResponse.getMessage());
 
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
-        assertThat(exceptionCaseWorkers.size()).isGreaterThanOrEqualTo(1);
-        assertThat(exceptionCaseWorkers.get(0).getFieldInError()).isEqualTo("lastName");
-        assertThat(exceptionCaseWorkers.get(1).getFieldInError()).isEqualTo("locations");
-        assertThat(exceptionCaseWorkers.get(0).getKeyField()).isEqualTo("test1@hmcts.net");
-        assertThat(exceptionCaseWorkers.get(1).getKeyField()).isEqualTo("test1@hmcts.net");
+        assertThat(exceptionCaseWorkers).hasSizeGreaterThanOrEqualTo(1);
     }
 
     @Test
@@ -228,12 +231,13 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     @Test
     public void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
-        String exceptedResponse = "{\"message\":\"Request completed with partial success. Some records "
-            + "failed during validation and were ignored.\","
-            + "\"message_details\":\"1 record(s) failed validation, 0 record(s) uploaded\","
-            + "\"error_details\":[{\"row_id\":\"1\","
-            + "\"error_description\":\"Failed from UP with response status 404\"}]}";
         userProfileService.resetAll();
+        String exceptedResponse = "{\"message\":\"Request completed with partial success. "
+            + "Some records failed during validation "
+            + "and were ignored.\",\"message_details\":\"1 record(s) failed validation, \","
+            + "\"error_details\":[{\"row_id\":\"1\","
+            + "\"error_description\":\"Failed to crate in UP with response status 404\"}]}";
+
         response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
@@ -260,9 +264,15 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
         //Audit & Exception for service Role Mapping
-        String json = getJsonResponse(response);
-        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class));
+        CaseWorkerFileCreationResponse resultResponse =
+            objectMapper.readValue(getJsonResponse(response), CaseWorkerFileCreationResponse.class);
+        CaseWorkerFileCreationResponse expectedResponse =
+            objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class);
+
+        assertThat(expectedResponse.getDetailedMessage()).isEqualTo(resultResponse.getDetailedMessage());
+        assertThat(expectedResponse.getErrorDetails()).containsAll(resultResponse.getErrorDetails());
+        assertThat(expectedResponse.getMessage()).isEqualTo(resultResponse.getMessage());
+
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());

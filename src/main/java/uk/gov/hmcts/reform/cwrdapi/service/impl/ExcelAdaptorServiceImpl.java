@@ -96,16 +96,26 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             List<Object> domainObjectList = new ArrayList<>();
             int objectCount = findAnnotation(parentField, MappingField.class).objectCount();//take count from parent
             for (int i = 0; i < objectCount; i++) {
-                Object childDomainObject = getInstanceOf(customObjectTriple.getLeft());//instantiate child domain object
+
+                //getInstanceOf(customObjectTriple.getLeft());//instantiate child domain object
+                Object childDomainObject = null;
                 for (Field childField: customObjectTriple.getRight()) {
                     MappingField mappingField = findAnnotation(childField, MappingField.class);
                     if (nonNull(mappingField)) {
                         String domainObjectColumnName = mappingField.columnName().split(DELIMITER_COMMA)[i].trim();
-                        setFieldValue(childField, childDomainObject, childHeaderValues.get(domainObjectColumnName));
-                        setIsPrimaryField(childDomainObject, mappingField, domainObjectColumnName);
+                        Object fieldValue = childHeaderValues.get(domainObjectColumnName);
+                        if (nonNull(fieldValue)) {
+                            childDomainObject = isNull(childDomainObject) ? getInstanceOf(customObjectTriple.getLeft())
+                                : childDomainObject;
+                            setFieldValue(childField, childDomainObject, fieldValue);
+                            setIsPrimaryField(childDomainObject, mappingField, domainObjectColumnName);
+                        }
+
                     }
                 }
-                domainObjectList.add(childDomainObject);//add populated child domain object into list
+                if (nonNull(childDomainObject)) {
+                    domainObjectList.add(childDomainObject); //add populated child domain object into list
+                }
             }
             setFieldValue(parentField, parentBean, domainObjectList);//finally set list to parent field
         });

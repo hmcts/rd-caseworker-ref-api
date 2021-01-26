@@ -57,6 +57,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -152,6 +153,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     //when profile is new then create new user profile
                     caseWorkerProfile = createCaseWorkerProfile(cwrRequest);
                     newCaseWorkerProfiles.add(caseWorkerProfile);
+
                 } else if (isTrue(caseWorkerProfile.getSuspended())) {
                     //when existing profile with delete flag is true then log exception
                     // add entry in exception table
@@ -171,6 +173,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     updateCaseWorkerProfiles.add(caseWorkerProfile);
                 }
             }
+
+            newCaseWorkerProfiles = newCaseWorkerProfiles.stream()
+                .filter(Objects::nonNull).collect(Collectors.toList());
+            updateCaseWorkerProfiles = updateCaseWorkerProfiles.stream()
+                .filter(Objects::nonNull).collect(Collectors.toList());
             processedCwProfiles = persistCaseWorkerInBatch(newCaseWorkerProfiles, updateCaseWorkerProfiles, requestMap);
         } catch (Exception exp) {
             log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);

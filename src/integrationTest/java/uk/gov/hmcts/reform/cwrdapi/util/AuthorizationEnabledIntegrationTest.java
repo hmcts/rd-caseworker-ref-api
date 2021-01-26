@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.cwrdapi.config.RestTemplateConfiguration;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
@@ -88,6 +89,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Value("${oidc.expiration}")
     private long expiration;
+
+    @MockBean
+    AuthTokenGenerator authTokenGenerator;
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
