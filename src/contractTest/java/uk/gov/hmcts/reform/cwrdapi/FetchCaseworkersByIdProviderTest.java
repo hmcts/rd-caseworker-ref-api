@@ -15,24 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefController;
-import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
-import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
-import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,33 +50,6 @@ public class FetchCaseworkersByIdProviderTest {
 
     @Autowired
     private DataSource ds;
-
-    @Autowired
-    private RoleTypeRepository roleTypeRepository;
-
-    @Autowired
-    private UserTypeRepository userTypeRepository;
-
-    @Autowired
-    private CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
-
-    @Autowired
-    private IdamRoleMappingService idamRoleMappingService;
-
-    @Autowired
-    private UserProfileFeignClient userProfileFeignClient;
-
-    @Autowired
-    private TopicPublisher topicPublisher;
-
-    @Autowired
-    private CaseWorkerLocationRepository caseWorkerLocationRepository;
-
-    @Autowired
-    private CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
-
-    @Autowired
-    private CaseWorkerRoleRepository caseWorkerRoleRepository;
 
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
@@ -144,8 +108,8 @@ public class FetchCaseworkersByIdProviderTest {
                 "lastName",
                 "sam.test@justice.gov.uk",
                 1L,
-                1,
                 "National",
+                1,
                 false,
                 timeNow,
                 timeNow,
