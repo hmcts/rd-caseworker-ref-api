@@ -103,7 +103,6 @@ feign:
   allow:
     headers:
       - authorization
-      - serviceauthorization
 userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
 
 crd:
