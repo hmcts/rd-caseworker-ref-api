@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
-import uk.gov.hmcts.reform.cwrdapi.util.SecurityUtils;
 
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ public class FeignInterceptorConfiguration {
     private String loggingComponentName;
 
     @Autowired
-    SecurityUtils securityUtils;
+    AuthTokenGenerator authTokenGenerator;
 
     @Bean
     public RequestInterceptor requestInterceptor(FeignHeaderConfig config) {
@@ -42,7 +42,7 @@ public class FeignInterceptorConfiguration {
                 }
             }
             requestTemplate.header(CaseWorkerConstants.SERVICE_AUTHORIZATION, CaseWorkerConstants.BEARER
-                    + securityUtils.getServiceAuthorizationHeader());
+                    + authTokenGenerator.generate());
         };
     }
 }
