@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
@@ -438,4 +437,3 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         return multiPartSpecBuilder.build();
     }
 }
-*/
