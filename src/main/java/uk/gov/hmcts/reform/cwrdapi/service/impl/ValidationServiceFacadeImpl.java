@@ -157,6 +157,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
         } else {
             caseWorkerAudit.setStatus(auditStatus.getStatus());
             caseWorkerAudit.setJobEndTime(LocalDateTime.now());
+            caseWorkerAudit.setJobId(getJobId());
         }
         return caseWorkerAudit;
     }

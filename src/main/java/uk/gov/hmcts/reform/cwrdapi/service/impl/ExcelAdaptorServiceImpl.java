@@ -73,7 +73,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                 createBeanFieldMaps(classType, parentFieldMap);
         Iterator<Row> rowIterator = sheet.rowIterator();
         rowIterator.next();//skip header
-        Field rowField = getRowIdField(classType);
+        Field rowField = getRowIdField((Class<Object>) classType);
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Object bean = getInstanceOf(classType.getName());//create parent object
@@ -210,11 +210,11 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         }
     }
 
-    private Field getRowIdField(Class classType) {
+    private Field getRowIdField(Class<Object> classType) {
         try {
             return classType.getSuperclass().getDeclaredField("rowId");
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException("invalid Row exception");
+            throw new IllegalArgumentException("invalid Row exception");
         }
     }
 

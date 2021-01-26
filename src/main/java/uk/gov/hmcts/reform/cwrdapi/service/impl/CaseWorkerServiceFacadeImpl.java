@@ -90,10 +90,9 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             log.info("{}::Time taken to validate the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time1));
 
-            Class<? extends CaseWorkerDomain> ob = file.getOriginalFilename() != null
-                && file.getOriginalFilename().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
+            Class<? extends CaseWorkerDomain> ob = nonNull(fileName)
+                && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
                 ? CaseWorkerProfile.class : ServiceRoleMapping.class;
-
 
             long time2 = System.currentTimeMillis();
             List<CaseWorkerDomain> caseWorkerRequest = (List<CaseWorkerDomain>) excelAdaptorService
