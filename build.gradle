@@ -197,7 +197,6 @@ sonarqube {
   properties {
     property "sonar.projectName", "reform::rd-caseworker-ref-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:reform::rd-caseworker-ref-api"
-    property "sonar.exclusions", "src/main/java/uk/**"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.pitest.mode", "reuseReport"
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
