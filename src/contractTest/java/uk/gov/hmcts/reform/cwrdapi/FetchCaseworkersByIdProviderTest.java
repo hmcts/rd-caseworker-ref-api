@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.sql.DataSource;
 
 import static org.mockito.Mockito.doReturn;
 
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.doReturn;
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}", host = "${PACT_BROKER_URL:localhost}",
         port = "${PACT_BROKER_PORT:9292}")
 @Import(CaseWorkerProviderTestConfiguration.class)
-@SpringBootTest(properties = { "crd.publisher.caseWorkerDataPerMessage=1" })
+@SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 public class FetchCaseworkersByIdProviderTest {
 
     @Autowired
@@ -55,6 +56,9 @@ public class FetchCaseworkersByIdProviderTest {
 
     @Autowired
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
+
+    @Autowired
+    private DataSource ds;
 
     @Autowired
     private RoleTypeRepository roleTypeRepository;
