@@ -165,46 +165,53 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         var caseWorkerFileCreationResponseBuilder =
             CaseWorkerFileCreationResponse.builder();
 
+        noOfUploadedRecords = noOfUploadedRecords - caseWorkerProfileConverter
+            .getSuspendedRowIds().size();
 
-        if (nonNull(exceptionCaseWorkerList) && exceptionCaseWorkerList.size() > 0) {
+        if (isNotEmpty(exceptionCaseWorkerList)) {
 
             Map<String, List<ExceptionCaseWorker>> failedRecords = exceptionCaseWorkerList.stream()
                 .collect(groupingBy(ExceptionCaseWorker::getExcelRowId));
 
             List<JsrFileErrors> jsrFileErrors = new LinkedList<>();
 
-            failedRecords.entrySet().stream().forEach(error -> {
-                error.getValue().stream().forEach(jsrInvalid -> {
+            failedRecords.entrySet().stream().forEach(error ->
+                error.getValue().stream().forEach(jsrInvalid ->
                     jsrFileErrors.add(JsrFileErrors.builder().rowId(jsrInvalid.getExcelRowId())
                         .errorDescription(jsrInvalid.getErrorDescription())
-                        .filedInError(jsrInvalid.getFieldInError()).build());
-                });
-            });
+                        .filedInError(jsrInvalid.getFieldInError()).build())));
 
             noOfUploadedRecords = noOfUploadedRecords - failedRecords.size();
-
-            String suspendedRecordMessage = getSuspendedErrorMessage(isCaseWorker, failedRecords);
+            String suspendedRecordMessage = getSuspendedErrorMessageForJsr(isCaseWorker, failedRecords);
 
             return caseWorkerFileCreationResponseBuilder.message(REQUEST_FAILED_FILE_UPLOAD_JSR)
                 .detailedMessage(format(RECORDS_FAILED, failedRecords.size()) + DELIMITER_COMMA + SPACE
                     + format(RECORDS_UPLOADED, noOfUploadedRecords)
                     + suspendedRecordMessage).errorDetails(jsrFileErrors).build();
         } else {
+            String suspendedRecordMessage = getSuspendedErrorMessage(isCaseWorker,
+                caseWorkerProfileConverter.getSuspendedRowIds().size());
+
             return caseWorkerFileCreationResponseBuilder
                 .message(REQUEST_COMPLETED_SUCCESSFULLY)
-                .detailedMessage(format(RECORDS_UPLOADED, noOfUploadedRecords)).build();
+                .detailedMessage(format(RECORDS_UPLOADED, noOfUploadedRecords)
+                    + suspendedRecordMessage).build();
         }
     }
 
-    private String getSuspendedErrorMessage(boolean isCaseWorker,
-                                            Map<String, List<ExceptionCaseWorker>> failedRecords) {
+    private String getSuspendedErrorMessageForJsr(boolean isCaseWorker,
+                                                  Map<String, List<ExceptionCaseWorker>> failedRecords) {
+        int suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
+            .filter(s -> failedRecords.containsKey(Long.toString(s))).collect(toList()).size();
+
+        return getSuspendedErrorMessage(isCaseWorker,
+            caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed);
+    }
+
+    private String getSuspendedErrorMessage(boolean isCaseWorker, int suspendedSize) {
         String suspendedRecordMessage = EMPTY;
-        if (isCaseWorker && isNotEmpty(caseWorkerProfileConverter.getSuspendedRowIds())) {
-            int suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
-                .filter(s -> failedRecords.containsKey(Long.toString(s))).collect(toList()).size();
-            suspendedRecordMessage = DELIMITER_COMMA + SPACE
-                + format(RECORDS_SUSPENDED,
-                (caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed));
+        if (isCaseWorker && suspendedSize > 0) {
+            suspendedRecordMessage = DELIMITER_COMMA + SPACE + format(RECORDS_SUSPENDED, suspendedSize);
         }
         return suspendedRecordMessage;
     }
