@@ -11,7 +11,6 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -35,12 +34,12 @@ import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
-import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.sql.DataSource;
 
 import static org.mockito.Mockito.doReturn;
 
@@ -49,7 +48,7 @@ import static org.mockito.Mockito.doReturn;
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}", host = "${PACT_BROKER_URL:localhost}",
         port = "${PACT_BROKER_PORT:9292}")
 @Import(CaseWorkerProviderTestConfiguration.class)
-@SpringBootTest(properties = { "crd.publisher.caseWorkerDataPerMessage=1" })
+@SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 public class FetchCaseworkersByIdProviderTest {
 
     @Autowired
