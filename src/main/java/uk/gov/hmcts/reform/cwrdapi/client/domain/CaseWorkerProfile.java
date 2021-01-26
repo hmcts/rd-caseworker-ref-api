@@ -8,12 +8,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 @Builder
 @Getter
@@ -36,6 +39,10 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String lastName;
 
     @MappingField(columnName = "Official Email")
+    @Email(message = CaseWorkerConstants.INVALID_EMAIL)
+    @Pattern(regexp = CaseWorkerConstants.USER_NAME_PATTERN + "@"
+            + CaseWorkerConstants.DOMAIN_JUSTICE_GOV_UK,
+            message = CaseWorkerConstants.INVALID_EMAIL)
     @NotEmpty
     @JsonProperty("email_id")
     private String officialEmail;
