@@ -39,33 +39,6 @@ public class CaseWorkerProviderTestConfiguration {
     @MockBean
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
 
-    @MockBean
-    private RoleTypeRepository roleTypeRepository;
-
-    @MockBean
-    private UserTypeRepository userTypeRepository;
-
-    @MockBean
-    private CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
-
-    @MockBean
-    private IdamRoleMappingService idamRoleMappingService;
-
-    @MockBean
-    private UserProfileFeignClient userProfileFeignClient;
-
-    @MockBean
-    private TopicPublisher topicPublisher;
-
-    @MockBean
-    private CaseWorkerLocationRepository caseWorkerLocationRepository;
-
-    @MockBean
-    private CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
-
-    @MockBean
-    private CaseWorkerRoleRepository caseWorkerRoleRepository;
-
     @TestConfiguration
     static class Configuration {
         Connection connection;
