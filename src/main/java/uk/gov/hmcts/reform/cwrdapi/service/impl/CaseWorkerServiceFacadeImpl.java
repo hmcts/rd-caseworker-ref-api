@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,22 +68,13 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     @Autowired
     AuditAndExceptionRepositoryServiceImpl auditAndExceptionRepositoryServiceImpl;
 
-    @Autowired
-    CaseWorkerServiceImpl caseWorkerServiceImpl;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-
     @Override
     @SuppressWarnings("unchecked")
     public ResponseEntity<Object> processFile(MultipartFile file) {
 
         AuditStatus status = SUCCESS;
 
-
         try {
-
             long time1 = System.currentTimeMillis();
             Workbook workbook = excelValidatorService.validateExcelFile(file);
             String fileName = file.getOriginalFilename();
@@ -177,8 +167,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             List<JsrFileErrors> jsrFileErrors = new LinkedList<>();
 
-            failedRecords.entrySet().stream().forEach(error ->
-                error.getValue().stream().forEach(jsrInvalid ->
+            failedRecords.forEach((key, value) ->
+                value.forEach(jsrInvalid ->
                     jsrFileErrors.add(JsrFileErrors.builder().rowId(jsrInvalid.getExcelRowId())
                         .errorDescription(jsrInvalid.getErrorDescription())
                         .filedInError(jsrInvalid.getFieldInError()).build())));
@@ -210,10 +200,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
     private String getSuspendedErrorMessageForJsr(boolean isCaseWorker,
                                                   Map<String, List<ExceptionCaseWorker>> failedRecords) {
-        int suspendedFailed = 0;
-
         if (isNotEmpty(caseWorkerProfileConverter.getSuspendedRowIds())) {
-            suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
+            int suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
                 .filter(s -> failedRecords.containsKey(Long.toString(s))).collect(toList()).size();
             return getSuspendedErrorMessage(isCaseWorker,
                 caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed);

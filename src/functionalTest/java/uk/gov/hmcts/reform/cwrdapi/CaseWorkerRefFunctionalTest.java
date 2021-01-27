@@ -27,8 +27,8 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
@@ -49,9 +49,10 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.util.ResourceUtils.getFile;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @RunWith(CustomSerenityRunner.class)
@@ -321,16 +322,15 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
-                        201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
+                        200, REQUEST_COMPLETED_SUCCESSFULLY,
                         CaseWorkerConstants.TYPE_XLSX, ROLE_CWD_ADMIN);
-        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
-                .as(CaseWorkerProfileCreationResponse.class);
-        assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
-                caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
-        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
-        assertEquals(format(CaseWorkerConstants.RECORDS_UPLOADED,
-                caseWorkerProfileCreationResponse.getCaseWorkerIds().size()),
-                caseWorkerProfileCreationResponse.getMessageDetails());
+
+        CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
+            .as(CaseWorkerFileCreationResponse.class);
+        assertTrue(caseWorkerFileCreationResponse.getMessage()
+            .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
+            .contains(format(RECORDS_UPLOADED, 3)));
     }
 
     @Test
@@ -338,17 +338,15 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsWithNoPassword.xls",
-                        201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
+                        200, REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
                         ROLE_CWD_ADMIN);
 
-        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
-                .as(CaseWorkerProfileCreationResponse.class);
-        assertEquals(CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
-                caseWorkerProfileCreationResponse.getCaseWorkerRegistrationResponse());
-        assertFalse(caseWorkerProfileCreationResponse.getCaseWorkerIds().isEmpty());
-        assertEquals(format(CaseWorkerConstants.RECORDS_UPLOADED,
-                caseWorkerProfileCreationResponse.getCaseWorkerIds().size()),
-                caseWorkerProfileCreationResponse.getMessageDetails());
+        CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
+            .as(CaseWorkerFileCreationResponse.class);
+        assertTrue(caseWorkerFileCreationResponse.getMessage()
+            .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
+            .contains(format(RECORDS_UPLOADED, 3)));
     }
 
     @Test
@@ -356,13 +354,16 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
-                        201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
+                        200, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
                         ROLE_CWD_ADMIN);
 
-        IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
-                .as(IdamRolesMappingResponse.class);
-        assertTrue(caseWorkerProfileCreationResponse.getMessage()
-                .contains(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS));
+
+        CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
+            .as(CaseWorkerFileCreationResponse.class);
+        assertTrue(caseWorkerFileCreationResponse.getMessage()
+            .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
+            .contains(format(RECORDS_UPLOADED, 4)));
     }
 
     @Test
@@ -370,13 +371,15 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
-                        201, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
+                        200, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
                         ROLE_CWD_ADMIN);
 
-        IdamRolesMappingResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
-                .as(IdamRolesMappingResponse.class);
+        CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerFileCreationResponse.class);
         assertTrue(caseWorkerProfileCreationResponse.getMessage()
-                .contains(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS));
+                .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
+            .contains(format(RECORDS_UPLOADED,4)));
     }
 
     @Test
