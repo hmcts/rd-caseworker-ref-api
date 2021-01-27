@@ -125,17 +125,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                 Object childDomainObject = null;
                 for (Field childField : customObjectTriple.getRight()) {
                     MappingField mappingField = findAnnotation(childField, MappingField.class);
-                    if (nonNull(mappingField)) {
-                        String domainObjectColumnName = mappingField.columnName().split(DELIMITER_COMMA)[i].trim();
-                        Object fieldValue = childHeaderValues.get(domainObjectColumnName);
-                        if (nonNull(fieldValue)) {
-                            childDomainObject = isNull(childDomainObject) ? getInstanceOf(customObjectTriple.getLeft())
-                                : childDomainObject;
-                            setFieldValue(childField, childDomainObject, fieldValue);
-                            setIsPrimaryField(childDomainObject, mappingField, domainObjectColumnName);
-                        }
-
-                    }
+                    childDomainObject = getChildObject(childHeaderValues, customObjectTriple, i,
+                        childDomainObject, childField, mappingField);
                 }
                 if (nonNull(childDomainObject)) {
                     domainObjectList.add(childDomainObject); //add populated child domain object into list
@@ -143,6 +134,23 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             }
             setFieldValue(parentField, parentBean, domainObjectList);//finally set list to parent field
         });
+    }
+
+    private Object getChildObject(Map<String, Object> childHeaderValues, Triple<String,
+        Field, List<Field>> customObjectTriple, int i, Object childDomainObject, Field childField,
+                                  MappingField mappingField) {
+        if (nonNull(mappingField)) {
+            String domainObjectColumnName = mappingField.columnName().split(DELIMITER_COMMA)[i].trim();
+            Object fieldValue = childHeaderValues.get(domainObjectColumnName);
+            if (nonNull(fieldValue)) {
+                childDomainObject = isNull(childDomainObject) ? getInstanceOf(customObjectTriple.getLeft())
+                    : childDomainObject;
+                setFieldValue(childField, childDomainObject, fieldValue);
+                setIsPrimaryField(childDomainObject, mappingField, domainObjectColumnName);
+            }
+
+        }
+        return childDomainObject;
     }
 
     //called once per file only
