@@ -22,12 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class WelcomeFuncTest {
 
     // use this when testing locally - replace the below content with this line
-    private final String targetInstance =
-        StringUtils.defaultIfBlank(
-            System.getenv("TEST_URL"),
-            "http://localhost:8095"
-        );
-
+    private final String targetInstance = "https://rd-caseworker-ref-api-pr-142.service.core-compute-preview.internal";
     @Test
     public void test_should_prove_app_is_running_and_healthy() {
         // local test

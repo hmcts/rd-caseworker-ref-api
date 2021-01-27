@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
 import io.restassured.builder.MultiPartSpecBuilder;
+import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.MultiPartSpecification;
