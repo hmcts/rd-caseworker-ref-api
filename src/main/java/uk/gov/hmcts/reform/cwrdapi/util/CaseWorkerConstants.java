@@ -70,14 +70,14 @@ public final class CaseWorkerConstants {
 
     public static final String ALREADY_SUSPENDED_ERROR_MESSAGE = "user is suspended already";
 
-    public static final String UP_CREATION_FAILED = "Failed to crate in UP with response status %s";
+    public static final String UP_CREATION_FAILED = "Failed to create in UP with response status %s";
 
     public static final String REQUEST_FAILED_FILE_UPLOAD_JSR =
         "Request completed with partial success. Some records failed during validation and were ignored.";
 
     public static final String RECORDS_FAILED = "%s record(s) failed validation";
 
-    public static final String RECORDS_SUSPENDED = "%s  record(s) suspended";
+    public static final String RECORDS_SUSPENDED = "%s record(s) suspended";
 
     public static final String DOMAIN_JUSTICE_GOV_UK = "justice.gov.uk";
     public static final String USER_NAME_PATTERN = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";

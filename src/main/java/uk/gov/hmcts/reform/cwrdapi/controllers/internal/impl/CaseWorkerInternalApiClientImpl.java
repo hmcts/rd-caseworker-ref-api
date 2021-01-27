@@ -18,12 +18,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AUTHORIZATION;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SERVICE_AUTHORIZATION;
 
 @Service
 public class CaseWorkerInternalApiClientImpl implements CaseWorkerInternalApiClient {
 
-    public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
-    public static final String AUTHORIZATION = "Authorization";
+
     @Autowired
     RestTemplate restTemplate;
     @Value("${server.port}")
@@ -33,27 +34,27 @@ public class CaseWorkerInternalApiClientImpl implements CaseWorkerInternalApiCli
     public <T> ResponseEntity<Object> postRequest(List<T> requestBody,
                                                   String path) {
         UriComponents uriComponents = UriComponentsBuilder
-                .newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(port)
-                .path("refdata/case-worker")
-                .path(path)
-                .build();
+            .newInstance()
+            .scheme("http")
+            .host("localhost")
+            .port(port)
+            .path("refdata/case-worker")
+            .path(path)
+            .build();
         HttpHeaders httpHeaders = getMultipleAuthHeaders();
         HttpEntity<List<T>> request =
-                new HttpEntity<>(requestBody, httpHeaders);
+            new HttpEntity<>(requestBody, httpHeaders);
 
         return restTemplate.postForEntity(
-                uriComponents.toUri(),
-                request,
-                Object.class);
+            uriComponents.toUri(),
+            request,
+            Object.class);
     }
 
     private HttpHeaders getMultipleAuthHeaders() {
         HttpHeaders headers = new HttpHeaders();
         ServletRequestAttributes servletRequestAttributes =
-                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
         if (nonNull(servletRequestAttributes)) {
             HttpServletRequest request = servletRequestAttributes.getRequest();
             headers.add(SERVICE_AUTHORIZATION, request.getHeader(SERVICE_AUTHORIZATION));

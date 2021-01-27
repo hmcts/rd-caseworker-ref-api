@@ -91,7 +91,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
 
-            long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, file.getName());
+            long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, fileName);
 
             long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);
@@ -128,7 +128,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             status = (nonNull(exceptionCaseWorkerList) && (exceptionCaseWorkerList.size()) > 0)
                 ? PARTIAL_SUCCESS : status;
 
-            validationServiceFacadeImpl.insertAudit(status, file.getName());
+            validationServiceFacadeImpl.insertAudit(status, fileName);
 
             CaseWorkerFileCreationResponse caseWorkerFileCreationResponse =
                 createResponse(totalRecords, exceptionCaseWorkerList, isCaseWorker);
@@ -136,7 +136,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             return ResponseEntity.ok().body(caseWorkerFileCreationResponse);
 
         } catch (Exception ex) {
-            long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.FAILURE, file.getName());
+            long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.FAILURE, file.getOriginalFilename());
             ExceptionCaseWorker exceptionCaseWorker = validationServiceFacadeImpl.createException(jobId,
                 ex.getMessage(), 0L);
             auditAndExceptionRepositoryServiceImpl.auditException(exceptionCaseWorker);

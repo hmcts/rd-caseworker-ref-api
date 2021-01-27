@@ -236,7 +236,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
             + "Some records failed during validation "
             + "and were ignored.\",\"message_details\":\"1 record(s) failed validation, \","
             + "\"error_details\":[{\"row_id\":\"1\","
-            + "\"error_description\":\"Failed to crate in UP with response status 404\"}]}";
+            + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
 
         response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
