@@ -30,15 +30,15 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
 
     private String id;
 
-    @MappingField(columnName = "FIRST NAME")
+    @MappingField(columnName = "First Name")
     @NotEmpty
     private String firstName;
 
-    @MappingField(columnName = "LAST NAME")
+    @MappingField(columnName = "Last Name")
     @NotEmpty
     private String lastName;
 
-    @MappingField(columnName = "Official Email")
+    @MappingField(columnName = "Email")
     @Email(message = CaseWorkerConstants.INVALID_EMAIL)
     @Pattern(regexp = CaseWorkerConstants.USER_NAME_PATTERN + "@"
             + CaseWorkerConstants.DOMAIN_JUSTICE_GOV_UK,
@@ -47,8 +47,8 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @JsonProperty("email_id")
     private String officialEmail;
 
-    @MappingField(columnName = "Region Id")
-    private int regionId;
+    @MappingField(columnName = "Region ID")
+    private Integer regionId;
 
     @MappingField(columnName = "Region")
     @NotEmpty

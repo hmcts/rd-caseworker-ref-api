@@ -23,7 +23,7 @@ public class Location implements Serializable {
 
     private static final long serialVersionUID = 2019L;
 
-    @MappingField(columnName = "Base location 1 id,Base location 2 id")
+    @MappingField(columnName = "Primary Base Location ID,Secondary location ID")
     @JsonProperty("location_id")
     private Integer baseLocationId;
 

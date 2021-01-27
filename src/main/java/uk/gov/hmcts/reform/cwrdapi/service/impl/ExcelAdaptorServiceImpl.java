@@ -219,7 +219,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case NUMERIC:
-                return cell.getNumericCellValue();
+                return (int) cell.getNumericCellValue();
             case STRING:
                 return cell.getStringCellValue();
             default:
