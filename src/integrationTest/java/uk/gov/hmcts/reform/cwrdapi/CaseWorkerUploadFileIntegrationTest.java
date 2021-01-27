@@ -252,6 +252,8 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileWithJsr() throws IOException {
 
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
             + "Some records failed during validation and were ignored.\","
             + "\"message_details\":\"2 record(s) failed validation, 2 record(s) uploaded\","

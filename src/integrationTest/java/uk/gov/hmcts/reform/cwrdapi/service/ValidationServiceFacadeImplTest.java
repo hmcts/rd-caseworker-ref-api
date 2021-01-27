@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
+import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,11 +52,12 @@ public class ValidationServiceFacadeImplTest {
     @Autowired
     SimpleJpaRepository<ExceptionCaseWorker, Long> simpleJpaRepositoryException;
 
-    @Autowired
-    SimpleJpaRepository<CaseWorkerAudit, Long> simpleJpaRepositoryAudit;
 
     @MockBean
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+
+    @Autowired
+    private IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
 
     @Test
     public void testAuditJsr() {
@@ -65,23 +67,32 @@ public class ValidationServiceFacadeImplTest {
         profile.setRowId(1);
         profile.setOfficialEmail("test@abc.com");
         caseWorkerProfiles.add(profile);
-        jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
 
+        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, "test");
         CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder()
             .fileName("test.xlsx")
-            .jobId(1L)
             .jobStartTime(LocalDateTime.now())
+            .jobId(jobId)
             .status(PARTIAL_SUCCESS).build();
 
-        simpleJpaRepositoryAudit.save(caseWorkerAudit);
+        validationServiceFacadeImpl.getInvalidRecords(caseWorkerProfiles);
+
+        auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
         ValidationServiceFacadeImpl validationServiceFacadeImplSpy = spy(validationServiceFacadeImpl);
-        validationServiceFacadeImplSpy.auditJsr(1);
-        List<ExceptionCaseWorker> exceptionCaseWorkers = simpleJpaRepositoryException.findAll();
+        validationServiceFacadeImplSpy.auditJsr(jobId);
+        List<ExceptionCaseWorker> exceptionCaseWorkers = auditAndExceptionRepositoryService.getAllExceptions(jobId);
         assertNotNull(exceptionCaseWorkers);
-        String error = exceptionCaseWorkers.stream().filter(s -> s.getFieldInError().equalsIgnoreCase("firstName"))
+        String error = exceptionCaseWorkers.stream()
+            .filter(s -> s.getFieldInError().equalsIgnoreCase("firstName"))
             .map(field -> field.getErrorDescription())
             .collect(Collectors.toList()).get(0);
         assertEquals("must not be empty", error);
-        verify(validationServiceFacadeImplSpy).auditJsr(1);
+        verify(validationServiceFacadeImplSpy).auditJsr(jobId);
+        assertNotNull(validationServiceFacadeImplSpy.getJsrExceptionCaseWorkers());
+    }
+
+    @Test
+    public void testInsertAudit() {
+        assertNotNull(validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, "test"));
     }
 }

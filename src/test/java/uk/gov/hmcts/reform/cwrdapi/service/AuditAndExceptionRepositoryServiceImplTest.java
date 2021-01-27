@@ -70,4 +70,13 @@ public class AuditAndExceptionRepositoryServiceImplTest {
         verify(auditAndExceptionRepositoryServiceImpl).auditException(exceptionCaseWorker);
     }
 
+    @Test
+    public void testGetAllExceptions() {
+        ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
+        exceptionCaseWorker.setJobId(1L);
+        when(caseWorkerExceptionRepository.save(exceptionCaseWorker)).thenReturn(exceptionCaseWorker);
+        auditAndExceptionRepositoryServiceImpl.auditException(exceptionCaseWorker);
+        auditAndExceptionRepositoryServiceImpl.getAllExceptions(1L);
+        verify(auditAndExceptionRepositoryServiceImpl).getAllExceptions(1L);
+    }
 }

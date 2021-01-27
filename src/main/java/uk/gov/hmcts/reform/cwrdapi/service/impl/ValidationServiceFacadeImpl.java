@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
@@ -17,6 +18,7 @@ import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.validation.ConstraintViolation;
@@ -72,8 +74,8 @@ public class ValidationServiceFacadeImpl implements IValidationService {
         ofNullable(constraintViolationSet).ifPresent(constraintViolations ->
             constraintViolations.forEach(constraintViolation -> {
                 if (isNull(field.get())) {
-                    field.set(getKeyFiled(constraintViolation.getRootBean()));
-                    field.get().setAccessible(true);
+                    field.set(getKeyFiled(constraintViolation.getRootBean()).get());
+                    ReflectionUtils.makeAccessible(field.get());
                 }
                 ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
                 exceptionCaseWorker.setJobId(jobId);
@@ -102,12 +104,14 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      * @param bean Object
      * @return Field Field
      */
-    private Field getKeyFiled(CaseWorkerDomain bean) {
-        Class objectClass = bean.getClass();
-        return stream(objectClass.getDeclaredFields()).filter(field ->
-            nonNull(findAnnotation(field,
-                MappingField.class)) && findAnnotation(field,
-                MappingField.class).position() == 1).findAny().get();
+    @SuppressWarnings("unchecked")
+    private Optional<Field> getKeyFiled(CaseWorkerDomain bean) {
+        Class<CaseWorkerDomain> objectClass = (Class<CaseWorkerDomain>) bean.getClass();
+        Optional<Field> field = stream(objectClass.getDeclaredFields()).filter(fld ->
+            nonNull(findAnnotation(fld,
+                MappingField.class)) && findAnnotation(fld,
+                MappingField.class).position() == 1).findFirst();
+        return (field.isPresent()) ? field : Optional.empty();
     }
 
     /**
@@ -122,7 +126,6 @@ public class ValidationServiceFacadeImpl implements IValidationService {
         jobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
         return jobId;
     }
-
 
     /**
      * Create ExceptionCaseWorker domain object.
