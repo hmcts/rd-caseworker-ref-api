@@ -317,7 +317,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
+                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsxWithNoPassword.xlsx",
                         201, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
                         CaseWorkerConstants.TYPE_XLSX, ROLE_CWD_ADMIN);
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse

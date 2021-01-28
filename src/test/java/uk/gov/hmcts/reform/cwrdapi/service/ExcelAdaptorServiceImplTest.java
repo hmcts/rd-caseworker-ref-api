@@ -31,30 +31,10 @@ public class ExcelAdaptorServiceImplTest {
 
     @Before
     public void initialize() {
-        List<String> acceptableHeaders = List.of("FIRST NAME", "LAST NAME", "Official Email",
+        List<String> acceptableHeaders = List.of("First Name", "Last Name", "Email",
                 "Region", "User type");
         ReflectionTestUtils.setField(excelAdaptorServiceImpl, "acceptableHeaders",
                 acceptableHeaders);
-    }
-
-    @Test
-    public void parseXlsxShouldReturnWorkbookObjectTest() throws IOException {
-        Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUserWithPassword.xlsx"), "1234");
-
-        List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
-        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
-        CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
-        assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
-        assertThat(caseWorkerProfile.getLastName()).isNotBlank();
-        assertThat(caseWorkerProfile.getOfficialEmail()).isNotBlank();
-        assertThat(caseWorkerProfile.getRegionName()).isNotBlank();
-        assertThat(caseWorkerProfile.getUserType()).isNotBlank();
-        assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
-        assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
-        assertThat(caseWorkerProfile.getLocations()).hasSize(2);
-        assertThat(caseWorkerProfile.getRoles()).hasSize(2);
-        assertThat(caseWorkerProfile.getWorkAreas()).hasSize(8);
     }
 
     @Test
@@ -82,10 +62,10 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void parseXlsxWhichHasFormula() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUserXlsWithFormula.xls"), "1234");
+                .create(new File("src/test/resources/CaseWorkerUserXlsWithFormula.xlsx"), "1234");
 
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
-        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows() - 1);
+        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows());
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
@@ -96,7 +76,7 @@ public class ExcelAdaptorServiceImplTest {
         assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
         assertThat(caseWorkerProfile.getLocations()).hasSize(2);
         assertThat(caseWorkerProfile.getRoles()).hasSize(2);
-        assertThat(caseWorkerProfile.getWorkAreas()).hasSize(8);
+        assertThat(caseWorkerProfile.getWorkAreas()).hasSize(1);
     }
 
     @Test
@@ -120,7 +100,7 @@ public class ExcelAdaptorServiceImplTest {
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage("File is missing the required column header FIRST NAME Please check the file.");
+                .hasMessage("File is missing the required column header First Name Please check the file.");
     }
 
     /*@Test
