@@ -67,7 +67,7 @@ public class ExcelAdaptorServiceImplTest {
 
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
-                .getPhysicalNumberOfRows());
+                .getPhysicalNumberOfRows() - 1);
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
