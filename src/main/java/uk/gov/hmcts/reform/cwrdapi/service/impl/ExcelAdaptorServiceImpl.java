@@ -78,9 +78,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         //but current code is better from debugging standpoint.
         acceptableHeaders.forEach(acceptableHeader -> {
             if (!headers.contains(acceptableHeader)) {
-                log.error(String.format(FILE_MISSING_HEADERS, acceptableHeader));
-                throw new ExcelValidationException(HttpStatus.BAD_REQUEST,
-                    String.format(FILE_MISSING_HEADERS, acceptableHeader));
+                log.error(FILE_MISSING_HEADERS);
+                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_MISSING_HEADERS);
             }
         });
     }
