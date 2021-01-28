@@ -29,16 +29,13 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
 
     private static final long serialVersionUID = 2019L;
 
-
     private String id;
 
     @MappingField(columnName = "First Name")
-    @NotEmpty
     @NotEmpty(message = CaseWorkerConstants.FIRST_NAME_MISSING)
     private String firstName;
 
     @MappingField(columnName = "Last Name")
-    @NotEmpty
     @NotEmpty(message = CaseWorkerConstants.LAST_NAME_MISSING)
     private String lastName;
 
