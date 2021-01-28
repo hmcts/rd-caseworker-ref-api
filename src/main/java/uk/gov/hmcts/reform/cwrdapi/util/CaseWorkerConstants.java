@@ -89,4 +89,13 @@ public final class CaseWorkerConstants {
             + " Upload a valid file in xlsx or xls format";
     public static final String FILE_MISSING_HEADERS =  "The file is missing some column headers."
             + " Review and upload again";
+
+    public static final String NO_LOCATION_PRESENT = "You must add location details and upload the file again.";
+    public static final String NO_ROLE_PRESENT = "You must add role details and upload the file again";
+    public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work"
+            + " and upload the file again";
+    public static final String NO_USER_TYPE_PRESENT = "You must add a user type and upload the file again";
+    public static final String FIRST_NAME_MISSING = "You must add a first name and upload the file again";
+    public static final String LAST_NAME_MISSING = "You must add a last name and upload the file again";
+    public static final String MISSING_REGION = "You must add a region and upload the file again";
 }

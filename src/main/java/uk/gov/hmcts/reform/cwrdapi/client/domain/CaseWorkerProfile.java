@@ -28,25 +28,16 @@ import javax.validation.constraints.Pattern;
 public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable {
 
     private static final long serialVersionUID = 2019L;
-    public static final String NO_LOCATION_PRESENT = "You must add location details and upload the file again.";
-    public static final String NO_ROLE_PRESENT = "You must add role details and upload the file again";
-    public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work"
-            + " and upload the file again";
-    public static final String NO_USER_TYPE_PRESENT = "You must add a user type and upload the file again";
-    public static final String FIRST_NAME_MISSING = "You must add a first name and upload the file again";
-    public static final String LAST_NAME_MISSING = "You must add a last name and upload the file again";
-    public static final String INVALID_EMAIL = "You must add a valid justice.gov.uk email address"
-            + " and upload the file again";
-    public static final String MISSING_REGION = "You must add a region and upload the file again";
+
 
     private String id;
 
     @MappingField(columnName = "FIRST NAME")
-    @NotEmpty(message = FIRST_NAME_MISSING)
+    @NotEmpty(message = CaseWorkerConstants.FIRST_NAME_MISSING)
     private String firstName;
 
     @MappingField(columnName = "LAST NAME")
-    @NotEmpty(message = LAST_NAME_MISSING)
+    @NotEmpty(message = CaseWorkerConstants.LAST_NAME_MISSING)
     private String lastName;
 
     @MappingField(columnName = "Official Email", position = 1)
@@ -54,21 +45,21 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @Pattern(regexp = CaseWorkerConstants.USER_NAME_PATTERN + "@"
             + CaseWorkerConstants.DOMAIN_JUSTICE_GOV_UK,
             message = CaseWorkerConstants.INVALID_EMAIL)
-    @NotEmpty(message = INVALID_EMAIL)
+    @NotEmpty(message = CaseWorkerConstants.INVALID_EMAIL)
     @JsonProperty("email_id")
     private String officialEmail;
 
     @MappingField(columnName = "Region Id")
-    @NotNull(message = MISSING_REGION)
+    @NotNull(message = CaseWorkerConstants.MISSING_REGION)
     private int regionId;
 
     @MappingField(columnName = "Region")
-    @NotEmpty(message = MISSING_REGION)
+    @NotEmpty(message = CaseWorkerConstants.MISSING_REGION)
     @JsonProperty("region")
     private String regionName;
 
     @MappingField(clazz = Location.class, objectCount = 2)
-    @NotEmpty(message = NO_LOCATION_PRESENT)
+    @NotEmpty(message = CaseWorkerConstants.NO_LOCATION_PRESENT)
     @JsonProperty("base_location")
     private List<Location> locations;
 
@@ -76,16 +67,16 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private Long userId;
 
     @MappingField(columnName = "User type")
-    @NotEmpty(message = NO_USER_TYPE_PRESENT)
+    @NotEmpty(message = CaseWorkerConstants.NO_USER_TYPE_PRESENT)
     private String userType;
 
     @MappingField(clazz = Role.class, objectCount = 2)
-    @NotEmpty(message = NO_ROLE_PRESENT)
+    @NotEmpty(message = CaseWorkerConstants.NO_ROLE_PRESENT)
     @JsonProperty("role")
     private List<Role> roles;
 
     @MappingField(clazz = WorkArea.class, objectCount = 8)
-    @NotEmpty(message = NO_WORK_AREA_PRESENT)
+    @NotEmpty(message = CaseWorkerConstants.NO_WORK_AREA_PRESENT)
     @JsonProperty("work_area")
     private List<WorkArea> workAreas;
 
