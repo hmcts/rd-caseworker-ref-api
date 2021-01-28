@@ -127,6 +127,13 @@ public class ValidationServiceFacadeImpl implements IValidationService {
         return jobId;
     }
 
+    public long startAuditJob(final AuditStatus auditStatus, final String fileName) {
+        this.caseWorkerAudit = CaseWorkerAudit.builder().build();
+        createOrUpdateCaseworkerAudit(auditStatus, fileName);
+        this.jobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
+        return jobId;
+    }
+
     /**
      * Create ExceptionCaseWorker domain object.
      *
@@ -148,7 +155,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      * @return CaseWorkerAudit CaseWorkerAudit
      */
     private CaseWorkerAudit createOrUpdateCaseworkerAudit(AuditStatus auditStatus, String fileName) {
-        if (isNull(caseWorkerAudit)) {
+        if (isNull(caseWorkerAudit) || isNull(caseWorkerAudit.getJobId())) {
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
             String userName = (nonNull(userInfo) && nonNull(userInfo.getName())) ? userInfo.getName() : EMPTY;
             caseWorkerAudit = CaseWorkerAudit.builder()
