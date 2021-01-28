@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +66,8 @@ public class ExcelAdaptorServiceImplTest {
                 .create(new File("src/test/resources/CaseWorkerUserXlsWithFormula.xlsx"), "1234");
 
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
-        assertThat(profiles).hasSize(workbook.getSheetAt(1).getPhysicalNumberOfRows());
+        assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
+                .getPhysicalNumberOfRows());
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
@@ -90,7 +92,6 @@ public class ExcelAdaptorServiceImplTest {
         assertThat(serviceRoleMapping.getRoleId()).isEqualTo(1);
         assertThat(serviceRoleMapping.getIdamRoles()).isEqualTo("caseworker-iac");
         assertThat(serviceRoleMapping.getSerivceId()).isEqualTo("BBA9");
-
     }
 
     @Test

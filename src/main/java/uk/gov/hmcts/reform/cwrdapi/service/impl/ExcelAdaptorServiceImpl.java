@@ -80,7 +80,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             if (!headers.contains(acceptableHeader)) {
                 log.error(String.format(FILE_MISSING_HEADERS, acceptableHeader));
                 throw new ExcelValidationException(HttpStatus.BAD_REQUEST,
-                        String.format(FILE_MISSING_HEADERS, acceptableHeader));
+                    String.format(FILE_MISSING_HEADERS, acceptableHeader));
             }
         });
     }
@@ -94,7 +94,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         collectHeaderList(headers, sheet);
         //scan parent and domain object fields by reflection and make maps
         List<Triple<String, Field, List<Field>>> customObjectFieldsMapping =
-                createBeanFieldMaps(classType, parentFieldMap);
+            createBeanFieldMaps(classType, parentFieldMap);
         Iterator<Row> rowIterator = sheet.rowIterator();
         rowIterator.next();//skip header
         Field rowField = getRowIdField((Class<Object>) classType);
@@ -104,7 +104,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             setFieldValue(rowField, bean, row.getRowNum());
             for (int i = 0; i < headers.size(); i++) { //set all parent fields
                 setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap,
-                        childHeaderToCellMap);
+                    childHeaderToCellMap);
             }
             populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
             objectList.add((T) bean);
@@ -113,8 +113,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void populateChildDomainObjects(
-            Object parentBean, List<Triple<String, Field, List<Field>>> customObjectFields,
-            Map<String, Object> childHeaderValues) {
+        Object parentBean, List<Triple<String, Field, List<Field>>> customObjectFields,
+        Map<String, Object> childHeaderValues) {
         customObjectFields.forEach(customObjectTriple -> {
             Field parentField = customObjectTriple.getMiddle();
             List<Object> domainObjectList = new ArrayList<>();
@@ -126,7 +126,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                 for (Field childField : customObjectTriple.getRight()) {
                     MappingField mappingField = findAnnotation(childField, MappingField.class);
                     childDomainObject = getChildObject(childHeaderValues, customObjectTriple, i,
-                            childDomainObject, childField, mappingField);
+                        childDomainObject, childField, mappingField);
                 }
                 if (nonNull(childDomainObject)) {
                     domainObjectList.add(childDomainObject); //add populated child domain object into list
@@ -137,14 +137,14 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private Object getChildObject(Map<String, Object> childHeaderValues, Triple<String,
-            Field, List<Field>> customObjectTriple, int i, Object childDomainObject, Field childField,
+        Field, List<Field>> customObjectTriple, int i, Object childDomainObject, Field childField,
                                   MappingField mappingField) {
         if (nonNull(mappingField)) {
             String domainObjectColumnName = mappingField.columnName().split(DELIMITER_COMMA)[i].trim();
             Object fieldValue = childHeaderValues.get(domainObjectColumnName);
             if (nonNull(fieldValue)) {
                 childDomainObject = isNull(childDomainObject) ? getInstanceOf(customObjectTriple.getLeft())
-                        : childDomainObject;
+                    : childDomainObject;
                 setFieldValue(childField, childDomainObject, fieldValue);
                 setIsPrimaryField(childDomainObject, mappingField, domainObjectColumnName);
             }
@@ -166,7 +166,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             } else {
                 // make triple of child domain object class name, parent field, respective list of domain object fields
                 customObjects.add(Triple.of(mappingField.clazz().getCanonicalName(), field,
-                        asList(mappingField.clazz().getDeclaredFields())));
+                    asList(mappingField.clazz().getDeclaredFields())));
             }
         }
         return customObjects;
