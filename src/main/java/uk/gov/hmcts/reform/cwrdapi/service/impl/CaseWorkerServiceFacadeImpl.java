@@ -91,7 +91,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
 
-            long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, fileName);
+            long jobId = validationServiceFacadeImpl.startAuditJob(AuditStatus.IN_PROGRESS, fileName);
 
             long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);

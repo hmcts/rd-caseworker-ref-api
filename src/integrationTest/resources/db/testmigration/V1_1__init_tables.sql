@@ -102,7 +102,7 @@ create table case_worker_exception (
    id bigint  default EXCEPTION_ID_SEQ.nextval,
    job_id bigint not null,
    excel_row_id varchar(32),
-   key varchar(32),
+   key varchar(256),
    field_in_error varchar(256),
    error_description varchar(512),
    updated_timestamp timestamp,
