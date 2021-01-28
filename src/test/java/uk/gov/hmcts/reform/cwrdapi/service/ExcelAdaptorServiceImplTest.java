@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,7 +120,7 @@ public class ExcelAdaptorServiceImplTest {
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage("File is missing the required column header FIRST NAME Please check the file.");
+                .hasMessage(CaseWorkerConstants.FILE_MISSING_HEADERS);
     }
 
     /*@Test

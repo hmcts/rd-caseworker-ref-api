@@ -11,14 +11,13 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Builder
 @Getter
@@ -31,11 +30,13 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private static final long serialVersionUID = 2019L;
     public static final String NO_LOCATION_PRESENT = "You must add location details and upload the file again.";
     public static final String NO_ROLE_PRESENT = "You must add role details and upload the file again";
-    public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work and upload the file again";
+    public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work"
+            + " and upload the file again";
     public static final String NO_USER_TYPE_PRESENT = "You must add a user type and upload the file again";
     public static final String FIRST_NAME_MISSING = "You must add a first name and upload the file again";
     public static final String LAST_NAME_MISSING = "You must add a last name and upload the file again";
-    public static final String INVALID_EMAIL = "You must add a valid justice.gov.uk email address and upload the file again";
+    public static final String INVALID_EMAIL = "You must add a valid justice.gov.uk email address"
+            + " and upload the file again";
     public static final String MISSING_REGION = "You must add a region and upload the file again";
 
     private String id;
