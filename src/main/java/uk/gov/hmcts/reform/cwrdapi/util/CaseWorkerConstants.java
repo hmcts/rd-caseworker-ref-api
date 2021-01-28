@@ -21,7 +21,6 @@ public final class CaseWorkerConstants {
     public static final String FILE_NOT_PRESENT_ERROR_MESSAGE = "File not present";
     public static final String FILE_PASSWORD_PROTECTED_ERROR_MESSAGE =
             "The file is password protected. Please provide a file without password.";
-    public static final String FILE_NO_DATA_ERROR_MESSAGE = "No data in Excel File";
     public static final String FILE_NO_VALID_SHEET_ERROR_MESSAGE = "The uploaded file does not contain "
             + "the worksheet named Case Worker Data";
     public static final String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
@@ -65,4 +64,27 @@ public final class CaseWorkerConstants {
 
     public static final String ORIGIN_EXUI = "EXUI";
 
+    public static final String UP_FAILURE_ROLES = "can't modify roles for user in UP";
+
+    public static final String STATUS_ACTIVE = "ACTIVE";
+
+    public static final String ALREADY_SUSPENDED_ERROR_MESSAGE = "user is suspended already";
+
+    public static final String UP_CREATION_FAILED = "Failed to create in UP with response status %s";
+
+    public static final String REQUEST_FAILED_FILE_UPLOAD_JSR =
+        "Request completed with partial success. Some records failed during validation and were ignored.";
+
+    public static final String RECORDS_FAILED = "%s record(s) failed validation";
+
+    public static final String RECORDS_SUSPENDED = "%s record(s) suspended";
+
+    public static final String DOMAIN_JUSTICE_GOV_UK = "justice.gov.uk";
+    public static final String USER_NAME_PATTERN = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
+    public static final String INVALID_EMAIL = "Please provide a valid email.";
+
+    public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the provided file."
+        + " Please upload a valid file in xls(x) format.";
+    public static final String FILE_MISSING_HEADERS =  "File is missing the required column header %s"
+        + " Please check the file.";
 }

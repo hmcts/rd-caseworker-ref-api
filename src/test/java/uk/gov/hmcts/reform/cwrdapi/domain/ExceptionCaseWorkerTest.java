@@ -16,7 +16,7 @@ public class ExceptionCaseWorkerTest {
         exceptionCaseWorker.setId(1L);
         exceptionCaseWorker.setJobId(1L);
         exceptionCaseWorker.setExcelRowId("ExcelRow1");
-        exceptionCaseWorker.setEmailId("Test@test.com");
+        exceptionCaseWorker.setKeyField("Test@test.com");
         exceptionCaseWorker.setFieldInError("Field1");
         exceptionCaseWorker.setErrorDescription("Invalid Email");
         exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now());
@@ -25,7 +25,7 @@ public class ExceptionCaseWorkerTest {
         assertThat(exceptionCaseWorker.getId(), is(1L));
         assertThat(exceptionCaseWorker.getJobId(), is(1L));
         assertThat(exceptionCaseWorker.getExcelRowId(), is("ExcelRow1"));
-        assertThat(exceptionCaseWorker.getEmailId(), is("Test@test.com"));
+        assertThat(exceptionCaseWorker.getKeyField(), is("Test@test.com"));
         assertThat(exceptionCaseWorker.getFieldInError(), is("Field1"));
         assertThat(exceptionCaseWorker.getErrorDescription(), is("Invalid Email"));
         assertNotNull(exceptionCaseWorker.getUpdatedTimeStamp());
