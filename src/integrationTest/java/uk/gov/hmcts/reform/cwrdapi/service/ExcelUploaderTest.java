@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelValidatorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,6 +25,7 @@ import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_CW_SHEET_NAME;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
 public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
@@ -96,7 +96,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
                 getMultipartFile("src/integrationTest/resources/CaseWorkerUserXlsxWithNoPassword.xlsx",
                         TYPE_XLSX));
         List<CaseWorkerProfile> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
-        assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
+        assertThat(profiles).hasSize(workbook.getSheet(REQUIRED_CW_SHEET_NAME)
                 .getPhysicalNumberOfRows() - 1);
         CaseWorkerProfile caseWorkerProfile = profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();

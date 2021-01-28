@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
@@ -51,8 +50,11 @@ import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.util.ResourceUtils.getFile;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @RunWith(CustomSerenityRunner.class)
@@ -322,8 +324,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsxWithNoPassword.xlsx",
-                        200, CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY,
-                        CaseWorkerConstants.TYPE_XLSX, ROLE_CWD_ADMIN);
+                        200, REQUEST_COMPLETED_SUCCESSFULLY,
+                        TYPE_XLSX, ROLE_CWD_ADMIN);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
             .as(CaseWorkerFileCreationResponse.class);
@@ -338,7 +340,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsWithNoPassword.xls",
-                        200, REQUEST_COMPLETED_SUCCESSFULLY, CaseWorkerConstants.TYPE_XLS,
+                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
                         ROLE_CWD_ADMIN);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
@@ -354,7 +356,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
-                        200, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
+                        200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
                         ROLE_CWD_ADMIN);
 
 
@@ -371,7 +373,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
-                        200, CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS, CaseWorkerConstants.TYPE_XLS,
+                        200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
                         ROLE_CWD_ADMIN);
 
         CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
@@ -398,7 +400,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithPassword.xlsx",
                 403, null,
-                CaseWorkerConstants.TYPE_XLSX, "Invalid");
+                TYPE_XLSX, "Invalid");
     }
 
     @Test
@@ -410,7 +412,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
         uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithNoPassword.xlsx",
                 403, exceptionMessage,
-                CaseWorkerConstants.TYPE_XLSX, ROLE_CWD_ADMIN);
+                TYPE_XLSX, ROLE_CWD_ADMIN);
     }
 
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
