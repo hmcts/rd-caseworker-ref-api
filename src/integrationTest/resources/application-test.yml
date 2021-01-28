@@ -122,4 +122,4 @@ crd:
       cwd-admin: cwd-admin
 
 excel:
-  acceptableHeaders: ${EXCEL_ACCEPTABLE_HEADERS:FIRST NAME,LAST NAME,Official Email,Region,User type}
+  acceptableHeaders: ${EXCEL_ACCEPTABLE_HEADERS:First Name,Last Name,Email,Region,User type}
