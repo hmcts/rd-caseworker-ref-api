@@ -38,7 +38,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @NotEmpty
     private String lastName;
 
-    @MappingField(columnName = "Official Email")
+    @MappingField(columnName = "Official Email", position = 1)
     @Email(message = CaseWorkerConstants.INVALID_EMAIL)
     @Pattern(regexp = CaseWorkerConstants.USER_NAME_PATTERN + "@"
             + CaseWorkerConstants.DOMAIN_JUSTICE_GOV_UK,

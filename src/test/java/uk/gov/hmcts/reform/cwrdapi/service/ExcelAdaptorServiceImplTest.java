@@ -53,8 +53,8 @@ public class ExcelAdaptorServiceImplTest {
         assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
         assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
         assertThat(caseWorkerProfile.getLocations()).hasSize(2);
-        assertThat(caseWorkerProfile.getRoles()).hasSize(2);
-        assertThat(caseWorkerProfile.getWorkAreas()).hasSize(8);
+        assertThat(caseWorkerProfile.getRoles()).hasSize(1);
+        assertThat(caseWorkerProfile.getWorkAreas()).hasSize(1);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ExcelAdaptorServiceImplTest {
         assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
         assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
         assertThat(caseWorkerProfile.getLocations()).hasSize(2);
-        assertThat(caseWorkerProfile.getRoles()).hasSize(2);
+        assertThat(caseWorkerProfile.getRoles()).hasSize(1);
         assertThat(caseWorkerProfile.getWorkAreas()).hasSize(8);
     }
 
@@ -110,7 +110,6 @@ public class ExcelAdaptorServiceImplTest {
         assertThat(serviceRoleMapping.getRoleId()).isEqualTo(1);
         assertThat(serviceRoleMapping.getIdamRoles()).isEqualTo("caseworker-iac");
         assertThat(serviceRoleMapping.getSerivceId()).isEqualTo("BBA9");
-
     }
 
     @Test

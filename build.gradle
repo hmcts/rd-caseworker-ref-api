@@ -166,7 +166,7 @@ jacoco {
 }
 
 jacocoTestReport {
-  executionData(test)
+  executionData(test,integration)
   reports {
     xml.enabled = true
     csv.enabled = false
@@ -198,13 +198,15 @@ sonarqube {
     property "sonar.projectName", "reform::rd-caseworker-ref-api"
     property "sonar.projectKey", "uk.gov.hmcts.reform:reform::rd-caseworker-ref-api"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
     property "sonar.pitest.mode", "reuseReport"
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/cwrdapi/config/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/request/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java," +
+                "src/main/java/uk/gov/hmcts/reform/cwrdapi/service/impl/CaseWorkerServiceImpl.java"
   }
 }
 
@@ -234,6 +236,7 @@ dependencies {
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springHystrix
   compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
+
 
   compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.5'
   compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -359,6 +362,7 @@ dependencies {
   testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
   testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
+  testCompile group: 'org.springframework', name: 'spring-test', version: '5.2.9.RELEASE'
 
   compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 

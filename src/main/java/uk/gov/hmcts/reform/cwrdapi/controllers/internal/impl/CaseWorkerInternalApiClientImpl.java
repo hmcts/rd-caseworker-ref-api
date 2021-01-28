@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SERVICE_AUTHO
 @Service
 public class CaseWorkerInternalApiClientImpl implements CaseWorkerInternalApiClient {
 
+
     @Autowired
     RestTemplate restTemplate;
     @Value("${server.port}")
@@ -33,27 +34,27 @@ public class CaseWorkerInternalApiClientImpl implements CaseWorkerInternalApiCli
     public <T> ResponseEntity<Object> postRequest(List<T> requestBody,
                                                   String path) {
         UriComponents uriComponents = UriComponentsBuilder
-                .newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(port)
-                .path("refdata/case-worker")
-                .path(path)
-                .build();
+            .newInstance()
+            .scheme("http")
+            .host("localhost")
+            .port(port)
+            .path("refdata/case-worker")
+            .path(path)
+            .build();
         HttpHeaders httpHeaders = getMultipleAuthHeaders();
         HttpEntity<List<T>> request =
-                new HttpEntity<>(requestBody, httpHeaders);
+            new HttpEntity<>(requestBody, httpHeaders);
 
         return restTemplate.postForEntity(
-                uriComponents.toUri(),
-                request,
-                Object.class);
+            uriComponents.toUri(),
+            request,
+            Object.class);
     }
 
     private HttpHeaders getMultipleAuthHeaders() {
         HttpHeaders headers = new HttpHeaders();
         ServletRequestAttributes servletRequestAttributes =
-                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
+            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
         if (nonNull(servletRequestAttributes)) {
             HttpServletRequest request = servletRequestAttributes.getRequest();
             headers.add(SERVICE_AUTHORIZATION, request.getHeader(SERVICE_AUTHORIZATION));

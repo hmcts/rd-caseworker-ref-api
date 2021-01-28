@@ -26,6 +26,7 @@ public class CaseWorkersProfileCreationRequest {
     private List<CaseWorkerLocationRequest> baseLocations;
 
     private List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests;
+    private long rowId;
 
     @JsonCreator
     public CaseWorkersProfileCreationRequest(@JsonProperty("first_name") String firstName,
@@ -38,7 +39,8 @@ public class CaseWorkersProfileCreationRequest {
             @JsonProperty("idam_roles") Set<String> idamRoles,
             @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
             @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
-            @JsonProperty("work_area") List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests) {
+            @JsonProperty("work_area") List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests,
+            @JsonProperty("rowId") long rowId) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,6 +53,7 @@ public class CaseWorkersProfileCreationRequest {
         this.baseLocations = baseLocations;
         this.workerWorkAreaRequests = workerWorkAreaRequests;
         this.region = region;
+        this.rowId = rowId;
     }
 
 
