@@ -74,6 +74,13 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ex.getMessage());
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> runtimeException(
+            RuntimeException ex) {
+        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR,
+                ErrorConstants.RUNTIME_EXCEPTION.getErrorMessage());
+    }
+
 
     private String getTimeStamp() {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());

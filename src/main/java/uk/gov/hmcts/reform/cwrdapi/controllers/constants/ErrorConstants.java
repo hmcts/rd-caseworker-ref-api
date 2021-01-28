@@ -16,7 +16,9 @@ public enum ErrorConstants {
     CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception"),
 
     ACCESS_EXCEPTION("9 : Access Denied"),
-    ERROR_PUBLISHING_TO_TOPIC("10 : Sorry, there is a problem with the service. Try again later");
+    ERROR_PUBLISHING_TO_TOPIC("10 : Sorry, there is a problem with the service. Try again later"),
+
+    RUNTIME_EXCEPTION("10 : Sorry, there is a problem with the service. Try again later");
 
     private final String errorMessage;
 
