@@ -262,8 +262,8 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     public void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
         userProfileService.resetAll();
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
-            + "Some records failed during validation "
-            + "and were ignored.\",\"message_details\":\"1 record(s) failed validation, \","
+            + "Some records failed during validation and were ignored.\","
+            + "\"message_details\":\"1 record(s) failed validation\","
             + "\"error_details\":[{\"row_id\":\"1\","
             + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
 
