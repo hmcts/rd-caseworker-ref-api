@@ -95,4 +95,9 @@ public class ValidationServiceFacadeImplTest {
     public void testInsertAudit() {
         assertNotNull(validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, "test"));
     }
+
+    @Test
+    public void testStartAuditJob() {
+        assertNotNull(validationServiceFacadeImpl.startAuditJob(AuditStatus.IN_PROGRESS, "test"));
+    }
 }
