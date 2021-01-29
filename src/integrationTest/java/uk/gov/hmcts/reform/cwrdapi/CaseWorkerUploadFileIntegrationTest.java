@@ -115,11 +115,11 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
             "application/octet-stream", "400", cwdAdmin);
     }
 
-    /*@Test
+    @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
-    }*/
+    }
 
     @Test
     public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
@@ -188,15 +188,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     @Test
     public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
 
-        String expectedErrorDetails = "{\"message\":\"Request completed with partial success. "
-            + "Some records failed during validation and were ignored.\","
-            + "\"message_details\":\"1 record(s) failed validation, 1 record(s) uploaded\","
-            + "\"error_details\":[{\"row_id\":\"2\",\"field_in_error\":\"lastName\","
-            + "\"error_description\":\"You must add a last name and upload the file again\"},"
-            + "{\"row_id\":\"2\",\"field_in_error\":\"locations\","
-            + "\"error_description\":\"You must add location details and upload the file again.\"}]}";
-
-        userProfileCreateUserWireMock(HttpStatus.CREATED);
+       userProfileCreateUserWireMock(HttpStatus.CREATED);
         response = uploadCaseWorkerFile("CaseWorkerUserXlsWithJSR.xls",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 

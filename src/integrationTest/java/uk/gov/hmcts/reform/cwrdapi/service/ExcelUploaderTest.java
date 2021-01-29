@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -119,4 +118,4 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
     }
-}*/
+}
