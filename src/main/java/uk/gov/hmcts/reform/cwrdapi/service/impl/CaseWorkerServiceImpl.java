@@ -548,7 +548,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 || (isNull(((UserProfileRolesResponse) resultResponse.get())
                 .getAttributeResponse()))
                 || (!(((UserProfileRolesResponse) resultResponse.get())
-                .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.CREATED.value())))) {
+                .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.OK.value())))) {
                 logUpFailures(UP_FAILURE_ROLES, rowId);
                 status = false;
             }
