@@ -103,22 +103,4 @@ public class ExcelAdaptorServiceImplTest {
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(CaseWorkerConstants.FILE_MISSING_HEADERS);
     }
-
-    /*@Test
-    public void sendXlsxWithMissingLocation() throws IOException {
-        Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/xlsxWithData_No_Location.xlsx"));
-        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_MISSING_HEADERS);
-    }*/
-
-    /*@Test
-    public void sendXlsxWithMissingFirstName() throws IOException {
-        Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/xlsxWithData_Missing_First_Name.xlsx"));
-        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_MISSING_HEADERS);
-    }*/
 }
