@@ -34,6 +34,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
+import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.IN_PROGRESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
@@ -75,6 +76,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         AuditStatus status = SUCCESS;
 
         try {
+            long jobId = validationServiceFacadeImpl.startAuditJob(IN_PROGRESS, file.getOriginalFilename());
             long time1 = System.currentTimeMillis();
             Workbook workbook = excelValidatorService.validateExcelFile(file);
             String fileName = file.getOriginalFilename();
@@ -90,8 +92,6 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 .parseExcel(workbook, ob);
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
-
-            long jobId = validationServiceFacadeImpl.startAuditJob(AuditStatus.IN_PROGRESS, fileName);
 
             long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);
@@ -177,25 +177,27 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             String suspendedRecordMessage = getSuspendedErrorMessageForJsr(isCaseWorker, failedRecords);
 
             return caseWorkerFileCreationResponseBuilder.message(REQUEST_FAILED_FILE_UPLOAD_JSR)
-                .detailedMessage(format(RECORDS_FAILED, failedRecords.size()) + DELIMITER_COMMA + SPACE
-                    + recordsUploadMessage(noOfUploadedRecords)
+                .detailedMessage(format(RECORDS_FAILED, failedRecords.size())
+                    + recordsUploadMessage(noOfUploadedRecords, true)
                     + suspendedRecordMessage).errorDetails(jsrFileErrors).build();
         } else {
             String suspendedRecordMessage = getSuspendedErrorMessage(isCaseWorker,
-                suspendedRow);
+                suspendedRow, false);
 
             return caseWorkerFileCreationResponseBuilder
                 .message(REQUEST_COMPLETED_SUCCESSFULLY)
-                .detailedMessage(recordsUploadMessage(noOfUploadedRecords)
+                .detailedMessage(recordsUploadMessage(noOfUploadedRecords, false)
                     + suspendedRecordMessage).build();
         }
     }
 
-    private String recordsUploadMessage(int size) {
+    private String recordsUploadMessage(int size, boolean isPartialSuccess) {
+        String message = EMPTY;
         if (size > 0) {
-            return format(RECORDS_UPLOADED, size);
+            message = isPartialSuccess ? message.concat(DELIMITER_COMMA + SPACE) : message;
+            return message + format(RECORDS_UPLOADED, size);
         }
-        return EMPTY;
+        return message;
     }
 
     private String getSuspendedErrorMessageForJsr(boolean isCaseWorker,
@@ -204,15 +206,17 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             int suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
                 .filter(s -> failedRecords.containsKey(Long.toString(s))).collect(toList()).size();
             return getSuspendedErrorMessage(isCaseWorker,
-                caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed);
+                caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed, true);
         }
         return EMPTY;
     }
 
-    private String getSuspendedErrorMessage(boolean isCaseWorker, int suspendedSize) {
+    private String getSuspendedErrorMessage(boolean isCaseWorker, int suspendedSize, boolean isPartialSuccess) {
         String suspendedRecordMessage = EMPTY;
         if (isCaseWorker && suspendedSize > 0) {
-            suspendedRecordMessage = DELIMITER_COMMA + SPACE + format(RECORDS_SUSPENDED, suspendedSize);
+            suspendedRecordMessage = isPartialSuccess ? suspendedRecordMessage.concat(DELIMITER_COMMA + SPACE)
+                : suspendedRecordMessage;
+            suspendedRecordMessage = suspendedRecordMessage + format(RECORDS_SUSPENDED, suspendedSize);
         }
         return suspendedRecordMessage;
     }

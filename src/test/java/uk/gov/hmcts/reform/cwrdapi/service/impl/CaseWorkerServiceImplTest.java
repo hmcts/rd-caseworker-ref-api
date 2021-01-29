@@ -228,7 +228,7 @@ public class CaseWorkerServiceImplTest {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         AttributeResponse attributeResponse = new AttributeResponse();
-        attributeResponse.setIdamStatusCode(HttpStatus.CREATED.value());
+        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
         userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))

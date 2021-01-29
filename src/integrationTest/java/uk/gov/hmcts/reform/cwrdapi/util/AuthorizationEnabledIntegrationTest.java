@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
@@ -23,6 +24,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.RestTemplateConfiguration;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
@@ -34,6 +37,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -95,6 +99,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Before
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
@@ -134,8 +141,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .withBody(getDynamicJwksResponse())));
     }
 
-    @Before
-    public void userProfileGetUserWireMock() {
+    public void userProfileGetUserWireMock(String idamStatus, String roles) {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
@@ -144,8 +150,29 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
                     + "  \"firstName\": \"prashanth\","
                     + "  \"lastName\": \"rao\","
-                    + "  \"email\": \"super.user@hmcts.net\""
+                    + "  \"email\": \"super.user@hmcts.net\","
+                    + "  \"idamStatus\": \"" + idamStatus + "\","
+                    + "  \"roles\": " + roles
                     + "}")));
+    }
+
+    public void modifyUserRoles() throws Exception {
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        RoleAdditionResponse roleAdditionRes = new RoleAdditionResponse();
+        roleAdditionRes.setIdamStatusCode("201");
+        roleAdditionRes.setIdamMessage("Success");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionRes);
+
+        userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(201)
+                .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
+    }
+
+    public void modifyUserStatus() {
+
     }
 
 
