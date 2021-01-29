@@ -188,12 +188,12 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     @Test
     public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
 
-       userProfileCreateUserWireMock(HttpStatus.CREATED);
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         response = uploadCaseWorkerFile("CaseWorkerUserXlsWithJSR.xls",
-            CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
+                CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 
         CaseWorkerFileCreationResponse resultResponse =
-            objectMapper.readValue(getJsonResponse(response), CaseWorkerFileCreationResponse.class);
+                objectMapper.readValue(getJsonResponse(response), CaseWorkerFileCreationResponse.class);
         CaseWorkerFileCreationResponse expectedResponse = createCaseWorkerExpectedErrorDetails();
         createCaseWorkerExpectedErrorDetails();
         assertThat(expectedResponse.getDetailedMessage()).isEqualTo(resultResponse.getDetailedMessage());
