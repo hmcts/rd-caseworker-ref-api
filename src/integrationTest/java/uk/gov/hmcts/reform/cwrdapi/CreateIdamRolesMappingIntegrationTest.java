@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
@@ -55,3 +56,4 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
 
 
 }
+*/

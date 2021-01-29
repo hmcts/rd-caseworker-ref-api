@@ -48,7 +48,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @JsonProperty("email_id")
     private String officialEmail;
 
-    @MappingField(columnName = "Region Id")
+    @MappingField(columnName = "Region ID")
     @NotNull(message = CaseWorkerConstants.MISSING_REGION)
     private Integer regionId;
 

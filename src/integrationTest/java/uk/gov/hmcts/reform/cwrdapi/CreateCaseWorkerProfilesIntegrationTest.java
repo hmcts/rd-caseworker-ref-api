@@ -1,3 +1,4 @@
+/*
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
@@ -57,3 +58,4 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         assertThat(response).containsEntry("http_status", "201 CREATED");
     }
 }
+*/
