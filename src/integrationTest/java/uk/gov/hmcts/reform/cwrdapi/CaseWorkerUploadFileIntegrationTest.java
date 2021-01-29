@@ -195,7 +195,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         CaseWorkerFileCreationResponse resultResponse =
                 objectMapper.readValue(getJsonResponse(response), CaseWorkerFileCreationResponse.class);
         CaseWorkerFileCreationResponse expectedResponse = createCaseWorkerExpectedErrorDetails();
-        createCaseWorkerExpectedErrorDetails();
+
         assertThat(expectedResponse.getDetailedMessage()).isEqualTo(resultResponse.getDetailedMessage());
         assertThat(expectedResponse.getErrorDetails()).containsAll(resultResponse.getErrorDetails());
         assertThat(expectedResponse.getMessage()).isEqualTo(resultResponse.getMessage());
