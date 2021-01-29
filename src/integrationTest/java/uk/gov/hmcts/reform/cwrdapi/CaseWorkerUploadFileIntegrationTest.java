@@ -54,19 +54,19 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     Map<String, Object> response = new HashMap<>();
 
-    //@Test
+    @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
-    //@Test
+    @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsWithNoPassword.xls",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
-    //@Test
+    @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
 
         String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
@@ -85,43 +85,43 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         assertThat(exceptionCaseWorkers).isEmpty();
     }
 
-    //@Test
+    @Test
     public void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
         uploadCaseWorkerFile("test.txt",
             CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
-    //@Test
+    @Test
     public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserWithPassword.xls",
             CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
-    //@Test
+    @Test
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserWithPassword.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
-    //@Test
+    @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
-    //@Test
+    @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
             "application/octet-stream", "400", cwdAdmin);
     }
 
-    //@Test
+    @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
-    //@Test
+    @Test
     public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
@@ -164,7 +164,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         return response;
     }
 
-    //@Test
+    @Test
     public void shouldCreateCaseWorkerAuditSuccess() throws IOException {
 
         String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
@@ -217,23 +217,33 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     private CaseWorkerFileCreationResponse createCaseWorkerExpectedErrorDetails() {
         List<JsrFileErrors> errors = new ArrayList<>();
-        errors.add(JsrFileErrors.builder().rowId("2").filedInError("locations").errorDescription(CaseWorkerConstants.NO_LOCATION_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("3").filedInError("roles").errorDescription(CaseWorkerConstants.NO_ROLE_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("4").filedInError("workAreas").errorDescription(CaseWorkerConstants.NO_WORK_AREA_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("5").filedInError("userType").errorDescription(CaseWorkerConstants.NO_USER_TYPE_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("6").filedInError("firstName").errorDescription(CaseWorkerConstants.FIRST_NAME_MISSING).build());
-        errors.add(JsrFileErrors.builder().rowId("7").filedInError("lastName").errorDescription(CaseWorkerConstants.LAST_NAME_MISSING).build());
-        errors.add(JsrFileErrors.builder().rowId("8").filedInError("officialEmail").errorDescription(CaseWorkerConstants.INVALID_EMAIL).build());
-        errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionName").errorDescription(CaseWorkerConstants.MISSING_REGION).build());
-        errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionId").errorDescription(CaseWorkerConstants.MISSING_REGION).build());
+        errors.add(JsrFileErrors.builder().rowId("2").filedInError("locations").errorDescription(
+                CaseWorkerConstants.NO_LOCATION_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("3").filedInError("roles").errorDescription(
+                CaseWorkerConstants.NO_ROLE_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("4").filedInError("workAreas").errorDescription(
+                CaseWorkerConstants.NO_WORK_AREA_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("5").filedInError("userType").errorDescription(
+                CaseWorkerConstants.NO_USER_TYPE_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("6").filedInError("firstName").errorDescription(
+                CaseWorkerConstants.FIRST_NAME_MISSING).build());
+        errors.add(JsrFileErrors.builder().rowId("7").filedInError("lastName").errorDescription(
+                CaseWorkerConstants.LAST_NAME_MISSING).build());
+        errors.add(JsrFileErrors.builder().rowId("8").filedInError("officialEmail").errorDescription(
+                CaseWorkerConstants.INVALID_EMAIL).build());
+        errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionName").errorDescription(
+                CaseWorkerConstants.MISSING_REGION).build());
+        errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionId").errorDescription(
+                CaseWorkerConstants.MISSING_REGION).build());
         return CaseWorkerFileCreationResponse.builder()
                 .errorDetails(errors)
                 .detailedMessage("8 record(s) failed validation, 1 record(s) uploaded")
-                .message("Request completed with partial success. Some records failed during validation and were ignored.")
+                .message("Request completed with partial success."
+                        + " Some records failed during validation and were ignored.")
                 .build();
     }
 
-    //@Test
+    @Test
     public void shouldCreateCaseWorkerAuditFailure() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
@@ -248,7 +258,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         assertNotNull(exceptionCaseWorkers.get(0).getErrorDescription());
     }
 
-    //@Test
+    @Test
     public void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
         userProfileService.resetAll();
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
@@ -268,7 +278,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         userProfileService.resetAll();
     }
 
-    //@Test
+    @Test
     public void shouldUploadServiceRoleMappingsXlsxFileWithJsr() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
