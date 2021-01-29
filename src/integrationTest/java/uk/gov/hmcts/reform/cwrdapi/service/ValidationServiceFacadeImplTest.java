@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -86,7 +87,7 @@ public class ValidationServiceFacadeImplTest {
             .filter(s -> s.getFieldInError().equalsIgnoreCase("firstName"))
             .map(field -> field.getErrorDescription())
             .collect(Collectors.toList()).get(0);
-        assertEquals("must not be empty", error);
+        assertEquals(CaseWorkerConstants.FIRST_NAME_MISSING, error);
         verify(validationServiceFacadeImplSpy).auditJsr(jobId);
         assertNotNull(validationServiceFacadeImplSpy.getJsrExceptionCaseWorkers());
     }
