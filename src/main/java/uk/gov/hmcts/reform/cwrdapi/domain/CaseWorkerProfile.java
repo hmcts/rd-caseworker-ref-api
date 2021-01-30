@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -73,10 +72,6 @@ public class CaseWorkerProfile implements Serializable {
     @UpdateTimestamp
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Column(name = "idam_role")
-    private String idamRoles;
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile", cascade = ALL,

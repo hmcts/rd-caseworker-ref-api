@@ -36,7 +36,7 @@ spring:
         registration:
           oidc:
             client-id: ${IDAM_CLIENT_ID:microservicekey-rd-caseworker-ref-api}
-            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+            client-secret: ${S2S_SECRET:ID5DJ6THPKTWKIL7}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration
@@ -89,7 +89,7 @@ security:
 ### dependency configuration
 idam:
   s2s-auth:
-    totp_secret: ${S2S_SECRET:}
+    totp_secret: ${S2S_SECRET:ID5DJ6THPKTWKIL7}
     microservice: rd_caseworker_ref_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
@@ -112,7 +112,7 @@ crd:
         bus:
           host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
           username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
-          password: ${CWRD_MQ_PASSWORD:AAAAAAAAAA}
+          password: ${CWRD_MQ_PASSWORD:97E6uvE6xHcqHAVlxufN1PH75tMHoZUe78FhsCbLLLQ=}
           topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
           # DO NOT SET THIS 'true' IN PRODUCTION!
           trustAllCerts: ${CWRD_MQ_TRUST_ALL_CERTS:false}
@@ -123,6 +123,6 @@ excel:
 
 launchdarkly:
   sdk:
-    key: ${RD_LD_SDK_KEY:}
-    environment: ${LAUNCH_DARKLY_ENV:local}
+    key: ${RD_LD_SDK_KEY:sdk-b1310c4a-e522-4512-9e68-d75d23b04c5d}
+    environment: ${LAUNCH_DARKLY_ENV:aat}
     user: rd
