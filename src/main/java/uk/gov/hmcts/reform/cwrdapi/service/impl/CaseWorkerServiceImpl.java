@@ -78,6 +78,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
@@ -150,6 +151,13 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                     .findByEmailId(cwrRequest.getEmailId().toLowerCase());
                 if (isNull(caseWorkerProfile)) {
+                    if (cwrRequest.isSuspended()) {
+                        //when suspending an user who does not exist in CW DB then log exception
+                        // add entry in exception table
+                        logUpFailures(format(NO_USER_TO_SUSPEND, cwrRequest.getRowId()),
+                                cwrRequest.getRowId());
+                        continue;
+                    }
                     //when profile is new then create new user profile
                     caseWorkerProfile = createCaseWorkerProfile(cwrRequest);
                     newCaseWorkerProfiles.add(caseWorkerProfile);
