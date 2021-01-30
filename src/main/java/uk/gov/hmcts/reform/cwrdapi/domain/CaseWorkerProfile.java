@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
+import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -72,6 +74,10 @@ public class CaseWorkerProfile implements Serializable {
     @UpdateTimestamp
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @MappingField(columnName = "IDAM Roles")
+    private String idamRoles;
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile", cascade = ALL,
