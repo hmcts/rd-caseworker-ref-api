@@ -98,4 +98,6 @@ public final class CaseWorkerConstants {
     public static final String FIRST_NAME_MISSING = "You must add a first name and upload the file again";
     public static final String LAST_NAME_MISSING = "You must add a last name and upload the file again";
     public static final String MISSING_REGION = "You must add a region and upload the file again";
+    public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
+            + "Please try again or check with HMCTS Support Team";
 }
