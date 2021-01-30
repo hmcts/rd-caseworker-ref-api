@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -79,6 +80,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @JsonProperty("work_area")
     private List<WorkArea> workAreas;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @MappingField(columnName = "IDAM Roles")
     private String idamRoles;
 
