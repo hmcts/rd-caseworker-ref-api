@@ -9,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
-import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -76,7 +75,7 @@ public class CaseWorkerProfile implements Serializable {
     private LocalDateTime lastUpdate;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @MappingField(columnName = "IDAM Roles")
+    @Column(name = "idam_role")
     private String idamRoles;
 
     @Fetch(FetchMode.SUBSELECT)
