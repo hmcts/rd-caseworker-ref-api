@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
@@ -79,6 +80,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
@@ -105,7 +107,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     UserTypeRepository userTypeRepository;
 
     @Autowired
-    CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
+    CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
 
     @Autowired
     CaseWorkerLocationRepository caseWorkerLocationRepository;
@@ -595,9 +597,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
             new HashSet<>();
-        userRoles.add("cwd-user");
+        userRoles.add(ROLE_CWD_USER);
         Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
-        if (!(idamRoles.isEmpty())) {
+        if (isNotEmpty(idamRoles)) {
             userRoles.addAll(idamRoles);
         }
         //Creating user profile request
@@ -626,17 +628,30 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
     // get the roles that needs to send to idam based on the roleType in the request.
-    Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
-        List<CaseWorkerIdamRoleAssociation> idamRolesInRequest = new ArrayList<>();
-        cwrdProfileRequest.getRoles().forEach(role ->
-            roleTypes.stream()
-                .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                .map(roleType -> idamRolesInRequest.addAll(cwIdamRoleAssocRepository.findByRoleType(roleType)))
+    Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwProfileRequest) {
+
+        // get Roles Types
+        List<RoleType> roleTypeList = new ArrayList<>();
+        cwProfileRequest.getRoles().forEach(role -> roleTypeList.addAll(
+                        roleTypes.stream()
+                        .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                        .collect(Collectors.toList()))
         );
 
-        return idamRolesInRequest.stream()
-            .map(CaseWorkerIdamRoleAssociation::getIdamRole)
-            .collect(Collectors.toSet());
+        // get work area codes
+        List<String> serviceCodes = cwProfileRequest.getWorkerWorkAreaRequests()
+                .stream()
+                .map(CaseWorkerWorkAreaRequest::getServiceCode)
+                .collect(Collectors.toList());
+
+
+        // get all assoc records matching role id and service code, finally return idam roles associated
+        Set<String> matchedRoles = roleAssocRepository.findByRoleTypeInAndServiceCodeIn(roleTypeList, serviceCodes)
+                .stream()
+                .map(CaseWorkerIdamRoleAssociation::getIdamRole)
+                .collect(Collectors.toSet());
+        log.info("{}:: roles matched from assoc :: {}", loggingComponentName, matchedRoles);
+        return matchedRoles;
     }
 
     // get the userTypeId by description.
