@@ -158,8 +158,6 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         int suspendedRow = isEmpty(caseWorkerProfileConverter.getSuspendedRowIds()) ? 0 :
             caseWorkerProfileConverter.getSuspendedRowIds().size();
 
-        noOfUploadedRecords = noOfUploadedRecords - suspendedRow;
-
         if (isNotEmpty(exceptionCaseWorkerList)) {
 
             Map<String, List<ExceptionCaseWorker>> failedRecords = exceptionCaseWorkerList.stream()
@@ -174,6 +172,9 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                         .filedInError(jsrInvalid.getFieldInError()).build())));
 
             noOfUploadedRecords = noOfUploadedRecords - failedRecords.size();
+            if (suspendedRow > 0) {
+                noOfUploadedRecords = calculateFinalUploadedRecords(noOfUploadedRecords, failedRecords);
+            }
             String suspendedRecordMessage = getSuspendedErrorMessageForJsr(isCaseWorker, failedRecords);
 
             return caseWorkerFileCreationResponseBuilder.message(REQUEST_FAILED_FILE_UPLOAD_JSR)
@@ -181,6 +182,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                     + recordsUploadMessage(noOfUploadedRecords, true)
                     + suspendedRecordMessage).errorDetails(jsrFileErrors).build();
         } else {
+            noOfUploadedRecords = noOfUploadedRecords - suspendedRow;
+
             String suspendedRecordMessage = getSuspendedErrorMessage(isCaseWorker,
                 suspendedRow, false);
 
@@ -189,6 +192,15 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 .detailedMessage(recordsUploadMessage(noOfUploadedRecords, false)
                     + suspendedRecordMessage).build();
         }
+    }
+
+    private int calculateFinalUploadedRecords(int noOfUploadedRecords,
+                                              Map<String, List<ExceptionCaseWorker>> failedRecords) {
+        int suspendedFailedRecords = (int) caseWorkerProfileConverter.getSuspendedRowIds().stream()
+                .filter(s -> failedRecords.containsKey(Long.toString(s))).count();
+
+        int suspendedSuccessRecords = caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailedRecords;
+        return noOfUploadedRecords - suspendedSuccessRecords;
     }
 
     private String recordsUploadMessage(int size, boolean isPartialSuccess) {
