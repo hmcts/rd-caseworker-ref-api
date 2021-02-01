@@ -31,7 +31,9 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -301,6 +303,19 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers.size()).isEqualTo(3);
+    }
+
+    @Test
+    public void shouldCreateCaseWorkerAuditFailureForSuspendingNewUser() throws IOException {
+        uploadCaseWorkerFile("CaseWorkerUserXlsxNewUserWithSuspended.xlsx",
+                CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(1);
+        assertEquals(format(CaseWorkerConstants.NO_USER_TO_SUSPEND, 1),
+                exceptionCaseWorkers.get(0).getErrorDescription());
     }
 
     private String getJsonResponse(Map<String, Object> response) {
