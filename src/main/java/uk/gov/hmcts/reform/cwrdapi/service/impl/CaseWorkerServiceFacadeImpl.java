@@ -159,6 +159,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                     .filter(StringUtils::isNotEmpty)
                     .distinct()
                     .count() > 1;
+
             if (multipleServiceCode) {
                 throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
             }
