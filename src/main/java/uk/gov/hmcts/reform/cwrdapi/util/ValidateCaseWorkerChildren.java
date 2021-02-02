@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = {CaseWorkerChildListValidator.class})
 @Documented
-public @interface ValidateCaseWorkerChildes {
+public @interface ValidateCaseWorkerChildren {
     String message() default "";
 
     Class<?>[] groups () default {};

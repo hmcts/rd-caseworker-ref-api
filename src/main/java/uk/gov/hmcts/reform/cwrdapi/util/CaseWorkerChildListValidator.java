@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SER
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 
-public class CaseWorkerChildListValidator implements ConstraintValidator<ValidateCaseWorkerChildes, CaseWorkerProfile> {
+public class CaseWorkerChildListValidator implements ConstraintValidator<ValidateCaseWorkerChildren, CaseWorkerProfile> {
 
     @Override
     public boolean isValid(CaseWorkerProfile caseWorkerProfile, ConstraintValidatorContext context) {
