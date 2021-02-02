@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -182,15 +183,21 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                     + recordsUploadMessage(noOfUploadedRecords, true)
                     + suspendedRecordMessage).errorDetails(jsrFileErrors).build();
         } else {
+            StringJoiner detailedMessage = new StringJoiner(DELIMITER_COMMA + SPACE);
             noOfUploadedRecords = noOfUploadedRecords - suspendedRow;
 
-            String suspendedRecordMessage = getSuspendedErrorMessage(isCaseWorker,
-                suspendedRow, false);
+            if (noOfUploadedRecords > 0) {
+                detailedMessage.add(recordsUploadMessage(noOfUploadedRecords, false));
+            }
+            if (suspendedRow > 0) {
+                String suspendedRecordMessage = getSuspendedErrorMessage(isCaseWorker,
+                        suspendedRow, false);
+                detailedMessage.add(suspendedRecordMessage);
+            }
 
             return caseWorkerFileCreationResponseBuilder
                 .message(REQUEST_COMPLETED_SUCCESSFULLY)
-                .detailedMessage(recordsUploadMessage(noOfUploadedRecords, false)
-                    + suspendedRecordMessage).build();
+                .detailedMessage(detailedMessage.toString()).build();
         }
     }
 
