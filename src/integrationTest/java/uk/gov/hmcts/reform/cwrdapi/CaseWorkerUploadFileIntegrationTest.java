@@ -280,7 +280,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
             + "Some records failed during validation and were ignored.\","
             + "\"message_details\":\"2 record(s) failed validation, 2 record(s) uploaded\","
-            + "\"error_details\":[{\"row_id\":\"1\",\"field_in_error\":\"serivceId\",\"error_description\":"
+            + "\"error_details\":[{\"row_id\":\"1\",\"field_in_error\":\"serviceId\",\"error_description\":"
             + "\"must not be empty\"},{\"row_id\":\"2\",\"field_in_error\":\"idamRoles\","
             + "\"error_description\":\"must not be empty\"},"
             + "{\"row_id\":\"2\",\"field_in_error\":\"roleId\",\"error_description\":\"must not be null\"}]}";
