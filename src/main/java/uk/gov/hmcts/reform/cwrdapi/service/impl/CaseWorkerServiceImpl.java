@@ -444,10 +444,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 return false;
             }
 
-
+            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
-            Set<String> idamRolesCwr = cwrProfileRequest.getIdamRoles();
+            Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
+                    new HashSet<>();
+            idamRolesCwr.addAll(mappedRoles);
             if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
                 Set<RoleName> mergedRoles = idamRolesCwr.stream()
                     .filter(s -> !(userProfileRoles.contains(s)))
