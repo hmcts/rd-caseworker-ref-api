@@ -13,7 +13,8 @@ import javax.transaction.Transactional;
 @Transactional
 public interface CaseWorkerIdamRoleAssociationRepository extends JpaRepository<CaseWorkerIdamRoleAssociation,Long> {
 
-    List<CaseWorkerIdamRoleAssociation> findByRoleType(RoleType roleType);
+    List<CaseWorkerIdamRoleAssociation> findByRoleTypeInAndServiceCodeIn(
+            List<RoleType> roleType, List<String> serviceCodes);
 
     /**
      * Deletes the record for all the service code.

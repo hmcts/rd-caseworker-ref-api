@@ -41,6 +41,8 @@ public final class CaseWorkerConstants {
         "Unauthorized Error : The requested resource is restricted and requires authentication";
 
     public static final String FORBIDDEN_ERROR = "Forbidden Error: Access denied for invalid permissions";
+    public static final String MULTIPLE_SERVICE_CODES = "The file must contain mapping for 1 Service Code."
+        + " Please update the Service Code for all the rows and re-upload the file";
 
     public static final String NO_DATA_FOUND = "The Caseworker data could not be found";
 
@@ -87,7 +89,7 @@ public final class CaseWorkerConstants {
 
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the file uploaded."
         + " Upload a valid file in xlsx or xls format";
-    public static final String FILE_MISSING_HEADERS = "The file is missing some column headers."
+    public static final String FILE_MISSING_HEADERS =  "The file is missing some column headers."
         + " Review and upload again";
 
     public static final String NO_LOCATION_PRESENT = "You must add location details and upload the file again.";
@@ -100,6 +102,8 @@ public final class CaseWorkerConstants {
     public static final String MISSING_REGION = "You must add a region and upload the file again";
     public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
         + "Please try again or check with HMCTS Support Team";
+    public static final String ROLE_CWD_USER = "cwd-user";
+
     public static final String DUPLICATE_PRIMARY_AND_SECONDARY_ROLES = "Primary and Secondary Roles Should "
         + "not be same.";
     public static final String DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS = "Primary and Secondary Locations Should not "

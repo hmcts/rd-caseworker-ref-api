@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
@@ -75,6 +76,8 @@ public class CaseWorkerServiceImplTest {
     CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
     @Mock
     CaseWorkerRoleRepository caseWorkerRoleRepository;
+    @Mock
+    CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
     @Mock
     private RoleTypeRepository roleTypeRepository;
     @Mock
@@ -152,6 +155,9 @@ public class CaseWorkerServiceImplTest {
         when(userTypeRepository.findAll()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(null);
+        when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
+                .thenReturn(new ArrayList<>());
+
         when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
             .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(201).build());
 
@@ -160,6 +166,7 @@ public class CaseWorkerServiceImplTest {
                 singletonList(cwProfileCreationRequest));
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
+        verify(caseWorkerIdamRoleAssociationRepository, times(1)).findByRoleTypeInAndServiceCodeIn(any(), any());
     }
 
     @Test
@@ -254,7 +261,7 @@ public class CaseWorkerServiceImplTest {
     @Test
     public void test_buildIdamRoleMappings_success() {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
-            .serivceId("BA11")
+            .serviceId("BA11")
             .idamRoles("role1")
             .roleId(1)
             .build();
@@ -263,7 +270,7 @@ public class CaseWorkerServiceImplTest {
             .buildIdamRoleMappings(singletonList(serviceRoleMapping));
 
         Set<String> serviceCode = new HashSet<>();
-        serviceCode.add(serviceRoleMapping.getSerivceId());
+        serviceCode.add(serviceRoleMapping.getServiceId());
 
         assertThat(idamRolesMappingResponse.getStatusCode()).isEqualTo(201);
         assertThat(idamRolesMappingResponse.getMessage())

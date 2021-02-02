@@ -111,7 +111,7 @@ public class ExcelAdaptorServiceImplTest {
         ServiceRoleMapping serviceRoleMapping = profiles.get(0);
         assertThat(serviceRoleMapping.getRoleId()).isEqualTo(1);
         assertThat(serviceRoleMapping.getIdamRoles()).isEqualTo("caseworker-iac");
-        assertThat(serviceRoleMapping.getSerivceId()).isEqualTo("BBA9");
+        assertThat(serviceRoleMapping.getServiceId()).isEqualTo("BBA9");
     }
 
     @Test
