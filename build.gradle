@@ -101,6 +101,24 @@ sourceSets {
     }
     resources.srcDir file('src/smokeTest/resources')
   }
+
+  contractTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/contractTest/java')
+    }
+    resources.srcDir file('src/contractTest/resources')
+  }
+
+  pactTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/pactTest/java')
+    }
+    resources.srcDir file('src/pactTest/resources')
+  }
 }
 
 idea {
@@ -160,6 +178,50 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     url = "jdbc:postgresql://${dburl}"
   }
 }
+
+task contract(type: Test) {
+  description = 'Runs the consumer Pact tests'
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/cwrdapi/**"
+  systemProperty 'pact.rootDir', "pacts"
+}
+
+task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+pact {
+  publish {
+    pactDirectory = 'pacts'
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
+    tags = ['Dev']
+    version = "1.0"
+  }
+}
+
+//Provider PACT tasks
+task contractTest(type: Test) {
+  logger.lifecycle("Runnning contract Tests")
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  exclude "uk/gov/hmcts/reform/roleassignment/*IdamConsumerTest*"
+}
+
+task runProviderPactVerification(type: Test) {
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+runProviderPactVerification.dependsOn contractTest
+
+runProviderPactVerification.finalizedBy pactVerify
 
 jacoco {
   toolVersion = "0.8.5"
@@ -344,6 +406,14 @@ dependencies {
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
+  contractTestCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
+    endorseStrictVersions()
+  }
+
+  contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.6.2")
+  contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
+
   testCompile group: 'org.pitest', name: 'pitest', version: versions.pitest
   testCompile 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.3.0'
   testCompile 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
@@ -356,9 +426,9 @@ dependencies {
   testCompile group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
   testCompile 'org.springframework.cloud:spring-cloud-contract-wiremock:2.2.4.RELEASE'
-
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
-
+  testCompile('com.opentable.components:otj-pg-embedded:0.13.3')
   testCompile group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
   testCompile group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testCompile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
@@ -374,6 +444,16 @@ dependencies {
 
   smokeTestCompile sourceSets.main.runtimeClasspath
   smokeTestCompile sourceSets.test.runtimeClasspath
+
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.1.7'
+
+  contractTestCompile sourceSets.main.runtimeClasspath
+  contractTestCompile sourceSets.test.runtimeClasspath
+
+  pactTestCompile sourceSets.main.runtimeClasspath
+  pactTestCompile sourceSets.test.runtimeClasspath
 }
 
 dependencyCheck {

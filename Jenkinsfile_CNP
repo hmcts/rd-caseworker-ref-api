@@ -37,6 +37,12 @@ def vaultOverrides = [
 // Configure branches to sync with master branch
 def branchesToSync = ['demo']
 
+// Vars for Kubernetes PACT
+env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+env.PACT_BROKER_PORT = "443"
+env.PACT_BROKER_SCHEME = "https"
+
 withPipeline(type, product, component) {
 
     overrideVaultEnvironments(vaultOverrides)
@@ -74,5 +80,9 @@ withPipeline(type, product, component) {
     after('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
+
+    enablePactAs([
+    AppPipelineDsl.PactRoles.PROVIDER
+    ])
 
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 
 import java.util.List;
 
+@Service
 public interface CaseWorkerService {
 
     List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
