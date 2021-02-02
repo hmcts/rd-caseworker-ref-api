@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.IN_PROGRESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.MULTIPLE_SERVICE_CODES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
@@ -93,6 +95,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
 
+            validateServiceRoleMappingSheet(caseWorkerRequest, ob);
+
             long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);
             log.info("{}::Time taken to validate the records is {}", loggingComponentName,
@@ -141,6 +145,21 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 ex.getMessage(), 0L);
             auditAndExceptionRepositoryServiceImpl.auditException(exceptionCaseWorker);
             throw ex;
+        }
+    }
+
+    private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList,
+                                                 Class<? extends CaseWorkerDomain> classType) {
+        if (nonNull(classType) && classType.equals(ServiceRoleMapping.class)) {
+            boolean multipleServiceCode = caseWorkerRequestList.stream()
+                    .filter(ServiceRoleMapping.class::isInstance)
+                    .map(ServiceRoleMapping.class::cast)
+                    .map(ServiceRoleMapping::getServiceId)
+                    .distinct()
+                    .count() > 1;
+            if (multipleServiceCode) {
+                throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
+            }
         }
     }
 

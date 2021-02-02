@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileConverter;
@@ -122,6 +123,24 @@ public class CaseWorkerServiceFacadeImplTest {
         ResponseEntity<Object> responseEntity =
             caseWorkerServiceFacade.processFile(multipartFile);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test(expected = InvalidRequestException.class)
+    public void shouldProcessServiceRoleMappingFileFailure() throws IOException {
+
+        List<ServiceRoleMapping> serviceRoleMappings = new ArrayList<>();
+
+        serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA1").build());
+        serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA2").build());
+
+        MultipartFile multipartFile =
+                getMultipartFile("src/test/resources/ServiceRoleMapping_Multiple_Ids.xls", TYPE_XLS);
+        when(excelValidatorService.validateExcelFile(multipartFile))
+                .thenReturn(workbook);
+        when(excelAdaptorService
+                .parseExcel(workbook, ServiceRoleMapping.class))
+                .thenReturn(serviceRoleMappings);
+        caseWorkerServiceFacade.processFile(multipartFile);
     }
 
     private MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {

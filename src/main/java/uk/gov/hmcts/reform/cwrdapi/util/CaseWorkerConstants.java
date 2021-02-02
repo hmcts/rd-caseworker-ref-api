@@ -41,6 +41,8 @@ public final class CaseWorkerConstants {
             "Unauthorized Error : The requested resource is restricted and requires authentication";
 
     public static final String FORBIDDEN_ERROR = "Forbidden Error: Access denied for invalid permissions";
+    public static final String MULTIPLE_SERVICE_CODES = "The file must contain mapping for 1 Service Code."
+            + " Please update the Service Code for all the rows and re-upload the file";
 
     public static final String NO_DATA_FOUND = "The Caseworker data could not be found";
 

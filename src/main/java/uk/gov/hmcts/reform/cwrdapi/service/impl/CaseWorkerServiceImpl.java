@@ -234,8 +234,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
             caseWorkerIdamRoleAssociation.setRoleId(serviceRoleMapping.getRoleId().longValue());
             caseWorkerIdamRoleAssociation.setIdamRole(serviceRoleMapping.getIdamRoles());
-            caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getSerivceId());
-            serviceCodes.add(serviceRoleMapping.getSerivceId());
+            caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getServiceId());
+            serviceCodes.add(serviceRoleMapping.getServiceId());
             caseWorkerIdamRoleAssociations.add(caseWorkerIdamRoleAssociation);
         });
         try {
