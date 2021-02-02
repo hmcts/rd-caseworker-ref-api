@@ -23,7 +23,7 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
 
     private Validator validator;
 
-    private Set<ConstraintViolation<T>> constraintViolations = new HashSet<>();
+    private Set<ConstraintViolation<T>> constraintViolations;
 
     @Value("${logging-component-name}")
     private String logComponentName;
@@ -41,6 +41,8 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
      * @return List binder list
      */
     public List<T> getInvalidJsrRecords(List<T> domains) {
+
+        constraintViolations = new HashSet<>();
 
         log.info("{}:: JsrValidatorInitializer data processing validate starts::",
             logComponentName);

@@ -11,6 +11,7 @@ import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -106,7 +107,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void createCwWhenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() {
         List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
         UserProfileResponse upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
-        assertEquals(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN), upResponse.getRoles());
+        Assertions.assertThat(upResponse.getRoles())
+                .containsExactlyInAnyOrderElementsOf(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN));
     }
 
     @Test

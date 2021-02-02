@@ -74,7 +74,6 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ex.getMessage());
     }
 
-
     private String getTimeStamp() {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());
     }

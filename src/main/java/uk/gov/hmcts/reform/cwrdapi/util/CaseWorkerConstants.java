@@ -17,12 +17,14 @@ public final class CaseWorkerConstants {
     public static final String DELIMITER_COMMA = ",";
 
     //excel adapter related error messages
-    public static final String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "File provided in request is not in xls(x) format";
-    public static final String FILE_NOT_PRESENT_ERROR_MESSAGE = "File not present";
+    public static final String FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE = "You can only upload xlsx or xls files."
+            + " Check it’s saved in the correct format and try again.";
+    public static final String FILE_NOT_PRESENT_ERROR_MESSAGE = "You can only upload xlsx or xls files."
+            + " Check it’s saved in the correct format and try again.";
     public static final String FILE_PASSWORD_PROTECTED_ERROR_MESSAGE =
             "The file is password protected. Please provide a file without password.";
-    public static final String FILE_NO_VALID_SHEET_ERROR_MESSAGE = "The uploaded file does not contain "
-            + "the worksheet named Case Worker Data";
+    public static final String FILE_NO_VALID_SHEET_ERROR_MESSAGE = "The uploaded file does not "
+            + "contain the ‘Staff data’ worksheet.";
     public static final String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
     public static final String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
     public static final String ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
@@ -76,15 +78,28 @@ public final class CaseWorkerConstants {
         "Request completed with partial success. Some records failed during validation and were ignored.";
 
     public static final String RECORDS_FAILED = "%s record(s) failed validation";
-
     public static final String RECORDS_SUSPENDED = "%s record(s) suspended";
 
     public static final String DOMAIN_JUSTICE_GOV_UK = "justice.gov.uk";
     public static final String USER_NAME_PATTERN = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
-    public static final String INVALID_EMAIL = "Please provide a valid email.";
+    public static final String INVALID_EMAIL = "You must add a valid justice.gov.uk email"
+            + " address and upload the file again";
 
-    public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the provided file."
-        + " Please upload a valid file in xls(x) format.";
-    public static final String FILE_MISSING_HEADERS =  "File is missing the required column header %s"
-        + " Please check the file.";
+    public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the file uploaded."
+            + " Upload a valid file in xlsx or xls format";
+    public static final String FILE_MISSING_HEADERS =  "The file is missing some column headers."
+            + " Review and upload again";
+
+    public static final String NO_LOCATION_PRESENT = "You must add location details and upload the file again.";
+    public static final String NO_ROLE_PRESENT = "You must add role details and upload the file again";
+    public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work"
+            + " and upload the file again";
+    public static final String NO_USER_TYPE_PRESENT = "You must add a user type and upload the file again";
+    public static final String FIRST_NAME_MISSING = "You must add a first name and upload the file again";
+    public static final String LAST_NAME_MISSING = "You must add a last name and upload the file again";
+    public static final String MISSING_REGION = "You must add a region and upload the file again";
+    public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
+            + "Please try again or check with HMCTS Support Team";
+    public static final String ROLE_CWD_USER = "cwd-user";
+
 }

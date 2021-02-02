@@ -43,7 +43,7 @@ public class ExceptionCaseWorker implements Serializable {
     private String excelRowId;
 
     @Column(name = "key")
-    @Size(max = 32)
+    @Size(max = 256)
     private String keyField;
 
     @Column(name = "field_in_error")
