@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             long time2 = System.currentTimeMillis();
             List<CaseWorkerDomain> caseWorkerRequest = (List<CaseWorkerDomain>) excelAdaptorService
                 .parseExcel(workbook, ob);
+
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
 
@@ -165,13 +167,15 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             Map<String, List<ExceptionCaseWorker>> failedRecords = exceptionCaseWorkerList.stream()
                 .collect(groupingBy(ExceptionCaseWorker::getExcelRowId));
 
-            List<JsrFileErrors> jsrFileErrors = new LinkedList<>();
+            LinkedList<JsrFileErrors> jsrFileErrors = new LinkedList<>();
 
-            failedRecords.forEach((key, value) ->
-                value.forEach(jsrInvalid ->
-                    jsrFileErrors.add(JsrFileErrors.builder().rowId(jsrInvalid.getExcelRowId())
-                        .errorDescription(jsrInvalid.getErrorDescription())
-                        .filedInError(jsrInvalid.getFieldInError()).build())));
+            failedRecords.entrySet().stream()
+                .sorted(Comparator.comparingInt(s -> Integer.valueOf(s.getKey())))
+                .forEachOrdered(map ->
+                    map.getValue().forEach(jsrInvalid ->
+                        jsrFileErrors.add(JsrFileErrors.builder().rowId(jsrInvalid.getExcelRowId())
+                            .errorDescription(jsrInvalid.getErrorDescription())
+                            .filedInError(jsrInvalid.getFieldInError()).build())));
 
             noOfUploadedRecords = noOfUploadedRecords - failedRecords.size();
             String suspendedRecordMessage = getSuspendedErrorMessageForJsr(isCaseWorker, failedRecords);
@@ -206,7 +210,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             int suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
                 .filter(s -> failedRecords.containsKey(Long.toString(s))).collect(toList()).size();
             return getSuspendedErrorMessage(isCaseWorker,
-                caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed, true);
+                caseWorkerProfileConverter.getSuspendedRowIds().size()
+                    - suspendedFailed, true);
         }
         return EMPTY;
     }

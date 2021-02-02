@@ -24,8 +24,8 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +41,12 @@ import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -192,10 +198,10 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         response = uploadCaseWorkerFile("CaseWorkerUserXlsWithJSR.xls",
-                CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
+            CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 
         CaseWorkerFileCreationResponse resultResponse =
-                objectMapper.readValue(getJsonResponse(response), CaseWorkerFileCreationResponse.class);
+            objectMapper.readValue(getJsonResponse(response), CaseWorkerFileCreationResponse.class);
         CaseWorkerFileCreationResponse expectedResponse = createCaseWorkerExpectedErrorDetails();
 
         assertThat(expectedResponse.getDetailedMessage()).isEqualTo(resultResponse.getDetailedMessage());
@@ -210,31 +216,37 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     }
 
     private CaseWorkerFileCreationResponse createCaseWorkerExpectedErrorDetails() {
-        List<JsrFileErrors> errors = new ArrayList<>();
+        LinkedList<JsrFileErrors> errors = new LinkedList<>();
         errors.add(JsrFileErrors.builder().rowId("2").filedInError("locations").errorDescription(
-                CaseWorkerConstants.NO_LOCATION_PRESENT).build());
+            CaseWorkerConstants.NO_LOCATION_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("3").filedInError("roles").errorDescription(
-                CaseWorkerConstants.NO_ROLE_PRESENT).build());
+            CaseWorkerConstants.NO_ROLE_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("4").filedInError("workAreas").errorDescription(
-                CaseWorkerConstants.NO_WORK_AREA_PRESENT).build());
+            CaseWorkerConstants.NO_WORK_AREA_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("5").filedInError("userType").errorDescription(
-                CaseWorkerConstants.NO_USER_TYPE_PRESENT).build());
+            CaseWorkerConstants.NO_USER_TYPE_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("6").filedInError("firstName").errorDescription(
-                CaseWorkerConstants.FIRST_NAME_MISSING).build());
+            CaseWorkerConstants.FIRST_NAME_MISSING).build());
         errors.add(JsrFileErrors.builder().rowId("7").filedInError("lastName").errorDescription(
-                CaseWorkerConstants.LAST_NAME_MISSING).build());
+            CaseWorkerConstants.LAST_NAME_MISSING).build());
         errors.add(JsrFileErrors.builder().rowId("8").filedInError("officialEmail").errorDescription(
-                CaseWorkerConstants.INVALID_EMAIL).build());
+            CaseWorkerConstants.INVALID_EMAIL).build());
         errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionName").errorDescription(
-                CaseWorkerConstants.MISSING_REGION).build());
+            CaseWorkerConstants.MISSING_REGION).build());
         errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionId").errorDescription(
-                CaseWorkerConstants.MISSING_REGION).build());
+            CaseWorkerConstants.MISSING_REGION).build());
+        errors.add(JsrFileErrors.builder().rowId("10").filedInError(ROLE_FIELD).errorDescription(
+            DUPLICATE_PRIMARY_AND_SECONDARY_ROLES).build());
+        errors.add(JsrFileErrors.builder().rowId("11").filedInError(LOCATION_FIELD).errorDescription(
+            DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS).build());
+        errors.add(JsrFileErrors.builder().rowId("12").filedInError(AREA_OF_WORK_FIELD).errorDescription(
+            DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         return CaseWorkerFileCreationResponse.builder()
-                .errorDetails(errors)
-                .detailedMessage("8 record(s) failed validation, 1 record(s) uploaded")
-                .message("Request completed with partial success."
-                        + " Some records failed during validation and were ignored.")
-                .build();
+            .errorDetails(errors)
+            .detailedMessage("11 record(s) failed validation, 1 record(s) uploaded")
+            .message("Request completed with partial success."
+                + " Some records failed during validation and were ignored.")
+            .build();
     }
 
     @Test
@@ -308,14 +320,14 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     @Test
     public void shouldCreateCaseWorkerAuditFailureForSuspendingNewUser() throws IOException {
         uploadCaseWorkerFile("CaseWorkerUserXlsxNewUserWithSuspended.xlsx",
-                CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         assertThat(exceptionCaseWorkers.size()).isEqualTo(1);
         assertEquals(format(CaseWorkerConstants.NO_USER_TO_SUSPEND, 1),
-                exceptionCaseWorkers.get(0).getErrorDescription());
+            exceptionCaseWorkers.get(0).getErrorDescription());
     }
 
     private String getJsonResponse(Map<String, Object> response) {

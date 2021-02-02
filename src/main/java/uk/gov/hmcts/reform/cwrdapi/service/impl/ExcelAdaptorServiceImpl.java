@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,6 +28,7 @@ import java.util.Objects;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.util.ReflectionUtils.makeAccessible;
@@ -99,6 +101,10 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Field rowField = getRowIdField((Class<Object>) classType);
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
+            //Skipping empty rows
+            if (checkIfRowIsEmpty(row)) {
+                rowIterator.next();
+            }
             Object bean = getInstanceOf(classType.getName());//create parent object
             setFieldValue(rowField, bean, row.getRowNum());
             for (int i = 0; i < headers.size(); i++) { //set all parent fields
@@ -259,6 +265,22 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
     private void throwFileParsingException() {
         throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
+    }
+
+    private boolean checkIfRowIsEmpty(Row row) {
+        if (row == null) {
+            return true;
+        }
+        if (row.getLastCellNum() <= 0) {
+            return true;
+        }
+        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+            Cell cell = row.getCell(cellNum);
+            if (cell != null && cell.getCellType() != CellType.BLANK && isNotBlank(cell.toString())) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

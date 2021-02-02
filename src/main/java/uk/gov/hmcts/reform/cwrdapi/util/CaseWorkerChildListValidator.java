@@ -1,0 +1,78 @@
+package uk.gov.hmcts.reform.cwrdapi.util;
+
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+
+import java.util.stream.Collectors;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+import static java.lang.Boolean.FALSE;
+import static java.util.Objects.nonNull;
+import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
+
+public class CaseWorkerChildListValidator implements ConstraintValidator<ValidateCaseWorkerChildes, CaseWorkerProfile> {
+
+    @Override
+    public boolean isValid(CaseWorkerProfile caseWorkerProfile, ConstraintValidatorContext context) {
+        //disable existing violation message
+        context.disableDefaultConstraintViolation();
+        return (isValidRoles(caseWorkerProfile, context)
+            && isValidLocations(caseWorkerProfile, context)
+            && isValidAreaOfWk(caseWorkerProfile, context));
+    }
+
+    private boolean isValidAreaOfWk(CaseWorkerProfile caseWorkerProfile, ConstraintValidatorContext context) {
+        boolean isValidAreaOfWk = true;
+        if (isNotEmpty(caseWorkerProfile.getWorkAreas())
+            && caseWorkerProfile.getWorkAreas().size() > 1
+            && caseWorkerProfile.getWorkAreas().stream()
+            .map(WorkArea::getServiceCode)
+            .collect(Collectors.toSet()).size()
+            != caseWorkerProfile.getWorkAreas().size()) {
+            isValidAreaOfWk = false;
+            context.buildConstraintViolationWithTemplate(DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK)
+                .addPropertyNode(AREA_OF_WORK_FIELD)
+                .addConstraintViolation();
+        }
+        return isValidAreaOfWk;
+    }
+
+    private boolean isValidLocations(CaseWorkerProfile caseWorkerProfile, ConstraintValidatorContext context) {
+        boolean isValidLocations = true;
+        if (isNotEmpty(caseWorkerProfile.getLocations())
+            && caseWorkerProfile.getLocations().size() > 1) {
+            isValidLocations = negate(caseWorkerProfile.getLocations().get(0).getBaseLocationId()
+                .equals(caseWorkerProfile.getLocations().get(1).getBaseLocationId()));
+            if (FALSE.equals(isValidLocations)) {
+                context.buildConstraintViolationWithTemplate(DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS)
+                    .addPropertyNode(LOCATION_FIELD)
+                    .addConstraintViolation();
+            }
+        }
+        return isValidLocations;
+    }
+
+    private boolean isValidRoles(CaseWorkerProfile caseWorkerProfile, ConstraintValidatorContext context) {
+        boolean isValidRoles = true;
+        if (isNotEmpty(caseWorkerProfile.getRoles())
+            && caseWorkerProfile.getRoles().size() > 1
+            && nonNull(caseWorkerProfile.getRoles().get(0).getRoleName())) {
+            isValidRoles = negate(caseWorkerProfile.getRoles().get(0).getRoleName()
+                .equalsIgnoreCase(caseWorkerProfile.getRoles().get(1).getRoleName()));
+            if (FALSE.equals(isValidRoles)) {
+                context.buildConstraintViolationWithTemplate(DUPLICATE_PRIMARY_AND_SECONDARY_ROLES)
+                    .addPropertyNode(ROLE_FIELD)
+                    .addConstraintViolation();
+            }
+        }
+        return isValidRoles;
+    }
+}
