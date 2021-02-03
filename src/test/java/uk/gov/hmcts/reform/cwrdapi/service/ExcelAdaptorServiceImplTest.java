@@ -33,41 +33,61 @@ public class ExcelAdaptorServiceImplTest {
     @Before
     public void initialize() {
         List<String> acceptableHeaders = List.of("First Name", "Last Name", "Email",
-                "Region", "User type");
+            "Region", "User type");
         ReflectionTestUtils.setField(excelAdaptorServiceImpl, "acceptableHeaders",
-                acceptableHeaders);
+            acceptableHeaders);
     }
 
     @Test
     public void parseXlsxShouldThrowExceptionWhenOnlyHeaderPresentTest() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUsers_WithXlsxOnlyHeader.xlsx"),
-                        "1234");
+            .create(new File("src/test/resources/CaseWorkerUsers_WithXlsxOnlyHeader.xlsx"),
+                "1234");
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
+            .isExactlyInstanceOf(ExcelValidationException.class)
+            .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
     }
 
     @Test
     public void parseXlsxShouldThrowExceptionWhenNoValidSheetNamePresentTest() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUsers_WithNoValidSheetName.xlsx"),
-                        "1234");
+            .create(new File("src/test/resources/CaseWorkerUsers_WithNoValidSheetName.xlsx"),
+                "1234");
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_NO_VALID_SHEET_ERROR_MESSAGE);
+            .isExactlyInstanceOf(ExcelValidationException.class)
+            .hasMessage(FILE_NO_VALID_SHEET_ERROR_MESSAGE);
     }
 
     @Test
     public void parseXlsxWhichHasFormula() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUserXlsWithFormula.xlsx"), "1234");
+            .create(new File("src/test/resources/CaseWorkerUserXlsWithFormula.xlsx"), "1234");
 
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
-                .getPhysicalNumberOfRows() - 1);
+            .getPhysicalNumberOfRows() - 1);
+        CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
+        assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
+        assertThat(caseWorkerProfile.getLastName()).isNotBlank();
+        assertThat(caseWorkerProfile.getOfficialEmail()).isNotBlank();
+        assertThat(caseWorkerProfile.getRegionName()).isNotBlank();
+        assertThat(caseWorkerProfile.getUserType()).isNotBlank();
+        assertThat(caseWorkerProfile.getIdamRoles()).isNotBlank();
+        assertThat(caseWorkerProfile.getSuspended()).isNotBlank();
+        assertThat(caseWorkerProfile.getLocations()).hasSize(2);
+        assertThat(caseWorkerProfile.getRoles()).hasSize(2);
+        assertThat(caseWorkerProfile.getWorkAreas()).hasSize(1);
+    }
+
+    @Test
+    public void parseXlsxWhichHasFormulaWithEmptyRows() throws IOException {
+        Workbook workbook = WorkbookFactory
+            .create(new File("src/test/resources/CaseWorkerUserXlsWithFormulaAndEmptyRow.xlsx"));
+        List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
+        assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
+            .getPhysicalNumberOfRows() - 2);
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
@@ -84,7 +104,7 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void parseServiceRoleMappingXlsx() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/ServiceRoleMapping_BBA9.xlsx"));
+            .create(new File("src/test/resources/ServiceRoleMapping_BBA9.xlsx"));
 
         List<ServiceRoleMapping> profiles = excelAdaptorServiceImpl.parseExcel(workbook, ServiceRoleMapping.class);
         assertThat(profiles).hasSize(workbook.getSheet(REQUIRED_ROLE_MAPPING_SHEET_NAME).getPhysicalNumberOfRows() - 1);
@@ -97,10 +117,10 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void sendXlsxWithIncorrectHeaders() throws IOException {
         Workbook workbook = WorkbookFactory
-                .create(new File("src/test/resources/CaseWorkerUserXlsWithInvalidHeaders.xls"));
+            .create(new File("src/test/resources/CaseWorkerUserXlsWithInvalidHeaders.xls"));
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(CaseWorkerConstants.FILE_MISSING_HEADERS);
+            .isExactlyInstanceOf(ExcelValidationException.class)
+            .hasMessage(CaseWorkerConstants.FILE_MISSING_HEADERS);
     }
 }
