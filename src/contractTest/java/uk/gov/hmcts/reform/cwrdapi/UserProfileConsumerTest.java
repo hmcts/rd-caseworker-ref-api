@@ -151,10 +151,10 @@ public class UserProfileConsumerTest {
         return newJsonBody(o -> o
                 .object("roleAdditionResponse", attribute -> attribute
                         .stringType("idamMessage", "11 OK")
-                        .numberType("idamStatusCode", 200))
+                        .stringType("idamStatusCode", "200"))
                 .minArrayLike("roleDeletionResponse", 1, 1,
                         roleDeletionResponse -> roleDeletionResponse
-                                .stringType("idamMessage", "Success")
+                                .stringType("idamMessage", "11 OK")
                                 .stringType("idamStatusCode", "200")
                                 .stringType("roleName", "caseworker")
                 )).build();

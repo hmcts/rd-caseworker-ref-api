@@ -185,11 +185,11 @@
             {
               "roleName": "caseworker",
               "idamStatusCode": "200",
-              "idamMessage": "Success"
+              "idamMessage": "11 OK"
             }
           ],
           "roleAdditionResponse": {
-            "idamStatusCode": 200,
+            "idamStatusCode": "200",
             "idamMessage": "11 OK"
           }
         },
@@ -206,7 +206,7 @@
             "$.roleAdditionResponse.idamStatusCode": {
               "matchers": [
                 {
-                  "match": "number"
+                  "match": "type"
                 }
               ],
               "combine": "AND"
