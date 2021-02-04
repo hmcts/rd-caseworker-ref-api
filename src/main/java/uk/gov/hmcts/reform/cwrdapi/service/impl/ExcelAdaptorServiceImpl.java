@@ -103,7 +103,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             Row row = rowIterator.next();
             //Skipping empty rows
             if (checkIfRowIsEmpty(row)) {
-                rowIterator.next();
+                continue;
             }
             Object bean = getInstanceOf(classType.getName());//create parent object
             setFieldValue(rowField, bean, row.getRowNum());
