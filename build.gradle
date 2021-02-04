@@ -222,6 +222,7 @@ task contractTest(type: Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
+  exclude "uk/gov/hmcts/reform/cwrdapi/*UserProfileConsumerTest*"
 }
 
 task runProviderPactVerification(type: Test) {
