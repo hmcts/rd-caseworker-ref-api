@@ -70,15 +70,24 @@ public class IdamOpenIdClient {
 
         String serializedUser = gson.toJson(user);
 
-        Response createdUserResponse = RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(testConfig.getIdamApiUrl())
-                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .body(serializedUser)
-                .post("/testing-support/accounts")
-                .andReturn();
+        Response createdUserResponse = null;
 
+        for (int i = 0; i < 5; i++) {
+            log.info("SIDAM createUser retry attempt : " + i + 1);
+            createdUserResponse = RestAssured
+                    .given()
+                    .relaxedHTTPSValidation()
+                    .baseUri(testConfig.getIdamApiUrl())
+                    .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                    .body(serializedUser)
+                    .post("/testing-support/accounts")
+                    .andReturn();
+            if (createdUserResponse.getStatusCode() == 504) {
+                log.info("SIDAM createUser retry response for attempt " + i + 1 + " 504");
+            } else {
+                break;
+            }
+        }
 
         log.info("openIdTokenResponse createUser response: " + createdUserResponse.getStatusCode());
 
