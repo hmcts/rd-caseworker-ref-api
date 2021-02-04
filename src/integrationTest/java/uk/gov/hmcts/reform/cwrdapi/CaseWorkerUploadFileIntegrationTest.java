@@ -64,13 +64,13 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsWithNoPassword.xls",
+        uploadCaseWorkerFile("Staff Data Upload Xls.xls",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
@@ -101,31 +101,31 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     @Test
     public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xls",
+        uploadCaseWorkerFile("Staff Data Upload With Password.xls",
             CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
@@ -136,7 +136,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
             "test-flag-1");
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
-        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
     }
 
@@ -179,7 +179,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
             + "\"message_details\":\"1 record(s) uploaded\"}";
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
         String json = getJsonResponse(response);
@@ -197,7 +197,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
     public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        response = uploadCaseWorkerFile("CaseWorkerUserXlsWithJSR.xls",
+        response = uploadCaseWorkerFile("Staff Data Upload With Jsr.xlsx",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 
         CaseWorkerFileCreationResponse resultResponse =
@@ -254,7 +254,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
@@ -273,7 +273,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
             + "\"error_details\":[{\"row_id\":\"1\","
             + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
 
-        response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
@@ -319,7 +319,7 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
 
     @Test
     public void shouldCreateCaseWorkerAuditFailureForSuspendingNewUser() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxNewUserWithSuspended.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();

@@ -325,16 +325,17 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserXlsxWithNoPassword.xlsx",
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
                         200, REQUEST_COMPLETED_SUCCESSFULLY,
                         TYPE_XLSX, ROLE_CWD_ADMIN);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
             .as(CaseWorkerFileCreationResponse.class);
+        System.out.println(caseWorkerFileCreationResponse.getMessage());
         assertTrue(caseWorkerFileCreationResponse.getMessage()
             .contains(REQUEST_COMPLETED_SUCCESSFULLY));
         assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
-            .contains(format(RECORDS_UPLOADED, 3)));
+            .contains(format(RECORDS_UPLOADED, 2)));
     }
 
     @Test
@@ -400,7 +401,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/CaseWorkerUserWithPassword.xlsx",
+        uploadCaseWorkerFile("src/functionalTest/resources/Staff Data UploadWithPassword.xlsx",
                 403, null,
                 TYPE_XLSX, "Invalid");
     }
