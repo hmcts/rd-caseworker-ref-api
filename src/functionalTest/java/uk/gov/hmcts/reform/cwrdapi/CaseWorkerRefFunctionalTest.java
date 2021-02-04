@@ -333,7 +333,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
             .as(CaseWorkerFileCreationResponse.class);
-        System.out.println(caseWorkerFileCreationResponse.getMessage());
         assertTrue(caseWorkerFileCreationResponse.getMessage()
             .contains(REQUEST_COMPLETED_SUCCESSFULLY));
         assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
