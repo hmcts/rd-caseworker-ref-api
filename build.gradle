@@ -189,6 +189,7 @@ task contract(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/cwrdapi/**"
   systemProperty 'pact.rootDir', "pacts"
+  exclude "uk/gov/hmcts/reform/cwrdapi/*FetchCaseworkersByIdProviderTest*"
 }
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
@@ -450,14 +451,13 @@ dependencies {
   smokeTestCompile sourceSets.main.runtimeClasspath
   smokeTestCompile sourceSets.test.runtimeClasspath
 
-  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
-  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
-  contractTestRuntime group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.1.7'
 
   contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
