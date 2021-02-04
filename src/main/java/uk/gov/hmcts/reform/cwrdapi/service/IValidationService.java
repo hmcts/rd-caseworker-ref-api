@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 
 import java.util.List;
 
@@ -20,4 +21,8 @@ public interface IValidationService {
      * @param jobId long
      */
     void auditJsr(long jobId);
+
+    long startAuditJob(final AuditStatus auditStatus, final String fileName);
+
+    long insertAudit(final AuditStatus auditStatus, final String fileName);
 }

@@ -18,17 +18,17 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ServiceRoleMapping extends CaseWorkerDomain {
 
-    @MappingField(columnName = "Service ID")
+    @MappingField(columnName = "Service ID", position = 1)
     @NotEmpty
     @JsonProperty(value = "service_code")
-    String serivceId;
+    String serviceId;
 
-    @MappingField(columnName = "Roles")
+    @MappingField(columnName = "Role")
     @NotNull
     @JsonProperty(value = "role")
     Integer roleId;
 
-    @MappingField(columnName = "Idam Roles")
+    @MappingField(columnName = "IDAM Roles")
     @NotEmpty
     @JsonProperty(value = "idam_roles")
     String idamRoles;

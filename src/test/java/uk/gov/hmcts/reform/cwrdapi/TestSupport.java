@@ -31,7 +31,7 @@ public class TestSupport {
 
         return ImmutableList.of(CaseWorkerProfile.builder()
             .firstName("test").lastName("test")
-            .officialEmail("test@test.com")
+            .officialEmail("test@justice.gov.uk")
             .regionId(1)
             .regionName("test")
             .userType("testUser")

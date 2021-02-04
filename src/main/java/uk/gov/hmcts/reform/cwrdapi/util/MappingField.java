@@ -13,4 +13,6 @@ public @interface MappingField {
     Class clazz() default Object.class;
 
     int objectCount() default 0;
+
+    int position() default -1;
 }

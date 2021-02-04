@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
@@ -25,12 +28,14 @@ import java.util.Objects;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.util.ReflectionUtils.makeAccessible;
 import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADERS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IS_PRIMARY_FIELD;
@@ -38,9 +43,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_CW_S
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE_MAPPING_SHEET_NAME;
 
 @Service
+@Slf4j
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private FormulaEvaluator formulaEvaluator = null;
+
+    @Value("${excel.acceptableHeaders}")
+    private List<String> acceptableHeaders;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
@@ -58,7 +67,23 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         } else if (sheet.getPhysicalNumberOfRows() < 2) { // check at least 1 row
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
+        List<String> headers = new LinkedList<>();
+        collectHeaderList(headers, sheet);
+        if (classType.equals(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class)) {
+            validateHeaders(headers);
+        }
         return mapToPojo(sheet, classType);
+    }
+
+    private void validateHeaders(List<String> headers) {
+        //below mentioned code can be shortened to headers.containsAll(acceptableHeaders),
+        //but current code is better from debugging standpoint.
+        acceptableHeaders.forEach(acceptableHeader -> {
+            if (!headers.contains(acceptableHeader)) {
+                log.error(FILE_MISSING_HEADERS);
+                throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_MISSING_HEADERS);
+            }
+        });
     }
 
     private <T> List<T> mapToPojo(Sheet sheet, Class<T> classType) {
@@ -69,16 +94,22 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
         collectHeaderList(headers, sheet);
         //scan parent and domain object fields by reflection and make maps
-        List<Triple<String,Field, List<Field>>> customObjectFieldsMapping =
-                createBeanFieldMaps(classType, parentFieldMap);
+        List<Triple<String, Field, List<Field>>> customObjectFieldsMapping =
+            createBeanFieldMaps(classType, parentFieldMap);
         Iterator<Row> rowIterator = sheet.rowIterator();
         rowIterator.next();//skip header
+        Field rowField = getRowIdField((Class<Object>) classType);
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
+            //Skipping empty rows
+            if (checkIfRowIsEmpty(row)) {
+                continue;
+            }
             Object bean = getInstanceOf(classType.getName());//create parent object
+            setFieldValue(rowField, bean, row.getRowNum());
             for (int i = 0; i < headers.size(); i++) { //set all parent fields
                 setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap,
-                        childHeaderToCellMap);
+                    childHeaderToCellMap);
             }
             populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
             objectList.add((T) bean);
@@ -87,33 +118,51 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void populateChildDomainObjects(
-            Object parentBean, List<Triple<String,Field, List<Field>>> customObjectFields,
-            Map<String, Object> childHeaderValues) {
+        Object parentBean, List<Triple<String, Field, List<Field>>> customObjectFields,
+        Map<String, Object> childHeaderValues) {
         customObjectFields.forEach(customObjectTriple -> {
             Field parentField = customObjectTriple.getMiddle();
             List<Object> domainObjectList = new ArrayList<>();
             int objectCount = findAnnotation(parentField, MappingField.class).objectCount();//take count from parent
             for (int i = 0; i < objectCount; i++) {
-                Object childDomainObject = getInstanceOf(customObjectTriple.getLeft());//instantiate child domain object
-                for (Field childField: customObjectTriple.getRight()) {
+
+                //getInstanceOf(customObjectTriple.getLeft());//instantiate child domain object
+                Object childDomainObject = null;
+                for (Field childField : customObjectTriple.getRight()) {
                     MappingField mappingField = findAnnotation(childField, MappingField.class);
-                    if (nonNull(mappingField)) {
-                        String domainObjectColumnName = mappingField.columnName().split(DELIMITER_COMMA)[i].trim();
-                        setFieldValue(childField, childDomainObject, childHeaderValues.get(domainObjectColumnName));
-                        setIsPrimaryField(childDomainObject, mappingField, domainObjectColumnName);
-                    }
+                    childDomainObject = getChildObject(childHeaderValues, customObjectTriple, i,
+                        childDomainObject, childField, mappingField);
                 }
-                domainObjectList.add(childDomainObject);//add populated child domain object into list
+                if (nonNull(childDomainObject)) {
+                    domainObjectList.add(childDomainObject); //add populated child domain object into list
+                }
             }
             setFieldValue(parentField, parentBean, domainObjectList);//finally set list to parent field
         });
     }
 
+    private Object getChildObject(Map<String, Object> childHeaderValues, Triple<String,
+        Field, List<Field>> customObjectTriple, int i, Object childDomainObject, Field childField,
+                                  MappingField mappingField) {
+        if (nonNull(mappingField)) {
+            String domainObjectColumnName = mappingField.columnName().split(DELIMITER_COMMA)[i].trim();
+            Object fieldValue = childHeaderValues.get(domainObjectColumnName);
+            if (nonNull(fieldValue)) {
+                childDomainObject = isNull(childDomainObject) ? getInstanceOf(customObjectTriple.getLeft())
+                    : childDomainObject;
+                setFieldValue(childField, childDomainObject, fieldValue);
+                setIsPrimaryField(childDomainObject, mappingField, domainObjectColumnName);
+            }
+
+        }
+        return childDomainObject;
+    }
+
     //called once per file only
-    private <T> List<Triple<String,Field, List<Field>>> createBeanFieldMaps(Class<T> objectClass,
-                                                                  Map<String, Field> headerToCellValueMap) {
-        List<Triple<String,Field, List<Field>>> customObjects = new ArrayList<>();
-        for (Field field: objectClass.getDeclaredFields()) {
+    private <T> List<Triple<String, Field, List<Field>>> createBeanFieldMaps(Class<T> objectClass,
+                                                                             Map<String, Field> headerToCellValueMap) {
+        List<Triple<String, Field, List<Field>>> customObjects = new ArrayList<>();
+        for (Field field : objectClass.getDeclaredFields()) {
             MappingField mappingField = findAnnotation(field, MappingField.class);
             if (isNull(mappingField)) {
                 // do nothing
@@ -122,7 +171,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             } else {
                 // make triple of child domain object class name, parent field, respective list of domain object fields
                 customObjects.add(Triple.of(mappingField.clazz().getCanonicalName(), field,
-                        asList(mappingField.clazz().getDeclaredFields())));
+                    asList(mappingField.clazz().getDeclaredFields())));
             }
         }
         return customObjects;
@@ -144,7 +193,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         }
     }
 
-    private Object getInstanceOf(String className)  {
+    private Object getInstanceOf(String className) {
         Object objectInstance = null;
         try {
             objectInstance = Class.forName(className).getDeclaredConstructor().newInstance();
@@ -155,7 +204,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void setParentFields(Object cellValue, Object bean, String header, Map<String, Field> fieldHashMap,
-                           Map<String, Object> childHeaderValues) {
+                                 Map<String, Object> childHeaderValues) {
         Field field = fieldHashMap.get(header);
         if (nonNull(field)) {
             setFieldValue(field, bean, cellValue);
@@ -176,11 +225,14 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private Object getCellValue(Cell cell) {
+        if (isNull(cell)) {
+            return null;
+        }
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:
-                return Integer.valueOf((int)cell.getNumericCellValue());
+                return Integer.valueOf((int) cell.getNumericCellValue());
             case FORMULA:
                 return getValueFromFormula(cell);
             default:
@@ -195,7 +247,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case NUMERIC:
-                return cell.getNumericCellValue();
+                return (int) cell.getNumericCellValue();
             case STRING:
                 return cell.getStringCellValue();
             default:
@@ -203,8 +255,32 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         }
     }
 
+    private Field getRowIdField(Class<Object> classType) {
+        try {
+            return classType.getSuperclass().getDeclaredField("rowId");
+        } catch (NoSuchFieldException e) {
+            throw new IllegalArgumentException("invalid Row exception");
+        }
+    }
+
     private void throwFileParsingException() {
         throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
+    }
+
+    private boolean checkIfRowIsEmpty(Row row) {
+        if (row == null) {
+            return true;
+        }
+        if (row.getLastCellNum() <= 0) {
+            return true;
+        }
+        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+            Cell cell = row.getCell(cellNum);
+            if (cell != null && cell.getCellType() != CellType.BLANK && isNotBlank(cell.toString())) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

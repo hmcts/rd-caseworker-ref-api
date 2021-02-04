@@ -90,7 +90,7 @@ public class CaseWorkerRefControllerTest {
 
         cwRequest = new CaseWorkersProfileCreationRequest("firstName",
                 "lastName","test@gmail.com",1,"userType","region",
-                false,roles,caseWorkerRoleRequests,caseWorkeLocationRequests,caseWorkeAreaRequests);
+                false,roles,caseWorkerRoleRequests,caseWorkeLocationRequests,caseWorkeAreaRequests, 0);
         caseWorkersProfileCreationRequest.add(cwRequest);
         cwProfileCreationResponse = CaseWorkerProfileCreationResponse
                 .builder()
@@ -151,7 +151,7 @@ public class CaseWorkerRefControllerTest {
     @Test
     public void test_buildIdamRoleMappings_success() {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
-                .serivceId("BA11")
+                .serviceId("BA11")
                 .idamRoles("role1")
                 .roleId(1)
                 .build();

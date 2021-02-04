@@ -16,7 +16,7 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
                 .roleId(1)
                 .idamRoles("testRole")
-                .serivceId("BBAA1")
+                .serviceId("BBAA1")
                 .build();
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createIdamRolesAssoc(Collections.singletonList(serviceRoleMapping), cwdAdmin);
@@ -52,4 +52,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
         assertThat(response).containsEntry("http_status", "500");
 
     }
+
+
 }

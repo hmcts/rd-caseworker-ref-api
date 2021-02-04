@@ -65,14 +65,14 @@ public class ExceptionMapper {
     @ExceptionHandler(CaseworkerMessageFailedException.class)
     public ResponseEntity<Object> handleCaseWorkerPublishMessageError(
             CaseworkerMessageFailedException ex) {
-        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getMessage());
+        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR,
+                ErrorConstants.ERROR_PUBLISHING_TO_TOPIC.getErrorMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<Object> handleLaunchDarklyException(Exception ex) {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ex.getMessage());
     }
-
 
     private String getTimeStamp() {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());

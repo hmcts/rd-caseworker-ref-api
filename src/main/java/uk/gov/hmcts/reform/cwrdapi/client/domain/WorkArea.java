@@ -22,8 +22,8 @@ public class WorkArea implements Serializable {
 
     private static final long serialVersionUID = 2021L;
 
-    @MappingField(columnName = "Aow1 Service Code,Aow2 Service Code,Aow3 Service Code,Aow4 Service Code,"
-        + "Aow5 Service Code, Aow6 Service Code,Aow7 Service Code,Aow8 Service Code")
+    @MappingField(columnName = "Area of Work1 ID,Area of Work2 ID,Area of Work3 ID,Area of Work4 ID,"
+        + "Area of Work5 ID, Area of Work6 ID,Area of Work7 ID,Area of Work8 ID")
     String serviceCode;
 
     @MappingField(columnName = "Area of Work1,Area of Work2,Area of Work3,Area of Work4,Area of Work5,Area of Work6,"

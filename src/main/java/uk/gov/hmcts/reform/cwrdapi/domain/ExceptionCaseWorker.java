@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +24,9 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @SequenceGenerator(name = "exception_id_seq", sequenceName = "exception_id_seq", allocationSize = 1)
+@Builder
 public class ExceptionCaseWorker implements Serializable {
 
     @Id
@@ -38,9 +42,9 @@ public class ExceptionCaseWorker implements Serializable {
     @Size(max = 32)
     private String excelRowId;
 
-    @Column(name = "email_id")
-    @Size(max = 32)
-    private String emailId;
+    @Column(name = "key")
+    @Size(max = 256)
+    private String keyField;
 
     @Column(name = "field_in_error")
     @Size(max = 32)

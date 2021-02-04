@@ -40,12 +40,12 @@ public class CaseWorkerIdamRoleAssociationRepositoryTest {
 
     @Test
     public void test_findByRoleType() {
-        when(caseWorkerIdamRoleAssociationRepository.findByRoleType(any()))
+        when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
                 .thenReturn(Collections.singletonList(caseWorkerIdamRoleAssociation));
 
-        assertFalse(caseWorkerIdamRoleAssociationRepository.findByRoleType(any()).isEmpty());
+        assertFalse(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()).isEmpty());
         assertThat(caseWorkerIdamRoleAssociationRepository
-                .findByRoleType(any()).get(0).getIdamRole()).isEqualTo("testIdamRole");
+                .findByRoleTypeInAndServiceCodeIn(any(), any()).get(0).getIdamRole()).isEqualTo("testIdamRole");
 
     }
 }
