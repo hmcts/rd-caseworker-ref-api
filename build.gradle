@@ -73,17 +73,6 @@ compileTestJava {
   options.compilerArgs << '-Xlint:deprecation' << "-Xlint:unchecked" << "-Werror"
 }
 
-configurations {
-  integrationTestCompile.extendsFrom testCompile
-  integrationTestRuntime.extendsFrom testRuntime
-  functionalTestCompile.extendsFrom testCompile
-  functionalTestRuntime.extendsFrom testRuntime
-  contractTestCompile.extendsFrom testCompile
-  contractTestRuntime.extendsFrom testRuntime
-  pactTestCompile.extendsFrom testCompile
-  pactTestRuntime.extendsFrom testRuntime
-}
-
 sourceSets {
 
   integrationTest {
@@ -143,6 +132,18 @@ idea {
   }
 }
 
+configurations {
+  integrationTestCompile.extendsFrom testCompile
+  integrationTestRuntime.extendsFrom testRuntime
+  functionalTestCompile.extendsFrom testCompile
+  functionalTestRuntime.extendsFrom testRuntime
+  contractTestCompile.extendsFrom testCompile
+  contractTestRuntime.extendsFrom testRuntime
+  pactTestCompile.extendsFrom testCompile
+  pactTestRuntime.extendsFrom testRuntime
+}
+
+
 pmd {
   toolVersion = '6.12.0'
   ignoreFailures = true
@@ -189,7 +190,7 @@ task contract(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/cwrdapi/**"
   systemProperty 'pact.rootDir', "pacts"
-  exclude "uk/gov/hmcts/reform/cwrdapi/*FetchCaseworkersByIdProviderTest*"
+  exclude "uk/gov/hmcts/reform/cwrdapi/*ProviderTest*"
 }
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
