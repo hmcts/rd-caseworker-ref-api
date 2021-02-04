@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -68,8 +69,8 @@ public class FetchCaseworkersByIdProviderTest {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
-                new CaseWorkerRefController(
-                        "RD-Caseworker-Ref-Api", caseWorkerServiceImpl, caseWorkerServiceFacade));
+                new CaseWorkerRefUsersController(
+                        "RD-Caseworker-Ref-Api", caseWorkerServiceImpl));
         context.setTarget(testTarget);
     }
 
