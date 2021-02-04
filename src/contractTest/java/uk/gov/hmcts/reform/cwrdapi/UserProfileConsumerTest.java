@@ -58,11 +58,10 @@ public class UserProfileConsumerTest {
     public RequestResponsePact executeGetUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
-                .given("A user profile get request is submitted with valid email")
-                .uponReceiving("valid request for profile data based on email")
-                .path(UP_URL)
+                .given("A user profile with roles get request is submitted with valid Id")
+                .uponReceiving("valid request for profile data based on Id")
+                .path(UP_URL + "007" + "/roles")
                 .method(HttpMethod.GET.toString())
-                .query("email=james.bond@justice.gov.uk")
                 .willRespondWith()
                 .status(HttpStatus.OK.value())
                 .headers(getResponseHeaders())
@@ -78,8 +77,7 @@ public class UserProfileConsumerTest {
                         .given()
                         .headers(getHttpHeaders())
                         .contentType(ContentType.JSON)
-                        .queryParam("email", "james.bond@justice.gov.uk")
-                        .get(mockServer.getUrl() + UP_URL)
+                        .get(mockServer.getUrl() + UP_URL + "007" + "/roles")
                         .then()
                         .log().all().extract().asString();
 
@@ -94,12 +92,8 @@ public class UserProfileConsumerTest {
                 .stringType("lastName", "bond")
                 .stringType("idamStatus", "Live")
                 .stringType("userIdentifier", "007")
+                .array("roles", role -> role.stringType("Secret-Agent"))
                 ).build();
-    }
-
-    //Create
-    private DslPart createUserProfileCreateResponse() {
-        return null;
     }
 
     //Update
@@ -107,8 +101,8 @@ public class UserProfileConsumerTest {
     public RequestResponsePact executeUpdateUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
-                .given("A user profile update request is submitted")
-                .uponReceiving("valid request to update profile data")
+                .given("A user profile update request is submitted for roles")
+                .uponReceiving("valid request to update profile data roles")
                 .path(UP_URL + "007")
                 .method(HttpMethod.PUT.toString())
                 .body(createUserProfileUpdateRequest())
@@ -158,6 +152,62 @@ public class UserProfileConsumerTest {
                                 .stringType("idamStatusCode", "200")
                                 .stringType("roleName", "caseworker")
                 )).build();
+    }
+
+    //Create
+    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
+    public RequestResponsePact executeCreateUserProfileAndGet200(PactDslWithProvider builder) {
+
+        return builder
+                .given("A user profile create request is submitted")
+                .uponReceiving("valid request to create profile data")
+                .path(UP_URL)
+                .method(HttpMethod.POST.toString())
+                .body(createUserProfileCreateRequest())
+                .willRespondWith()
+                .status(HttpStatus.CREATED.value())
+                .headers(getResponseHeaders())
+                .body(createUserProfileCreateResponse())
+                .toPact();
+    }
+
+    @Test
+    @PactTestFor(pactMethod = "executeCreateUserProfileAndGet200")
+    void createUserProfileAndGet200Test(MockServer mockServer) throws JSONException {
+        String actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getHttpHeaders())
+                        .contentType(ContentType.JSON)
+                        .body(createUserProfileCreateRequest().toString())
+                        .post(mockServer.getUrl() + UP_URL)
+                        .then()
+                        .log().all().extract().asString();
+
+        JSONObject jsonResponse = new JSONObject(actualResponseBody);
+        Assertions.assertNotNull(jsonResponse);
+    }
+
+    private DslPart createUserProfileCreateRequest() {
+        return newJsonBody(o -> o
+                .stringType("email", "james.bond@justice.gov.uk")
+                .stringType("firstName", "james")
+                .stringType("lastName", "bond")
+                .stringType("languagePreference", "EN")
+                .booleanType("emailCommsConsent", true)
+                .booleanType("postalCommsConsent", true)
+                .booleanType("resendInvite", false)
+                .stringType("userType","INTERNAL")
+                .stringType("userCategory", "PROFESSIONAL")
+                .array("roles", role -> role.stringType("Secret-Agent"))
+        ).build();
+    }
+
+    private DslPart createUserProfileCreateResponse() {
+        return newJsonBody(o -> o
+                .stringType("idamId", "uuid format id")
+                .numberValue("idamRegistrationResponse", 201)
+        ).build();
     }
 
 

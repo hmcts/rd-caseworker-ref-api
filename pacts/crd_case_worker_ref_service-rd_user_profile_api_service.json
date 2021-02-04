@@ -7,27 +7,26 @@
   },
   "interactions": [
     {
-      "description": "valid request for profile data based on email",
+      "description": "valid request to create profile data",
       "request": {
-        "method": "GET",
+        "method": "POST",
         "path": "/v1/userprofile/",
-        "query": {
-          "email": [
-            "james.bond@justice.gov.uk"
-          ]
-        }
-      },
-      "response": {
-        "status": 200,
         "headers": {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json; charset=UTF-8"
         },
         "body": {
           "firstName": "james",
           "lastName": "bond",
-          "userIdentifier": "007",
+          "languagePreference": "EN",
+          "userCategory": "PROFESSIONAL",
+          "emailCommsConsent": true,
+          "roles": [
+            "Secret-Agent"
+          ],
+          "userType": "INTERNAL",
+          "postalCommsConsent": true,
           "email": "james.bond@justice.gov.uk",
-          "idamStatus": "Live"
+          "resendInvite": false
         },
         "matchingRules": {
           "body": {
@@ -55,7 +54,7 @@
               ],
               "combine": "AND"
             },
-            "$.idamStatus": {
+            "$.languagePreference": {
               "matchers": [
                 {
                   "match": "type"
@@ -63,7 +62,69 @@
               ],
               "combine": "AND"
             },
-            "$.userIdentifier": {
+            "$.emailCommsConsent": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.postalCommsConsent": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.resendInvite": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.userType": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.userCategory": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roles[0]": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "idamRegistrationResponse": 201,
+          "idamId": "uuid format id"
+        },
+        "matchingRules": {
+          "body": {
+            "$.idamId": {
               "matchers": [
                 {
                   "match": "type"
@@ -76,12 +137,12 @@
       },
       "providerStates": [
         {
-          "name": "A user profile get request is submitted with valid email"
+          "name": "A user profile create request is submitted"
         }
       ]
     },
     {
-      "description": "valid request to update profile data",
+      "description": "valid request to update profile data roles",
       "request": {
         "method": "PUT",
         "path": "/v1/userprofile/007",
@@ -249,7 +310,87 @@
       },
       "providerStates": [
         {
-          "name": "A user profile update request is submitted"
+          "name": "A user profile update request is submitted for roles"
+        }
+      ]
+    },
+    {
+      "description": "valid request for profile data based on Id",
+      "request": {
+        "method": "GET",
+        "path": "/v1/userprofile/007/roles"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "firstName": "james",
+          "lastName": "bond",
+          "userIdentifier": "007",
+          "roles": [
+            "Secret-Agent"
+          ],
+          "email": "james.bond@justice.gov.uk",
+          "idamStatus": "Live"
+        },
+        "matchingRules": {
+          "body": {
+            "$.email": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.firstName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.lastName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.idamStatus": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.userIdentifier": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roles[0]": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "A user profile with roles get request is submitted with valid Id"
         }
       ]
     }
