@@ -24,6 +24,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.RestTemplateConfiguration;
@@ -171,9 +172,21 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
 
-    public void modifyUserStatus() {
+    public void modifyUserStatus(int idamStatus) throws Exception {
 
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+
+        AttributeResponse attributeResponse = new AttributeResponse();
+        attributeResponse.setIdamStatusCode(idamStatus);
+        userProfileRolesResponse.setAttributeResponse(attributeResponse);
+
+        userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(201)
+                .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
+
 
 
     @Before
