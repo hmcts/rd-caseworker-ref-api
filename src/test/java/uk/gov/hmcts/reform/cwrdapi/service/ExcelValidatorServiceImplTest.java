@@ -47,7 +47,7 @@ public class ExcelValidatorServiceImplTest {
     public void sendXlsTest() throws IOException {
         Workbook workbook = excelValidatorServiceImpl
                 .validateExcelFile(
-                        getMultipartFile("src/test/resources/CaseWorkerUserXlsWithNoPassword.xls", TYPE_XLS));
+                        getMultipartFile("src/test/resources/Staff Data Upload.xls", TYPE_XLS));
         assertThat(workbook).isNotNull();
     }
 
@@ -61,7 +61,7 @@ public class ExcelValidatorServiceImplTest {
 
     @Test
     public void sendXlsxTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/test/resources/CaseWorkerUserXlsxWithNoPassword.xlsx", TYPE_XLSX);
+        MultipartFile file = getMultipartFile("src/test/resources/Staff Data Upload.xlsx", TYPE_XLSX);
         Workbook workbook = excelValidatorServiceImpl.validateExcelFile(file);
         assertThat(workbook).isNotNull();
     }

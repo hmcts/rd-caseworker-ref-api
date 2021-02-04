@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -29,7 +27,6 @@ import static io.micrometer.core.instrument.util.StringUtils.isNotEmpty;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.util.ReflectionUtils.makeAccessible;
@@ -47,13 +44,10 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE
 @Slf4j
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
-    private FormulaEvaluator formulaEvaluator = null;
-
     @Value("${excel.acceptableHeaders}")
     private List<String> acceptableHeaders;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
-        formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }

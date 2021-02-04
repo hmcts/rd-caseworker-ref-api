@@ -42,7 +42,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void sendXlsTest() throws IOException {
         Workbook workbook = excelValidatorService
-                .validateExcelFile(getMultipartFile("src/integrationTest/resources/Staff Data Upload With Password.xls",
+                .validateExcelFile(getMultipartFile("src/integrationTest/resources/Staff Data Upload Xls.xls",
                         TYPE_XLS));
         assertThat(workbook).isNotNull();
     }
@@ -58,7 +58,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
 
     @Test
     public void sendXlsxTest() throws IOException {
-        MultipartFile file = getMultipartFile("src/integrationTest/resources/Staff Data UploadXlsxWithNoPassword.xlsx",
+        MultipartFile file = getMultipartFile("src/integrationTest/resources/Staff Data Upload.xlsx",
                 TYPE_XLSX);
         Workbook workbook = excelValidatorService.validateExcelFile(file);
         assertThat(workbook).isNotNull();
@@ -93,11 +93,11 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
     @Test
     public void parseXlsxShouldReturnWorkbookObjectTest() throws IOException {
         Workbook workbook = excelValidatorService.validateExcelFile(
-                getMultipartFile("src/integrationTest/resources/Staff Data UploadXlsxWithNoPassword.xlsx",
+                getMultipartFile("src/integrationTest/resources/Staff Data Upload.xlsx",
                         TYPE_XLSX));
         List<CaseWorkerProfile> profiles = excelAdaptorService.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheet(REQUIRED_CW_SHEET_NAME)
-                .getPhysicalNumberOfRows() - 1);
+                .getPhysicalNumberOfRows() - 49);
         CaseWorkerProfile caseWorkerProfile = profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();

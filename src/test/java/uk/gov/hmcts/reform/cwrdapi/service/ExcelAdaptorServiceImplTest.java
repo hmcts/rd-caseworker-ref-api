@@ -63,11 +63,11 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void parseXlsxWhichHasFormula() throws IOException {
         Workbook workbook = WorkbookFactory
-            .create(new File("src/test/resources/CaseWorkerUserXlsWithFormula.xlsx"), "1234");
+            .create(new File("src/test/resources/Staff Data Upload With Formula.xlsx"));
 
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
-            .getPhysicalNumberOfRows() - 1);
+            .getPhysicalNumberOfRows() - 49);
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
@@ -84,10 +84,10 @@ public class ExcelAdaptorServiceImplTest {
     @Test
     public void parseXlsxWhichHasFormulaWithEmptyRows() throws IOException {
         Workbook workbook = WorkbookFactory
-            .create(new File("src/test/resources/CaseWorkerUserXlsWithFormulaAndEmptyRow.xlsx"));
+            .create(new File("src/test/resources/Staff Data Upload.xlsx"));
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
-            .getPhysicalNumberOfRows() - 2);
+            .getPhysicalNumberOfRows() - 49);
         CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();

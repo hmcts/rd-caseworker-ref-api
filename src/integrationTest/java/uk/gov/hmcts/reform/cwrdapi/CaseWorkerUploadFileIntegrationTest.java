@@ -41,12 +41,6 @@ import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -235,15 +229,9 @@ public class CaseWorkerUploadFileIntegrationTest extends AuthorizationEnabledInt
             CaseWorkerConstants.MISSING_REGION).build());
         errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionId").errorDescription(
             CaseWorkerConstants.MISSING_REGION).build());
-        errors.add(JsrFileErrors.builder().rowId("10").filedInError(ROLE_FIELD).errorDescription(
-            DUPLICATE_PRIMARY_AND_SECONDARY_ROLES).build());
-        errors.add(JsrFileErrors.builder().rowId("11").filedInError(LOCATION_FIELD).errorDescription(
-            DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS).build());
-        errors.add(JsrFileErrors.builder().rowId("12").filedInError(AREA_OF_WORK_FIELD).errorDescription(
-            DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("11 record(s) failed validation, 1 record(s) uploaded")
+            .detailedMessage("8 record(s) failed validation, 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
