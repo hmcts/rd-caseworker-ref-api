@@ -16,15 +16,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceFacadeImpl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +29,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -58,7 +54,7 @@ public class CaseWorkerRefControllerTest {
     ResponseEntity<Object> responseEntity;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
         cwResponse = CaseWorkerProfileCreationResponse
                 .builder()
@@ -102,53 +98,6 @@ public class CaseWorkerRefControllerTest {
     }
 
     @Test
-    public void createCaseWorkerProfilesTest() {
-
-        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-             .thenReturn(Collections.emptyList());
-        ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-
-        assertNotNull(actual);
-        verify(caseWorkerServiceMock,times(1))
-                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-
-    }
-
-    @Test
-    public void test_sendCwDataToTopic_called_when_ids_exists() {
-        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setCaseWorkerId("1234");
-        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-                .thenReturn(Collections.singletonList(caseWorkerProfile));
-        ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-
-        assertNotNull(actual);
-        verify(caseWorkerServiceMock,times(1))
-                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-        verify(caseWorkerServiceMock,times(1)).publishCaseWorkerDataToTopic(any());
-    }
-
-    @Test
-    public void test_sendCwDataToTopic_not_called_when_no_ids_exists() {
-        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
-                .thenReturn(Collections.emptyList());
-        ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-
-        assertNotNull(actual);
-        verify(caseWorkerServiceMock,times(1))
-                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-        verify(caseWorkerServiceMock,times(0))
-                .publishCaseWorkerDataToTopic(any());
-    }
-
-    @Test(expected = InvalidRequestException.class)
-    public void createCaseWorkerProfilesShouldThrow400() {
-
-        caseWorkersProfileCreationRequest = null;
-        ResponseEntity<?> actual = caseWorkerRefController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-    }
-
-    @Test
     public void test_buildIdamRoleMappings_success() {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
                 .serviceId("BA11")
@@ -176,27 +125,6 @@ public class CaseWorkerRefControllerTest {
 
         verify(caseWorkerServiceMock,times(0))
                 .buildIdamRoleMappings(anyList());
-    }
-
-    @Test(expected = InvalidRequestException.class)
-    public void fetchCaseworkersByIdShouldThrow400() {
-        caseWorkerRefController.fetchCaseworkersById(UserRequest.builder().userIds(Collections.emptyList()).build());
-    }
-
-    @Test
-    public void shouldFetchCaseworkerDetails() {
-        responseEntity = ResponseEntity.ok().body(null);
-        when(caseWorkerServiceMock.fetchCaseworkersById(any()))
-                .thenReturn(responseEntity);
-        UserRequest userRequest =  UserRequest.builder().userIds(Arrays.asList(
-                "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"))
-                .build();
-        ResponseEntity<?> actual = caseWorkerRefController.fetchCaseworkersById(userRequest);
-
-        assertNotNull(actual);
-        verify(caseWorkerServiceMock,times(1))
-                .fetchCaseworkersById(Arrays.asList(
-                        "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
     }
 
     @Test
