@@ -323,8 +323,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    @Ignore(value = "As we are evaluating the formula cell value from cache, we are not able to get the randomly"
-            + "generated email. Ignoring the test until we have a permanent solution")
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
@@ -336,13 +334,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(caseWorkerFileCreationResponse.getMessage()
             .contains(REQUEST_COMPLETED_SUCCESSFULLY));
         assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
-            .contains(format(RECORDS_UPLOADED, 2)));
+            .contains(format(RECORDS_UPLOADED, 3)));
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
-    @Ignore(value = "As we are evaluating the formula cell value from cache, we are not able to get the randomly"
-            + "generated email. Ignoring the test until we have a permanent solution")
     public void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xls",
