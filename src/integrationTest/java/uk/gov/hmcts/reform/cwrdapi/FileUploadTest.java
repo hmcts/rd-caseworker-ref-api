@@ -52,7 +52,7 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
     public void validateAuditCaseWorkerCreate() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
         String json = getJsonResponse(response);

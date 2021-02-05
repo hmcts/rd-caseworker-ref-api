@@ -61,7 +61,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
     @Test
     public void shouldProcessCaseWorkerFile() throws IOException {
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
 
         when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(new ArrayList<>());
 
@@ -75,7 +75,7 @@ public class CaseWorkerServiceFacadeImplTest {
     public void shouldProcessCaseWorkerFileWithPartialSuccess() throws IOException {
 
 
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithJSR.xls");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload JSR.xlsx");
 
         List<ExceptionCaseWorker> exceptionCaseWorkers =
             ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
@@ -86,7 +86,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
     @Test(expected = Exception.class)
     public void shouldProcessCaseWorkerFileFailure() throws IOException {
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
         when(auditAndExceptionRepositoryService.getAllExceptions(anyLong()))
             .thenThrow(new RuntimeException("Failure test"));
         caseWorkerServiceFacade.processFile(multipartFile);
