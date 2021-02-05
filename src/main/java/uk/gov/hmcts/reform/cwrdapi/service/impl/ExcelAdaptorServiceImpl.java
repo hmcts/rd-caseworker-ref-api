@@ -48,7 +48,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     @Value("${excel.acceptableHeaders}")
     private List<String> acceptableHeaders;
 
-    FormulaEvaluator evaluator;
+    private FormulaEvaluator evaluator;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         evaluator = workbook.getCreationHelper().createFormulaEvaluator();
