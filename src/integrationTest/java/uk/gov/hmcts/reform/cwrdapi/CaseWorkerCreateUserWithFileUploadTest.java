@@ -24,25 +24,19 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsWithNoPassword.xls",
+        uploadCaseWorkerFile("Staff Data Upload Xls.xls",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
@@ -73,31 +67,31 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xls",
+        uploadCaseWorkerFile("Staff Data Upload With Password.xls",
             CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithOnlyHeader.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
     }
 
@@ -108,7 +102,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             "test-flag-1");
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
-        uploadCaseWorkerFile("CaseWorkerUserWithPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
     }
 
@@ -122,7 +116,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        response = uploadCaseWorkerFile("CaseWorkerUserXlsWithJSR.xls",
+        response = uploadCaseWorkerFile("Staff Data Upload With Jsr.xlsx",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 
         CaseWorkerFileCreationResponse resultResponse =
@@ -160,15 +154,9 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.MISSING_REGION).build());
         errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionId").errorDescription(
             CaseWorkerConstants.MISSING_REGION).build());
-        errors.add(JsrFileErrors.builder().rowId("10").filedInError(ROLE_FIELD).errorDescription(
-            DUPLICATE_PRIMARY_AND_SECONDARY_ROLES).build());
-        errors.add(JsrFileErrors.builder().rowId("11").filedInError(LOCATION_FIELD).errorDescription(
-            DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS).build());
-        errors.add(JsrFileErrors.builder().rowId("12").filedInError(AREA_OF_WORK_FIELD).errorDescription(
-            DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("11 record(s) failed validation, 1 record(s) uploaded")
+            .detailedMessage("8 record(s) failed validation, 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
@@ -179,7 +167,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
-        uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
@@ -198,7 +186,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "\"error_details\":[{\"row_id\":\"1\","
             + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
 
-        response = uploadCaseWorkerFile("CaseWorkerUserXlsxWithNoPassword.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
