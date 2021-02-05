@@ -44,7 +44,7 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
 
         caseWorkersProfileCreationRequests = ImmutableList.of(CaseWorkersProfileCreationRequest
             .caseWorkersProfileCreationRequest()
-            .firstName("firstName").lastName("lastName").emailId("test@gmail.com").regionId(1).userType("userType")
+            .firstName(" firstName ").lastName(" lastName ").emailId("test@gmail.com").regionId(1).userType("userType")
             .region("region").suspended(false).roles(caseWorkerRoleRequests).idamRoles(roles)
             .baseLocations(caseWorkerLocationRequests).workerWorkAreaRequests(caseWorkerAreaRequests).build());
     }

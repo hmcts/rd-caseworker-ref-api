@@ -139,15 +139,12 @@ public class CaseWorkerRefController {
     @Secured("cwd-admin")
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
-        if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
-
-            throw new InvalidRequestException("Caseworker Profiles Request is empty");
-        }
 
         CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
                 CaseWorkerProfileCreationResponse
                         .builder()
                         .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY);
+
         long time1 = System.currentTimeMillis();
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);

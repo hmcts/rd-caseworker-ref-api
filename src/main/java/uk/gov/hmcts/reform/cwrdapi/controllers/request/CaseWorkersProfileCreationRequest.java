@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.cwrdapi.controllers.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import uk.gov.hmcts.reform.cwrdapi.config.TrimField;
 
 import java.util.List;
 import java.util.Set;
@@ -14,13 +16,19 @@ import java.util.Set;
 @Builder(builderMethodName = "caseWorkersProfileCreationRequest")
 public class CaseWorkersProfileCreationRequest {
 
+    @JsonDeserialize(using = TrimField.class)
     private String firstName;
+    @JsonDeserialize(using = TrimField.class)
     private String lastName;
+    @JsonDeserialize(using = TrimField.class)
     private String emailId;
     private Integer regionId;
+    @JsonDeserialize(using = TrimField.class)
     private String userType;
+    @JsonDeserialize(using = TrimField.class)
     private String region;
     private boolean suspended;
+    @JsonDeserialize(using = TrimField.class)
     private Set<String> idamRoles;
     private List<CaseWorkerRoleRequest> roles;
     private List<CaseWorkerLocationRequest> baseLocations;
