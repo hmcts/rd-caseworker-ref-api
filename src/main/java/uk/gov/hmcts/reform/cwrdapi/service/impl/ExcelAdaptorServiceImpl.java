@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -47,7 +48,10 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     @Value("${excel.acceptableHeaders}")
     private List<String> acceptableHeaders;
 
+    private FormulaEvaluator evaluator;
+
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
+        evaluator = workbook.getCreationHelper().createFormulaEvaluator();
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
@@ -238,7 +242,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     //It should be removed before deploying to production
 
     private Object getValueFromFormula(Cell cell) {
-        switch (cell.getCachedFormulaResultType()) {
+        switch (evaluator.evaluateFormulaCell(cell)) {
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case NUMERIC:

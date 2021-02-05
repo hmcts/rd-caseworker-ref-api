@@ -75,7 +75,7 @@ public class CaseWorkerServiceFacadeImplTest {
     public void shouldProcessCaseWorkerFileWithPartialSuccess() throws IOException {
 
 
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload JSR.xlsx");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload With Jsr.xlsx");
 
         List<ExceptionCaseWorker> exceptionCaseWorkers =
             ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
