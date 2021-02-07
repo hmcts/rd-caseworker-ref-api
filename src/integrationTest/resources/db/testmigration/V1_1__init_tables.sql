@@ -1,13 +1,5 @@
 
-
 create schema if not exists dbrdcaseworker;
-
-create sequence CASE_WORKER_LOCATION_ID_SEQ;
-create sequence CASE_WORKER_WORK_AREA_ID_SEQ;
-create sequence CASE_WORKER_ROLE_ID_SEQ;
-create sequence CW_IDAM_ROLE_ASSOC_ID_SEQ;
-create sequence JOB_ID_SEQ;
-create sequence EXCEPTION_ID_SEQ;
 
 create table case_worker_profile(
 	case_worker_id varchar(64),
@@ -26,8 +18,8 @@ create table case_worker_profile(
 );
 
 create table case_worker_location(
-	case_worker_location_id serial,
-	case_worker_id varchar(64) not null,
+	case_worker_location_id bigint,
+	case_worker_id varchar(64),
 	location varchar(128),
     location_id int not null,
     primary_flag boolean,
@@ -40,7 +32,7 @@ create table case_worker_location(
 
 
 create table case_worker_work_area(
-	case_worker_work_area_id serial,
+	case_worker_work_area_id bigint,
 	case_worker_id varchar(64) not null,
 	area_of_work varchar(128) not null,
     service_code varchar(16) not null,
@@ -51,7 +43,7 @@ create table case_worker_work_area(
 );
 
 create table case_worker_role(
-	case_worker_role_id serial,
+	case_worker_role_id bigint,
 	case_worker_id varchar(64) not null,
 	role_id int not null,
 	primary_flag boolean,
@@ -78,7 +70,7 @@ create table user_type(
 );
 
 create table case_worker_idam_role_assoc(
-    cw_idam_role_assoc_id serial,
+    cw_idam_role_assoc_id bigint,
     role_id int not null,
 	service_code varchar(16) not null,
 	idam_role varchar(64) not null,
@@ -88,7 +80,7 @@ create table case_worker_idam_role_assoc(
 );
 
 create table case_worker_audit (
-    job_id serial,
+    job_id bigint,
     authenticated_user_id varchar(32),
     job_start_time timestamp not null,
     file_name varchar(64) not null,
@@ -99,10 +91,10 @@ create table case_worker_audit (
 );
 
 create table case_worker_exception (
-   id bigint  default EXCEPTION_ID_SEQ.nextval,
+   id bigint,
    job_id bigint not null,
    excel_row_id varchar(32),
-   key varchar(256),
+   email_id varchar(32),
    field_in_error varchar(256),
    error_description varchar(512),
    updated_timestamp timestamp,

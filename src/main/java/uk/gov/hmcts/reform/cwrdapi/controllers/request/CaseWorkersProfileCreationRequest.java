@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import uk.gov.hmcts.reform.cwrdapi.config.TrimField;
+import uk.gov.hmcts.reform.cwrdapi.config.TrimStringFields;
 
 import java.util.List;
 import java.util.Set;
@@ -16,19 +16,18 @@ import java.util.Set;
 @Builder(builderMethodName = "caseWorkersProfileCreationRequest")
 public class CaseWorkersProfileCreationRequest {
 
-    @JsonDeserialize(using = TrimField.class)
+    @JsonDeserialize(using = TrimStringFields.class)
     private String firstName;
-    @JsonDeserialize(using = TrimField.class)
+    @JsonDeserialize(using = TrimStringFields.class)
     private String lastName;
-    @JsonDeserialize(using = TrimField.class)
+    @JsonDeserialize(using = TrimStringFields.class)
     private String emailId;
     private Integer regionId;
-    @JsonDeserialize(using = TrimField.class)
+    @JsonDeserialize(using = TrimStringFields.class)
     private String userType;
-    @JsonDeserialize(using = TrimField.class)
+    @JsonDeserialize(using = TrimStringFields.class)
     private String region;
     private boolean suspended;
-    @JsonDeserialize(using = TrimField.class)
     private Set<String> idamRoles;
     private List<CaseWorkerRoleRequest> roles;
     private List<CaseWorkerLocationRequest> baseLocations;
