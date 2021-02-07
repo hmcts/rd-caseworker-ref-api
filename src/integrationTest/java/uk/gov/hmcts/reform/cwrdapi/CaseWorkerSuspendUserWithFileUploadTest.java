@@ -32,7 +32,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
         validateAuditCaseWorkerCreate();
         modifyUserStatus(200);
-        response = uploadCaseWorkerFile("CaseWorkerUserSuspendedXlsxWithNoPassword.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -46,7 +46,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerUpdateAuditFailureWithWrongStatus() throws Exception {
         validateAuditCaseWorkerCreate();
         modifyUserStatus(400);
-        response = uploadCaseWorkerFile("CaseWorkerUserSuspendedXlsxWithNoPassword.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -61,7 +61,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
         validateAuditCaseWorkerCreate();
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
-        response = uploadCaseWorkerFile("CaseWorkerUserSuspendedXlsxWithNoPassword.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -73,7 +73,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditFailureForSuspendingNewUser() throws IOException {
-        uploadCaseWorkerFile("CaseWorkerUserXlsxNewUserWithSuspended.xlsx",
+        uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
