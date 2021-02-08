@@ -175,7 +175,6 @@ public class CaseWorkerServiceFacadeImplTest {
 
     @Test
     public void shouldProcessCaseWorkerFileWithSuspendedRowFailed() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
                 .firstName("test").lastName("test")
                 .officialEmail("test@justice.gov.uk")
@@ -195,7 +194,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
         caseWorkerProfiles.add(caseWorkerProfile1);
         caseWorkerProfiles.add(caseWorkerProfile2);
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
 
         List<ExceptionCaseWorker> exceptionCaseWorkers =
                 ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
@@ -207,6 +206,7 @@ public class CaseWorkerServiceFacadeImplTest {
         when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        ObjectMapper mapper = new ObjectMapper();
         String responseString = mapper.writeValueAsString(responseEntity.getBody());
         assertTrue(responseString.contains("1 record(s) failed validation, 1 record(s) uploaded"));
     }
