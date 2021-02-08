@@ -1,3 +1,5 @@
+
+
 create schema if not exists dbrdcaseworker;
 
 create sequence CASE_WORKER_LOCATION_ID_SEQ;
