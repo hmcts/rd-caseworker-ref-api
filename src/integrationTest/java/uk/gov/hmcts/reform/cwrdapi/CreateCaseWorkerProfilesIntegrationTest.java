@@ -4,14 +4,21 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,38 +29,73 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
 
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests;
 
+    @Autowired
+    CaseWorkerProfileRepository caseWorkerProfileRepository;
+
+    @Autowired
+    CaseWorkerLocationRepository caseWorkerLocationRepository;
+
+    @Autowired
+    CaseWorkerRoleRepository caseWorkerRoleRepository;
+
+    @Autowired
+    CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
+
     @Before
     public void setUpClient() {
 
         super.setUpClient();
 
         //Set up Case worker data
-        Set<String> roles = ImmutableSet.of("tribunal_case_worker");
+        Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests =
-            ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest().role("role").isPrimaryFlag(true).build());
+            ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest().role(" role ").isPrimaryFlag(true).build());
 
         List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
             .caseWorkersLocationRequest()
             .isPrimaryFlag(true).locationId(1)
-            .location("location").build());
+            .location(" location ").build());
 
         List<CaseWorkerWorkAreaRequest> caseWorkerAreaRequests = ImmutableList.of(CaseWorkerWorkAreaRequest
             .caseWorkerWorkAreaRequest()
-            .areaOfWork("areaOfWork").serviceCode("serviceCode")
+            .areaOfWork(" areaOfWork ").serviceCode(" serviceCode ")
             .build());
 
         caseWorkersProfileCreationRequests = ImmutableList.of(CaseWorkersProfileCreationRequest
             .caseWorkersProfileCreationRequest()
-            .firstName("firstName").lastName("lastName").emailId("test@gmail.com").regionId(1).userType("userType")
+            .firstName(" firstName ").lastName(" lastName ").emailId("test.inttest@hmcts.gov.uk")
+                .regionId(1).userType("CTSC")
             .region("region").suspended(false).roles(caseWorkerRoleRequests).idamRoles(roles)
             .baseLocations(caseWorkerLocationRequests).workerWorkAreaRequests(caseWorkerAreaRequests).build());
+        caseWorkerProfileRepository.deleteAll();
+        caseWorkerLocationRepository.deleteAll();
+        caseWorkerRoleRepository.deleteAll();
+        caseWorkerWorkAreaRepository.deleteAll();
+
     }
 
     @Test
-    public void shouldCreateCaseWorker() throws IOException {
+    public void shouldCreateCaseWorker() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         Map<String, Object> response = caseworkerReferenceDataClient
             .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "201 CREATED");
+
+        CaseWorkerProfile profile =
+                caseWorkerProfileRepository.findByEmailId("test.inttest@hmcts.gov.uk");
+        assertThat(profile.getFirstName()).isEqualTo("firstName");
+        assertThat(profile.getLastName()).isEqualTo("lastName");
+        assertThat(profile.getEmailId()).isEqualTo("test.inttest@hmcts.gov.uk");
+        assertThat(profile.getRegion()).isEqualTo("region");
+
+        List<CaseWorkerLocation> caseWorkerLocations = caseWorkerLocationRepository.findAll();
+        CaseWorkerLocation caseWorkerLocation = caseWorkerLocations.get(0);
+        assertThat(caseWorkerLocation.getLocation()).isEqualTo("location");
+
+        List<CaseWorkerWorkArea> caseWorkerWorkAreas = caseWorkerWorkAreaRepository.findAll();
+        CaseWorkerWorkArea caseWorkerWorkArea = caseWorkerWorkAreas.get(0);
+        assertThat(caseWorkerWorkArea.getAreaOfWork()).isEqualTo("areaOfWork");
+        assertThat(caseWorkerWorkArea.getServiceCode()).isEqualTo("serviceCode");
+
     }
 }

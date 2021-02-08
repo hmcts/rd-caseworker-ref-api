@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 
 @RequestMapping(
         path = "/refdata/case-worker"
@@ -148,6 +149,8 @@ public class CaseWorkerRefController {
                 CaseWorkerProfileCreationResponse
                         .builder()
                         .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY);
+
+        trimIdamRoles(caseWorkersProfileCreationRequest);
         long time1 = System.currentTimeMillis();
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
