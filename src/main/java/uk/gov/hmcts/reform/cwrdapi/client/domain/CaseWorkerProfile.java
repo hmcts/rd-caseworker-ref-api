@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
+import uk.gov.hmcts.reform.cwrdapi.util.ValidateCaseWorkerChildren;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@ValidateCaseWorkerChildren
 public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable {
 
     private static final long serialVersionUID = 2019L;

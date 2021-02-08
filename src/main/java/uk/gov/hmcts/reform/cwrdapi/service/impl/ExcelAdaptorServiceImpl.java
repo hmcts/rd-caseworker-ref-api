@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.micrometer.core.instrument.util.StringUtils.isNotEmpty;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -44,13 +45,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE
 @Slf4j
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
-    private FormulaEvaluator formulaEvaluator = null;
-
     @Value("${excel.acceptableHeaders}")
     private List<String> acceptableHeaders;
 
+    private FormulaEvaluator evaluator;
+
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
-        formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
+        evaluator = workbook.getCreationHelper().createFormulaEvaluator();
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
@@ -99,6 +100,10 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Field rowField = getRowIdField((Class<Object>) classType);
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
+            //Skipping empty rows
+            if (checkIfRowIsEmpty(row)) {
+                continue;
+            }
             Object bean = getInstanceOf(classType.getName());//create parent object
             setFieldValue(rowField, bean, row.getRowNum());
             for (int i = 0; i < headers.size(); i++) { //set all parent fields
@@ -141,7 +146,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         if (nonNull(mappingField)) {
             String domainObjectColumnName = mappingField.columnName().split(DELIMITER_COMMA)[i].trim();
             Object fieldValue = childHeaderValues.get(domainObjectColumnName);
-            if (nonNull(fieldValue)) {
+            if (nonNull(fieldValue) && isNotEmpty(fieldValue.toString())) {
                 childDomainObject = isNull(childDomainObject) ? getInstanceOf(customObjectTriple.getLeft())
                     : childDomainObject;
                 setFieldValue(childField, childDomainObject, fieldValue);
@@ -181,7 +186,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     }
 
     private void setFieldValue(Field field, Object bean, Object value) {
-        if (nonNull(field)) {
+        if (nonNull(field) && nonNull(value) && isNotEmpty(value.toString())) {
             makeAccessible(field);
             setField(field, bean, value);
         }
@@ -237,7 +242,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     //It should be removed before deploying to production
 
     private Object getValueFromFormula(Cell cell) {
-        switch (formulaEvaluator.evaluateFormulaCell(cell)) {
+        switch (evaluator.evaluateFormulaCell(cell)) {
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case NUMERIC:
@@ -259,6 +264,23 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
     private void throwFileParsingException() {
         throw new ExcelValidationException(INTERNAL_SERVER_ERROR, ERROR_FILE_PARSING_ERROR_MESSAGE);
+    }
+
+    private boolean checkIfRowIsEmpty(Row row) {
+        if (row == null) {
+            return true;
+        }
+        if (row.getLastCellNum() <= 0) {
+            return true;
+        }
+        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+            Cell cell = row.getCell(cellNum);
+            Object cellValue = getCellValue(cell);
+            if (nonNull(cellValue) && isNotEmpty(cellValue.toString())) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

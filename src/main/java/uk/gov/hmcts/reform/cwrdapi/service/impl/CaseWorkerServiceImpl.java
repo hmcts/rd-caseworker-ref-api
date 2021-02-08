@@ -83,6 +83,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SU
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SUSPEND_USER_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
@@ -234,8 +235,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
             caseWorkerIdamRoleAssociation.setRoleId(serviceRoleMapping.getRoleId().longValue());
             caseWorkerIdamRoleAssociation.setIdamRole(serviceRoleMapping.getIdamRoles());
-            caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getSerivceId());
-            serviceCodes.add(serviceRoleMapping.getSerivceId());
+            caseWorkerIdamRoleAssociation.setServiceCode(serviceRoleMapping.getServiceId());
+            serviceCodes.add(serviceRoleMapping.getServiceId());
             caseWorkerIdamRoleAssociations.add(caseWorkerIdamRoleAssociation);
         });
         try {
@@ -444,10 +445,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 return false;
             }
 
-
+            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
-            Set<String> idamRolesCwr = cwrProfileRequest.getIdamRoles();
+            Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
+                    new HashSet<>();
+            idamRolesCwr.addAll(mappedRoles);
             if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
                 Set<RoleName> mergedRoles = idamRolesCwr.stream()
                     .filter(s -> !(userProfileRoles.contains(s)))
@@ -559,14 +562,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .getAttributeResponse()))
                 || (!(((UserProfileRolesResponse) resultResponse.get())
                 .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.OK.value())))) {
-                logUpFailures(UP_FAILURE_ROLES, rowId);
+                logUpFailures(SUSPEND_USER_FAILED, rowId);
                 status = false;
             }
 
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}",
                 loggingComponentName, rowId, ex.getMessage());
-            logUpFailures(UP_FAILURE_ROLES, rowId);
+            logUpFailures(SUSPEND_USER_FAILED, rowId);
             status = false;
         }
         return status;

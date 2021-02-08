@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.LinkedList;
 
 @Getter
 @Setter
@@ -25,5 +25,5 @@ public class CaseWorkerFileCreationResponse {
     private String detailedMessage;
 
     @JsonProperty("error_details")
-    private List<JsrFileErrors> errorDetails;
+    private LinkedList<JsrFileErrors> errorDetails;
 }

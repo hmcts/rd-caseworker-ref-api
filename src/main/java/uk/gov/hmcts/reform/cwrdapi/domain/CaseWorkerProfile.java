@@ -91,4 +91,5 @@ public class CaseWorkerProfile implements Serializable {
     @JoinColumn(name = "user_type_id", referencedColumnName = "user_type_id",
             insertable = false, updatable = false, nullable = false)
     private UserType userType;
+
 }

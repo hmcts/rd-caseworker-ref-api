@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +42,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.IN_PROGRESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.MULTIPLE_SERVICE_CODES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
@@ -91,8 +95,11 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             long time2 = System.currentTimeMillis();
             List<CaseWorkerDomain> caseWorkerRequest = (List<CaseWorkerDomain>) excelAdaptorService
                 .parseExcel(workbook, ob);
+
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
+
+            validateServiceRoleMappingSheet(caseWorkerRequest, ob);
 
             long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);
@@ -145,6 +152,23 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         }
     }
 
+    private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList,
+                                                 Class<? extends CaseWorkerDomain> classType) {
+        if (nonNull(classType) && classType.equals(ServiceRoleMapping.class)) {
+            boolean multipleServiceCode = caseWorkerRequestList.stream()
+                    .filter(ServiceRoleMapping.class::isInstance)
+                    .map(ServiceRoleMapping.class::cast)
+                    .map(ServiceRoleMapping::getServiceId)
+                    .filter(StringUtils::isNotEmpty)
+                    .distinct()
+                    .count() > 1;
+
+            if (multipleServiceCode) {
+                throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
+            }
+        }
+    }
+
     /**
      * create CaseWorkerFileCreationResponse.
      *
@@ -164,13 +188,15 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             Map<String, List<ExceptionCaseWorker>> failedRecords = exceptionCaseWorkerList.stream()
                 .collect(groupingBy(ExceptionCaseWorker::getExcelRowId));
 
-            List<JsrFileErrors> jsrFileErrors = new LinkedList<>();
+            LinkedList<JsrFileErrors> jsrFileErrors = new LinkedList<>();
 
-            failedRecords.forEach((key, value) ->
-                value.forEach(jsrInvalid ->
-                    jsrFileErrors.add(JsrFileErrors.builder().rowId(jsrInvalid.getExcelRowId())
-                        .errorDescription(jsrInvalid.getErrorDescription())
-                        .filedInError(jsrInvalid.getFieldInError()).build())));
+            failedRecords.entrySet().stream()
+                .sorted(Comparator.comparingInt(s -> Integer.valueOf(s.getKey())))
+                .forEachOrdered(map ->
+                    map.getValue().forEach(jsrInvalid ->
+                        jsrFileErrors.add(JsrFileErrors.builder().rowId(jsrInvalid.getExcelRowId())
+                            .errorDescription(jsrInvalid.getErrorDescription())
+                            .filedInError(jsrInvalid.getFieldInError()).build())));
 
             noOfUploadedRecords = noOfUploadedRecords - failedRecords.size();
             if (suspendedRow > 0) {
@@ -225,7 +251,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             int suspendedFailed = caseWorkerProfileConverter.getSuspendedRowIds().stream()
                 .filter(s -> failedRecords.containsKey(Long.toString(s))).collect(toList()).size();
             return getSuspendedErrorMessage(isCaseWorker,
-                caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailed, true);
+                caseWorkerProfileConverter.getSuspendedRowIds().size()
+                    - suspendedFailed, true);
         }
         return EMPTY;
     }

@@ -14,15 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileConverter;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
@@ -36,7 +31,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -70,7 +64,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
     @Test
     public void shouldProcessCaseWorkerFile() throws IOException {
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
 
         when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(new ArrayList<>());
 
@@ -84,7 +78,7 @@ public class CaseWorkerServiceFacadeImplTest {
     public void shouldProcessCaseWorkerFileWithPartialSuccess() throws IOException {
 
 
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithJSR.xls");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload With Jsr.xlsx");
 
         List<ExceptionCaseWorker> exceptionCaseWorkers =
             ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
@@ -95,7 +89,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
     @Test(expected = Exception.class)
     public void shouldProcessCaseWorkerFileFailure() throws IOException {
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
         when(auditAndExceptionRepositoryService.getAllExceptions(anyLong()))
             .thenThrow(new RuntimeException("Failure test"));
         caseWorkerServiceFacade.processFile(multipartFile);
@@ -134,43 +128,22 @@ public class CaseWorkerServiceFacadeImplTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    @Test(expected = InvalidRequestException.class)
+    public void shouldProcessServiceRoleMappingFileFailure() throws IOException {
 
-    @Test
-    public void shouldProcessCaseWorkerFileWithSuspendedRowFailed() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
-                        .firstName("test").lastName("test")
-                        .officialEmail("test@justice.gov.uk")
-                        .regionId(1)
-                        .regionName("test")
-                        .userType("testUser")
-                        .build();
+        List<ServiceRoleMapping> serviceRoleMappings = new ArrayList<>();
 
-        CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
-                .firstName("test1").lastName("test1")
-                .officialEmail("test1@justice.gov.uk")
-                .regionId(1)
-                .regionName("test1")
-                .userType("testUser")
-                .build();
-        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA1").build());
+        serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA2").build());
 
-        caseWorkerProfiles.add(caseWorkerProfile1);
-        caseWorkerProfiles.add(caseWorkerProfile2);
-        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
-
-        List<ExceptionCaseWorker> exceptionCaseWorkers =
-                ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+        MultipartFile multipartFile =
+                getMultipartFile("src/test/resources/ServiceRoleMapping_Multiple_Ids.xls", TYPE_XLS);
+        when(excelValidatorService.validateExcelFile(multipartFile))
+                .thenReturn(workbook);
         when(excelAdaptorService
-                .parseExcel(workbook, CaseWorkerProfile.class))
-                .thenReturn(caseWorkerProfiles);
-        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
-        when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
-        ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        String responseString = mapper.writeValueAsString(responseEntity.getBody());
-        assertTrue(responseString.contains("1 record(s) failed validation, 1 record(s) uploaded"));
+                .parseExcel(workbook, ServiceRoleMapping.class))
+                .thenReturn(serviceRoleMappings);
+        caseWorkerServiceFacade.processFile(multipartFile);
     }
 
     private MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
@@ -200,4 +173,41 @@ public class CaseWorkerServiceFacadeImplTest {
         return multipartFile;
     }
 
+    @Test
+    public void shouldProcessCaseWorkerFileWithSuspendedRowFailed() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
+                .firstName("test").lastName("test")
+                .officialEmail("test@justice.gov.uk")
+                .regionId(1)
+                .regionName("test")
+                .userType("testUser")
+                .build();
+
+        CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
+                .firstName("test1").lastName("test1")
+                .officialEmail("test1@justice.gov.uk")
+                .regionId(1)
+                .regionName("test1")
+                .userType("testUser")
+                .build();
+        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+
+        caseWorkerProfiles.add(caseWorkerProfile1);
+        caseWorkerProfiles.add(caseWorkerProfile2);
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("CaseWorkerUserXlsWithNoPassword.xls");
+
+        List<ExceptionCaseWorker> exceptionCaseWorkers =
+                ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
+        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+        when(excelAdaptorService
+                .parseExcel(workbook, CaseWorkerProfile.class))
+                .thenReturn(caseWorkerProfiles);
+        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
+        when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
+        ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        String responseString = mapper.writeValueAsString(responseEntity.getBody());
+        assertTrue(responseString.contains("1 record(s) failed validation, 1 record(s) uploaded"));
+    }
 }
