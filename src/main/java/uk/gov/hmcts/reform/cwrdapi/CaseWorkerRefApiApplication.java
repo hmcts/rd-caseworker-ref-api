@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
@@ -13,6 +14,8 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 @EnableJpaRepositories
 @SpringBootApplication
 @EnableCaching
+@EnableJms
+//@EnableTransactionManagement
 @EnableRetry
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.cwrdapi" },
