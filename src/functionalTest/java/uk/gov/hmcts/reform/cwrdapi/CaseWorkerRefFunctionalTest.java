@@ -326,15 +326,12 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
-                        200, REQUEST_COMPLETED_SUCCESSFULLY,
-                        TYPE_XLSX, ROLE_CWD_ADMIN);
+                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLSX, ROLE_CWD_ADMIN);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
             .as(CaseWorkerFileCreationResponse.class);
-        assertTrue(caseWorkerFileCreationResponse.getMessage()
-            .contains(REQUEST_COMPLETED_SUCCESSFULLY));
-        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
-            .contains(format(RECORDS_UPLOADED, 3)));
+        assertTrue(caseWorkerFileCreationResponse.getMessage().contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage().contains(format(RECORDS_UPLOADED, 4)));
     }
 
     @Test
@@ -428,7 +425,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .multiPart(multiPartSpec)
                 .post("/refdata/case-worker/upload-file")
                 .andReturn();
-        response.then()
+        response.then().log().all()
                 .assertThat()
                 .statusCode(statusCode);
 

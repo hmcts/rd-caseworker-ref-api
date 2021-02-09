@@ -115,4 +115,5 @@ public final class CaseWorkerConstants {
     public static final String LOCATION_FIELD = "Location";
     public static final String AREA_OF_WORK_FIELD = "Area Of Work";
     public static final String FILE = "file";
+    public static final String AND = "and";
 }
