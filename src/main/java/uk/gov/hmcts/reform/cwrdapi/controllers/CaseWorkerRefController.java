@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -137,6 +138,7 @@ public class CaseWorkerRefController {
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("cwd-admin")
+    @Transactional
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
         if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
