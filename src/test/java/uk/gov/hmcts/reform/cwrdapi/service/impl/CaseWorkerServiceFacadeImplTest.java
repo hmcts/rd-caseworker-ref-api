@@ -208,6 +208,6 @@ public class CaseWorkerServiceFacadeImplTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         ObjectMapper mapper = new ObjectMapper();
         String responseString = mapper.writeValueAsString(responseEntity.getBody());
-        assertTrue(responseString.contains("1 record(s) failed validation, 1 record(s) uploaded"));
+        assertTrue(responseString.contains("1 record(s) failed validation and 1 record(s) uploaded"));
     }
 }
