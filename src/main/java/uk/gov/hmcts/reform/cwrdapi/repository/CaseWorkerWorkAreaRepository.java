@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import java.util.List;
 
 @Repository
-@Transactional
 public interface CaseWorkerWorkAreaRepository extends JpaRepository<CaseWorkerWorkArea, Long> {
     void deleteByCaseWorkerProfileIn(List<CaseWorkerProfile> caseWorkerProfileList);
 }
