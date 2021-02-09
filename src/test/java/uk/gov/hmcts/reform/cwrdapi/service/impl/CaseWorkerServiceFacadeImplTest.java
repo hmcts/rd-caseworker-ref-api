@@ -247,7 +247,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessCaseWorkerFileWithSuspendedMessage() throws IOException {
+    public void shouldProcessCaseWorkerFileWithSuspendedFailedMessage() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
                 .firstName("test").lastName("test")
                 .officialEmail("test@justice.gov.uk")
@@ -256,19 +256,79 @@ public class CaseWorkerServiceFacadeImplTest {
                 .userType("testUser")
                 .build();
 
+        CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
+                .firstName("test1").lastName("test1")
+                .officialEmail("test1@justice.gov.uk")
+                .regionId(1)
+                .regionName("test1")
+                .userType("testUser")
+                .build();
+
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         caseWorkerProfiles.add(caseWorkerProfile1);
+        caseWorkerProfiles.add(caseWorkerProfile2);
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
 
         when(excelAdaptorService
                 .parseExcel(workbook, CaseWorkerProfile.class))
                 .thenReturn(caseWorkerProfiles);
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
-        when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
+        List<ExceptionCaseWorker> exceptionCaseWorkers =
+                ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
+        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+        when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(2L));
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         ObjectMapper mapper = new ObjectMapper();
         String responseString = mapper.writeValueAsString(responseEntity.getBody());
-        assertTrue(responseString.contains("1 record(s) suspended"));
+        assertTrue(responseString.contains("1 record(s) failed validation and 1 record(s) suspended"));
+    }
+
+    @Test
+    public void shouldProcessCaseWorkerFileWithUploadedFailedSuspendedMessage() throws IOException {
+        CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
+                .firstName("test").lastName("test")
+                .officialEmail("test@justice.gov.uk")
+                .regionId(1)
+                .regionName("test")
+                .userType("testUser")
+                .build();
+
+        CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
+                .firstName("test1").lastName("test1")
+                .officialEmail("test1@justice.gov.uk")
+                .regionId(1)
+                .regionName("test1")
+                .userType("testUser")
+                .build();
+
+        CaseWorkerProfile caseWorkerProfile3 = CaseWorkerProfile.builder()
+                .firstName("test").lastName("test")
+                .officialEmail("test@justice.gov.uk")
+                .regionId(1)
+                .regionName("test")
+                .userType("testUser")
+                .build();
+        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+
+        caseWorkerProfiles.add(caseWorkerProfile1);
+        caseWorkerProfiles.add(caseWorkerProfile2);
+        caseWorkerProfiles.add(caseWorkerProfile3);
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
+
+        List<ExceptionCaseWorker> exceptionCaseWorkers =
+                ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
+        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+        when(excelAdaptorService
+                .parseExcel(workbook, CaseWorkerProfile.class))
+                .thenReturn(caseWorkerProfiles);
+        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
+        when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(2L));
+        ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        ObjectMapper mapper = new ObjectMapper();
+        String responseString = mapper.writeValueAsString(responseEntity.getBody());
+        assertTrue(responseString.contains("1 record(s) failed validation, 1 record(s) uploaded, and "
+                + "1 record(s) suspended"));
     }
 }
