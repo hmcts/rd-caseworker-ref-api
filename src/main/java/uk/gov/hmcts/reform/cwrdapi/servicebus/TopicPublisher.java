@@ -27,7 +27,7 @@ public class TopicPublisher {
         this.destination = destination;
     }
 
-    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 2000, multiplier = 3))
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 3))
     public void sendMessage(Object message) {
         log.info("{}:: Publishing message to service bus topic.", loggingComponentName);
         jmsTemplate.convertAndSend(destination, message);
