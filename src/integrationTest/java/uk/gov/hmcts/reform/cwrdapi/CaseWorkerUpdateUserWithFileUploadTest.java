@@ -31,7 +31,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -46,7 +46,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("STALE", roles);
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -62,7 +62,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -79,7 +79,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         userProfileGetUserWireMock("ACTIVE", roles);
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))

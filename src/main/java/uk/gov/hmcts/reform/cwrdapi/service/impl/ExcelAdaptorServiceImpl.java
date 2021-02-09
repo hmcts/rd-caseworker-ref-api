@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -48,10 +47,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     @Value("${excel.acceptableHeaders}")
     private List<String> acceptableHeaders;
 
-    private FormulaEvaluator evaluator;
-
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
-        evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
@@ -99,21 +96,30 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         rowIterator.next();//skip header
         Field rowField = getRowIdField((Class<Object>) classType);
         while (rowIterator.hasNext()) {
+
             Row row = rowIterator.next();
             //Skipping empty rows
             if (checkIfRowIsEmpty(row)) {
                 continue;
             }
-            Object bean = getInstanceOf(classType.getName());//create parent object
-            setFieldValue(rowField, bean, row.getRowNum());
-            for (int i = 0; i < headers.size(); i++) { //set all parent fields
-                setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap,
-                    childHeaderToCellMap);
-            }
-            populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
-            objectList.add((T) bean);
+            processRows(classType, objectList, childHeaderToCellMap, parentFieldMap, headers, customObjectFieldsMapping,
+                rowField, row);
         }
         return objectList;
+    }
+
+    private <T> void processRows(Class<T> classType, List<T> objectList, Map<String, Object> childHeaderToCellMap,
+                                 Map<String, Field> parentFieldMap, List<String> headers, List<Triple<String,
+
+        Field, List<Field>>> customObjectFieldsMapping, Field rowField, Row row) {
+        Object bean = getInstanceOf(classType.getName());//create parent object
+        setFieldValue(rowField, bean, row.getRowNum());
+        for (int i = 0; i < headers.size(); i++) { //set all parent fields
+            setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap,
+                childHeaderToCellMap);
+        }
+        populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
+        objectList.add((T) bean);
     }
 
     private void populateChildDomainObjects(
@@ -242,7 +248,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     //It should be removed before deploying to production
 
     private Object getValueFromFormula(Cell cell) {
-        switch (evaluator.evaluateFormulaCell(cell)) {
+        switch (cell.getCachedFormulaResultType()) {
             case BOOLEAN:
                 return cell.getBooleanCellValue();
             case NUMERIC:

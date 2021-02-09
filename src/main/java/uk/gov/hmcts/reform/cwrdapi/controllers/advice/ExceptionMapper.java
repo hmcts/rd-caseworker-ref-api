@@ -34,7 +34,7 @@ public class ExceptionMapper {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     public ResponseEntity<Object> handleEmptyResultDataAccessException(
-            EmptyResultDataAccessException ex) {
+        EmptyResultDataAccessException ex) {
         return errorDetailsResponseEntity(ex, NOT_FOUND, ErrorConstants.EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
@@ -46,33 +46,58 @@ public class ExceptionMapper {
 
     @ExceptionHandler(ExcelValidationException.class)
     public ResponseEntity<Object> excelValidationExceptionHandler(
-            ExcelValidationException ex) {
+        ExcelValidationException ex) {
         return errorDetailsResponseEntity(ex, ex.getHttpStatus(), ex.getErrorMessage());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Object> handlerForNoCaseWorkersFound(
-            ResourceNotFoundException ex) {
+        ResourceNotFoundException ex) {
         return errorDetailsResponseEntity(ex, NOT_FOUND, ErrorConstants.EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
     }
 
     @ExceptionHandler(IdamRolesMappingException.class)
     public ResponseEntity<Object> handleIdamRolesMappingError(
-            IdamRolesMappingException ex) {
+        IdamRolesMappingException ex) {
         return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(CaseworkerMessageFailedException.class)
     public ResponseEntity<Object> handleCaseWorkerPublishMessageError(
-            CaseworkerMessageFailedException ex) {
+        CaseworkerMessageFailedException ex) {
         return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR,
-                ErrorConstants.ERROR_PUBLISHING_TO_TOPIC.getErrorMessage());
+            ErrorConstants.ERROR_PUBLISHING_TO_TOPIC.getErrorMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<Object> handleLaunchDarklyException(Exception ex) {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ex.getMessage());
     }
+
+    //    @ExceptionHandler(DataIntegrityViolationException.class)
+    //    public ResponseEntity<Object> dataIntegrityViolationError(DataIntegrityViolationException ex) {
+    //        String errorMessage = DATA_INTEGRITY_VIOLATION.getErrorMessage();
+    //        if (ex.getCause() != null && ex.getCause().getCause() != null && ex.getCause().getCause()
+    //            .getMessage() != null) {
+    //            String message = ex.getCause().getCause().getMessage().toUpperCase();
+    //            if (message.contains("SRA_ID")) {
+    //                errorMessage = String.format(errorMessage, "SRA_ID");
+    //            } else if (message.contains("COMPANY_NUMBER")) {
+    //                errorMessage = String.format(errorMessage, "COMPANY_NUMBER");
+    //            } else if (message.contains("EMAIL_ADDRESS")) {
+    //                errorMessage = String.format(errorMessage, "EMAIL");
+    //            } else if (message.contains("PBA_NUMBER")) {
+    //                errorMessage = String.format(errorMessage, "PBA_NUMBER");
+    //            }
+    //        }
+    //        return errorDetailsResponseEntity(ex, BAD_REQUEST, errorMessage);
+    //    }
+    //
+    //    @ExceptionHandler(ConstraintViolationException.class)
+    //    public ResponseEntity<Object> constraintViolationError(ConstraintViolationException ex) {
+    //        return errorDetailsResponseEntity(ex, BAD_REQUEST, DATA_INTEGRITY_VIOLATION.getErrorMessage());
+    //
+    //    }
 
     private String getTimeStamp() {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(new Date());
@@ -89,9 +114,9 @@ public class ExceptionMapper {
     private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
-        ErrorResponse errorDetails = new ErrorResponse(httpStatus.value(),httpStatus.getReasonPhrase(),errorMsg,
-                                                       getRootException(ex).getLocalizedMessage(),
-                getTimeStamp());
+        ErrorResponse errorDetails = new ErrorResponse(httpStatus.value(), httpStatus.getReasonPhrase(), errorMsg,
+            getRootException(ex).getLocalizedMessage(),
+            getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);
     }

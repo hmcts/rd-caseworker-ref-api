@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
@@ -42,11 +43,12 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     private CaseWorkerAudit caseWorkerAudit;
 
     @Autowired
+    @Lazy
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    private long jobId;
+    private long auditJobId;
 
-    List<ExceptionCaseWorker> jsrExceptionCaseWorkers;
+    List<ExceptionCaseWorker> caseWorkersExceptions;
 
 
     /**
@@ -65,10 +67,10 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      *
      * @param jobId long
      */
-    public void auditJsr(long jobId) {
+    public void saveJsrExceptionsForCaseworkerJob(long jobId) {
         Set<ConstraintViolation<CaseWorkerDomain>> constraintViolationSet
             = jsrValidatorInitializer.getConstraintViolations();
-        jsrExceptionCaseWorkers = new LinkedList<>();
+        caseWorkersExceptions = new LinkedList<>();
         AtomicReference<Field> field = new AtomicReference<>();
         //if JSR violation present then only persist exception
         ofNullable(constraintViolationSet).ifPresent(constraintViolations ->
@@ -84,9 +86,9 @@ public class ValidationServiceFacadeImpl implements IValidationService {
                 exceptionCaseWorker.setExcelRowId(String.valueOf(constraintViolation.getRootBean().getRowId()));
                 exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now());
                 exceptionCaseWorker.setKeyField(getKeyFieldValue(field.get(), constraintViolation.getRootBean()));
-                jsrExceptionCaseWorkers.add(exceptionCaseWorker);
+                caseWorkersExceptions.add(exceptionCaseWorker);
             }));
-        auditAndExceptionRepositoryService.auditException(jsrExceptionCaseWorkers);
+        auditAndExceptionRepositoryService.auditException(caseWorkersExceptions);
     }
 
 
@@ -121,17 +123,17 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      * @param fileName    String
      * @return long id
      */
-    public long insertAudit(final AuditStatus auditStatus, final String fileName) {
+    public long updateCaseWorkerAuditStatus(final AuditStatus auditStatus, final String fileName) {
         createOrUpdateCaseworkerAudit(auditStatus, fileName);
-        jobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
-        return jobId;
+        auditJobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
+        return auditJobId;
     }
 
-    public long startAuditJob(final AuditStatus auditStatus, final String fileName) {
+    public long startCaseworkerAuditing(final AuditStatus auditStatus, final String fileName) {
         this.caseWorkerAudit = CaseWorkerAudit.builder().build();
         createOrUpdateCaseworkerAudit(auditStatus, fileName);
-        this.jobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
-        return jobId;
+        this.auditJobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
+        return auditJobId;
     }
 
     /**
@@ -167,16 +169,16 @@ public class ValidationServiceFacadeImpl implements IValidationService {
         } else {
             caseWorkerAudit.setStatus(auditStatus.getStatus());
             caseWorkerAudit.setJobEndTime(LocalDateTime.now());
-            caseWorkerAudit.setJobId(getJobId());
+            caseWorkerAudit.setJobId(getAuditJobId());
         }
         return caseWorkerAudit;
     }
 
-    public List<ExceptionCaseWorker> getJsrExceptionCaseWorkers() {
-        return jsrExceptionCaseWorkers;
+    public List<ExceptionCaseWorker> getCaseWorkersExceptions() {
+        return caseWorkersExceptions;
     }
 
-    public long getJobId() {
-        return jobId;
+    public long getAuditJobId() {
+        return auditJobId;
     }
 }

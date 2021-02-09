@@ -7,10 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import uk.gov.hmcts.reform.cwrdapi.util.AuditInterceptor;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 
 @Configuration
-public class LaunchDarklyConfiguration implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer {
+
 
     @Bean
     public LDClient ldClient(@Value("${launchdarkly.sdk.key}") String sdkKey) {
@@ -20,13 +22,21 @@ public class LaunchDarklyConfiguration implements WebMvcConfigurer {
     @Autowired
     private FeatureConditionEvaluation featureConditionEvaluation;
 
+    @Autowired
+    AuditInterceptor auditInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+
+        //Launch Darkly Feature Toggle
         registry.addInterceptor(featureConditionEvaluation)
                 .addPathPatterns("/refdata/case-worker/users/fetchUsersById",
                         "/refdata/case-worker/idam-roles-mapping",
                         "/refdata/case-worker/users",
                         "/refdata/case-worker/upload-file");
 
+        //Audit Interceptor
+        registry.addInterceptor(auditInterceptor)
+            .addPathPatterns("/refdata/case-worker/upload-file");
     }
 }

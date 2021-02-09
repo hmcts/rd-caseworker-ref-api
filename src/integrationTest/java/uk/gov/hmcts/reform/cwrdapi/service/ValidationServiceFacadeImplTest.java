@@ -69,7 +69,7 @@ public class ValidationServiceFacadeImplTest {
         profile.setOfficialEmail("test@abc.com");
         caseWorkerProfiles.add(profile);
 
-        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, "test");
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.IN_PROGRESS, "test");
         CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder()
             .fileName("test.xlsx")
             .jobStartTime(LocalDateTime.now())
@@ -80,7 +80,7 @@ public class ValidationServiceFacadeImplTest {
 
         auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
         ValidationServiceFacadeImpl validationServiceFacadeImplSpy = spy(validationServiceFacadeImpl);
-        validationServiceFacadeImplSpy.auditJsr(jobId);
+        validationServiceFacadeImplSpy.saveJsrExceptionsForCaseworkerJob(jobId);
         List<ExceptionCaseWorker> exceptionCaseWorkers = auditAndExceptionRepositoryService.getAllExceptions(jobId);
         assertNotNull(exceptionCaseWorkers);
         String error = exceptionCaseWorkers.stream()
@@ -88,18 +88,18 @@ public class ValidationServiceFacadeImplTest {
             .map(field -> field.getErrorDescription())
             .collect(Collectors.toList()).get(0);
         assertEquals(CaseWorkerConstants.FIRST_NAME_MISSING, error);
-        verify(validationServiceFacadeImplSpy).auditJsr(jobId);
-        assertNotNull(validationServiceFacadeImplSpy.getJsrExceptionCaseWorkers());
+        verify(validationServiceFacadeImplSpy).saveJsrExceptionsForCaseworkerJob(jobId);
+        assertNotNull(validationServiceFacadeImplSpy.getCaseWorkersExceptions());
     }
 
     @Test
     public void testInsertAudit() {
-        assertNotNull(validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, "test"));
+        assertNotNull(validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.IN_PROGRESS, "test"));
     }
 
     @Test
     public void testStartAuditJob() {
-        assertNotNull(validationServiceFacadeImpl.startAuditJob(AuditStatus.IN_PROGRESS, "test"));
+        assertNotNull(validationServiceFacadeImpl.startCaseworkerAuditing(AuditStatus.IN_PROGRESS, "test"));
     }
 }
 

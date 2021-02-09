@@ -537,7 +537,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     private void logUpFailures(String message, long rowId) {
-        long jobId = validationServiceFacade.getJobId();
+        long jobId = validationServiceFacade.getAuditJobId();
         ExceptionCaseWorker exceptionCaseWorker = validationServiceFacade.createException(jobId, message, rowId);
         upExceptionCaseWorkers.add(exceptionCaseWorker);
         auditAndExceptionRepositoryService.auditException(exceptionCaseWorker);

@@ -80,8 +80,8 @@ public class ValidationServiceFacadeTest {
         caseWorkerProfiles.add(profile);
         jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         doNothing().when(auditAndExceptionRepositoryServiceImpl).auditException(anyList());
-        validationServiceFacadeImpl.auditJsr(1);
-        verify(validationServiceFacadeImpl).auditJsr(1);
+        validationServiceFacadeImpl.saveJsrExceptionsForCaseworkerJob(1);
+        verify(validationServiceFacadeImpl).saveJsrExceptionsForCaseworkerJob(1);
     }
 
     @Test(expected = Exception.class)
@@ -95,12 +95,12 @@ public class ValidationServiceFacadeTest {
     @Test
     public void testInsertAudit() {
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
-        validationServiceFacadeImpl.insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
+        validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
 
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
-        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
         verify(validationServiceFacadeImpl, times(2))
-            .insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
+            .updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
         assertEquals(1, jobId);
     }
 
@@ -108,9 +108,9 @@ public class ValidationServiceFacadeTest {
     public void testUpdateAudit() {
         setField(validationServiceFacadeImpl, "caseWorkerAudit", CaseWorkerAudit.builder().build());
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
-        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
         verify(validationServiceFacadeImpl, times(1))
-            .insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
+            .updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
         assertEquals(1, jobId);
     }
 

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 
 import java.util.List;
@@ -20,9 +21,27 @@ public interface IValidationService {
      *
      * @param jobId long
      */
-    void auditJsr(long jobId);
+    void saveJsrExceptionsForCaseworkerJob(long jobId);
 
-    long startAuditJob(final AuditStatus auditStatus, final String fileName);
+    /**
+     * Create CWR Audit entry with in-progress Status.
+     *
+     * @param auditStatus AuditStatus
+     * @param fileName    String
+     * @return JobId long
+     */
+    long startCaseworkerAuditing(final AuditStatus auditStatus, final String fileName);
 
-    long insertAudit(final AuditStatus auditStatus, final String fileName);
+    /**
+     * Update Audit status with Success/Failure/PartialSuccess.
+     *
+     * @param auditStatus AuditStatus
+     * @param fileName    String
+     * @return JobId long
+     */
+    long updateCaseWorkerAuditStatus(final AuditStatus auditStatus, final String fileName);
+
+    List<ExceptionCaseWorker> getCaseWorkersExceptions();
+
+    long getAuditJobId();
 }
