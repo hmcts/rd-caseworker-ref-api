@@ -42,7 +42,6 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateStaleUser() throws Exception {
-
         validateAuditCaseWorkerCreate();
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("STALE", roles);
