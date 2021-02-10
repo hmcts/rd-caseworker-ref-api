@@ -91,7 +91,7 @@ public final class CaseWorkerConstants {
 
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the file uploaded."
         + " Upload a valid file in xlsx or xls format";
-    public static final String FILE_MISSING_HEADERS =  "The file is missing some column headers."
+    public static final String FILE_MISSING_HEADERS = "The file is missing some column headers."
         + " Review and upload again";
 
     public static final String NO_LOCATION_PRESENT = "You must add location details and upload the file again.";
@@ -116,4 +116,6 @@ public final class CaseWorkerConstants {
     public static final String AREA_OF_WORK_FIELD = "Area Of Work";
     public static final String FILE = "file";
     public static final String AND = "and";
+
+    public static final String UP_MISSING_RESPONSE_BODY = "UP response missing body";
 }

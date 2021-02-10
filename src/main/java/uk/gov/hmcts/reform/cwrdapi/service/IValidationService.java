@@ -44,4 +44,6 @@ public interface IValidationService {
     List<ExceptionCaseWorker> getCaseWorkersExceptions();
 
     long getAuditJobId();
+
+    void logFailures(String message, long rowId);
 }

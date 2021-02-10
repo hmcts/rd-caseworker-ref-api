@@ -8,13 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-
 
 @SuppressWarnings("unchecked")
 public class JsonFeignResponseUtil {
@@ -29,7 +27,7 @@ public class JsonFeignResponseUtil {
         try {
             return Optional.of(json.readValue(response.body().asReader(Charset.defaultCharset()),
                     (Class<Object>) clazz));
-        } catch (IOException e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }

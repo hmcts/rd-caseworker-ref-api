@@ -8,7 +8,8 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
+import uk.gov.hmcts.reform.cwrdapi.repository.AuditRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 
 import static java.util.Arrays.stream;
@@ -37,10 +39,13 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     @Autowired
     private IJsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
-    @Autowired
-    private IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
-
     private CaseWorkerAudit caseWorkerAudit;
+
+    @Autowired
+    AuditRepository caseWorkerAuditRepository;
+
+    @Autowired
+    ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
 
     @Autowired
     @Lazy
@@ -67,6 +72,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      *
      * @param jobId long
      */
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void saveJsrExceptionsForCaseworkerJob(long jobId) {
         Set<ConstraintViolation<CaseWorkerDomain>> constraintViolationSet
             = jsrValidatorInitializer.getConstraintViolations();
@@ -88,7 +94,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
                 exceptionCaseWorker.setKeyField(getKeyFieldValue(field.get(), constraintViolation.getRootBean()));
                 caseWorkersExceptions.add(exceptionCaseWorker);
             }));
-        auditAndExceptionRepositoryService.auditException(caseWorkersExceptions);
+        exceptionCaseWorkerRepository.saveAll(caseWorkersExceptions);
     }
 
 
@@ -123,16 +129,18 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      * @param fileName    String
      * @return long id
      */
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public long updateCaseWorkerAuditStatus(final AuditStatus auditStatus, final String fileName) {
         createOrUpdateCaseworkerAudit(auditStatus, fileName);
-        auditJobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
+        this.auditJobId = caseWorkerAuditRepository.save(caseWorkerAudit).getJobId();
         return auditJobId;
     }
 
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public long startCaseworkerAuditing(final AuditStatus auditStatus, final String fileName) {
         this.caseWorkerAudit = CaseWorkerAudit.builder().build();
         createOrUpdateCaseworkerAudit(auditStatus, fileName);
-        this.auditJobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
+        this.auditJobId = caseWorkerAuditRepository.save(caseWorkerAudit).getJobId();
         return auditJobId;
     }
 
@@ -172,6 +180,19 @@ public class ValidationServiceFacadeImpl implements IValidationService {
             caseWorkerAudit.setJobId(getAuditJobId());
         }
         return caseWorkerAudit;
+    }
+
+
+    /**
+     * logging User profile failures.
+     *
+     * @param message String
+     * @param rowId   long
+     */
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void logFailures(String message, long rowId) {
+        ExceptionCaseWorker exceptionCaseWorker = createException(getAuditJobId(), message, rowId);
+        exceptionCaseWorkerRepository.save(exceptionCaseWorker);
     }
 
     public List<ExceptionCaseWorker> getCaseWorkersExceptions() {

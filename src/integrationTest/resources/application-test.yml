@@ -22,6 +22,8 @@ spring:
           lob:
             non_contextual_creation: true
           batch_size: 10
+          order_updates: true
+          order_inserts: true
   main:
     allow-bean-definition-overriding: true
   application:

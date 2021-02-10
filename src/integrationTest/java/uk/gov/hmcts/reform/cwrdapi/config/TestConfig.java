@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
-import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditAndExceptionRepositoryServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
@@ -27,10 +25,6 @@ public class TestConfig {
         return new JsrValidatorInitializer();
     }
 
-    @Bean
-    IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService() {
-        return new AuditAndExceptionRepositoryServiceImpl();
-    }
 
     @Bean
     CaseWorkerReferenceDataClient caseWorkerReferenceDataClient(@Value("${local.server.port}") int port) {

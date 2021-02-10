@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.JsrFileErrors;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileConverter;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
@@ -69,7 +70,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     CaseWorkerProfileConverter caseWorkerProfileConverter;
 
     @Autowired
-    AuditAndExceptionRepositoryServiceImpl auditAndExceptionRepositoryServiceImpl;
+    ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -132,19 +134,18 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             return sendResponse(file, status, isCaseWorker, totalRecords);
 
         } catch (Exception ex) {
-            long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE,
+            validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE,
                 file.getOriginalFilename());
-            auditAndExceptionRepositoryServiceImpl.auditException(validationServiceFacadeImpl.createException(jobId,
-                ex.getMessage(), 0L));
+            validationServiceFacadeImpl.logFailures(ex.getMessage(), 0L);
             throw ex;
         }
     }
 
 
-    private ResponseEntity<Object> sendResponse(MultipartFile file, AuditStatus status,
+    public ResponseEntity<Object> sendResponse(MultipartFile file, AuditStatus status,
                                                 Boolean isCaseWorker, int totalRecords) {
-        List<ExceptionCaseWorker> exceptionCaseWorkerList =
-            auditAndExceptionRepositoryServiceImpl.getAllExceptions(validationServiceFacadeImpl.getAuditJobId());
+        List<ExceptionCaseWorker> exceptionCaseWorkerList = exceptionCaseWorkerRepository
+            .findByJobId(validationServiceFacadeImpl.getAuditJobId());
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse =
             createResponse(totalRecords, exceptionCaseWorkerList, isCaseWorker);
         status = (nonNull(exceptionCaseWorkerList) && (exceptionCaseWorkerList.size()) > 0)
@@ -182,7 +183,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             CaseWorkerFileCreationResponse.builder();
 
         int suspendedRecords = isCaseWorker && isNotEmpty(caseWorkerProfileConverter.getSuspendedRowIds())
-                ? caseWorkerProfileConverter.getSuspendedRowIds().size() : 0;
+            ? caseWorkerProfileConverter.getSuspendedRowIds().size() : 0;
 
         if (isNotEmpty(exceptionCaseWorkerList)) {
 
@@ -220,7 +221,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     }
 
     private String constructDetailedMessage(int totalRecords, int suspendedRecords, Map<String,
-            List<ExceptionCaseWorker>> failedRecords) {
+        List<ExceptionCaseWorker>> failedRecords) {
         String detailedMessage = format(RECORDS_FAILED, failedRecords.size());
         //get the uploaded records excluding failed records
         int uploadedRecords = totalRecords - failedRecords.size();
@@ -233,21 +234,21 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         }
         if (uploadedRecords > 0 && suspendedRecords > 0) {
             detailedMessage = format(RECORDS_FAILED, failedRecords.size()) + DELIMITER_COMMA + SPACE
-                    + format(RECORDS_UPLOADED, uploadedRecords) + DELIMITER_COMMA + SPACE + AND + SPACE
-                    + format(RECORDS_SUSPENDED, suspendedRecords);
+                + format(RECORDS_UPLOADED, uploadedRecords) + DELIMITER_COMMA + SPACE + AND + SPACE
+                + format(RECORDS_SUSPENDED, suspendedRecords);
         } else if (uploadedRecords > 0) {
             detailedMessage = format(RECORDS_FAILED, failedRecords.size()) + SPACE + AND + SPACE
-                    + format(RECORDS_UPLOADED, uploadedRecords);
+                + format(RECORDS_UPLOADED, uploadedRecords);
         } else if (suspendedRecords > 0) {
             detailedMessage = format(RECORDS_FAILED, failedRecords.size()) + SPACE + AND + SPACE
-                    + format(RECORDS_SUSPENDED, suspendedRecords);
+                + format(RECORDS_SUSPENDED, suspendedRecords);
         }
         return detailedMessage;
     }
 
     private int calculateFinalSuspendedRecords(Map<String, List<ExceptionCaseWorker>> failedRecords) {
         int suspendedFailedRecords = (int) caseWorkerProfileConverter.getSuspendedRowIds().stream()
-                .filter(s -> failedRecords.containsKey(Long.toString(s))).count();
+            .filter(s -> failedRecords.containsKey(Long.toString(s))).count();
 
         return caseWorkerProfileConverter.getSuspendedRowIds().size() - suspendedFailedRecords;
     }

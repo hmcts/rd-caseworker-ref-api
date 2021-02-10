@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
-import feign.FeignException;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
-import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleName;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
@@ -44,10 +42,10 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
-import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -55,7 +53,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -86,6 +83,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SUSPEND_USER_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_MISSING_RESPONSE_BODY;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 
 @Service
@@ -137,9 +135,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     ValidationServiceFacadeImpl validationServiceFacade;
 
     @Autowired
-    IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
-
-    List<ExceptionCaseWorker> upExceptionCaseWorkers;
+    CwrdCommonRepository cwrdCommonreporsitory;
 
     @Override
     public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest> cwRequests) {
@@ -147,7 +143,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         List<CaseWorkerProfile> updateCaseWorkerProfiles = new ArrayList<>();
         Map<String, CaseWorkersProfileCreationRequest> requestMap = new HashMap<>();
         List<CaseWorkerProfile> processedCwProfiles = new ArrayList<>();
-        upExceptionCaseWorkers = new LinkedList<>();
         try {
             getRolesAndUserTypes();
             for (CaseWorkersProfileCreationRequest cwrRequest : cwRequests) {
@@ -157,8 +152,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     if (cwrRequest.isSuspended()) {
                         //when suspending an user who does not exist in CW DB then log exception
                         // add entry in exception table
-                        logUpFailures(format(NO_USER_TO_SUSPEND, cwrRequest.getRowId()),
-                                cwrRequest.getRowId());
+                        validationServiceFacade.logFailures(format(NO_USER_TO_SUSPEND, cwrRequest.getRowId()),
+                            cwrRequest.getRowId());
                         continue;
                     }
                     //when profile is new then create new user profile
@@ -168,7 +163,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 } else if (isTrue(caseWorkerProfile.getSuspended())) {
                     //when existing profile with delete flag is true then log exception
                     // add entry in exception table
-                    logUpFailures(ALREADY_SUSPENDED_ERROR_MESSAGE, cwrRequest.getRowId());
+                    validationServiceFacade.logFailures(ALREADY_SUSPENDED_ERROR_MESSAGE, cwrRequest.getRowId());
                 } else if (cwrRequest.isSuspended()) {
                     //when existing profile with delete flag is true in request then suspend user
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
@@ -205,6 +200,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
+            cwrdCommonreporsitory.flush();
 
             //Skipping UP failed records as they already logged with logUpFailures
             newCaseWorkerProfiles.addAll(updateCaseWorkerProfiles.stream().filter(updatedProfile ->
@@ -384,11 +380,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     updateUserRolesInIdam(cwrdProfileRequest, userProfileCreationResponse.getIdamId());
                 }
             } else {
-                log.error("{}::UP response missing body", loggingComponentName);
+                validationServiceFacade.logFailures(UP_MISSING_RESPONSE_BODY, cwrdProfileRequest.getRowId());
+                log.error("{}::" + UP_MISSING_RESPONSE_BODY, loggingComponentName);
             }
-        } else {
-            //Add failed request to list and save to the exception table
-            log.error("{}::Idam register user failed", loggingComponentName);
         }
         return caseWorkerProfile;
     }
@@ -441,7 +435,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .getIdamStatus()))
                 || (!STATUS_ACTIVE.equalsIgnoreCase(((UserProfileResponse) resultResponse.get())
                 .getIdamStatus()))) {
-                logUpFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
+                validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
                 return false;
             }
 
@@ -449,7 +443,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                    new HashSet<>();
+                new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
             if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
                 Set<RoleName> mergedRoles = idamRolesCwr.stream()
@@ -464,7 +458,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 }
             }
         } catch (Exception exception) {
-            logUpFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
+            validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
             return false;
         }
         return true;
@@ -510,10 +504,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
 
     // Idam_UP call.
+    @SuppressWarnings("unchecked")
     private ResponseEntity<Object> createUserProfileInIdamUP(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Response response = null;
-        Object clazz = null;
+        Object clazz;
         try {
             long time1 = System.currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
@@ -522,27 +517,21 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 clazz = UserProfileCreationResponse.class;
             } else {
                 clazz = ErrorResponse.class;
-                logUpFailures(format(UP_CREATION_FAILED, response.status()),
+                validationServiceFacade.logFailures(format(UP_CREATION_FAILED, response.status()),
                     cwrdProfileRequest.getRowId());
             }
-
-        } catch (FeignException ex) {
-            log.error("{}:: UserProfile api failed:: status code {} & message {}",
-                loggingComponentName, ex.status(), ex.getMessage());
-            clazz = ErrorResponse.class;
+            return toResponseEntity(response, clazz);
+        } catch (Exception ex) {
+            log.error("{}:: UserProfile api failed:: message {}", loggingComponentName, ex.getMessage());
             //Log UP failures
-            logUpFailures(ex.getMessage(), cwrdProfileRequest.getRowId());
+            validationServiceFacade.logFailures(ex.getMessage(), cwrdProfileRequest.getRowId());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            if (nonNull(response)) {
+                response.close();
+            }
         }
-        return toResponseEntity(response, clazz);
     }
-
-    private void logUpFailures(String message, long rowId) {
-        long jobId = validationServiceFacade.getAuditJobId();
-        ExceptionCaseWorker exceptionCaseWorker = validationServiceFacade.createException(jobId, message, rowId);
-        upExceptionCaseWorkers.add(exceptionCaseWorker);
-        auditAndExceptionRepositoryService.auditException(exceptionCaseWorker);
-    }
-
 
     public boolean modifyCaseWorkerUserStatus(UserProfileUpdatedData userProfileUpdatedData, String userId,
                                               String origin, long rowId) {
@@ -562,14 +551,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .getAttributeResponse()))
                 || (!(((UserProfileRolesResponse) resultResponse.get())
                 .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.OK.value())))) {
-                logUpFailures(SUSPEND_USER_FAILED, rowId);
+                validationServiceFacade.logFailures(SUSPEND_USER_FAILED, rowId);
                 status = false;
             }
 
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}",
                 loggingComponentName, rowId, ex.getMessage());
-            logUpFailures(SUSPEND_USER_FAILED, rowId);
+            validationServiceFacade.logFailures(SUSPEND_USER_FAILED, rowId);
             status = false;
         }
         return status;
@@ -590,14 +579,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .getRoleAdditionResponse()))
                 || (((UserProfileRolesResponse) resultResponse.get()).getRoleAdditionResponse()
                 .getIdamStatusCode().equals(valueOf(HttpStatus.CREATED.value())) == FALSE)) {
-                logUpFailures(UP_FAILURE_ROLES, rowId);
+                validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
                 return false;
             }
 
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}",
                 loggingComponentName, rowId, ex.getMessage());
-            logUpFailures("can't modify roles for user in UP", rowId);
+            validationServiceFacade.logFailures("can't modify roles for user in UP", rowId);
             return false;
         }
         return true;
@@ -625,18 +614,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             false);
     }
 
-
     // get the roleTypes and userTypes.
     public void getRolesAndUserTypes() {
-
         if (roleTypes.isEmpty()) {
             roleTypes = roleTypeRepository.findAll();
         }
+
         if (userTypes.isEmpty()) {
             userTypes = userTypeRepository.findAll();
         }
     }
-
 
     // get the roles that needs to send to idam based on the roleType in the request.
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwProfileRequest) {
@@ -644,23 +631,23 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         // get Roles Types
         List<RoleType> roleTypeList = new ArrayList<>();
         cwProfileRequest.getRoles().forEach(role -> roleTypeList.addAll(
-                        roleTypes.stream()
-                        .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                        .collect(Collectors.toList()))
+            roleTypes.stream()
+                .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                .collect(Collectors.toList()))
         );
 
         // get work area codes
         List<String> serviceCodes = cwProfileRequest.getWorkerWorkAreaRequests()
-                .stream()
-                .map(CaseWorkerWorkAreaRequest::getServiceCode)
-                .collect(Collectors.toList());
+            .stream()
+            .map(CaseWorkerWorkAreaRequest::getServiceCode)
+            .collect(Collectors.toList());
 
 
         // get all assoc records matching role id and service code, finally return idam roles associated
         Set<String> matchedRoles = roleAssocRepository.findByRoleTypeInAndServiceCodeIn(roleTypeList, serviceCodes)
-                .stream()
-                .map(CaseWorkerIdamRoleAssociation::getIdamRole)
-                .collect(Collectors.toSet());
+            .stream()
+            .map(CaseWorkerIdamRoleAssociation::getIdamRole)
+            .collect(Collectors.toSet());
         log.info("{}:: roles matched from assoc :: {}", loggingComponentName, matchedRoles);
         return matchedRoles;
     }
@@ -673,9 +660,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return userTypeId.orElse(0L);
     }
 
-    public List<ExceptionCaseWorker> getUpExceptionCaseWorkers() {
-        return upExceptionCaseWorkers;
-    }
 
     private Optional<Object> validateAndGetResponseEntity(ResponseEntity<Object> responseEntity) {
         if (nonNull(responseEntity)) {

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
@@ -114,6 +113,14 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
+    public void shouldCreateCaseWorkerAuditSuccessWitUpConflict() throws Exception {
+        String roles = "[\"Senior Tribunal Caseworker\"]";
+        userProfileGetUserWireMock("ACTIVE", roles);
+        modifyUserRoles();
+        validateAuditCaseWorkerConflict();
+    }
+
+    @Test
     public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
@@ -179,7 +186,21 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    @Ignore
+    public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
+        //create invalid stub of UP for Exception validation
+        userProfileService.resetAll();
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(FAILURE.getStatus());
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
+        assertNotNull(exceptionCaseWorkers.get(0).getErrorDescription());
+    }
+
+    @Test
     public void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
         userProfileService.resetAll();
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "

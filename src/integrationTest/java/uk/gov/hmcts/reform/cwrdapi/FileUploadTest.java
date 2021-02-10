@@ -52,6 +52,16 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
     public void validateAuditCaseWorkerCreate() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+        validateAuditCaseWorker();
+    }
+
+    public void validateAuditCaseWorkerConflict() throws IOException {
+
+        userProfileCreateUserWireMock(HttpStatus.CONFLICT);
+        validateAuditCaseWorker();
+    }
+
+    private void validateAuditCaseWorker() throws IOException {
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
