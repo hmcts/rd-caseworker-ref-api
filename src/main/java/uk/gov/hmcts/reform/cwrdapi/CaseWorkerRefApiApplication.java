@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 @SpringBootApplication
 @EnableCaching
 @EnableJms
-//@EnableTransactionManagement
 @EnableRetry
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.cwrdapi" },
