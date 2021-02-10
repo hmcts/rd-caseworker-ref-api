@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Repository
-public class CwrCommonRepository implements ICwrCommonRepository {
+public class CwrdCommonRepository implements ICwrdCommonRepository {
 
     @PersistenceContext
     private EntityManager entityManager;

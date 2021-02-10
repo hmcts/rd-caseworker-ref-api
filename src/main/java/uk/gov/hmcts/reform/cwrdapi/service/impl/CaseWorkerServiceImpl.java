@@ -48,7 +48,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
-import uk.gov.hmcts.reform.cwrdapi.service.ICwrCommonRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -122,7 +122,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     CaseWorkerRoleRepository caseWorkerRoleRepository;
 
     @Autowired
-    ICwrCommonRepository cwrCommonRepository;
+    ICwrdCommonRepository cwrCommonRepository;
 
     @Autowired
     IdamRoleMappingService idamRoleMappingService;

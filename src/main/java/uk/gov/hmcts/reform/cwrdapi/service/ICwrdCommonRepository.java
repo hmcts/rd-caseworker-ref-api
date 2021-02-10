@@ -1,5 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-public interface ICwrCommonRepository {
+public interface ICwrdCommonRepository {
     void flush();
 }
