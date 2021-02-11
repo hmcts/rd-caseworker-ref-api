@@ -32,10 +32,17 @@ public class ExcelAdaptorServiceImplTest {
 
     @Before
     public void initialize() {
-        List<String> acceptableHeaders = List.of("First Name", "Last Name", "Email",
-            "Region", "User type");
-        ReflectionTestUtils.setField(excelAdaptorServiceImpl, "acceptableHeaders",
-            acceptableHeaders);
+        List<String> acceptableCaseWorkerHeaders = List.of("First Name","Last Name","Email","Region","Region ID",
+                "Primary Base Location Name","Primary Base Location ID","Secondary Location","Secondary Location ID",
+                "User type","Primary Role","Secondary Role","Area of Work1","Area of Work1 ID","Area of Work2",
+                "Area of Work2 ID","Area of Work2","Area of Work2 ID","Area of Work4","Area of Work4 ID",
+                "Area of Work5","Area of Work5 ID","Area of Work6","Area of Work6 ID","Area of Work7",
+                "Area of Work7 ID","Area of Work8","Area of Work8 ID","IDAM Roles","Suspended");
+        List<String> acceptableServiceRoleMappingHeaders = List.of("Service ID","Role","IDAM Roles");
+        ReflectionTestUtils.setField(excelAdaptorServiceImpl, "acceptableCaseWorkerHeaders",
+            acceptableCaseWorkerHeaders);
+        ReflectionTestUtils.setField(excelAdaptorServiceImpl, "acceptableServiceRoleMappingHeaders",
+                acceptableServiceRoleMappingHeaders);
     }
 
     @Test
@@ -115,12 +122,22 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void sendXlsxWithIncorrectHeaders() throws IOException {
+    public void sendCwXlsxWithIncorrectHeaders() throws IOException {
         Workbook workbook = WorkbookFactory
             .create(new File("src/test/resources/Staff Data UploadWithInvalidHeaders.xls"));
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
             .isExactlyInstanceOf(ExcelValidationException.class)
             .hasMessage(CaseWorkerConstants.FILE_MISSING_HEADERS);
+    }
+
+    @Test
+    public void sendServiceRoleMappingXlsxWithIncorrectHeaders() throws IOException {
+        Workbook workbook = WorkbookFactory
+                .create(new File("src/test/resources/ServiceRoleMapping_InvalidHeaders.xlsx"));
+
+        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, ServiceRoleMapping.class))
+                .isExactlyInstanceOf(ExcelValidationException.class)
+                .hasMessage(CaseWorkerConstants.FILE_MISSING_HEADERS);
     }
 }
