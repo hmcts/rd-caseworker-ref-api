@@ -38,7 +38,9 @@ public class TopicPublisher {
     public void sendMessage(@NotNull Object message) {
         log.info("{}:: Publishing message to service bus topic.", loggingComponentName);
         if (message instanceof PublishCaseWorkerData) {
-            log.info("{}:: Job Id is: {}, Count of User Ids is: {} ", loggingComponentName, validationService.getJobId(),
+            log.info("{}:: Job Id is: {}, Count of User Ids is: {} ",
+                    loggingComponentName,
+                    validationService.getJobId(),
                     ((PublishCaseWorkerData) message).getUserIds() != null
                             ? ((PublishCaseWorkerData) message).getUserIds().size() : null);
         }
