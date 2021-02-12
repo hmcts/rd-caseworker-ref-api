@@ -7,12 +7,14 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
+import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.lang.reflect.Field;
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static io.micrometer.core.instrument.util.StringUtils.isNotEmpty;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -34,6 +37,7 @@ import static org.springframework.util.ReflectionUtils.makeAccessible;
 import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADERS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
@@ -49,6 +53,12 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private List<String> acceptableHeaders;
 
     private FormulaEvaluator evaluator;
+
+    @Autowired
+    ValidationServiceFacadeImpl validationServiceFacade;
+
+    @Autowired
+    private IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         evaluator = workbook.getCreationHelper().createFormulaEvaluator();
@@ -100,20 +110,34 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Field rowField = getRowIdField((Class<Object>) classType);
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            //Skipping empty rows
-            if (checkIfRowIsEmpty(row)) {
-                continue;
+            Object bean = null;
+            try {
+                if (checkIfRowIsEmpty(row)) {
+                    continue; //Skipping empty rows
+                }
+                bean = populateDomainObject(classType, rowField, headers, row, parentFieldMap, childHeaderToCellMap,
+                        customObjectFieldsMapping);
+            } catch (Exception ex) {
+                validationServiceFacade.auditException(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
+                        (long) row.getRowNum());
             }
-            Object bean = getInstanceOf(classType.getName());//create parent object
-            setFieldValue(rowField, bean, row.getRowNum());
-            for (int i = 0; i < headers.size(); i++) { //set all parent fields
-                setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap,
-                    childHeaderToCellMap);
+            if (nonNull(bean)) {
+                objectList.add((T) bean);
             }
-            populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
-            objectList.add((T) bean);
         }
         return objectList;
+    }
+
+    public <T> Object populateDomainObject(Class<T> classType, Field rowField, List<String> headers, Row row,
+                                      Map<String, Field> parentFieldMap, Map<String, Object> childHeaderToCellMap,
+                                      List<Triple<String, Field, List<Field>>> customObjectFieldsMapping) {
+        Object bean = getInstanceOf(classType.getName());//create parent object
+        setFieldValue(rowField, bean, row.getRowNum());// set row id to parent field
+        for (int i = 0; i < headers.size(); i++) { //set all parent fields
+            setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap, childHeaderToCellMap);
+        }
+        populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
+        return bean;
     }
 
     private void populateChildDomainObjects(

@@ -28,6 +28,7 @@ public final class CaseWorkerConstants {
     public static final String ERROR_FILE_PARSING_ERROR_MESSAGE = "Error while parsing ";
     public static final String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
     public static final String ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
+    public static final String ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE = "Error parsing excel cell : %s";
 
     public static final String IDAM_ROLE_MAPPINGS_SUCCESS =
         "Successfully built the idam role mappings for the service id provided";
