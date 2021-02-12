@@ -44,9 +44,13 @@ public class TopicPublisher {
                     ((PublishCaseWorkerData) message).getUserIds() != null
                             ? ((PublishCaseWorkerData) message).getUserIds().size() : null);
         }
-
-        jmsTemplate.convertAndSend(destination, message);
-        log.info("{}:: Message published to service bus topic", loggingComponentName);
+        try {
+            jmsTemplate.convertAndSend(destination, message);
+            log.info("{}:: Message published to service bus topic", loggingComponentName);
+        } catch (Exception ex) {
+            log.error("{}:: Publishing message to service bus topic has failed: {} ", loggingComponentName, ex);
+            throw new CaseworkerMessageFailedException(ex.getMessage());
+        }
     }
 
     @Recover
