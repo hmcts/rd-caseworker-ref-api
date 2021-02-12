@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.JsrFileErrors;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,10 +21,13 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.FILE_UPLOAD_IN_PROGRESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
@@ -34,11 +41,15 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
+    @Autowired
+    JdbcTemplate template;
+
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
+
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
@@ -97,8 +108,10 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @Test
@@ -263,5 +276,22 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers.size()).isEqualTo(3);
+    }
+
+    @Test
+    public void shouldFailCaseWorkerUsersXlsxFileUploadIfPreviousUploadInProgress() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+
+        template.execute("update case_worker_audit set status = 'InProgress' "
+            + "where job_id = (select max(job_id) from case_worker_audit)");
+
+        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
+
+        ErrorResponse resultResponse = (ErrorResponse) getJsonResponse(response, "response_body",
+            ErrorResponse.class);
+
+        assertEquals(FILE_UPLOAD_IN_PROGRESS.getErrorMessage(), resultResponse.getErrorDescription());
     }
 }

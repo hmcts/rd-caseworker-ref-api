@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
@@ -112,5 +113,15 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
         Gson gson = new Gson();
         String json = gson.toJson(response.get("body"));
         return json;
+    }
+
+    protected Object getJsonResponse(Map<String, Object> response, String body, Class clazz) {
+        Gson gson = new Gson();
+        return gson.fromJson(removeQuotesAndUnescape(gson.toJson(response.get(body))), clazz);
+    }
+
+    private String removeQuotesAndUnescape(String uncleanJson) {
+        String noQuotes = uncleanJson.replaceAll("^\"|\"$", "");
+        return StringEscapeUtils.unescapeJava(noQuotes);
     }
 }

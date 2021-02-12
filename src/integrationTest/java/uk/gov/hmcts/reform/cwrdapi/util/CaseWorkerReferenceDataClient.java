@@ -47,7 +47,7 @@ public class CaseWorkerReferenceDataClient {
     private long expiration;
     @Autowired
     Environment environment;
-
+    static String bearerToken;
     @Value("${idam.s2s-authorised.services}")
     private String serviceName;
 
@@ -72,15 +72,15 @@ public class CaseWorkerReferenceDataClient {
         HttpHeaders httpHeaders = getMultipleAuthHeaders(role);
         httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        HttpEntity<MultiValueMap<String, Object>>  request =
-                new HttpEntity<>(body, httpHeaders);
+        HttpEntity<MultiValueMap<String, Object>> request =
+            new HttpEntity<>(body, httpHeaders);
         return sendRequest(uriPath, request);
     }
 
 
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
-        HttpEntity<T>    request = new HttpEntity<>(requestBody, getMultipleAuthHeaders(role, userId));
+        HttpEntity<T> request = new HttpEntity<>(requestBody, getMultipleAuthHeaders(role, userId));
 
         return sendRequest(uriPath, request);
     }
@@ -91,9 +91,9 @@ public class CaseWorkerReferenceDataClient {
         try {
 
             responseEntity = restTemplate.postForEntity(
-                    uriPath,
-                    request,
-                    Map.class);
+                uriPath,
+                request,
+                Map.class);
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);
@@ -116,8 +116,10 @@ public class CaseWorkerReferenceDataClient {
 
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
-        String bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+        if (StringUtils.isBlank(bearerToken)) {
+            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
                 : userId, role));
+        }
         headers.add("Authorization", bearerToken);
 
         return headers;
@@ -131,13 +133,13 @@ public class CaseWorkerReferenceDataClient {
     private Map getResponse(ResponseEntity<Map> responseEntity) {
 
         Map response = objectMapper
-                .convertValue(
-                        responseEntity.getBody(),
-                        Map.class);
+            .convertValue(
+                responseEntity.getBody(),
+                Map.class);
 
         response.put("http_status", responseEntity.getStatusCode().toString());
         response.put("headers", responseEntity.getHeaders().toString());
-        response.put("body",       responseEntity.getBody());
+        response.put("body", responseEntity.getBody());
         return response;
     }
 
@@ -151,5 +153,9 @@ public class CaseWorkerReferenceDataClient {
             .setIssuedAt(new Date())
             .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
             .compact();
+    }
+
+    public static void setBearerToken(String bearerToken) {
+        CaseWorkerReferenceDataClient.bearerToken = bearerToken;
     }
 }
