@@ -33,7 +33,7 @@ public class CaseWorkerAudit implements Serializable {
     private Long jobId;
 
     @Column(name = "authenticated_user_id")
-    @Size(max = 32)
+    @Size(max = 64)
     private String authenticatedUserId;
 
     @Column(name = "job_start_time")

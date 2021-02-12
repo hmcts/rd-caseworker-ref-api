@@ -34,6 +34,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
+
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xls.xls",

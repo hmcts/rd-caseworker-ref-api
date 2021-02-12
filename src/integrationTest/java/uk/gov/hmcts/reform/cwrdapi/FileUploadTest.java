@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +15,8 @@ import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.repository.AuditRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
@@ -35,10 +36,10 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
-    protected SimpleJpaRepository<CaseWorkerAudit, Long> caseWorkerAuditRepository;
+    protected AuditRepository caseWorkerAuditRepository;
 
     @Autowired
-    protected SimpleJpaRepository<ExceptionCaseWorker, Long> caseWorkerExceptionRepository;
+    protected ExceptionCaseWorkerRepository caseWorkerExceptionRepository;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -76,9 +77,9 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
     }
 
     public Map<String, Object> uploadCaseWorkerFile(String fileName,
-                                                     String fileType,
-                                                     String status,
-                                                     String role) throws IOException {
+                                                    String fileType,
+                                                    String status,
+                                                    String role) throws IOException {
 
         response.clear();
         File file = getFile("src/integrationTest/resources/" + fileName);

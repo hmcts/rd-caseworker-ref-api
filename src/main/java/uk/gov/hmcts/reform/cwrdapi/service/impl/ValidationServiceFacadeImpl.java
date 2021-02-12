@@ -167,12 +167,12 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     private CaseWorkerAudit createOrUpdateCaseworkerAudit(AuditStatus auditStatus, String fileName) {
         if (isNull(caseWorkerAudit) || isNull(caseWorkerAudit.getJobId())) {
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
-            String userName = (nonNull(userInfo) && nonNull(userInfo.getName())) ? userInfo.getName() : EMPTY;
+            String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : EMPTY;
             caseWorkerAudit = CaseWorkerAudit.builder()
                 .status(auditStatus.getStatus())
                 .jobStartTime(LocalDateTime.now())
                 .fileName(fileName)
-                .authenticatedUserId(userName)
+                .authenticatedUserId(userId)
                 .build();
         } else {
             caseWorkerAudit.setStatus(auditStatus.getStatus());

@@ -18,15 +18,20 @@ public enum ErrorConstants {
     ACCESS_EXCEPTION("9 : Access Denied"),
     ERROR_PUBLISHING_TO_TOPIC("10 : Sorry, there is a problem with the service. Try again later"),
 
-    RUNTIME_EXCEPTION("10 : Sorry, there is a problem with the service. Try again later");
+    RUNTIME_EXCEPTION("10 : Sorry, there is a problem with the service. Try again later"),
+
+    FILE_UPLOAD_IN_PROGRESS("11 : File upload is already in progress."
+        + " Please try again once existing file upload is completed");
 
     private final String errorMessage;
 
-    ErrorConstants(String  errorMessage) {
-        this.errorMessage  = errorMessage;
+    ErrorConstants(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     public String getErrorMessage() {
         return this.errorMessage;
     }
+
+
 }
