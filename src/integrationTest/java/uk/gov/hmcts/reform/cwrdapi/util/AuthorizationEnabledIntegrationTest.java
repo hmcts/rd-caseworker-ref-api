@@ -64,7 +64,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected FeatureToggleServiceImpl featureToggleServiceImpl;
 
     @MockBean
-    TopicPublisher topicPublisher;
+    protected TopicPublisher topicPublisher;
 
     @MockBean
     LDClient ldClient;

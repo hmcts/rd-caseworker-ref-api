@@ -25,4 +25,6 @@ public interface IValidationService {
     long startAuditJob(final AuditStatus auditStatus, final String fileName);
 
     long insertAudit(final AuditStatus auditStatus, final String fileName);
+
+    long getJobId();
 }

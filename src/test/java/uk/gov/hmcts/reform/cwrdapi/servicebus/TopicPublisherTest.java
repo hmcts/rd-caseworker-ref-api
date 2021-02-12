@@ -9,9 +9,11 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 
 import java.net.NoRouteToHostException;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -20,15 +22,21 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TopicPublisherTest {
+
     @Mock
     PublishCaseWorkerData publishCaseWorkerData;
 
+    @Mock
+    IValidationService validationService;
+
     private static final String DESTINATION = "Bermuda";
     private final JmsTemplate jmsTemplate = mock(JmsTemplate.class);
-    private TopicPublisher topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION);
+    private TopicPublisher topicPublisher;
 
     @Test
     public void sendMessageCallsTheJmsTemplate() {
+        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
+        doReturn(1L).when(validationService).getJobId();
         topicPublisher.sendMessage(publishCaseWorkerData);
 
         verify(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
@@ -36,6 +44,7 @@ public class TopicPublisherTest {
 
     @Test(expected = CaseworkerMessageFailedException.class)
     public void recoverMessageThrowsThePassedException() throws Throwable {
+        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
         Exception exception = new NoRouteToHostException("");
         topicPublisher.recoverMessage(exception);
     }
@@ -44,8 +53,9 @@ public class TopicPublisherTest {
     public void sendMessageWhenThrowExceptionWhenConnectionFactoryInstanceDifferent() {
         SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
         doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
+        doReturn(1L).when(validationService).getJobId();
 
-        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION);
+        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
 
         try {
             topicPublisher.sendMessage(publishCaseWorkerData);
