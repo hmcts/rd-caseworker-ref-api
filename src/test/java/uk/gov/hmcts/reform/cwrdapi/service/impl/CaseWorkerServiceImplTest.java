@@ -39,11 +39,10 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.CwrdCommonRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -97,8 +96,6 @@ public class CaseWorkerServiceImplTest {
     @Mock
     IValidationService validationServiceFacade;
 
-    @Mock
-    CwrdCommonRepository cwrdCommonreporsitory;
 
     private CaseWorkersProfileCreationRequest cwProfileCreationRequest;
     private RoleType roleType;
@@ -167,7 +164,7 @@ public class CaseWorkerServiceImplTest {
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(null);
         when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
-                .thenReturn(new ArrayList<>());
+            .thenReturn(new ArrayList<>());
 
         when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
             .request(mock(Request.class)).body(body, Charset.defaultCharset()).status(201).build());

@@ -40,7 +40,7 @@ public class TopicPublisher {
         if (message instanceof PublishCaseWorkerData) {
             log.info("{}:: Job Id is: {}, Count of User Ids is: {} ",
                     loggingComponentName,
-                    validationService.getJobId(),
+                    validationService.getAuditJobId(),
                     ((PublishCaseWorkerData) message).getUserIds() != null
                             ? ((PublishCaseWorkerData) message).getUserIds().size() : null);
         }
