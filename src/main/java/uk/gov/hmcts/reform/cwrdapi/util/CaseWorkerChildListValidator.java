@@ -50,8 +50,9 @@ public class CaseWorkerChildListValidator implements ConstraintValidator<Validat
         boolean isValidLocations = true;
         if (isNotEmpty(caseWorkerProfile.getLocations())
             && caseWorkerProfile.getLocations().size() > 1) {
-            isValidLocations = negate(caseWorkerProfile.getLocations().get(0).getBaseLocationId()
-                .equals(caseWorkerProfile.getLocations().get(1).getBaseLocationId()));
+            //@TO do remove getLocationName with Id problem with excel sheet
+            isValidLocations = negate(caseWorkerProfile.getLocations().get(0).getLocationName()
+                .equalsIgnoreCase(caseWorkerProfile.getLocations().get(1).getLocationName()));
             if (FALSE.equals(isValidLocations)) {
                 context.buildConstraintViolationWithTemplate(DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS)
                     .addPropertyNode(LOCATION_FIELD)

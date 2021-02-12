@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.CwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -83,6 +84,8 @@ public class CaseWorkerServiceImplTest {
     private IdamRoleMappingService idamRoleMappingService;
     @Mock
     private TopicPublisher topicPublisher;
+    @Mock
+    private CwrdCommonRepository cwrdCommonRepository;
     @Mock
     private CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
 

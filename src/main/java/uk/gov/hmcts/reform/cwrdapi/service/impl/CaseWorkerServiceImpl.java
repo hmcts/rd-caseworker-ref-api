@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
+import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -120,6 +121,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     @Autowired
     CaseWorkerRoleRepository caseWorkerRoleRepository;
+
+    @Autowired
+    ICwrdCommonRepository cwrCommonRepository;
 
     @Autowired
     IdamRoleMappingService idamRoleMappingService;
@@ -204,6 +208,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
+            cwrCommonRepository.flush();
 
             //Skipping UP failed records as they already logged with logUpFailures
             newCaseWorkerProfiles.addAll(updateCaseWorkerProfiles.stream().filter(updatedProfile ->
