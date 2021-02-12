@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import uk.gov.hmcts.reform.cwrdapi.config.CaseWorkerStaticValueRepositoryAccessor;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
@@ -39,8 +40,6 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -79,15 +78,13 @@ public class CaseWorkerServiceImplTest {
     @Mock
     CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
     @Mock
-    private RoleTypeRepository roleTypeRepository;
-    @Mock
-    private UserTypeRepository userTypeRepository;
-    @Mock
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
     private IdamRoleMappingService idamRoleMappingService;
     @Mock
     private TopicPublisher topicPublisher;
+    @Mock
+    private CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
 
     private CaseWorkersProfileCreationRequest cwProfileCreationRequest;
     private RoleType roleType;
@@ -151,8 +148,8 @@ public class CaseWorkerServiceImplTest {
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(roleTypeRepository.findAll()).thenReturn(singletonList(roleType));
-        when(userTypeRepository.findAll()).thenReturn(singletonList(userType));
+        when(caseWorkerStaticValueRepositoryAccessor.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerStaticValueRepositoryAccessor.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(null);
         when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
@@ -205,8 +202,8 @@ public class CaseWorkerServiceImplTest {
                     Charset.defaultCharset())
                 .status(200).build());
 
-        when(roleTypeRepository.findAll()).thenReturn(singletonList(roleType));
-        when(userTypeRepository.findAll()).thenReturn(singletonList(userType));
+        when(caseWorkerStaticValueRepositoryAccessor.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerStaticValueRepositoryAccessor.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(null);
         when(caseWorkerProfileRepository.saveAll(any()))
@@ -429,8 +426,8 @@ public class CaseWorkerServiceImplTest {
         profile.setSuspended(false);
 
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
-        when(roleTypeRepository.findAll()).thenReturn(singletonList(roleType));
-        when(userTypeRepository.findAll()).thenReturn(singletonList(userType));
+        when(caseWorkerStaticValueRepositoryAccessor.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerStaticValueRepositoryAccessor.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(profile);
         when(userProfileFeignClient.getUserProfileWithRolesById(any()))
@@ -452,8 +449,6 @@ public class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
-        verify(roleTypeRepository, times(1)).findAll();
-        verify(userTypeRepository, times(1)).findAll();
         verify(caseWorkerLocationRepository, times(1)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerWorkAreaRepository, times(1)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerRoleRepository, times(1)).deleteByCaseWorkerProfileIn(any());
