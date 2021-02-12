@@ -38,7 +38,7 @@ def versions = [
   springBoot         : '2.3.4.RELEASE',
   springHystrix      : '2.1.1.RELEASE',
   springfoxSwagger   : '2.9.2',
-  pact_version       : '3.5.24',
+  pact_version       : '4.1.7',
   launchDarklySdk    : "5.2.1"
 ]
 
@@ -137,6 +137,10 @@ configurations {
   integrationTestRuntime.extendsFrom testRuntime
   functionalTestCompile.extendsFrom testCompile
   functionalTestRuntime.extendsFrom testRuntime
+  contractTestCompile.extendsFrom testCompile
+  contractTestRuntime.extendsFrom testRuntime
+  pactTestCompile.extendsFrom testCompile
+  pactTestRuntime.extendsFrom testRuntime
 }
 
 
@@ -186,6 +190,7 @@ task contract(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/cwrdapi/**"
   systemProperty 'pact.rootDir', "pacts"
+  exclude "uk/gov/hmcts/reform/cwrdapi/*ProviderTest*"
 }
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
@@ -194,6 +199,14 @@ task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test 
 }
 
 runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+project.ext {
+  pactVersion = getCheckedOutGitCommitHash()
+}
+
+def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
 
 pact {
   publish {
@@ -210,7 +223,7 @@ task contractTest(type: Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-  exclude "uk/gov/hmcts/reform/roleassignment/*IdamConsumerTest*"
+  exclude "uk/gov/hmcts/reform/cwrdapi/*UserProfileConsumerTest*"
 }
 
 task runProviderPactVerification(type: Test) {
@@ -406,10 +419,6 @@ dependencies {
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-  contractTestCompile(group: 'au.com.dius', name:'pact-jvm-consumer-junit5_2.12', version: versions.pact_version) {
-    endorseStrictVersions()
-  }
-
   contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.6.2")
   contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.2")
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
@@ -445,9 +454,15 @@ dependencies {
   smokeTestCompile sourceSets.main.runtimeClasspath
   smokeTestCompile sourceSets.test.runtimeClasspath
 
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
   contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.1.7'
   contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: '4.1.7'
   contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.1.7'
+
+  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
   contractTestCompile sourceSets.main.runtimeClasspath
   contractTestCompile sourceSets.test.runtimeClasspath

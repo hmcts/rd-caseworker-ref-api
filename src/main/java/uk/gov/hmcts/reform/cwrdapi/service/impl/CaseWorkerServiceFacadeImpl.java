@@ -86,8 +86,10 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             log.info("{}::Time taken to validate the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time1));
 
-            Class<? extends CaseWorkerDomain> ob = nonNull(fileName)
-                && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
+            boolean isCaseWorker = nonNull(fileName)
+                    && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME);
+
+            Class<? extends CaseWorkerDomain> ob = isCaseWorker
                 ? CaseWorkerProfile.class : ServiceRoleMapping.class;
 
             long time2 = System.currentTimeMillis();
@@ -96,8 +98,6 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
-
-            validateServiceRoleMappingSheet(caseWorkerRequest, ob);
 
             long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);
@@ -113,17 +113,14 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 //Inserts JSR exceptions
                 validationServiceFacadeImpl.auditJsr(jobId);
             }
-            boolean isCaseWorker = false;
             if (isNotEmpty(caseWorkerRequest)) {
-                if (caseWorkerRequest.get(0).getClass().isAssignableFrom(CaseWorkerProfile.class)) {
-
+                if (isCaseWorker) {
                     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests
                         = caseWorkerProfileConverter.convert(caseWorkerRequest);
                     caseWorkerInternalClient
                         .postRequest(caseWorkersProfileCreationRequests, "/users");
-                    isCaseWorker = true;
-
                 } else {
+                    validateServiceRoleMappingSheet(caseWorkerRequest);
                     caseWorkerInternalClient.postRequest(caseWorkerRequest, "/idam-roles-mapping");
                 }
             }
@@ -150,20 +147,17 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         }
     }
 
-    private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList,
-                                                 Class<? extends CaseWorkerDomain> classType) {
-        if (nonNull(classType) && classType.equals(ServiceRoleMapping.class)) {
-            boolean multipleServiceCode = caseWorkerRequestList.stream()
-                    .filter(ServiceRoleMapping.class::isInstance)
-                    .map(ServiceRoleMapping.class::cast)
-                    .map(ServiceRoleMapping::getServiceId)
-                    .filter(StringUtils::isNotEmpty)
-                    .distinct()
-                    .count() > 1;
+    private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList) {
+        boolean multipleServiceCode = caseWorkerRequestList.stream()
+                .filter(ServiceRoleMapping.class::isInstance)
+                .map(ServiceRoleMapping.class::cast)
+                .map(ServiceRoleMapping::getServiceId)
+                .filter(StringUtils::isNotEmpty)
+                .distinct()
+                .count() > 1;
 
-            if (multipleServiceCode) {
-                throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
-            }
+        if (multipleServiceCode) {
+            throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
         }
     }
 
