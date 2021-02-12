@@ -87,8 +87,10 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             log.info("{}::Time taken to validate the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time1));
 
-            Class<? extends CaseWorkerDomain> ob = nonNull(fileName)
-                && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME)
+            boolean isCaseWorker = nonNull(fileName)
+                    && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME);
+
+            Class<? extends CaseWorkerDomain> ob = isCaseWorker
                 ? CaseWorkerProfile.class : ServiceRoleMapping.class;
 
             long time2 = System.currentTimeMillis();
@@ -97,8 +99,6 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             log.info("{}::Time taken to parse the given file {} is {}",
                 loggingComponentName, fileName, (System.currentTimeMillis() - time2));
-
-            validateServiceRoleMappingSheet(caseWorkerRequest, ob);
 
             long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);
@@ -114,19 +114,14 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 //Inserts JSR exceptions
                 validationServiceFacadeImpl.saveJsrExceptionsForCaseworkerJob(jobId);
             }
-
-            Boolean isCaseWorker = false;
             if (isNotEmpty(caseWorkerRequest)) {
-                if (caseWorkerRequest.get(0).getClass().isAssignableFrom(CaseWorkerProfile.class)) {
-                    //refer = file Upload
+                if (isCaseWorker) {
                     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests
                         = caseWorkerProfileConverter.convert(caseWorkerRequest);
-
                     caseWorkerInternalClient
                         .postRequest(caseWorkersProfileCreationRequests, "/users");
-                    isCaseWorker = true;
-
                 } else {
+                    validateServiceRoleMappingSheet(caseWorkerRequest);
                     caseWorkerInternalClient.postRequest(caseWorkerRequest, "/idam-roles-mapping");
                 }
             }
@@ -141,7 +136,6 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         }
     }
 
-
     public ResponseEntity<Object> sendResponse(MultipartFile file, AuditStatus status,
                                                 Boolean isCaseWorker, int totalRecords) {
         List<ExceptionCaseWorker> exceptionCaseWorkerList = exceptionCaseWorkerRepository
@@ -154,10 +148,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         return ResponseEntity.ok().body(caseWorkerFileCreationResponse);
     }
 
-    private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList,
-                                                 Class<? extends CaseWorkerDomain> classType) {
-        if (nonNull(classType) && classType.equals(ServiceRoleMapping.class)) {
-            boolean multipleServiceCode = caseWorkerRequestList.stream()
+    private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList) {
+        boolean multipleServiceCode = caseWorkerRequestList.stream()
                 .filter(ServiceRoleMapping.class::isInstance)
                 .map(ServiceRoleMapping.class::cast)
                 .map(ServiceRoleMapping::getServiceId)
@@ -165,9 +157,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 .distinct()
                 .count() > 1;
 
-            if (multipleServiceCode) {
-                throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
-            }
+        if (multipleServiceCode) {
+            throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
         }
     }
 
@@ -183,7 +174,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             CaseWorkerFileCreationResponse.builder();
 
         int suspendedRecords = isCaseWorker && isNotEmpty(caseWorkerProfileConverter.getSuspendedRowIds())
-            ? caseWorkerProfileConverter.getSuspendedRowIds().size() : 0;
+                ? caseWorkerProfileConverter.getSuspendedRowIds().size() : 0;
 
         if (isNotEmpty(exceptionCaseWorkerList)) {
 
@@ -245,6 +236,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         }
         return detailedMessage;
     }
+
 
     private int calculateFinalSuspendedRecords(Map<String, List<ExceptionCaseWorker>> failedRecords) {
         int suspendedFailedRecords = (int) caseWorkerProfileConverter.getSuspendedRowIds().stream()
