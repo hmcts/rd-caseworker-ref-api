@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jms.UncategorizedJmsException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -77,9 +79,18 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
     @Test
     public void shouldCreateCaseWorker() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        assertThat(caseWorkerProfileRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerLocationRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(0L);
+
         Map<String, Object> response = caseworkerReferenceDataClient
-            .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+                .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "201 CREATED");
+
+        assertThat(caseWorkerProfileRepository.count()).isEqualTo(1L);
+        assertThat(caseWorkerLocationRepository.count()).isEqualTo(1L);
+        assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(1L);
 
         CaseWorkerProfile profile =
                 caseWorkerProfileRepository.findByEmailId("test.inttest@hmcts.gov.uk");
@@ -96,6 +107,22 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         CaseWorkerWorkArea caseWorkerWorkArea = caseWorkerWorkAreas.get(0);
         assertThat(caseWorkerWorkArea.getAreaOfWork()).isEqualTo("areaOfWork");
         assertThat(caseWorkerWorkArea.getServiceCode()).isEqualTo("serviceCode");
+    }
 
+    @Test
+    public void shouldRollbackCreateCaseWorkerInCaseOfException() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        Mockito.doThrow(new UncategorizedJmsException("jms exception"))
+                .when(topicPublisher).sendMessage(Mockito.any());
+        assertThat(caseWorkerProfileRepository.count()).isEqualTo(0L);
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+                .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+        assertThat(response).containsEntry("http_status", "500");
+
+        assertThat(caseWorkerProfileRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerLocationRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerRoleRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(0L);
     }
 }
