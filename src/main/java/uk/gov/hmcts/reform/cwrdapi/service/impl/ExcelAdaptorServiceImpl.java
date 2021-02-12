@@ -45,21 +45,30 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE
 @Slf4j
 @SuppressWarnings("unchecked")
 public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
-    @Value("${excel.acceptableHeaders}")
-    private List<String> acceptableHeaders;
+    @Value("${excel.acceptableCaseWorkerHeaders}")
+    private List<String> acceptableCaseWorkerHeaders;
+
+    @Value("${excel.acceptableServiceRoleMappingHeaders}")
+    private List<String> acceptableServiceRoleMappingHeaders;
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
     private FormulaEvaluator evaluator;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+        List<String> validHeaders;
         if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
         Sheet sheet;
         if (classType.isAssignableFrom(CaseWorkerProfile.class)) {
             sheet = workbook.getSheet(REQUIRED_CW_SHEET_NAME);
+            validHeaders = acceptableCaseWorkerHeaders;
         } else {
             sheet = workbook.getSheet(REQUIRED_ROLE_MAPPING_SHEET_NAME);
+            validHeaders = acceptableServiceRoleMappingHeaders;
         }
         if (Objects.isNull(sheet)) {
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_VALID_SHEET_ERROR_MESSAGE);
@@ -68,30 +77,26 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         }
         List<String> headers = new LinkedList<>();
         collectHeaderList(headers, sheet);
-        if (classType.equals(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.class)) {
-            validateHeaders(headers);
-        }
-        return mapToPojo(sheet, classType);
+        validateHeaders(headers, validHeaders);
+        return mapToPojo(sheet, classType, headers);
     }
 
-    private void validateHeaders(List<String> headers) {
+    private void validateHeaders(List<String> headersToBeValidated,
+                                 List<String> validHeaders) {
         //below mentioned code can be shortened to headers.containsAll(acceptableHeaders),
         //but current code is better from debugging standpoint.
-        acceptableHeaders.forEach(acceptableHeader -> {
-            if (!headers.contains(acceptableHeader)) {
-                log.error(FILE_MISSING_HEADERS);
+        validHeaders.forEach(acceptableHeader -> {
+            if (!headersToBeValidated.contains(acceptableHeader)) {
+                log.error("{}::{}", loggingComponentName, FILE_MISSING_HEADERS);
                 throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_MISSING_HEADERS);
             }
         });
     }
 
-    private <T> List<T> mapToPojo(Sheet sheet, Class<T> classType) {
+    private <T> List<T> mapToPojo(Sheet sheet, Class<T> classType, List<String> headers) {
         List<T> objectList = new ArrayList<>();
         Map<String, Object> childHeaderToCellMap = new HashMap<>();
         Map<String, Field> parentFieldMap = new HashMap<>();
-        List<String> headers = new LinkedList<>();
-
-        collectHeaderList(headers, sheet);
         //scan parent and domain object fields by reflection and make maps
         List<Triple<String, Field, List<Field>>> customObjectFieldsMapping =
             createBeanFieldMaps(classType, parentFieldMap);

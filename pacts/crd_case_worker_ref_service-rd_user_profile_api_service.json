@@ -1,0 +1,406 @@
+{
+  "provider": {
+    "name": "rd_user_profile_api_service"
+  },
+  "consumer": {
+    "name": "crd_case_worker_ref_service"
+  },
+  "interactions": [
+    {
+      "description": "valid request to create profile data",
+      "request": {
+        "method": "POST",
+        "path": "/v1/userprofile/",
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "body": {
+          "firstName": "james",
+          "lastName": "bond",
+          "languagePreference": "EN",
+          "userCategory": "PROFESSIONAL",
+          "emailCommsConsent": true,
+          "roles": [
+            "Secret-Agent"
+          ],
+          "userType": "INTERNAL",
+          "postalCommsConsent": true,
+          "email": "james.bond@justice.gov.uk",
+          "resendInvite": false
+        },
+        "matchingRules": {
+          "body": {
+            "$.email": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.firstName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.lastName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.languagePreference": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.emailCommsConsent": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.postalCommsConsent": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.resendInvite": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.userType": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.userCategory": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roles[0]": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "idamRegistrationResponse": 201,
+          "idamId": "uuid format id"
+        },
+        "matchingRules": {
+          "body": {
+            "$.idamId": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "A user profile create request is submitted"
+        }
+      ]
+    },
+    {
+      "description": "valid request to update profile data roles",
+      "request": {
+        "method": "PUT",
+        "path": "/v1/userprofile/007",
+        "headers": {
+          "Content-Type": "application/json; charset=UTF-8"
+        },
+        "body": {
+          "firstName": "james",
+          "lastName": "bond",
+          "rolesDelete": [
+            {
+              "name": "caseworker"
+            }
+          ],
+          "rolesAdd": [
+            {
+              "name": "tribunal-caseworker"
+            }
+          ],
+          "email": "james.bond@justice.gov.uk",
+          "idamStatus": "status"
+        },
+        "matchingRules": {
+          "body": {
+            "$.email": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.firstName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.lastName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.idamStatus": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.rolesAdd": {
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.rolesAdd[*].name": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.rolesDelete": {
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.rolesDelete[*].name": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "roleDeletionResponse": [
+            {
+              "roleName": "caseworker",
+              "idamStatusCode": "200",
+              "idamMessage": "11 OK"
+            }
+          ],
+          "roleAdditionResponse": {
+            "idamStatusCode": "200",
+            "idamMessage": "11 OK"
+          }
+        },
+        "matchingRules": {
+          "body": {
+            "$.roleAdditionResponse.idamMessage": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roleAdditionResponse.idamStatusCode": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roleDeletionResponse": {
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roleDeletionResponse[*].idamMessage": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roleDeletionResponse[*].idamStatusCode": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roleDeletionResponse[*].roleName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "A user profile update request is submitted for roles"
+        }
+      ]
+    },
+    {
+      "description": "valid request for profile data based on Id",
+      "request": {
+        "method": "GET",
+        "path": "/v1/userprofile/007/roles"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "firstName": "james",
+          "lastName": "bond",
+          "userIdentifier": "007",
+          "roles": [
+            "Secret-Agent"
+          ],
+          "email": "james.bond@justice.gov.uk",
+          "idamStatus": "Live"
+        },
+        "matchingRules": {
+          "body": {
+            "$.email": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.firstName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.lastName": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.idamStatus": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.userIdentifier": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            },
+            "$.roles[0]": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "A user profile with roles get request is submitted with valid Id"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    },
+    "pact-jvm": {
+      "version": "4.1.7"
+    }
+  }
+}

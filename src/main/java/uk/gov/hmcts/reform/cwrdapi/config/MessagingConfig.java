@@ -52,6 +52,7 @@ public class MessagingConfig {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         returnValue.setMessageConverter(new MappingJackson2MessageConverter());
+        returnValue.setSessionTransacted(true);
         return returnValue;
     }
 
