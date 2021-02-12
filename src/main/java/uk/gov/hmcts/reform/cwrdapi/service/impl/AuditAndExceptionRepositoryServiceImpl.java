@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
@@ -25,6 +27,7 @@ public class AuditAndExceptionRepositoryServiceImpl implements IAuditAndExceptio
      * @param audit CaseWorkerAudit
      * @return Long
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long auditSchedulerStatus(CaseWorkerAudit audit) {
         return caseWorkerAuditRepository.save(audit).getJobId();
     }
@@ -34,6 +37,7 @@ public class AuditAndExceptionRepositoryServiceImpl implements IAuditAndExceptio
      *
      * @param exceptionCaseWorkers List
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void auditException(List<ExceptionCaseWorker> exceptionCaseWorkers) {
         exceptionCaseWorkerRepository.saveAll(exceptionCaseWorkers);
     }
@@ -43,6 +47,7 @@ public class AuditAndExceptionRepositoryServiceImpl implements IAuditAndExceptio
      *
      * @param exceptionCaseWorker ExceptionCaseWorker
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void auditException(ExceptionCaseWorker exceptionCaseWorker) {
         exceptionCaseWorkerRepository.save(exceptionCaseWorker);
     }

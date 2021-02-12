@@ -27,6 +27,12 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
@@ -157,9 +163,15 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.MISSING_REGION).build());
         errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionId").errorDescription(
             CaseWorkerConstants.MISSING_REGION).build());
+        errors.add(JsrFileErrors.builder().rowId("11").filedInError(ROLE_FIELD).errorDescription(
+            DUPLICATE_PRIMARY_AND_SECONDARY_ROLES).build());
+        errors.add(JsrFileErrors.builder().rowId("10").filedInError(LOCATION_FIELD).errorDescription(
+            DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS).build());
+        errors.add(JsrFileErrors.builder().rowId("12").filedInError(AREA_OF_WORK_FIELD).errorDescription(
+            DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("8 record(s) failed validation and 1 record(s) uploaded")
+            .detailedMessage("11 record(s) failed validation and 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
