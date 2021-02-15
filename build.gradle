@@ -251,6 +251,7 @@ jacocoTestReport {
 
 pitest {
   targetClasses = ['uk.gov.hmcts.reform.*']
+  testSourceSets = [sourceSets.integrationTest, sourceSets.test]
   excludedClasses = [
     'uk.gov.hmcts.reform.cwrdapi.config.*',
     'uk.gov.hmcts.reform.cwrdapi.controller.*',
@@ -262,7 +263,7 @@ pitest {
   historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
   outputFormats = ['XML', 'HTML']
   timestampedReports = true
-  mutationThreshold = 20
+  mutationThreshold = 70
 }
 
 
