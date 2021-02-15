@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
@@ -46,7 +45,7 @@ public class ValidationServiceFacadeImplTest {
 
     @Spy
     @Autowired
-    ValidationServiceFacadeImpl validationServiceFacadeImpl;
+    IValidationService validationServiceFacadeImpl;
 
     @Autowired
     JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
@@ -77,7 +76,7 @@ public class ValidationServiceFacadeImplTest {
         validationServiceFacadeImpl.getInvalidRecords(caseWorkerProfiles);
 
         validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "");
-        ValidationServiceFacadeImpl validationServiceFacadeImplSpy = spy(validationServiceFacadeImpl);
+        IValidationService validationServiceFacadeImplSpy = spy(validationServiceFacadeImpl);
         validationServiceFacadeImplSpy.saveJsrExceptionsForCaseworkerJob(jobId);
         List<ExceptionCaseWorker> exceptionCaseWorkers = exceptionCaseWorkerRepository.findByJobId(jobId);
         assertNotNull(exceptionCaseWorkers);

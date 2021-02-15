@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -135,7 +136,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     List<UserType> userTypes = new ArrayList<>();
 
     @Autowired
-    ValidationServiceFacadeImpl validationServiceFacade;
+    IValidationService validationServiceFacade;
 
     @Override
     public List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest> cwRequests) {

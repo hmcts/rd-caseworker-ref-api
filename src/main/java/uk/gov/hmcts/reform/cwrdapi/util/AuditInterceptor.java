@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE;
 
 @MultipartConfig
 @Component
+@Slf4j
 public class AuditInterceptor implements HandlerInterceptor {
 
     @Autowired
@@ -35,6 +38,9 @@ public class AuditInterceptor implements HandlerInterceptor {
     @Autowired
     @Lazy
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+
+    @Value("${logging-component-name}")
+    private String loggingComponentName;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -50,7 +56,8 @@ public class AuditInterceptor implements HandlerInterceptor {
                 fileName = multipartFile.getOriginalFilename();
             }
             //Starts CWR Auditing with Job Status in Progress.
-            validationServiceFacadeImpl.startCaseworkerAuditing(IN_PROGRESS, fileName);
+            long jobId = validationServiceFacadeImpl.startCaseworkerAuditing(IN_PROGRESS, fileName);
+            log.info("{}:: Started File Upload with job {}", loggingComponentName, jobId);
         } else {
             throw new ForbiddenException(FILE_UPLOAD_IN_PROGRESS.getErrorMessage());
         }

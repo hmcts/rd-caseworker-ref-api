@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +37,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @Component
+@Slf4j
 public class ValidationServiceFacadeImpl implements IValidationService {
 
     @Autowired
@@ -54,6 +58,9 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     private long auditJobId;
 
     List<ExceptionCaseWorker> caseWorkersExceptions;
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
 
     /**
@@ -81,6 +88,8 @@ public class ValidationServiceFacadeImpl implements IValidationService {
         //if JSR violation present then only persist exception
         ofNullable(constraintViolationSet).ifPresent(constraintViolations ->
             constraintViolations.forEach(constraintViolation -> {
+                log.info("{}:: Invalid JSR for row Id {} in job {} ", loggingComponentName,
+                    constraintViolation.getRootBean().getRowId(), jobId);
                 if (isNull(field.get())) {
                     field.set(getKeyFiled(constraintViolation.getRootBean()).get());
                     ReflectionUtils.makeAccessible(field.get());
@@ -90,7 +99,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
                 exceptionCaseWorker.setFieldInError(constraintViolation.getPropertyPath().toString());
                 exceptionCaseWorker.setErrorDescription(constraintViolation.getMessage());
                 exceptionCaseWorker.setExcelRowId(String.valueOf(constraintViolation.getRootBean().getRowId()));
-                exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now());
+                exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now(ZoneOffset.UTC));
                 exceptionCaseWorker.setKeyField(getKeyFieldValue(field.get(), constraintViolation.getRootBean()));
                 caseWorkersExceptions.add(exceptionCaseWorker);
             }));
@@ -170,13 +179,13 @@ public class ValidationServiceFacadeImpl implements IValidationService {
             String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : EMPTY;
             caseWorkerAudit = CaseWorkerAudit.builder()
                 .status(auditStatus.getStatus())
-                .jobStartTime(LocalDateTime.now())
+                .jobStartTime(LocalDateTime.now(ZoneOffset.UTC))
                 .fileName(fileName)
                 .authenticatedUserId(userId)
                 .build();
         } else {
             caseWorkerAudit.setStatus(auditStatus.getStatus());
-            caseWorkerAudit.setJobEndTime(LocalDateTime.now());
+            caseWorkerAudit.setJobEndTime(LocalDateTime.now(ZoneOffset.UTC));
             caseWorkerAudit.setJobId(getAuditJobId());
         }
         return caseWorkerAudit;
@@ -191,6 +200,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void logFailures(String message, long rowId) {
+        log.info("{}:: Sidam/Up failure for row Id {} in job {} ", loggingComponentName, rowId, getAuditJobId());
         ExceptionCaseWorker exceptionCaseWorker = createException(getAuditJobId(), message, rowId);
         exceptionCaseWorkerRepository.save(exceptionCaseWorker);
     }

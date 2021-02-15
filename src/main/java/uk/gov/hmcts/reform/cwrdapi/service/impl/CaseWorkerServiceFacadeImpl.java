@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileConverter;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
@@ -64,7 +65,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     CaseWorkerInternalApiClientImpl caseWorkerInternalClient;
 
     @Autowired
-    ValidationServiceFacadeImpl validationServiceFacadeImpl;
+    IValidationService validationServiceFacadeImpl;
 
     @Autowired
     CaseWorkerProfileConverter caseWorkerProfileConverter;
@@ -129,9 +130,11 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             return sendResponse(file, status, isCaseWorker, totalRecords);
 
         } catch (Exception ex) {
-            validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE,
+
+            long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE,
                 file.getOriginalFilename());
             validationServiceFacadeImpl.logFailures(ex.getMessage(), 0L);
+            log.error("{}:: Failed File Upload for job {}", loggingComponentName, jobId);
             throw ex;
         }
     }
@@ -144,7 +147,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             createResponse(totalRecords, exceptionCaseWorkerList, isCaseWorker);
         status = (nonNull(exceptionCaseWorkerList) && (exceptionCaseWorkerList.size()) > 0)
             ? PARTIAL_SUCCESS : status;
-        validationServiceFacadeImpl.updateCaseWorkerAuditStatus(status, file.getOriginalFilename());
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(status, file.getOriginalFilename());
+        log.info("{}:: Completed File Upload for Job {} with status", loggingComponentName, jobId, status);
         return ResponseEntity.ok().body(caseWorkerFileCreationResponse);
     }
 
