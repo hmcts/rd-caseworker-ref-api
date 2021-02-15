@@ -160,7 +160,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         status = (nonNull(exceptionCaseWorkerList) && (exceptionCaseWorkerList.size()) > 0)
             ? PARTIAL_SUCCESS : status;
         long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(status, file.getOriginalFilename());
-        log.info("{}:: Completed File Upload for Job {} with status", loggingComponentName, jobId, status);
+        log.info("{}:: Completed File Upload for Job {} with status {}", loggingComponentName, jobId, status);
         return ResponseEntity.ok().body(caseWorkerFileCreationResponse);
     }
 

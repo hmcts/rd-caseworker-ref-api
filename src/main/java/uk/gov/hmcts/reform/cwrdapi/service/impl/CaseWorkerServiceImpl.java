@@ -382,7 +382,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 }
             } else {
                 validationServiceFacade.logFailures(UP_MISSING_RESPONSE_BODY, cwrdProfileRequest.getRowId());
-                log.error("{}::" + UP_MISSING_RESPONSE_BODY, loggingComponentName);
+                log.error("{}:: {}", UP_MISSING_RESPONSE_BODY, loggingComponentName);
             }
         }
         return caseWorkerProfile;
