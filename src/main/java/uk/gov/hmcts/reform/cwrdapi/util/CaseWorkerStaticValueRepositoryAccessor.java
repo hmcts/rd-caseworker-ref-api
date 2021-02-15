@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.config;
+package uk.gov.hmcts.reform.cwrdapi.util;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;

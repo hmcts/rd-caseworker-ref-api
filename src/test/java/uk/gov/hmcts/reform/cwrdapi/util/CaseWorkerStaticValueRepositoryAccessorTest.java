@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.config;
+package uk.gov.hmcts.reform.cwrdapi.util;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 
 import java.util.Collections;
 
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CaseWorkerStaticValueRepositoryAccessorTest {
