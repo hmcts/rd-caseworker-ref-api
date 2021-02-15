@@ -208,15 +208,15 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
 
     public void userProfileCreateUserWireMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStaus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                + "  \"idamRegistrationResponse\":\"201\""
-                + "}";
-            returnHttpStaus = 201;
-        }
+
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(status.value())
+                .withBody("{"
+                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                    + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
+                    + "}")));
     }
 
     public static class CaseWorkerTransformer extends ResponseTransformer {

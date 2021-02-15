@@ -36,7 +36,7 @@ public class TopicPublisherTest {
     @Test
     public void sendMessageCallsTheJmsTemplate() {
         topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
-        doReturn(1L).when(validationService).getJobId();
+        doReturn(1L).when(validationService).getAuditJobId();
         topicPublisher.sendMessage(publishCaseWorkerData);
 
         verify(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
@@ -53,7 +53,7 @@ public class TopicPublisherTest {
     public void sendMessageWhenThrowExceptionWhenConnectionFactoryInstanceDifferent() {
         SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
         doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
-        doReturn(1L).when(validationService).getJobId();
+        doReturn(1L).when(validationService).getAuditJobId();
 
         topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
 

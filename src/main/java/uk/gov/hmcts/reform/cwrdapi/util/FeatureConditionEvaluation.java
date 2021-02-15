@@ -33,6 +33,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
     @Autowired
     private final FeatureToggleService featureToggleService;
 
+
     @Override
     public boolean preHandle(HttpServletRequest request,
                              @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {

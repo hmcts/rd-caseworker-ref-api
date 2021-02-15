@@ -2,13 +2,12 @@ package uk.gov.hmcts.reform.cwrdapi.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.cwrdapi.repository.AuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.AuditAndExceptionRepositoryServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
@@ -20,8 +19,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -38,23 +35,19 @@ public class ValidationServiceFacadeTest {
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = mock(JwtGrantedAuthoritiesConverter.class);
 
 
-    IAuditAndExceptionRepositoryService auditAndExceptionRepositoryServiceImpl =
-        spy(new AuditAndExceptionRepositoryServiceImpl());
-
     ExceptionCaseWorkerRepository exceptionCaseWorkerRepository = mock(ExceptionCaseWorkerRepository.class);
 
     @SuppressWarnings("unchecked")
-    SimpleJpaRepository<CaseWorkerAudit, Long> caseWorkerAuditRepository = mock(SimpleJpaRepository.class);
+    AuditRepository caseWorkerAuditRepository = mock(AuditRepository.class);
 
 
     @Before
     public void init() throws Exception {
-        setField(auditAndExceptionRepositoryServiceImpl, "exceptionCaseWorkerRepository",
+        setField(validationServiceFacadeImpl, "exceptionCaseWorkerRepository",
             exceptionCaseWorkerRepository);
-        setField(auditAndExceptionRepositoryServiceImpl, "caseWorkerAuditRepository",
+        setField(validationServiceFacadeImpl, "caseWorkerAuditRepository",
             caseWorkerAuditRepository);
-        setField(validationServiceFacadeImpl, "auditAndExceptionRepositoryService",
-            auditAndExceptionRepositoryServiceImpl);
+
         setField(validationServiceFacadeImpl, "jwtGrantedAuthoritiesConverter", jwtGrantedAuthoritiesConverter);
     }
 
@@ -79,28 +72,28 @@ public class ValidationServiceFacadeTest {
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         caseWorkerProfiles.add(profile);
         jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        doNothing().when(auditAndExceptionRepositoryServiceImpl).auditException(anyList());
-        validationServiceFacadeImpl.auditJsr(1);
-        verify(validationServiceFacadeImpl).auditJsr(1);
+        //doNothing().when(auditAndExceptionRepositoryServiceImpl).auditException(anyList());
+        validationServiceFacadeImpl.saveJsrExceptionsForCaseworkerJob(1);
+        verify(validationServiceFacadeImpl).saveJsrExceptionsForCaseworkerJob(1);
     }
 
     @Test(expected = Exception.class)
     public void testAuditJsrWithException() {
         CaseWorkerDomain domain = CaseWorkerProfile.builder().build();
-        Field field = invokeMethod(validationServiceFacadeImpl, "getKeyFiled",domain);
-        Object [] objects = {field, domain};
+        Field field = invokeMethod(validationServiceFacadeImpl, "getKeyFiled", domain);
+        Object[] objects = {field, domain};
         invokeMethod(validationServiceFacadeImpl, "getKeyFieldValue", objects);
     }
 
     @Test
     public void testInsertAudit() {
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
-        validationServiceFacadeImpl.insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
+        validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
 
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
-        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
         verify(validationServiceFacadeImpl, times(2))
-            .insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
+            .updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
         assertEquals(1, jobId);
     }
 
@@ -108,9 +101,9 @@ public class ValidationServiceFacadeTest {
     public void testUpdateAudit() {
         setField(validationServiceFacadeImpl, "caseWorkerAudit", CaseWorkerAudit.builder().build());
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
-        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
         verify(validationServiceFacadeImpl, times(1))
-            .insertAudit(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
+            .updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
         assertEquals(1, jobId);
     }
 

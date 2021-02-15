@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 
 import java.util.List;
 
@@ -14,10 +13,11 @@ import java.util.List;
 public interface CaseWorkerService {
 
     List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
-                                                                caseWorkersProfileCreationRequest);
+                                                          caseWorkersProfileCreationRequest);
 
     /**
      * Builds the idam role mappings for case worker roles.
+     *
      * @param serviceRoleMappings list of ServiceRoleMapping
      * @return IdamRoleAssocResponse
      */
@@ -25,19 +25,17 @@ public interface CaseWorkerService {
 
     /**
      * Prepare caseworker data to be published as a message to topic.
+     *
      * @param caseWorkerData list containing caseworker data
      */
     void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData);
 
     /**
      * Returns the caseworker details.
+     *
      * @param caseWorkerIds list
      * @return CaseWorkerProfile
      */
     ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds);
-
-    public List<ExceptionCaseWorker> getUpExceptionCaseWorkers();
-
-
 }
 

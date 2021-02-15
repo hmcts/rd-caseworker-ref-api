@@ -17,7 +17,11 @@ public enum ErrorConstants {
 
     ACCESS_EXCEPTION("7 : Access Denied"),
 
-    RUNTIME_EXCEPTION("8 : Sorry, there is a problem with the service. Try again later");
+    RUNTIME_EXCEPTION("8 : Sorry, there is a problem with the service. Try again later"),
+
+    FILE_UPLOAD_IN_PROGRESS("9 : File upload is already in progress."
+                                + " Please try again once existing file upload is completed");
+
 
     private final String errorMessage;
 

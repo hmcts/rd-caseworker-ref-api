@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
+import uk.gov.hmcts.reform.cwrdapi.repository.AuditRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
@@ -17,11 +20,13 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 
 import static java.util.Arrays.stream;
@@ -32,23 +37,30 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @Component
-@Getter
+@Slf4j
 public class ValidationServiceFacadeImpl implements IValidationService {
 
     @Autowired
     private IJsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
-    @Autowired
-    private IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
-
     private CaseWorkerAudit caseWorkerAudit;
 
     @Autowired
+    AuditRepository caseWorkerAuditRepository;
+
+    @Autowired
+    ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
+
+    @Autowired
+    @Lazy
     private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    private long jobId;
+    private long auditJobId;
 
-    List<ExceptionCaseWorker> jsrExceptionCaseWorkers;
+    List<ExceptionCaseWorker> caseWorkersExceptions;
+
+    @Value("${loggingComponentName}")
+    private String loggingComponentName;
 
 
     /**
@@ -67,14 +79,17 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      *
      * @param jobId long
      */
-    public void auditJsr(long jobId) {
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void saveJsrExceptionsForCaseworkerJob(long jobId) {
         Set<ConstraintViolation<CaseWorkerDomain>> constraintViolationSet
             = jsrValidatorInitializer.getConstraintViolations();
-        jsrExceptionCaseWorkers = new LinkedList<>();
+        caseWorkersExceptions = new LinkedList<>();
         AtomicReference<Field> field = new AtomicReference<>();
         //if JSR violation present then only persist exception
         ofNullable(constraintViolationSet).ifPresent(constraintViolations ->
             constraintViolations.forEach(constraintViolation -> {
+                log.info("{}:: Invalid JSR for row Id {} in job {} ", loggingComponentName,
+                    constraintViolation.getRootBean().getRowId(), jobId);
                 if (isNull(field.get())) {
                     field.set(getKeyFiled(constraintViolation.getRootBean()).get());
                     ReflectionUtils.makeAccessible(field.get());
@@ -84,11 +99,11 @@ public class ValidationServiceFacadeImpl implements IValidationService {
                 exceptionCaseWorker.setFieldInError(constraintViolation.getPropertyPath().toString());
                 exceptionCaseWorker.setErrorDescription(constraintViolation.getMessage());
                 exceptionCaseWorker.setExcelRowId(String.valueOf(constraintViolation.getRootBean().getRowId()));
-                exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now());
+                exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now(ZoneOffset.UTC));
                 exceptionCaseWorker.setKeyField(getKeyFieldValue(field.get(), constraintViolation.getRootBean()));
-                jsrExceptionCaseWorkers.add(exceptionCaseWorker);
+                caseWorkersExceptions.add(exceptionCaseWorker);
             }));
-        auditAndExceptionRepositoryService.auditException(jsrExceptionCaseWorkers);
+        exceptionCaseWorkerRepository.saveAll(caseWorkersExceptions);
     }
 
 
@@ -123,17 +138,19 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      * @param fileName    String
      * @return long id
      */
-    public long insertAudit(final AuditStatus auditStatus, final String fileName) {
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public long updateCaseWorkerAuditStatus(final AuditStatus auditStatus, final String fileName) {
         createOrUpdateCaseworkerAudit(auditStatus, fileName);
-        jobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
-        return jobId;
+        this.auditJobId = caseWorkerAuditRepository.save(caseWorkerAudit).getJobId();
+        return auditJobId;
     }
 
-    public long startAuditJob(final AuditStatus auditStatus, final String fileName) {
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public long startCaseworkerAuditing(final AuditStatus auditStatus, final String fileName) {
         this.caseWorkerAudit = CaseWorkerAudit.builder().build();
         createOrUpdateCaseworkerAudit(auditStatus, fileName);
-        this.jobId = auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
-        return jobId;
+        this.auditJobId = caseWorkerAuditRepository.save(caseWorkerAudit).getJobId();
+        return auditJobId;
     }
 
     /**
@@ -159,35 +176,40 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     private CaseWorkerAudit createOrUpdateCaseworkerAudit(AuditStatus auditStatus, String fileName) {
         if (isNull(caseWorkerAudit) || isNull(caseWorkerAudit.getJobId())) {
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
-            String userName = (nonNull(userInfo) && nonNull(userInfo.getName())) ? userInfo.getName() : EMPTY;
+            String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : EMPTY;
             caseWorkerAudit = CaseWorkerAudit.builder()
                 .status(auditStatus.getStatus())
-                .jobStartTime(LocalDateTime.now())
+                .jobStartTime(LocalDateTime.now(ZoneOffset.UTC))
                 .fileName(fileName)
-                .authenticatedUserId(userName)
+                .authenticatedUserId(userId)
                 .build();
         } else {
             caseWorkerAudit.setStatus(auditStatus.getStatus());
-            caseWorkerAudit.setJobEndTime(LocalDateTime.now());
-            caseWorkerAudit.setJobId(getJobId());
+            caseWorkerAudit.setJobEndTime(LocalDateTime.now(ZoneOffset.UTC));
+            caseWorkerAudit.setJobId(getAuditJobId());
         }
         return caseWorkerAudit;
     }
 
+
     /**
-     * Creates ExceptionCaseWorker and audit exception.
-     * @param message message for exception
-     * @param rowId excel row id
+     * logging User profile failures.
+     *
+     * @param message String
+     * @param rowId   long
      */
-    public void auditException(String message, Long rowId) {
-        auditAndExceptionRepositoryService.auditException(createException(getJobId(), message, rowId));
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void logFailures(String message, long rowId) {
+        log.info("{}:: Sidam/Up failure for row Id {} in job {} ", loggingComponentName, rowId, getAuditJobId());
+        ExceptionCaseWorker exceptionCaseWorker = createException(getAuditJobId(), message, rowId);
+        exceptionCaseWorkerRepository.save(exceptionCaseWorker);
     }
 
-    public List<ExceptionCaseWorker> getJsrExceptionCaseWorkers() {
-        return jsrExceptionCaseWorkers;
+    public List<ExceptionCaseWorker> getCaseWorkersExceptions() {
+        return caseWorkersExceptions;
     }
 
-    public long getJobId() {
-        return jobId;
+    public long getAuditJobId() {
+        return auditJobId;
     }
 }
