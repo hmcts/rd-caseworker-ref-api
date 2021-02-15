@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ExceptionMapper;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -138,13 +140,22 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             return ResponseEntity.ok().body(caseWorkerFileCreationResponse);
 
+        } catch (HttpServerErrorException ex) {
+            auditLog(file, ex);
+            // We are not using Spring Advice here. We are preparing the response from below method are returning it.
+            return new ExceptionMapper().errorDetailsResponseEntity(ex,
+                    ex.getStatusCode(), ex.getMessage());
         } catch (Exception ex) {
-            long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.FAILURE, file.getOriginalFilename());
-            ExceptionCaseWorker exceptionCaseWorker = validationServiceFacadeImpl.createException(jobId,
-                ex.getMessage(), 0L);
-            auditAndExceptionRepositoryServiceImpl.auditException(exceptionCaseWorker);
+            auditLog(file, ex);
             throw ex;
         }
+    }
+
+    private void auditLog(MultipartFile file, Exception ex) {
+        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.FAILURE, file.getOriginalFilename());
+        ExceptionCaseWorker exceptionCaseWorker = validationServiceFacadeImpl.createException(jobId,
+                ex.getMessage(), 0L);
+        auditAndExceptionRepositoryServiceImpl.auditException(exceptionCaseWorker);
     }
 
     private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList) {
