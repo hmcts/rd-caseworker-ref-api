@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
-import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
@@ -134,7 +133,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Autowired
     private TopicPublisher topicPublisher;
 
-      @Autowired
+    @Autowired
     IValidationService validationServiceFacade;
 
     @Autowired
@@ -150,7 +149,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Map<String, CaseWorkersProfileCreationRequest> requestMap = new HashMap<>();
         List<CaseWorkerProfile> processedCwProfiles = new ArrayList<>();
         try {
-            getRolesAndUserTypes();
+
             for (CaseWorkersProfileCreationRequest cwrRequest : cwRequests) {
                 CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                     .findByEmailId(cwrRequest.getEmailId().toLowerCase());
@@ -623,17 +622,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             false);
     }
 
-    // get the roleTypes and userTypes.
-    public void getRolesAndUserTypes() {
-        if (roleTypes.isEmpty()) {
-            roleTypes = roleTypeRepository.findAll();
-        }
-
-        if (userTypes.isEmpty()) {
-            userTypes = userTypeRepository.findAll();
-        }
-    }
-
     // get the roles that needs to send to idam based on the roleType in the request.
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwProfileRequest) {
 
@@ -663,7 +651,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return matchedRoles;
     }
 
-    // get the userTypeId by description.
     // get the userTypeId by description.
     public Long getUserTypeIdByDesc(String userTypeReq) {
         Optional<Long> userTypeId = caseWorkerStaticValueRepositoryAccessor
