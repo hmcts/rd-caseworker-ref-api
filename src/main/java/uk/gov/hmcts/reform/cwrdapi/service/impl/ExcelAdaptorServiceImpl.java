@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
-import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
@@ -67,8 +66,6 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     @Autowired
     IValidationService validationServiceFacade;
 
-    @Autowired
-    private IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         evaluator = workbook.getCreationHelper().createFormulaEvaluator();
@@ -113,40 +110,42 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Map<String, Field> parentFieldMap = new HashMap<>();
         //scan parent and domain object fields by reflection and make maps
         List<Triple<String, Field, List<Field>>> customObjectFieldsMapping =
-                createBeanFieldMaps(classType, parentFieldMap);
+            createBeanFieldMaps(classType, parentFieldMap);
         Iterator<Row> rowIterator = sheet.rowIterator();
         rowIterator.next();//skip header
         Field rowField = getRowIdField((Class<Object>) classType);
         Optional<Object> bean;
         while (rowIterator.hasNext()) {
             bean = handleRowProcessing(classType, rowField, headers, rowIterator.next(), parentFieldMap,
-                    childHeaderToCellMap, customObjectFieldsMapping);
+                childHeaderToCellMap, customObjectFieldsMapping);
             bean.ifPresent(o -> objectList.add((T) o));
         }
         return objectList;
     }
 
     public <T> Optional<Object> handleRowProcessing(Class<T> classType, Field rowField, List<String> headers, Row row,
-                                 Map<String, Field> parentFieldMap, Map<String, Object> childHeaderToCellMap,
-                                 List<Triple<String, Field, List<Field>>> customObjectFieldsMapping) {
+                                                    Map<String, Field> parentFieldMap,
+                                                    Map<String, Object> childHeaderToCellMap,
+                                                    List<Triple<String, Field, List<Field>>>
+                                                        customObjectFieldsMapping) {
         Object bean;
         try {
             if (checkIfRowIsEmpty(row)) {
                 return empty(); //Skipping empty rows
             }
             bean = populateDomainObject(classType, rowField, headers, row, parentFieldMap, childHeaderToCellMap,
-                    customObjectFieldsMapping);
+                customObjectFieldsMapping);
         } catch (Exception ex) {
-            validationServiceFacade.auditException(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
-                    (long) row.getRowNum());
+            validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
+                row.getRowNum());
             return empty();
         }
         return ofNullable(bean);
     }
 
     public <T> Object populateDomainObject(Class<T> classType, Field rowField, List<String> headers, Row row,
-                                      Map<String, Field> parentFieldMap, Map<String, Object> childHeaderToCellMap,
-                                      List<Triple<String, Field, List<Field>>> customObjectFieldsMapping) {
+                                           Map<String, Field> parentFieldMap, Map<String, Object> childHeaderToCellMap,
+                                           List<Triple<String, Field, List<Field>>> customObjectFieldsMapping) {
         Object bean = getInstanceOf(classType.getName());//create parent object
         setFieldValue(rowField, bean, row.getRowNum());// set row id to parent field
         for (int i = 0; i < headers.size(); i++) { //set all parent fields

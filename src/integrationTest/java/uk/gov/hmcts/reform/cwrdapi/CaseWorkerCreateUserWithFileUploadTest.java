@@ -118,6 +118,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
             "test-flag-1");
@@ -125,6 +126,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
         uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             TYPE_XLSX, "403", cwdAdmin);
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
 
