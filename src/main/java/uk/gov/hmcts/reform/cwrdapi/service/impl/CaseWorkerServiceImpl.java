@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
 import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
@@ -133,15 +134,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Autowired
     private TopicPublisher topicPublisher;
 
-    List<RoleType> roleTypes = new ArrayList<>();
-
-    List<UserType> userTypes = new ArrayList<>();
-
     @Autowired
     ValidationServiceFacadeImpl validationServiceFacade;
 
     @Autowired
     IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
+
+    @Autowired
+    CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
 
     List<ExceptionCaseWorker> upExceptionCaseWorkers;
 
@@ -153,7 +153,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         List<CaseWorkerProfile> processedCwProfiles = new ArrayList<>();
         upExceptionCaseWorkers = new LinkedList<>();
         try {
-            getRolesAndUserTypes();
             for (CaseWorkersProfileCreationRequest cwrRequest : cwRequests) {
                 CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                     .findByEmailId(cwrRequest.getEmailId().toLowerCase());
@@ -504,7 +503,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public List<CaseWorkerRole> mapCaseWorkerRoleRequestMapping(String idamId,
                                                                 CaseWorkersProfileCreationRequest cwrdProfileRequest) {
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
-        cwrdProfileRequest.getRoles().forEach(role -> roleTypes.stream().filter(roleType ->
+        cwrdProfileRequest.getRoles().forEach(role -> caseWorkerStaticValueRepositoryAccessor
+                .getRoleTypes()
+                .stream().filter(roleType ->
             role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
             .forEach(roleType -> {
                 CaseWorkerRole workerRole = new CaseWorkerRole(idamId, roleType.getRoleId(), role.isPrimaryFlag());
@@ -630,26 +631,15 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             false);
     }
 
-
-    // get the roleTypes and userTypes.
-    public void getRolesAndUserTypes() {
-
-        if (roleTypes.isEmpty()) {
-            roleTypes = roleTypeRepository.findAll();
-        }
-        if (userTypes.isEmpty()) {
-            userTypes = userTypeRepository.findAll();
-        }
-    }
-
-
     // get the roles that needs to send to idam based on the roleType in the request.
     Set<String> getUserRolesByRoleId(CaseWorkersProfileCreationRequest cwProfileRequest) {
 
         // get Roles Types
         List<RoleType> roleTypeList = new ArrayList<>();
         cwProfileRequest.getRoles().forEach(role -> roleTypeList.addAll(
-                        roleTypes.stream()
+                caseWorkerStaticValueRepositoryAccessor
+                        .getRoleTypes()
+                        .stream()
                         .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
                         .collect(Collectors.toList()))
         );
@@ -672,7 +662,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     // get the userTypeId by description.
     public Long getUserTypeIdByDesc(String userTypeReq) {
-        Optional<Long> userTypeId = userTypes.stream().filter(userType ->
+        Optional<Long> userTypeId = caseWorkerStaticValueRepositoryAccessor
+                .getUserTypes()
+                .stream().filter(userType ->
             userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
             .map(UserType::getUserTypeId).findFirst();
         return userTypeId.orElse(0L);
