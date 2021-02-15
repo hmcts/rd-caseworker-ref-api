@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import javax.validation.constraints.NotNull;
 
@@ -44,19 +45,15 @@ public class TopicPublisher {
                     ((PublishCaseWorkerData) message).getUserIds() != null
                             ? ((PublishCaseWorkerData) message).getUserIds().size() : null);
         }
-        try {
-            jmsTemplate.convertAndSend(destination, message);
-            log.info("{}:: Message published to service bus topic", loggingComponentName);
-        } catch (Exception ex) {
-            log.error("{}:: Publishing message to service bus topic has failed: {} ", loggingComponentName, ex);
-            throw new CaseworkerMessageFailedException(ex.getMessage());
-        }
+
+        jmsTemplate.convertAndSend(destination, message);
+        log.info("{}:: Message published to service bus topic", loggingComponentName);
     }
 
     @Recover
     public void recoverMessage(Exception ex) {
         log.error("{}:: Publishing message to service bus topic failed with exception: {} ", loggingComponentName, ex);
-        throw new CaseworkerMessageFailedException(ex.getMessage());
+        throw new CaseworkerMessageFailedException(CaseWorkerConstants.ASB_PUBLISH_ERROR);
     }
 }
 

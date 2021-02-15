@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants;
-import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -67,8 +66,7 @@ public class ExceptionMapper {
     public ResponseEntity<Object> handleCaseWorkerPublishMessageError(
             CaseworkerMessageFailedException ex) {
         //This exception is being handled differently than others
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
-                .body(CaseWorkerConstants.ASB_PUBLISH_ERROR);
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
