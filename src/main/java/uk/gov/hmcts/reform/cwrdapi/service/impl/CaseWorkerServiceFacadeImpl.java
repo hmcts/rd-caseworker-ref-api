@@ -229,14 +229,14 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         }
         if (uploadedRecords > 0 && suspendedRecords > 0) {
             detailedMessage = format(RECORDS_FAILED, failedRecords.size()) + DELIMITER_COMMA + SPACE
-                + format(RECORDS_UPLOADED, uploadedRecords) + DELIMITER_COMMA + SPACE + AND + SPACE
-                + format(RECORDS_SUSPENDED, suspendedRecords);
+                .concat(format(RECORDS_UPLOADED, uploadedRecords) + DELIMITER_COMMA + SPACE + AND + SPACE)
+                .concat(format(RECORDS_SUSPENDED, suspendedRecords));
         } else if (uploadedRecords > 0) {
             detailedMessage = format(RECORDS_FAILED, failedRecords.size()) + SPACE + AND + SPACE
-                + format(RECORDS_UPLOADED, uploadedRecords);
+                .concat(format(RECORDS_UPLOADED, uploadedRecords));
         } else if (suspendedRecords > 0) {
             detailedMessage = format(RECORDS_FAILED, failedRecords.size()) + SPACE + AND + SPACE
-                + format(RECORDS_SUSPENDED, suspendedRecords);
+                .concat(format(RECORDS_SUSPENDED, suspendedRecords));
         }
         return detailedMessage;
     }
