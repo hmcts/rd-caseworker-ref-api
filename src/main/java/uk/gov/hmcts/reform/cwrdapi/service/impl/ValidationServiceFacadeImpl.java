@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
@@ -31,6 +32,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 @Component
+@Getter
 public class ValidationServiceFacadeImpl implements IValidationService {
 
     @Autowired
@@ -170,6 +172,15 @@ public class ValidationServiceFacadeImpl implements IValidationService {
             caseWorkerAudit.setJobId(getJobId());
         }
         return caseWorkerAudit;
+    }
+
+    /**
+     * Creates ExceptionCaseWorker and audit exception.
+     * @param message message for exception
+     * @param rowId excel row id
+     */
+    public void auditException(String message, Long rowId) {
+        auditAndExceptionRepositoryService.auditException(createException(getJobId(), message, rowId));
     }
 
     public List<ExceptionCaseWorker> getJsrExceptionCaseWorkers() {

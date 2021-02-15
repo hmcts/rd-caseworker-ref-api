@@ -27,4 +27,6 @@ public interface IValidationService {
     long insertAudit(final AuditStatus auditStatus, final String fileName);
 
     long getJobId();
+
+    void auditException(String message, Long rowId);
 }
