@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.IAuditAndExceptionRepositoryService;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.lang.reflect.Field;
@@ -64,7 +65,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private FormulaEvaluator evaluator;
 
     @Autowired
-    ValidationServiceFacadeImpl validationServiceFacade;
+    IValidationService validationServiceFacade;
 
     @Autowired
     private IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
