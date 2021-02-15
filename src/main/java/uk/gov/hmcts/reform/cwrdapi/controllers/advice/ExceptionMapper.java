@@ -65,8 +65,8 @@ public class ExceptionMapper {
     @ExceptionHandler(CaseworkerMessageFailedException.class)
     public ResponseEntity<Object> handleCaseWorkerPublishMessageError(
             CaseworkerMessageFailedException ex) {
-        return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR,
-                ErrorConstants.ERROR_PUBLISHING_TO_TOPIC.getErrorMessage());
+        //This exception is being handled differently than others
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
@@ -86,8 +86,7 @@ public class ExceptionMapper {
         return rootException;
     }
 
-    private ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus,
-                                                              String errorMsg) {
+    public ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(httpStatus.value(),httpStatus.getReasonPhrase(),errorMsg,

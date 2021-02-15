@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ExceptionMapper;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -129,15 +131,26 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             return sendResponse(file, status, isCaseWorker, totalRecords);
 
+        } catch (HttpServerErrorException ex) {
+            auditLog(file, ex);
+            // We are not using Spring Advice here. We are preparing the response from below method are returning it.
+            return new ExceptionMapper().errorDetailsResponseEntity(ex,
+                ex.getStatusCode(), ex.getMessage());
         } catch (Exception ex) {
+            auditLog(file, ex);
 
-            long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE,
-                file.getOriginalFilename());
-            validationServiceFacadeImpl.logFailures(ex.getMessage(), 0L);
-            log.error("{}:: Failed File Upload for job {}", loggingComponentName, jobId);
             throw ex;
         }
     }
+
+    private void auditLog(MultipartFile file, Exception ex) {
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE, file.getOriginalFilename());
+        log.error("{}:: Failed File Upload for job {}", loggingComponentName, jobId);
+        ExceptionCaseWorker exceptionCaseWorker = validationServiceFacadeImpl.createException(jobId,
+            ex.getMessage(), 0L);
+        validationServiceFacadeImpl.logFailures( ex.getMessage(), 0L);
+    }
+
 
     public ResponseEntity<Object> sendResponse(MultipartFile file, AuditStatus status,
                                                 Boolean isCaseWorker, int totalRecords) {
