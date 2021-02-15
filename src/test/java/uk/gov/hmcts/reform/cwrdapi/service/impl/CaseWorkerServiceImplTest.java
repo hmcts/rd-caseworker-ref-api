@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.CwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
-import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerStaticValueRepositoryAccessor;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -87,7 +86,7 @@ public class CaseWorkerServiceImplTest {
     @Mock
     private CwrdCommonRepository cwrdCommonRepository;
     @Mock
-    private CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
+    private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
 
     private CaseWorkersProfileCreationRequest cwProfileCreationRequest;
     private RoleType roleType;
@@ -151,8 +150,8 @@ public class CaseWorkerServiceImplTest {
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
 
-        when(caseWorkerStaticValueRepositoryAccessor.getRoleTypes()).thenReturn(singletonList(roleType));
-        when(caseWorkerStaticValueRepositoryAccessor.getUserTypes()).thenReturn(singletonList(userType));
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(null);
         when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
@@ -205,8 +204,8 @@ public class CaseWorkerServiceImplTest {
                     Charset.defaultCharset())
                 .status(200).build());
 
-        when(caseWorkerStaticValueRepositoryAccessor.getRoleTypes()).thenReturn(singletonList(roleType));
-        when(caseWorkerStaticValueRepositoryAccessor.getUserTypes()).thenReturn(singletonList(userType));
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(null);
         when(caseWorkerProfileRepository.saveAll(any()))
@@ -429,8 +428,8 @@ public class CaseWorkerServiceImplTest {
         profile.setSuspended(false);
 
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
-        when(caseWorkerStaticValueRepositoryAccessor.getRoleTypes()).thenReturn(singletonList(roleType));
-        when(caseWorkerStaticValueRepositoryAccessor.getUserTypes()).thenReturn(singletonList(userType));
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
             .thenReturn(profile);
         when(userProfileFeignClient.getUserProfileWithRolesById(any()))

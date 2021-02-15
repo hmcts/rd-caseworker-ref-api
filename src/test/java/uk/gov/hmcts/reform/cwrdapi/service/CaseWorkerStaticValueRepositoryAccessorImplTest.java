@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.util;
+package uk.gov.hmcts.reform.cwrdapi.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,14 +8,17 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerStaticValueRepositoryAccessorImpl;
 
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CaseWorkerStaticValueRepositoryAccessorTest {
+public class CaseWorkerStaticValueRepositoryAccessorImplTest {
     @Mock
     private SimpleJpaRepository<RoleType,Long> roleTypeRepository;
 
@@ -23,7 +26,7 @@ public class CaseWorkerStaticValueRepositoryAccessorTest {
     private SimpleJpaRepository<UserType, Long> userTypeRepository;
 
     @InjectMocks
-    private CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
+    private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
 
     @Test
     public void shouldGetRolesFromRoleTypeRepo() {
@@ -31,9 +34,10 @@ public class CaseWorkerStaticValueRepositoryAccessorTest {
         roleType.setDescription("testRole");
         roleType.setRoleId(1L);
         when(roleTypeRepository.findAll()).thenReturn(Collections.singletonList(roleType));
-        caseWorkerStaticValueRepositoryAccessor.initialize();
+        caseWorkerStaticValueRepositoryAccessorImpl.initialize();
         assertEquals("testRole",
-                caseWorkerStaticValueRepositoryAccessor.getRoleTypes().get(0).getDescription());
+                caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes().get(0).getDescription());
+        verify(roleTypeRepository, times(1)).findAll();
     }
 
     @Test
@@ -42,8 +46,9 @@ public class CaseWorkerStaticValueRepositoryAccessorTest {
         roleType.setDescription("testUser");
         roleType.setUserTypeId(1L);
         when(userTypeRepository.findAll()).thenReturn(Collections.singletonList(roleType));
-        caseWorkerStaticValueRepositoryAccessor.initialize();
+        caseWorkerStaticValueRepositoryAccessorImpl.initialize();
         assertEquals("testUser",
-                caseWorkerStaticValueRepositoryAccessor.getUserTypes().get(0).getDescription());
+                caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes().get(0).getDescription());
+        verify(userTypeRepository, times(1)).findAll();
     }
 }
