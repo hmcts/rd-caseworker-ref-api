@@ -91,7 +91,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 loggingComponentName, fileName, (System.currentTimeMillis() - time1));
 
             boolean isCaseWorker = nonNull(fileName)
-                    && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME);
+                && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME);
 
             Class<? extends CaseWorkerDomain> ob = isCaseWorker
                 ? CaseWorkerProfile.class : ServiceRoleMapping.class;
@@ -144,16 +144,15 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     }
 
     private void auditLog(MultipartFile file, Exception ex) {
-        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE, file.getOriginalFilename());
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.FAILURE,
+            file.getOriginalFilename());
         log.error("{}:: Failed File Upload for job {}", loggingComponentName, jobId);
-        ExceptionCaseWorker exceptionCaseWorker = validationServiceFacadeImpl.createException(jobId,
-            ex.getMessage(), 0L);
-        validationServiceFacadeImpl.logFailures( ex.getMessage(), 0L);
+        validationServiceFacadeImpl.logFailures(ex.getMessage(), 0L);
     }
 
 
     public ResponseEntity<Object> sendResponse(MultipartFile file, AuditStatus status,
-                                                Boolean isCaseWorker, int totalRecords) {
+                                               Boolean isCaseWorker, int totalRecords) {
         List<ExceptionCaseWorker> exceptionCaseWorkerList = exceptionCaseWorkerRepository
             .findByJobId(validationServiceFacadeImpl.getAuditJobId());
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse =
@@ -167,12 +166,12 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
     private void validateServiceRoleMappingSheet(List<CaseWorkerDomain> caseWorkerRequestList) {
         boolean multipleServiceCode = caseWorkerRequestList.stream()
-                .filter(ServiceRoleMapping.class::isInstance)
-                .map(ServiceRoleMapping.class::cast)
-                .map(ServiceRoleMapping::getServiceId)
-                .filter(StringUtils::isNotEmpty)
-                .distinct()
-                .count() > 1;
+            .filter(ServiceRoleMapping.class::isInstance)
+            .map(ServiceRoleMapping.class::cast)
+            .map(ServiceRoleMapping::getServiceId)
+            .filter(StringUtils::isNotEmpty)
+            .distinct()
+            .count() > 1;
 
         if (multipleServiceCode) {
             throw new InvalidRequestException(MULTIPLE_SERVICE_CODES);
@@ -191,7 +190,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             CaseWorkerFileCreationResponse.builder();
 
         int suspendedRecords = isCaseWorker && isNotEmpty(caseWorkerProfileConverter.getSuspendedRowIds())
-                ? caseWorkerProfileConverter.getSuspendedRowIds().size() : 0;
+            ? caseWorkerProfileConverter.getSuspendedRowIds().size() : 0;
 
         if (isNotEmpty(exceptionCaseWorkerList)) {
 
