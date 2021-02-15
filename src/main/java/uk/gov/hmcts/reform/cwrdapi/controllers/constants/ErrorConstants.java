@@ -11,13 +11,13 @@ public enum ErrorConstants {
 
     EMPTY_RESULT_DATA_ACCESS("4 : Resource not found"),
 
-    UNKNOWN_EXCEPTION("8 : error was caused by an unknown exception"),
+    UNKNOWN_EXCEPTION("5 : error was caused by an unknown exception"),
 
-    CONFLICT_EXCEPTION("10 : Error was caused by duplicate key exception"),
+    CONFLICT_EXCEPTION("6 : Error was caused by duplicate key exception"),
 
-    ACCESS_EXCEPTION("9 : Access Denied"),
+    ACCESS_EXCEPTION("7 : Access Denied"),
 
-    RUNTIME_EXCEPTION("10 : Sorry, there is a problem with the service. Try again later");
+    RUNTIME_EXCEPTION("8 : Sorry, there is a problem with the service. Try again later");
 
     private final String errorMessage;
 
