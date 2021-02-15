@@ -66,7 +66,7 @@ public class ExceptionMapper {
     @ExceptionHandler(CaseworkerMessageFailedException.class)
     public ResponseEntity<Object> handleCaseWorkerPublishMessageError(
             CaseworkerMessageFailedException ex) {
-        //For th
+        //This exception is being handled differently than others
         return ResponseEntity.status(INTERNAL_SERVER_ERROR)
                 .body(CaseWorkerConstants.ASB_PUBLISH_ERROR);
     }
