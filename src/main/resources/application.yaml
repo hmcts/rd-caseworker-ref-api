@@ -18,12 +18,12 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        order_updates: true
+        order_inserts: true
         jdbc:
           lob:
             non_contextual_creation: true
           batch_size: 20
-          order_inserts: true
-          order_updates: true
   application:
     name: RD Caseworker Ref API
   main:
