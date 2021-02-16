@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -56,7 +57,7 @@ public class CaseWorkerWorkArea implements Serializable {
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "case_worker_id", referencedColumnName = "case_worker_id",
             insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;

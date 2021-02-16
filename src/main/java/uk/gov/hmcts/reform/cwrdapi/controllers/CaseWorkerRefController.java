@@ -27,6 +27,7 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
@@ -83,7 +84,7 @@ public class CaseWorkerRefController {
     @PostMapping(value = "/upload-file",
             consumes = "multipart/form-data")
     @Secured("cwd-admin")
-    public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam(FILE)  MultipartFile file) {
         long time1 = System.currentTimeMillis();
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(file);
         log.info("{}::Total Time taken to upload the given file is {}", loggingComponentName,

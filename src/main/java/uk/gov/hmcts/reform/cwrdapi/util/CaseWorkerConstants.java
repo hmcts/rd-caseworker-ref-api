@@ -29,6 +29,11 @@ public final class CaseWorkerConstants {
     public static final String INVALID_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
     public static final String ERROR_PARSING_EXCEL_FILE_ERROR_MESSAGE = "Excel File is invalid";
 
+    public static final String ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE = "Error parsing excel cell : %s";
+
+    public static final String ASB_PUBLISH_ERROR = "There was an error in communication with Role Assignment Service."
+            + " Please try again later.";
+  
     public static final String IDAM_ROLE_MAPPINGS_SUCCESS =
         "Successfully built the idam role mappings for the service id provided";
 
@@ -91,7 +96,7 @@ public final class CaseWorkerConstants {
 
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the file uploaded."
         + " Upload a valid file in xlsx or xls format";
-    public static final String FILE_MISSING_HEADERS =  "The file is missing some column headers."
+    public static final String FILE_MISSING_HEADERS = "The file is missing some column headers."
         + " Review and upload again";
 
     public static final String NO_LOCATION_PRESENT = "You must add location details and upload the file again.";
@@ -114,5 +119,8 @@ public final class CaseWorkerConstants {
     public static final String ROLE_FIELD = "Role";
     public static final String LOCATION_FIELD = "Location";
     public static final String AREA_OF_WORK_FIELD = "Area Of Work";
+    public static final String FILE = "file";
     public static final String AND = "and";
+
+    public static final String UP_MISSING_RESPONSE_BODY = "UP response missing body";
 }

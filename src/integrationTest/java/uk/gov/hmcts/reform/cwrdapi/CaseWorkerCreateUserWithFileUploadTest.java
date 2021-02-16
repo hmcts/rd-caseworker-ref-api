@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.JsrFileErrors;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,10 +21,13 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.FILE_UPLOAD_IN_PROGRESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
@@ -29,21 +36,27 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRI
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
+    @Autowired
+    JdbcTemplate template;
+
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xls.xls",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
     }
 
     @Test
@@ -52,7 +65,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
             + "\"message_details\":\"4 record(s) uploaded\"}";
         Map<String, Object> response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
 
         //Audit & Exception for service Role Mapping
         String json = getJsonResponse(response);
@@ -68,7 +81,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
         uploadCaseWorkerFile("test.txt",
-            CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
+            TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
@@ -80,13 +93,13 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
+            TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "400", cwdAdmin);
+            TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
@@ -97,25 +110,37 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "403", "invalid");
+            TYPE_XLSX, "403", "invalid");
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @Test
     public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
             "test-flag-1");
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
         uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
+            TYPE_XLSX, "403", cwdAdmin);
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
 
     @Test
     public void shouldCreateCaseWorkerAuditSuccess() throws IOException {
         validateAuditCaseWorkerCreate();
+    }
+
+    @Test
+    public void shouldCreateCaseWorkerAuditSuccessWitUpConflict() throws Exception {
+        String roles = "[\"Senior Tribunal Caseworker\"]";
+        userProfileGetUserWireMock("ACTIVE", roles);
+        modifyUserRoles();
+        validateAuditCaseWorkerConflict();
     }
 
     @Test
@@ -180,6 +205,21 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
+            TYPE_XLSX, "500", cwdAdmin);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(FAILURE.getStatus());
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
+        assertNotNull(exceptionCaseWorkers.get(0).getErrorDescription());
+    }
+
+    @Test
+    public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
+        //create invalid stub of UP for Exception validation
+        userProfileService.resetAll();
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
@@ -199,7 +239,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
 
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -223,7 +263,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "{\"row_id\":\"2\",\"field_in_error\":\"roleId\",\"error_description\":\"must not be null\"}]}";
 
         response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9WithJSR.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
 
         //Audit & Exception for service Role Mapping
         CaseWorkerFileCreationResponse resultResponse =
@@ -240,5 +280,31 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers.size()).isEqualTo(3);
+    }
+
+    @Test
+    public void shouldFailCaseWorkerUsersXlsxFileUploadIfPreviousUploadInProgress() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+
+        template.execute("update case_worker_audit set status = 'InProgress' "
+            + "where job_id = (select max(job_id) from case_worker_audit)");
+
+        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+            CaseWorkerConstants.TYPE_XLSX, "403", cwdAdmin);
+
+        ErrorResponse resultResponse = (ErrorResponse) getJsonResponse(response, "response_body",
+            ErrorResponse.class);
+
+        assertEquals(FILE_UPLOAD_IN_PROGRESS.getErrorMessage(), resultResponse.getErrorDescription());
+    }
+
+    @Test
+    public void shouldHandlePartialSuccessWhenFileHasBadFormulaRecord() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_FAILED, 4));
+        assertThat((List)response.get("error_details")).hasSize(4);
     }
 }
