@@ -122,5 +122,5 @@ public final class CaseWorkerConstants {
     public static final String FILE = "file";
     public static final String AND = "and";
 
-    public static final String RESPONSE_BODY_MISSING_FORM_UP = "Response Body is missing from User Profile";
+    public static final String RESPONSE_BODY_MISSING_FROM_UP = "Response Body is missing from User Profile";
 }

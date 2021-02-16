@@ -81,7 +81,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FORM_UP;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FROM_UP;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SUSPEND_USER_FAILED;
@@ -385,8 +385,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     updateUserRolesInIdam(cwrdProfileRequest, userProfileCreationResponse.getIdamId());
                 }
             } else {
-                validationServiceFacade.logFailures(RESPONSE_BODY_MISSING_FORM_UP, cwrdProfileRequest.getRowId());
-                log.error("{}:: {}", RESPONSE_BODY_MISSING_FORM_UP, loggingComponentName);
+                validationServiceFacade.logFailures(RESPONSE_BODY_MISSING_FROM_UP, cwrdProfileRequest.getRowId());
+                log.error("{}:: {}", RESPONSE_BODY_MISSING_FROM_UP, loggingComponentName);
             }
         }
         return caseWorkerProfile;
