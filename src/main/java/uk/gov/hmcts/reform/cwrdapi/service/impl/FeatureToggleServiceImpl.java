@@ -35,9 +35,9 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     @PostConstruct
     public void mapServiceToFlag() {
         launchDarklyMap = new HashMap<>();
-        launchDarklyMap.put("CaseWorkerRefController.fetchCaseworkersById",
+        launchDarklyMap.put("CaseWorkerRefUsersController.fetchCaseworkersById",
                 CWD_UPLOAD_FILE_FLAG);
-        launchDarklyMap.put("CaseWorkerRefController.createCaseWorkerProfiles",
+        launchDarklyMap.put("CaseWorkerRefUsersController.createCaseWorkerProfiles",
                 CWD_UPLOAD_FILE_FLAG);
         launchDarklyMap.put("CaseWorkerRefController.buildIdamRoleMappings",
                 CWD_UPLOAD_FILE_FLAG);
