@@ -66,6 +66,8 @@ import java.util.stream.Collectors;
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.time.LocalDateTime.now;
+import static java.time.ZoneOffset.UTC;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -378,7 +380,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
             if (nonNull(upResponse)) {
                 caseWorkerProfile = new CaseWorkerProfile();
-                populateCaseWorkerProfile(cwrdProfileRequest, caseWorkerProfile, upResponse.getIdamId());
+                populateCaseWorkerProfile(cwrdProfileRequest, caseWorkerProfile, upResponse.getIdamId(), true);
                 if (responseEntity.getStatusCode() == CONFLICT) {
                     UserProfileCreationResponse userProfileCreationResponse
                         = (UserProfileCreationResponse) requireNonNull(responseEntity.getBody());
@@ -393,9 +395,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     public void populateCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest,
-                                          CaseWorkerProfile caseWorkerProfile, String idamId) {
+                                          CaseWorkerProfile caseWorkerProfile, String idamId, boolean isNewProfile) {
         //case worker profile request mapping
-        mapCaseWorkerProfileRequest(idamId, cwrdProfileRequest, caseWorkerProfile);
+        mapCaseWorkerProfileRequest(idamId, cwrdProfileRequest, caseWorkerProfile, isNewProfile);
         //Locations data request mapping and setting to case worker profile
         caseWorkerProfile.getCaseWorkerLocations().addAll(mapCaseWorkerLocationRequest(idamId, cwrdProfileRequest));
         //caseWorkerRoles roles request mapping and data setting to case worker profile
@@ -421,7 +423,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         caseWorkerProfile.getCaseWorkerWorkAreas().clear();
         caseWorkerProfile.getCaseWorkerRoles().clear();
         //update existing profile with file values
-        populateCaseWorkerProfile(cwrdProfileRequest, caseWorkerProfile, caseWorkerProfile.getCaseWorkerId());
+        populateCaseWorkerProfile(cwrdProfileRequest, caseWorkerProfile, caseWorkerProfile.getCaseWorkerId(), false);
         // update roles in sidam
         return updateUserRolesInIdam(cwrdProfileRequest, caseWorkerProfile.getCaseWorkerId());
     }
@@ -471,7 +473,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public CaseWorkerProfile mapCaseWorkerProfileRequest(String idamId,
                                                          CaseWorkersProfileCreationRequest cwrdProfileRequest,
-                                                         CaseWorkerProfile caseWorkerProfile) {
+                                                         CaseWorkerProfile caseWorkerProfile, boolean isNewProfile) {
         caseWorkerProfile.setCaseWorkerId(idamId);
         caseWorkerProfile.setFirstName(cwrdProfileRequest.getFirstName());
         caseWorkerProfile.setLastName(cwrdProfileRequest.getLastName());
@@ -480,6 +482,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         caseWorkerProfile.setUserTypeId(getUserTypeIdByDesc(cwrdProfileRequest.getUserType()));
         caseWorkerProfile.setRegionId(cwrdProfileRequest.getRegionId());
         caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());
+        if (isNewProfile) {
+            caseWorkerProfile.setCreatedDate(now(UTC));
+        }
+        caseWorkerProfile.setLastUpdate(now(UTC));
         return caseWorkerProfile;
     }
 
