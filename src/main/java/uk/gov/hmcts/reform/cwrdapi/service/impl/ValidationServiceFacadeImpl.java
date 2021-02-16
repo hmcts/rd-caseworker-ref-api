@@ -200,13 +200,10 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void logFailures(String message, long rowId) {
-        log.info("{}:: Sidam/Up failure for row Id {} in job {} ", loggingComponentName, rowId, getAuditJobId());
+        log.info("{}:: Failure row Id {} with error {} in job {}  ", loggingComponentName, rowId,
+            getAuditJobId(), message);
         ExceptionCaseWorker exceptionCaseWorker = createException(getAuditJobId(), message, rowId);
         exceptionCaseWorkerRepository.save(exceptionCaseWorker);
-    }
-
-    public List<ExceptionCaseWorker> getCaseWorkersExceptions() {
-        return caseWorkersExceptions;
     }
 
     public long getAuditJobId() {
