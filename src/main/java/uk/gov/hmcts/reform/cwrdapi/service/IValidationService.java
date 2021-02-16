@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
-import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 
 import java.util.List;
@@ -40,8 +39,6 @@ public interface IValidationService {
      * @return JobId long
      */
     long updateCaseWorkerAuditStatus(final AuditStatus auditStatus, final String fileName);
-
-    List<ExceptionCaseWorker> getCaseWorkersExceptions();
 
     long getAuditJobId();
 

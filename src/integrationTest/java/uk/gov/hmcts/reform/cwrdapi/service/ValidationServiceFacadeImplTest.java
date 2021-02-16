@@ -86,7 +86,6 @@ public class ValidationServiceFacadeImplTest {
             .collect(Collectors.toList()).get(0);
         assertEquals(CaseWorkerConstants.FIRST_NAME_MISSING, error);
         verify(validationServiceFacadeImplSpy).saveJsrExceptionsForCaseworkerJob(jobId);
-        assertNotNull(validationServiceFacadeImplSpy.getCaseWorkersExceptions());
     }
 
     @Test
