@@ -150,8 +150,7 @@ public class CaseWorkerRefController {
 
         CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
                 CaseWorkerProfileCreationResponse
-                        .builder()
-                        .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY);
+                        .builder();
 
         trimIdamRoles(caseWorkersProfileCreationRequest);
         long time1 = System.currentTimeMillis();
@@ -167,7 +166,9 @@ public class CaseWorkerRefController {
             List<String> caseWorkerIds = processedCwProfiles.stream()
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
+
             caseWorkerProfileCreationResponse
+                    .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY)
                     .messageDetails(format(RECORDS_UPLOADED, caseWorkerIds.size()))
                     .caseWorkerIds(caseWorkerIds);
         }
