@@ -191,7 +191,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .filter(Objects::nonNull).collect(Collectors.toList());
             processedCwProfiles = persistCaseWorkerInBatch(newCaseWorkerProfiles, updateCaseWorkerProfiles, requestMap);
         } catch (Exception exp) {
-            log.error("{}:: createCaseWorkerUserProfiles failed ::{}", loggingComponentName, exp);
+            log.error("{}:: createCaseWorkerUserProfiles failed :: Job Id {} ::{}", loggingComponentName,
+                    validationServiceFacade.getAuditJobId(),exp);
             throw exp;
         }
         return processedCwProfiles;
@@ -215,7 +216,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         if (isNotEmpty(newCaseWorkerProfiles)) {
             long time1 = System.currentTimeMillis();
             processedCwProfiles = caseWorkerProfileRepo.saveAll(newCaseWorkerProfiles);
-            log.info("{}:: case worker profiles inserted ::{}", loggingComponentName, processedCwProfiles.size());
+            log.info("{}:: {} case worker profiles inserted :: Job Id {}", loggingComponentName,
+                    processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
             log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
                 (System.currentTimeMillis() - time1));
         }
@@ -255,8 +257,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .build();
 
         } catch (Exception e) {
-            log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}. Reason:: {}",
-                loggingComponentName, serviceCodes.toString(), e.getMessage());
+            log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}:: Job Id {}::Reason:: {}",
+                loggingComponentName, serviceCodes.toString(), validationServiceFacade.getAuditJobId(),e.getMessage());
             throw new IdamRolesMappingException(e.getMessage());
         }
     }
@@ -386,7 +388,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 }
             } else {
                 validationServiceFacade.logFailures(RESPONSE_BODY_MISSING_FROM_UP, cwrdProfileRequest.getRowId());
-                log.error("{}:: {}", RESPONSE_BODY_MISSING_FROM_UP, loggingComponentName);
+                log.error("{}:: {}:: Job Id {}:: Row Id {}", RESPONSE_BODY_MISSING_FROM_UP, loggingComponentName,
+                        validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
             }
         }
         return caseWorkerProfile;
@@ -529,7 +532,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             }
             return toResponseEntity(response, clazz);
         } catch (Exception ex) {
-            log.error("{}:: UserProfile api failed:: message {}", loggingComponentName, ex.getMessage());
+            log.error("{}:: UserProfile api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
+                    ex.getMessage(), validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
             //Log UP failures
             validationServiceFacade.logFailures(ex.getMessage(), cwrdProfileRequest.getRowId());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -547,7 +551,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         boolean status = true;
         try {
             Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
-            log.info("{}:: UserProfile update roles :: status code {} ", loggingComponentName, response.status());
+            log.info("{}:: UserProfile update roles :: status code {}:: Job Id {}", loggingComponentName,
+                    response.status(), validationServiceFacade.getAuditJobId());
 
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
 
@@ -564,8 +569,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             }
 
         } catch (Exception ex) {
-            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}",
-                loggingComponentName, rowId, ex.getMessage());
+            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
+                loggingComponentName, rowId, ex.getMessage(),validationServiceFacade.getAuditJobId());
             validationServiceFacade.logFailures(SUSPEND_USER_FAILED, rowId);
             status = false;
         }
@@ -592,8 +597,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             }
 
         } catch (Exception ex) {
-            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}",
-                loggingComponentName, rowId, ex.getMessage());
+            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
+                loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
             validationServiceFacade.logFailures("can't modify roles for user in UP", rowId);
             return false;
         }

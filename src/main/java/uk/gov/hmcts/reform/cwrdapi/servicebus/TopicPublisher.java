@@ -37,7 +37,8 @@ public class TopicPublisher {
 
     @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 3))
     public void sendMessage(@NotNull Object message) {
-        log.info("{}:: Publishing message to service bus topic.", loggingComponentName);
+        log.info("{}:: Publishing message to service bus topic:: Job Id is: {}", loggingComponentName,
+                validationService.getAuditJobId());
         if (message instanceof PublishCaseWorkerData) {
             log.info("{}:: Job Id is: {}, Count of User Ids is: {} ",
                     loggingComponentName,
@@ -47,12 +48,14 @@ public class TopicPublisher {
         }
 
         jmsTemplate.convertAndSend(destination, message);
-        log.info("{}:: Message published to service bus topic", loggingComponentName);
+        log.info("{}:: Message published to service bus topic:: Job Id is: {}", loggingComponentName,
+                validationService.getAuditJobId());
     }
 
     @Recover
     public void recoverMessage(Exception ex) {
-        log.error("{}:: Publishing message to service bus topic failed with exception: {} ", loggingComponentName, ex);
+        log.error("{}:: Publishing message to service bus topic failed with exception: {}:: Job Id {}",
+                loggingComponentName, ex, validationService.getAuditJobId());
         throw new CaseworkerMessageFailedException(CaseWorkerConstants.ASB_PUBLISH_ERROR);
     }
 }
