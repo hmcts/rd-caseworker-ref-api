@@ -173,12 +173,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     //when existing profile with delete flag is true in request then suspend user
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
                         .idamStatus(IDAM_STATUS_SUSPENDED).build();
-                    if (modifyCaseWorkerUserStatus(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(),
+                    if (isUserSuspended(usrProfileStatusUpdate, caseWorkerProfile.getCaseWorkerId(),
                         ORIGIN_EXUI, cwrRequest.getRowId())) {
                         caseWorkerProfile.setSuspended(true);
                         newCaseWorkerProfiles.add(caseWorkerProfile);
                     }
-                } else if (isNotTrue(caseWorkerProfile.getSuspended())) {
+                } else {
                     //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
                     requestMap.put(caseWorkerProfile.getEmailId(), cwrRequest);
                     updateCaseWorkerProfiles.add(caseWorkerProfile);
@@ -461,7 +461,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 if (isNotEmpty(mergedRoles)) {
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
                         .rolesAdd(mergedRoles).build();
-                    return modifyCaseWorkerUser(usrProfileStatusUpdate, idamId, "EXUI",
+                    return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
                         cwrProfileRequest.getRowId());
                 }
             }
@@ -545,19 +545,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
 
-    public boolean modifyCaseWorkerUserStatus(UserProfileUpdatedData userProfileUpdatedData, String userId,
-                                              String origin, long rowId) {
+    public boolean isUserSuspended(UserProfileUpdatedData userProfileUpdatedData, String userId,
+                                   String origin, long rowId) {
 
         boolean status = true;
         try {
-            Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
-            log.info("{}:: UserProfile update roles :: status code {}:: Job Id {}", loggingComponentName,
-                    response.status(), validationServiceFacade.getAuditJobId());
-
-            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
-
-            Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-
+            Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
             if (!resultResponse.isPresent()
                 || (isNull(((UserProfileRolesResponse) resultResponse.get())
@@ -577,15 +570,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return status;
     }
 
-    public boolean modifyCaseWorkerUser(UserProfileUpdatedData userProfileUpdatedData, String userId,
-                                        String origin, long rowId) {
+    public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
+                                     String origin, long rowId) {
         try {
-            Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
-            log.info("{}:: UserProfile update roles :: status code {} ", loggingComponentName, response.status());
-
-            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
-
-            Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+            Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
             if (!resultResponse.isPresent()
                 || (isNull(((UserProfileRolesResponse) resultResponse.get())
@@ -603,6 +591,17 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             return false;
         }
         return true;
+    }
+
+    private Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
+                                                          String userId, String origin) {
+        Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
+        log.info("{}:: UserProfile update roles :: status code {}:: Job Id {}", loggingComponentName,
+                response.status(), validationServiceFacade.getAuditJobId());
+
+        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
+
+        return validateAndGetResponseEntity(responseEntity);
     }
 
     // creating user profile request
