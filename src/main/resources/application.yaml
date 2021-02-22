@@ -25,7 +25,6 @@ spring:
             non_contextual_creation: true
           batch_size: 20
           time_zone: UTC
-          batch_size: 20
 
   application:
     name: RD Caseworker Ref API
