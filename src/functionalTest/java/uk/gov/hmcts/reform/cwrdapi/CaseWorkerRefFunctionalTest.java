@@ -66,8 +66,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 @SuppressWarnings("unchecked")
 public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
-    public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefController.createCaseWorkerProfiles";
-    public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefController.fetchCaseworkersById";
+    public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefUsersController.createCaseWorkerProfiles";
+    public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
     public static List<String> caseWorkerIds = new ArrayList<>();
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
 
