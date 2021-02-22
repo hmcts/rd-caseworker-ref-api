@@ -467,7 +467,7 @@ public class CaseWorkerServiceImplTest {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("1");
         CaseWorkerProfile caseWorkerProfile = caseWorkerServiceImpl.mapCaseWorkerProfileRequest(
-            "1", cwProfileCreationRequest, new CaseWorkerProfile(), true);
+            "1", cwProfileCreationRequest, new CaseWorkerProfile());
 
         assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("1");
         assertThat(caseWorkerProfile.getFirstName()).isEqualTo(cwProfileCreationRequest.getFirstName());
@@ -477,25 +477,6 @@ public class CaseWorkerServiceImplTest {
         assertThat(caseWorkerProfile.getUserTypeId()).isZero();
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(cwProfileCreationRequest.getRegionId());
         assertThat(caseWorkerProfile.getRegion()).isEqualTo(cwProfileCreationRequest.getRegion());
-    }
-
-    @Test
-    public void testMapCaseWorkerProfileRequestForUpdate() {
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId("1");
-        CaseWorkerProfile caseWorkerProfile = caseWorkerServiceImpl.mapCaseWorkerProfileRequest(
-                "1", cwProfileCreationRequest, new CaseWorkerProfile(), false);
-
-        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("1");
-        assertThat(caseWorkerProfile.getFirstName()).isEqualTo(cwProfileCreationRequest.getFirstName());
-        assertThat(caseWorkerProfile.getLastName()).isEqualTo(cwProfileCreationRequest.getLastName());
-        assertThat(caseWorkerProfile.getEmailId()).isEqualTo(cwProfileCreationRequest.getEmailId());
-        assertThat(caseWorkerProfile.getSuspended()).isFalse();
-        assertThat(caseWorkerProfile.getUserTypeId()).isZero();
-        assertThat(caseWorkerProfile.getRegionId()).isEqualTo(cwProfileCreationRequest.getRegionId());
-        assertThat(caseWorkerProfile.getRegion()).isEqualTo(cwProfileCreationRequest.getRegion());
-        assertThat(caseWorkerProfile.getCreatedDate()).isNull();
-        assertThat(caseWorkerProfile.getLastUpdate()).isNotNull();
     }
 
 }

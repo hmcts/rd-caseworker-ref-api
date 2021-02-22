@@ -24,6 +24,7 @@ spring:
           batch_size: 10
           order_updates: true
           order_inserts: true
+          time_zone: UTC
   main:
     allow-bean-definition-overriding: true
   application:

@@ -23,6 +23,7 @@ spring:
             non_contextual_creation: true
           batch_size: 5
           order_inserts: true
+          time_zone: UTC
   application:
     name: RD Caseworker Ref API
   main:
