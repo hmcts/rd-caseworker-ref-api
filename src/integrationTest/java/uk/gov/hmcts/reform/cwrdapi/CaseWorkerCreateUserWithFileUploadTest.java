@@ -21,8 +21,10 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -51,6 +53,9 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
+        //to check UTC time is persisted in db
+        assertThat(caseWorkerProfileRepository.findAll().get(0).getCreatedDate())
+                .isCloseToUtcNow(within(10, SECONDS));
     }
 
     @Test
