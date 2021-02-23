@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +98,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
                 exceptionCaseWorker.setFieldInError(constraintViolation.getPropertyPath().toString());
                 exceptionCaseWorker.setErrorDescription(constraintViolation.getMessage());
                 exceptionCaseWorker.setExcelRowId(String.valueOf(constraintViolation.getRootBean().getRowId()));
-                exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now(ZoneOffset.UTC));
+                exceptionCaseWorker.setUpdatedTimeStamp(LocalDateTime.now());
                 exceptionCaseWorker.setKeyField(getKeyFieldValue(field.get(), constraintViolation.getRootBean()));
                 caseWorkersExceptions.add(exceptionCaseWorker);
             }));
@@ -179,13 +178,13 @@ public class ValidationServiceFacadeImpl implements IValidationService {
             String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : EMPTY;
             caseWorkerAudit = CaseWorkerAudit.builder()
                 .status(auditStatus.getStatus())
-                .jobStartTime(LocalDateTime.now(ZoneOffset.UTC))
+                .jobStartTime(LocalDateTime.now())
                 .fileName(fileName)
                 .authenticatedUserId(userId)
                 .build();
         } else {
             caseWorkerAudit.setStatus(auditStatus.getStatus());
-            caseWorkerAudit.setJobEndTime(LocalDateTime.now(ZoneOffset.UTC));
+            caseWorkerAudit.setJobEndTime(LocalDateTime.now());
             caseWorkerAudit.setJobId(getAuditJobId());
         }
         return caseWorkerAudit;
