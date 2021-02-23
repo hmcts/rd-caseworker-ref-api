@@ -24,6 +24,7 @@ spring:
           lob:
             non_contextual_creation: true
           batch_size: 10
+          time_zone: UTC
   main:
     allow-bean-definition-overriding: true
   application:

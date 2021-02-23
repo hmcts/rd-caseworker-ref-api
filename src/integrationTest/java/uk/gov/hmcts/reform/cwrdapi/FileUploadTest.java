@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationRe
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.repository.AuditRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -41,6 +42,9 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
 
     @Autowired
     protected ExceptionCaseWorkerRepository caseWorkerExceptionRepository;
+
+    @Autowired
+    protected CaseWorkerProfileRepository caseWorkerProfileRepository;
 
     @Autowired
     protected ObjectMapper objectMapper;
