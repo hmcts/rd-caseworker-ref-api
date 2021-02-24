@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -165,7 +166,8 @@ public class CaseWorkerServiceFacadeImplTest {
         List<CaseWorkerProfile> caseWorkerDomains = new ArrayList<>();
         caseWorkerDomains.add(caseWorkerProfile1);
         caseWorkerDomains.add(caseWorkerProfile2);
-        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(ImmutableList.of(caseWorkerProfile1));
+        List<CaseWorkerDomain> caseWorkerList = ImmutableList.of(caseWorkerProfile1);
+        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(caseWorkerList);
         MultipartFile multipartFile =
             getMultipartFile("src/test/resources/" + fileName, TYPE_XLS);
         when(excelValidatorService.validateExcelFile(multipartFile))

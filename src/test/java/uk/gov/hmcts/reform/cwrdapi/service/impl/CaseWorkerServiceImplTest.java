@@ -269,9 +269,9 @@ public class CaseWorkerServiceImplTest {
             .idamRoles("role1")
             .roleId(1)
             .build();
-
+        List<ServiceRoleMapping> serviceRoleMappingList = singletonList(serviceRoleMapping);
         IdamRolesMappingResponse idamRolesMappingResponse = caseWorkerServiceImpl
-            .buildIdamRoleMappings(singletonList(serviceRoleMapping));
+            .buildIdamRoleMappings(serviceRoleMappingList);
 
         Set<String> serviceCode = new HashSet<>();
         serviceCode.add(serviceRoleMapping.getServiceId());
