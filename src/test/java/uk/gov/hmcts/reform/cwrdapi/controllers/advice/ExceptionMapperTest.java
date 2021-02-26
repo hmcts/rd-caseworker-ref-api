@@ -7,10 +7,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionMapperTest {
@@ -89,5 +91,27 @@ public class ExceptionMapperTest {
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
         assertEquals(forbiddenException.getMessage(), ((ErrorResponse)responseEntity.getBody())
                 .getErrorDescription());
+    }
+
+    @Test
+    public void test_handle_general_exception() {
+        Exception exception = new Exception("General Exception");
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleException(exception);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorDescription());
+        assertEquals(UNKNOWN_EXCEPTION.getErrorMessage(), ((ErrorResponse)responseEntity.getBody())
+                .getErrorMessage());
+    }
+
+    @Test
+    public void test_handle_forbidden_error_exception() {
+        AccessDeniedException exception = new AccessDeniedException("Access Denied");
+
+        ResponseEntity<Object> responseEntity = exceptionMapper.handleForbiddenException(exception);
+
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
+
     }
 }
