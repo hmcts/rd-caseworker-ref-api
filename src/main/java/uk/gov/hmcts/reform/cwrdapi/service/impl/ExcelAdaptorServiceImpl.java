@@ -148,7 +148,9 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                                            Map<String, Field> parentFieldMap, Map<String, Object> childHeaderToCellMap,
                                            List<Triple<String, Field, List<Field>>> customObjectFieldsMapping) {
         Object bean = getInstanceOf(classType.getName());//create parent object
-        setFieldValue(rowField, bean, row.getRowNum());// set row id to parent field
+        //Incrementing the row id by 1 because in the excel, first row will always contain headers.
+        //Actual record containing user details will be starting from row 2.
+        setFieldValue(rowField, bean, row.getRowNum() + 1);// set row id to parent field
         for (int i = 0; i < headers.size(); i++) { //set all parent fields
             setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap, childHeaderToCellMap);
         }

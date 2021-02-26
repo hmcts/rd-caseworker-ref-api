@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Builder
@@ -52,7 +51,6 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String officialEmail;
 
     @MappingField(columnName = "Region ID")
-    @NotNull(message = CaseWorkerConstants.MISSING_REGION)
     private Integer regionId;
 
     @MappingField(columnName = "Region")
