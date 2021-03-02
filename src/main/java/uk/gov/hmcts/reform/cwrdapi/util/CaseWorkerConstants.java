@@ -73,7 +73,7 @@ public final class CaseWorkerConstants {
 
     public static final String ORIGIN_EXUI = "EXUI";
 
-    public static final String UP_FAILURE_ROLES = "The user is currently in pending state"
+    public static final String UP_FAILURE_ROLES = "The user is currently in pending state."
             + "Please wait for the user to become active and try again";
 
     public static final String SUSPEND_USER_FAILED = "suspend user in UP failed";

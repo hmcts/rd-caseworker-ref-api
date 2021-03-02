@@ -587,7 +587,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
                 loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
-            validationServiceFacade.logFailures("can't modify roles for user in UP", rowId);
+            validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
             return false;
         }
         return true;
