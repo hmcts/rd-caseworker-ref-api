@@ -70,9 +70,6 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         evaluator = workbook.getCreationHelper().createFormulaEvaluator();
         List<String> validHeaders;
-        if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
-        }
         Sheet sheet;
         if (classType.isAssignableFrom(CaseWorkerProfile.class)) {
             sheet = workbook.getSheet(REQUIRED_CW_SHEET_NAME);
