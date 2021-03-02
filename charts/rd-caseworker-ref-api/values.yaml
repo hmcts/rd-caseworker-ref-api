@@ -23,7 +23,7 @@ java:
     rd:
       secrets:
         - caseworker-ref-api-POSTGRES-PASS
-        - AppInsightsInstrumentationKey
+        - ApplicationInsightsInstrumentationKey
         - caseworker-topic-primary-send-listen-shared-access-key
         - caseworker-ref-api-s2s-secret
         - LD-SDK-KEY
