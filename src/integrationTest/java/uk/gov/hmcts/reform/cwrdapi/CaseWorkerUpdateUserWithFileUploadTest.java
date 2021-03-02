@@ -51,7 +51,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 1),
+            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -67,7 +67,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 1),
+            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -84,7 +84,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 1),
+            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);

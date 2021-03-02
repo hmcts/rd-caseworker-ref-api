@@ -172,29 +172,27 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     private CaseWorkerFileCreationResponse createCaseWorkerExpectedErrorDetails() {
         LinkedList<JsrFileErrors> errors = new LinkedList<>();
-        errors.add(JsrFileErrors.builder().rowId("2").filedInError("locations").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("3").filedInError("locations").errorDescription(
             CaseWorkerConstants.NO_LOCATION_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("3").filedInError("roles").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("4").filedInError("roles").errorDescription(
             CaseWorkerConstants.NO_ROLE_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("4").filedInError("workAreas").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("5").filedInError("workAreas").errorDescription(
             CaseWorkerConstants.NO_WORK_AREA_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("5").filedInError("userType").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("6").filedInError("userType").errorDescription(
             CaseWorkerConstants.NO_USER_TYPE_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("6").filedInError("firstName").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("7").filedInError("firstName").errorDescription(
             CaseWorkerConstants.FIRST_NAME_MISSING).build());
-        errors.add(JsrFileErrors.builder().rowId("7").filedInError("lastName").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("8").filedInError("lastName").errorDescription(
             CaseWorkerConstants.LAST_NAME_MISSING).build());
-        errors.add(JsrFileErrors.builder().rowId("8").filedInError("officialEmail").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("9").filedInError("officialEmail").errorDescription(
             CaseWorkerConstants.INVALID_EMAIL).build());
-        errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionName").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("10").filedInError("regionName").errorDescription(
             CaseWorkerConstants.MISSING_REGION).build());
-        errors.add(JsrFileErrors.builder().rowId("9").filedInError("regionId").errorDescription(
-            CaseWorkerConstants.MISSING_REGION).build());
-        errors.add(JsrFileErrors.builder().rowId("11").filedInError(ROLE_FIELD).errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("12").filedInError(ROLE_FIELD).errorDescription(
             DUPLICATE_PRIMARY_AND_SECONDARY_ROLES).build());
-        errors.add(JsrFileErrors.builder().rowId("10").filedInError(LOCATION_FIELD).errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("11").filedInError(LOCATION_FIELD).errorDescription(
             DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS).build());
-        errors.add(JsrFileErrors.builder().rowId("12").filedInError(AREA_OF_WORK_FIELD).errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("13").filedInError(AREA_OF_WORK_FIELD).errorDescription(
             DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
@@ -240,7 +238,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
             + "Some records failed during validation and were ignored.\","
             + "\"message_details\":\"1 record(s) failed validation\","
-            + "\"error_details\":[{\"row_id\":\"1\","
+            + "\"error_details\":[{\"row_id\":\"2\","
             + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
 
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
@@ -262,10 +260,10 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
             + "Some records failed during validation and were ignored.\","
             + "\"message_details\":\"2 record(s) failed validation and 2 record(s) uploaded\","
-            + "\"error_details\":[{\"row_id\":\"1\",\"field_in_error\":\"serviceId\",\"error_description\":"
-            + "\"must not be empty\"},{\"row_id\":\"2\",\"field_in_error\":\"idamRoles\","
+            + "\"error_details\":[{\"row_id\":\"2\",\"field_in_error\":\"serviceId\",\"error_description\":"
+            + "\"must not be empty\"},{\"row_id\":\"3\",\"field_in_error\":\"idamRoles\","
             + "\"error_description\":\"must not be empty\"},"
-            + "{\"row_id\":\"2\",\"field_in_error\":\"roleId\",\"error_description\":\"must not be null\"}]}";
+            + "{\"row_id\":\"3\",\"field_in_error\":\"roleId\",\"error_description\":\"must not be null\"}]}";
 
         response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9WithJSR.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
