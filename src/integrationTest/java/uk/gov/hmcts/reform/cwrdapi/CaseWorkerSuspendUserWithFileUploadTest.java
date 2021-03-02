@@ -50,7 +50,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1,1),
+            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -65,7 +65,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1,1),
+            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -80,7 +80,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         assertThat(exceptionCaseWorkers.size()).isEqualTo(1);
-        assertEquals(format(CaseWorkerConstants.NO_USER_TO_SUSPEND, 1),
+        assertEquals(format(CaseWorkerConstants.NO_USER_TO_SUSPEND, 2),
             exceptionCaseWorkers.get(0).getErrorDescription());
     }
 }
