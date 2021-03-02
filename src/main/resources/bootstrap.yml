@@ -6,6 +6,6 @@ spring:
       aliases:
         caseworker-ref-api-s2s-secret: S2S_SECRET
         caseworker-ref-api-POSTGRES-PASS: POSTGRES_PASSWORD
-        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        ApplicationInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         caseworker-topic-primary-send-listen-shared-access-key: CWRD_MQ_PASSWORD
         LD-SDK-KEY: RD_LD_SDK_KEY

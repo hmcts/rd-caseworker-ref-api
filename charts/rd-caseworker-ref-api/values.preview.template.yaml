@@ -22,7 +22,7 @@ java:
   keyVaults:
     rd:
       secrets:
-        - AppInsightsInstrumentationKey
+        - ApplicationInsightsInstrumentationKey
         - caseworker-topic-primary-send-listen-shared-access-key
         - caseworker-ref-api-s2s-secret
         - LD-SDK-KEY
