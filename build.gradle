@@ -341,6 +341,11 @@ dependencies {
   compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
   implementation "io.github.openfeign:feign-httpclient:11.0"
   implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+  implementation group: 'com.azure', name: 'azure-core', version: '1.13.0'
+  implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.1'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.0.2'
+
   implementation('org.apache.httpcomponents:httpclient:4.5.13') {
     because 'Apache HttpClient versions prior to version 4.5.13 can misinterpret malformed authority component in ' +
             'request URIs passed to the library as java.net.URI object and pick the wrong target host for request execution.'
