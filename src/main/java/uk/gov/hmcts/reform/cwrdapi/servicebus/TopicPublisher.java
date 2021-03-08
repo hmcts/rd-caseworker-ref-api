@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedExc
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Service
@@ -94,8 +94,8 @@ public class TopicPublisher {
     }
 
     public ServiceBusSenderClient getServiceBusSenderClient() {
-        String connectionString = "Endpoint=sb://" +
-                host + ";SharedAccessKeyName=" + sharedAccessKeyName + ";SharedAccessKey=" + sharedAccessKeyValue;
+        String connectionString = "Endpoint=sb://"
+                + host + ";SharedAccessKeyName=" + sharedAccessKeyName + ";SharedAccessKey=" + sharedAccessKeyValue;
 
         return new ServiceBusClientBuilder()
                 .connectionString(connectionString)
