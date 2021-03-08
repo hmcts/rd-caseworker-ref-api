@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.servicebus;
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusMessage;
+import com.azure.messaging.servicebus.ServiceBusMessageBatch;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.azure.messaging.servicebus.ServiceBusTransactionContext;
 import com.launchdarkly.shaded.com.google.gson.Gson;
@@ -16,7 +17,10 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedExc
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
 import javax.validation.constraints.NotNull;
 
 @Slf4j
@@ -33,10 +37,13 @@ public class TopicPublisher {
 
     @Value("${crd.publisher.azure.service.bus.host}")
     String host;
+
     @Value("${crd.publisher.azure.service.bus.topic}")
     String topic;
+
     @Value("${crd.publisher.azure.service.bus.username}")
     String sharedAccessKeyName;
+
     @Value("${crd.publisher.azure.service.bus.password}")
     String sharedAccessKeyValue;
 
@@ -67,13 +74,10 @@ public class TopicPublisher {
                     loggingComponentName, exception, validationService.getAuditJobId());
             if (Objects.nonNull(serviceBusSenderClient) && Objects.nonNull(transactionContext)) {
                 serviceBusSenderClient.rollbackTransaction(transactionContext);
-                serviceBusSenderClient.close();
             }
             throw new CaseworkerMessageFailedException(CaseWorkerConstants.ASB_PUBLISH_ERROR);
         }
 
-        serviceBusSenderClient.commitTransaction(transactionContext);
-        serviceBusSenderClient.close();
         log.info("{}:: Message published to service bus topic:: Job Id is: {}", loggingComponentName,
                 validationService.getAuditJobId());
     }
@@ -82,15 +86,39 @@ public class TopicPublisher {
                                       ServiceBusSenderClient serviceBusSenderClient,
                                       ServiceBusTransactionContext transactionContext) {
         log.info("{}:: Started publishing to topic::", loggingComponentName);
-        ListUtils.partition(caseWorkerData.getUserIds(), caseWorkerDataPerMessage)
+        ServiceBusMessageBatch messageBatch = serviceBusSenderClient.createMessageBatch();
+        List<ServiceBusMessage> serviceBusMessages = new ArrayList<>();
+
+        ListUtils.partition(caseWorkerData.getUserIds(), 2)
                 .forEach(data -> {
                     PublishCaseWorkerData publishCaseWorkerDataChunk = new PublishCaseWorkerData();
                     publishCaseWorkerDataChunk.setUserIds(data);
-
-                    serviceBusSenderClient.sendMessage(
-                            new ServiceBusMessage(new Gson().toJson(publishCaseWorkerDataChunk)),
-                            transactionContext);
+                    serviceBusMessages.add(new ServiceBusMessage(new Gson().toJson(publishCaseWorkerDataChunk)));
                 });
+
+        for (ServiceBusMessage message : serviceBusMessages) {
+            if (messageBatch.tryAddMessage(message)) {
+                continue;
+            }
+
+            // The batch is full, so we create a new batch and send the batch.
+            serviceBusSenderClient.sendMessages(messageBatch, transactionContext);
+
+            // create a new batch
+            messageBatch = serviceBusSenderClient.createMessageBatch();
+
+            // Add that message that we couldn't before.
+            if (!messageBatch.tryAddMessage(message)) {
+                log.error("Message is too large for an empty batch. Skipping. Max size: {}.",
+                        messageBatch.getMaxSizeInBytes());
+            }
+        }
+
+        if (messageBatch.getCount() > 0) {
+            serviceBusSenderClient.sendMessages(messageBatch, transactionContext);
+            log.info("Sent a batch of messages to the topic: {}", topic);
+        }
+        serviceBusSenderClient.commitTransaction(transactionContext);
     }
 
     public ServiceBusSenderClient getServiceBusSenderClient() {
