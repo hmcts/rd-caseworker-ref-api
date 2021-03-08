@@ -354,7 +354,7 @@ dependencies {
   compile group:"org.yaml", name: "snakeyaml", version:"1.27"
 
   compile group: 'org.springframework', name: 'spring-jms', version: '5.2.9.RELEASE'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.54.0'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.56.0'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
