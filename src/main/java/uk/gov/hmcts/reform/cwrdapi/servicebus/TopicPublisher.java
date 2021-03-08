@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.servicebus;
 
+import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
@@ -98,6 +99,7 @@ public class TopicPublisher {
 
         return new ServiceBusClientBuilder()
                 .connectionString(connectionString)
+                .retryOptions(new AmqpRetryOptions())
                 .sender()
                 .topicName(topic)
                 .buildClient();
