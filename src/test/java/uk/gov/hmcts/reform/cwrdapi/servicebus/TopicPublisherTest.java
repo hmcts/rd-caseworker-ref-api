@@ -84,25 +84,6 @@ public class TopicPublisherTest {
         topicPublisher.sendMessage(publishCaseWorkerData);
         verify(serviceBusSenderClient, times(1)).rollbackTransaction(any());
     }
-
-    /*@Test(expected = CaseworkerMessageFailedException.class)
-    public void shouldNotAddTooBigMessage() {
-        PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
-        List<String> userIdList = new ArrayList<>();
-        for (int i = 0; i < 5000; i++) {
-            userIdList.add(UUID.randomUUID().toString());
-        }
-        publishCaseWorkerData.setUserIds(userIdList);
-        doReturn(1L).when(validationService).getAuditJobId();
-        doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
-        doReturn(true).when(messageBatch).tryAddMessage(any());
-        doReturn(1).when(messageBatch).getCount();
-        doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
-        setField(topicPublisher, "caseWorkerDataPerMessage", 5000);
-        topicPublisher.sendMessage(publishCaseWorkerData);
-
-        verify(serviceBusSenderClient, times(1)).commitTransaction(any());
-    }*/
 }
 
 
