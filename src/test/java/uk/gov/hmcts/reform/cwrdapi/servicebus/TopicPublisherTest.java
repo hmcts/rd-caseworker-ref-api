@@ -23,6 +23,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,6 +84,20 @@ public class TopicPublisherTest {
 
         topicPublisher.sendMessage(publishCaseWorkerData);
         verify(serviceBusSenderClient, times(1)).rollbackTransaction(any());
+    }
+
+    @Test
+    public void sendLargeMessageCallsAzureSendMessage() {
+
+        doReturn(1L).when(validationService).getAuditJobId();
+        doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
+        doReturn(1).when(messageBatch).getCount();
+        lenient().doReturn(false).when(messageBatch).tryAddMessage(any());
+        doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
+
+        topicPublisher.sendMessage(publishCaseWorkerData);
+
+        verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }
 }
 
