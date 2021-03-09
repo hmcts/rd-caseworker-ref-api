@@ -36,7 +36,7 @@ public class TopicPublisher {
     private int caseWorkerDataPerMessage;
 
     @Value("${crd.publisher.azure.service.bus.topic}")
-    String topic;
+    private String topic;
 
     @Autowired
     public TopicPublisher(IValidationService validationService, MessagingConfig messagingConfig) {
