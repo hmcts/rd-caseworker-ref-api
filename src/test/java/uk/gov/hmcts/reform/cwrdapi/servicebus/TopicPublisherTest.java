@@ -78,7 +78,7 @@ public class TopicPublisherTest {
 
         doReturn(1L).when(validationService).getAuditJobId();
         doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
-
+        doReturn(transactionContext).when(serviceBusSenderClient).createTransaction();
         doThrow(new RuntimeException("Some Exception")).when(serviceBusSenderClient).createMessageBatch();
 
         topicPublisher.sendMessage(publishCaseWorkerData);
