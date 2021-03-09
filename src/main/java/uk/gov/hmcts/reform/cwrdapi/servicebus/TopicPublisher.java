@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.servicebus;
 
-import com.azure.core.amqp.AmqpRetryOptions;
-import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusMessageBatch;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
@@ -18,10 +16,11 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedExc
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Service

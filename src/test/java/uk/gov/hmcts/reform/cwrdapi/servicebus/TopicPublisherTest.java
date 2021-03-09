@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.config.MessagingConfig;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,27 +73,35 @@ public class TopicPublisherTest {
         verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }
 
-    /*@Test(expected = CaseworkerMessageFailedException.class)
-    public void recoverMessageThrowsThePassedException() throws Throwable {
-        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
-        Exception exception = new NoRouteToHostException("");
-        topicPublisher.recoverMessage(exception);
+    @Test(expected = CaseworkerMessageFailedException.class)
+    public void shouldThrowExceptionForConnectionIssues() {
+
+        doReturn(1L).when(validationService).getAuditJobId();
+        doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
+
+        doThrow(new RuntimeException("Some Exception")).when(serviceBusSenderClient).createMessageBatch();
+
+        topicPublisher.sendMessage(publishCaseWorkerData);
+        verify(serviceBusSenderClient, times(1)).rollbackTransaction(any());
     }
 
-    @Test
-    public void sendMessageWhenThrowExceptionWhenConnectionFactoryInstanceDifferent() {
-        SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
-        doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
-        doReturn(1L).when(validationService).getAuditJobId();
-
-        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
-
-        try {
-            topicPublisher.sendMessage(publishCaseWorkerData);
-        } catch (Exception e) {
-            verify(connectionFactory, never()).resetConnection();
-            verify(jmsTemplate, times(1)).convertAndSend(DESTINATION, publishCaseWorkerData);
+    /*@Test(expected = CaseworkerMessageFailedException.class)
+    public void shouldNotAddTooBigMessage() {
+        PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
+        List<String> userIdList = new ArrayList<>();
+        for (int i = 0; i < 5000; i++) {
+            userIdList.add(UUID.randomUUID().toString());
         }
+        publishCaseWorkerData.setUserIds(userIdList);
+        doReturn(1L).when(validationService).getAuditJobId();
+        doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
+        doReturn(true).when(messageBatch).tryAddMessage(any());
+        doReturn(1).when(messageBatch).getCount();
+        doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
+        setField(topicPublisher, "caseWorkerDataPerMessage", 5000);
+        topicPublisher.sendMessage(publishCaseWorkerData);
+
+        verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }*/
 }
 
