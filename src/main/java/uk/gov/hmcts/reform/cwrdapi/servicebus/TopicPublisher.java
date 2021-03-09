@@ -17,11 +17,10 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedExc
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Service
@@ -68,7 +67,6 @@ public class TopicPublisher {
             serviceBusSenderClient = getServiceBusSenderClient();
             transactionContext = serviceBusSenderClient.createTransaction();
             publishMessageToTopic(caseWorkerIds, serviceBusSenderClient, transactionContext);
-
         } catch (Exception exception) {
             log.error("{}:: Publishing message to service bus topic failed with exception: {}:: Job Id {}",
                     loggingComponentName, exception, validationService.getAuditJobId());
@@ -77,7 +75,7 @@ public class TopicPublisher {
             }
             throw new CaseworkerMessageFailedException(CaseWorkerConstants.ASB_PUBLISH_ERROR);
         }
-
+        serviceBusSenderClient.commitTransaction(transactionContext);
         log.info("{}:: Message published to service bus topic:: Job Id is: {}", loggingComponentName,
                 validationService.getAuditJobId());
     }
@@ -89,7 +87,7 @@ public class TopicPublisher {
         ServiceBusMessageBatch messageBatch = serviceBusSenderClient.createMessageBatch();
         List<ServiceBusMessage> serviceBusMessages = new ArrayList<>();
 
-        ListUtils.partition(caseWorkerData.getUserIds(), 2)
+        ListUtils.partition(caseWorkerData.getUserIds(), caseWorkerDataPerMessage)
                 .forEach(data -> {
                     PublishCaseWorkerData publishCaseWorkerDataChunk = new PublishCaseWorkerData();
                     publishCaseWorkerDataChunk.setUserIds(data);
@@ -118,7 +116,6 @@ public class TopicPublisher {
             serviceBusSenderClient.sendMessages(messageBatch, transactionContext);
             log.info("Sent a batch of messages to the topic: {}", topic);
         }
-        serviceBusSenderClient.commitTransaction(transactionContext);
     }
 
     public ServiceBusSenderClient getServiceBusSenderClient() {
