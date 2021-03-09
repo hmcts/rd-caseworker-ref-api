@@ -18,11 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
 
-    String expectedResponse = "{\"message\":\"Request completed with partial success. "
+    String exceptedResponseUpdate = "{\"message\":\"Request completed with partial success. "
         + "Some records failed during validation and were ignored.\","
         + "\"message_details\":\"%s record(s) failed validation\","
-        + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"The user is currently in pending state. "
-            + "Please wait for the user to become active and try again\"}]}";
+        + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"can't modify roles for user in UP\"}]}";
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
@@ -51,7 +50,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
+            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -67,7 +66,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
+            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -84,7 +83,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
+            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
