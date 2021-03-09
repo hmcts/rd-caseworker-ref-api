@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
+import uk.gov.hmcts.reform.cwrdapi.config.MessagingConfig;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -27,6 +28,7 @@ import java.util.Objects;
 public class TopicPublisher {
 
     private final IValidationService validationService;
+    private final MessagingConfig messagingConfig;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -34,21 +36,13 @@ public class TopicPublisher {
     @Value("${crd.publisher.caseWorkerDataPerMessage}")
     private int caseWorkerDataPerMessage;
 
-    @Value("${crd.publisher.azure.service.bus.host}")
-    String host;
-
     @Value("${crd.publisher.azure.service.bus.topic}")
     String topic;
 
-    @Value("${crd.publisher.azure.service.bus.username}")
-    String sharedAccessKeyName;
-
-    @Value("${crd.publisher.azure.service.bus.password}")
-    String sharedAccessKeyValue;
-
     @Autowired
-    public TopicPublisher(IValidationService validationService) {
+    public TopicPublisher(IValidationService validationService, MessagingConfig messagingConfig) {
         this.validationService = validationService;
+        this.messagingConfig = messagingConfig;
     }
 
     //The Azure library has retry mechanism inbuilt, which will try to send message until timeout.
@@ -64,7 +58,7 @@ public class TopicPublisher {
             log.info("{}:: Job Id is: {}, Count of User Ids is: {} ",
                     loggingComponentName, validationService.getAuditJobId(), caseWorkerIds.getUserIds().size());
 
-            serviceBusSenderClient = getServiceBusSenderClient();
+            serviceBusSenderClient = messagingConfig.getServiceBusSenderClient();
             transactionContext = serviceBusSenderClient.createTransaction();
             publishMessageToTopic(caseWorkerIds, serviceBusSenderClient, transactionContext);
         } catch (Exception exception) {
@@ -118,16 +112,6 @@ public class TopicPublisher {
         }
     }
 
-    public ServiceBusSenderClient getServiceBusSenderClient() {
-        String connectionString = "Endpoint=sb://"
-                + host + ";SharedAccessKeyName=" + sharedAccessKeyName + ";SharedAccessKey=" + sharedAccessKeyValue;
 
-        return new ServiceBusClientBuilder()
-                .connectionString(connectionString)
-                .retryOptions(new AmqpRetryOptions())
-                .sender()
-                .topicName(topic)
-                .buildClient();
-    }
 }
 
