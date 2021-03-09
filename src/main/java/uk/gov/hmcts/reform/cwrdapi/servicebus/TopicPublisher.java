@@ -4,7 +4,7 @@ import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusMessageBatch;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.azure.messaging.servicebus.ServiceBusTransactionContext;
-import com.launchdarkly.shaded.com.google.gson.Gson;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class TopicPublisher {
                 validationService.getAuditJobId());
     }
 
-    public void publishMessageToTopic(PublishCaseWorkerData caseWorkerData,
+    private void publishMessageToTopic(PublishCaseWorkerData caseWorkerData,
                                       ServiceBusSenderClient serviceBusSenderClient,
                                       ServiceBusTransactionContext transactionContext) {
         log.info("{}:: Started publishing to topic::", loggingComponentName);
@@ -110,7 +110,6 @@ public class TopicPublisher {
             log.info("Sent a batch of messages to the topic: {}", topic);
         }
     }
-
 
 }
 
