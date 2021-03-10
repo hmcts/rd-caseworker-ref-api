@@ -46,7 +46,7 @@ public class TopicPublisher {
 
     //The Azure library has retry mechanism inbuilt, which will try to send message until timeout.
     // There is no need for explicit retry mechanism.
-    public void sendMessage(@NotNull PublishCaseWorkerData caseWorkerIds) {
+    public void sendMessage(@NotNull List<String> caseWorkerIds) {
         ServiceBusSenderClient serviceBusSenderClient = null;
         ServiceBusTransactionContext transactionContext = null;
 
@@ -55,7 +55,7 @@ public class TopicPublisher {
                     validationService.getAuditJobId());
 
             log.info("{}:: Job Id is: {}, Count of User Ids is: {} ",
-                    loggingComponentName, validationService.getAuditJobId(), caseWorkerIds.getUserIds().size());
+                    loggingComponentName, validationService.getAuditJobId(), caseWorkerIds.size());
 
             serviceBusSenderClient = messagingConfig.getServiceBusSenderClient();
             transactionContext = serviceBusSenderClient.createTransaction();
@@ -73,14 +73,15 @@ public class TopicPublisher {
                 validationService.getAuditJobId());
     }
 
-    private void publishMessageToTopic(PublishCaseWorkerData caseWorkerData,
-                                      ServiceBusSenderClient serviceBusSenderClient,
-                                      ServiceBusTransactionContext transactionContext) {
-        log.info("{}:: Started publishing to topic::", loggingComponentName);
+    private void publishMessageToTopic(List<String> caseWorkerData,
+                                       ServiceBusSenderClient serviceBusSenderClient,
+                                       ServiceBusTransactionContext transactionContext) {
+        log.info("{}:: Started publishing to topic:: Job Id {}", loggingComponentName,
+                validationService.getAuditJobId());
         ServiceBusMessageBatch messageBatch = serviceBusSenderClient.createMessageBatch();
         List<ServiceBusMessage> serviceBusMessages = new ArrayList<>();
 
-        ListUtils.partition(caseWorkerData.getUserIds(), caseWorkerDataPerMessage)
+        ListUtils.partition(caseWorkerData, caseWorkerDataPerMessage)
                 .forEach(data -> {
                     PublishCaseWorkerData publishCaseWorkerDataChunk = new PublishCaseWorkerData();
                     publishCaseWorkerDataChunk.setUserIds(data);
@@ -100,14 +101,15 @@ public class TopicPublisher {
 
             // Add that message that we couldn't before.
             if (!messageBatch.tryAddMessage(message)) {
-                log.error("Message is too large for an empty batch. Skipping. Max size: {}.",
-                        messageBatch.getMaxSizeInBytes());
+                log.error("{}:: Message is too large for an empty batch. Skipping. Max size: {}. Job id::{}",
+                        loggingComponentName, messageBatch.getMaxSizeInBytes(), validationService.getAuditJobId());
             }
         }
 
         if (messageBatch.getCount() > 0) {
             serviceBusSenderClient.sendMessages(messageBatch, transactionContext);
-            log.info("Sent a batch of messages to the topic: {}", topic);
+            log.info("{}:: Sent a batch of messages to the topic: {} ::Job id::{}", loggingComponentName, topic,
+                    validationService.getAuditJobId());
         }
     }
 

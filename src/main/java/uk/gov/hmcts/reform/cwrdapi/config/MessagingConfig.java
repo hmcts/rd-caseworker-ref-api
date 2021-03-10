@@ -11,13 +11,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class MessagingConfig {
 
-
-    @Value("${loggingComponentName}")
-    private String loggingComponentName;
-
-    @Value("${crd.publisher.caseWorkerDataPerMessage}")
-    private int caseWorkerDataPerMessage;
-
     @Value("${crd.publisher.azure.service.bus.host}")
     String host;
 

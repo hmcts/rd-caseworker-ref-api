@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
@@ -273,9 +272,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             .map(CaseWorkerProfile::getCaseWorkerId)
             .collect(Collectors.toUnmodifiableList());
 
-        PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
-        publishCaseWorkerData.setUserIds(caseWorkerIds);
-        topicPublisher.sendMessage(publishCaseWorkerData);
+        topicPublisher.sendMessage(caseWorkerIds);
     }
 
     /**

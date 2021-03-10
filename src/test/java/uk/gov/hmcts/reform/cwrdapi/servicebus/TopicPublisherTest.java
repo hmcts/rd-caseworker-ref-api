@@ -44,12 +44,13 @@ public class TopicPublisherTest {
 
     private TopicPublisher topicPublisher;
     PublishCaseWorkerData publishCaseWorkerData;
+    List<String> userIdList;
     List<ServiceBusMessage> serviceBusMessageList = new ArrayList<>();
 
     @Before
     public void beforeTest() {
         publishCaseWorkerData = new PublishCaseWorkerData();
-        List<String> userIdList = new ArrayList<>();
+        userIdList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             userIdList.add(UUID.randomUUID().toString());
         }
@@ -69,7 +70,7 @@ public class TopicPublisherTest {
         doReturn(1).when(messageBatch).getCount();
         doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
 
-        topicPublisher.sendMessage(publishCaseWorkerData);
+        topicPublisher.sendMessage(userIdList);
 
         verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }
@@ -82,7 +83,7 @@ public class TopicPublisherTest {
         doReturn(transactionContext).when(serviceBusSenderClient).createTransaction();
         doThrow(new RuntimeException("Some Exception")).when(serviceBusSenderClient).createMessageBatch();
 
-        topicPublisher.sendMessage(publishCaseWorkerData);
+        topicPublisher.sendMessage(userIdList);
         verify(serviceBusSenderClient, times(1)).rollbackTransaction(any());
     }
 
@@ -95,7 +96,7 @@ public class TopicPublisherTest {
         lenient().doReturn(false).when(messageBatch).tryAddMessage(any());
         doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
 
-        topicPublisher.sendMessage(publishCaseWorkerData);
+        topicPublisher.sendMessage(userIdList);
 
         verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }
