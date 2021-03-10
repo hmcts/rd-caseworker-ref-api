@@ -44,8 +44,6 @@ public class TopicPublisher {
         this.messagingConfig = messagingConfig;
     }
 
-    //The Azure library has retry mechanism inbuilt, which will try to send message until timeout.
-    // There is no need for explicit retry mechanism.
     public void sendMessage(@NotNull List<String> caseWorkerIds) {
         ServiceBusSenderClient serviceBusSenderClient = null;
         ServiceBusTransactionContext transactionContext = null;
