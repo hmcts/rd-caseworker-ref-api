@@ -87,18 +87,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully_with_extra_spaces() throws IOException {
+        uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
-
-        Map<String, Object> response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx",
-                TYPE_XLSX, "200 OK", cwdAdmin);
-
-        //Audit & Exception for service Role Mapping
-        String json = getJsonResponse(response);
-        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-                .isEqualTo(objectMapper.readValue(exceptedResponse, CaseWorkerFileCreationResponse.class));
-
-        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
-        assertThat(exceptionCaseWorkers).isEmpty();
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
         CaseWorkerIdamRoleAssociation association = associations.get(0);
         assertThat(association.getIdamRole()).isEqualTo("caseworker-iac");
