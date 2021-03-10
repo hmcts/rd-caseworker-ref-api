@@ -59,7 +59,6 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String regionName;
 
     @MappingField(clazz = Location.class, objectCount = 2)
-    @NotEmpty(message = CaseWorkerConstants.NO_LOCATION_PRESENT)
     @JsonProperty("base_location")
     private List<Location> locations;
 
