@@ -99,8 +99,8 @@ public final class CaseWorkerConstants {
     public static final String FILE_MISSING_HEADERS = "The file is missing some column headers."
         + " Review and upload again";
 
-    public static final String NO_PRIMARY_LOCATION_PRESENT = "You must add Primary Base Location Name and"
-        + "upload the file again";
+    public static final String NO_PRIMARY_LOCATION_PRESENT = "You must add Primary Base Location Name"
+        + " and upload the file again";
     public static final String NO_ROLE_PRESENT = "You must add role details and upload the file again";
     public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work"
         + " and upload the file again";
