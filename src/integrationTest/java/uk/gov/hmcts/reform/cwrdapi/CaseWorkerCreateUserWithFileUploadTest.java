@@ -38,7 +38,15 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_MISSING;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_MISSING;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.MISSING_REGION;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_ROLE_PRESENT;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TYPE_PRESENT;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_WORK_AREA_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
@@ -184,31 +192,34 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     private CaseWorkerFileCreationResponse createCaseWorkerExpectedErrorDetails() {
         LinkedList<JsrFileErrors> errors = new LinkedList<>();
-        errors.add(JsrFileErrors.builder().rowId("3").filedInError("locations").errorDescription(
-            CaseWorkerConstants.NO_LOCATION_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("3").filedInError(LOCATION_FIELD).errorDescription(
+            NO_PRIMARY_LOCATION_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("4").filedInError("roles").errorDescription(
-            CaseWorkerConstants.NO_ROLE_PRESENT).build());
+            NO_ROLE_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("5").filedInError("workAreas").errorDescription(
-            CaseWorkerConstants.NO_WORK_AREA_PRESENT).build());
+            NO_WORK_AREA_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("6").filedInError("userType").errorDescription(
-            CaseWorkerConstants.NO_USER_TYPE_PRESENT).build());
+            NO_USER_TYPE_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("7").filedInError("firstName").errorDescription(
-            CaseWorkerConstants.FIRST_NAME_MISSING).build());
+            FIRST_NAME_MISSING).build());
         errors.add(JsrFileErrors.builder().rowId("8").filedInError("lastName").errorDescription(
-            CaseWorkerConstants.LAST_NAME_MISSING).build());
+            LAST_NAME_MISSING).build());
         errors.add(JsrFileErrors.builder().rowId("9").filedInError("officialEmail").errorDescription(
-            CaseWorkerConstants.INVALID_EMAIL).build());
+            INVALID_EMAIL).build());
         errors.add(JsrFileErrors.builder().rowId("10").filedInError("regionName").errorDescription(
-            CaseWorkerConstants.MISSING_REGION).build());
+            MISSING_REGION).build());
         errors.add(JsrFileErrors.builder().rowId("12").filedInError(ROLE_FIELD).errorDescription(
             DUPLICATE_PRIMARY_AND_SECONDARY_ROLES).build());
         errors.add(JsrFileErrors.builder().rowId("11").filedInError(LOCATION_FIELD).errorDescription(
             DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS).build());
         errors.add(JsrFileErrors.builder().rowId("13").filedInError(AREA_OF_WORK_FIELD).errorDescription(
             DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
+        errors.add(JsrFileErrors.builder().rowId("14").filedInError(LOCATION_FIELD).errorDescription(
+            NO_PRIMARY_LOCATION_PRESENT).build());
+
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("11 record(s) failed validation and 1 record(s) uploaded")
+            .detailedMessage("12 record(s) failed validation and 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
