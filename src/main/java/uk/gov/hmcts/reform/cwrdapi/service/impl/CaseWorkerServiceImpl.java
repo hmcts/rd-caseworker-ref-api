@@ -424,45 +424,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     public boolean updateUserRolesInIdam(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId) {
-
-//        try {
-//            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
-//            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
-//
-//            Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-//
-//
-//            if (!resultResponse.isPresent()
-//                || (isNull(((UserProfileResponse) resultResponse.get())
-//                .getIdamStatus()))
-//                || (!STATUS_ACTIVE.equalsIgnoreCase(((UserProfileResponse) resultResponse.get())
-//                .getIdamStatus()))) {
-//                validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
-//                return false;
-//            }
-//
-//            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
-//            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
-//            Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
-//            Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-//                new HashSet<>();
-//            idamRolesCwr.addAll(mappedRoles);
-//            if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
-//                Set<RoleName> mergedRoles = idamRolesCwr.stream()
-//                    .filter(s -> !(userProfileRoles.contains(s)))
-//                    .map(RoleName::new)
-//                    .collect(toSet());
-//                if (isNotEmpty(mergedRoles)) {
-//                    UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-//                        .rolesAdd(mergedRoles).build();
-//                    return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
-//                        cwrProfileRequest.getRowId());
-//                }
-//            }
-//        } catch (Exception exception) {
-//            validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
-//            return false;
-//        }
         return true;
     }
 
