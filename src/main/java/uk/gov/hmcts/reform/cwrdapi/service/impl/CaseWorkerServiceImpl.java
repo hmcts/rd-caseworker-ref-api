@@ -3,14 +3,12 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
@@ -274,12 +272,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             .map(CaseWorkerProfile::getCaseWorkerId)
             .collect(Collectors.toUnmodifiableList());
 
-        PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
-        ListUtils.partition(caseWorkerIds, caseWorkerDataPerMessage)
-            .forEach(data -> {
-                publishCaseWorkerData.setUserIds(data);
-                topicPublisher.sendMessage(publishCaseWorkerData);
-            });
+        topicPublisher.sendMessage(caseWorkerIds);
     }
 
     /**
