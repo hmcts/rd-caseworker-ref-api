@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 
 import java.util.stream.Collectors;
@@ -61,8 +62,9 @@ public class CaseWorkerChildListValidator implements ConstraintValidator<Validat
                     .addConstraintViolation();
             }
         } else if (isEmpty(caseWorkerProfile.getLocations())
-                   || (caseWorkerProfile.getLocations().size() == 1
-                   && !caseWorkerProfile.getLocations().get(0).isPrimary())) {
+                   || caseWorkerProfile.getLocations()
+                      .stream()
+                      .noneMatch(Location::isPrimary)) {
 
             isValidLocations = false;
             context.buildConstraintViolationWithTemplate(NO_PRIMARY_LOCATION_PRESENT)
