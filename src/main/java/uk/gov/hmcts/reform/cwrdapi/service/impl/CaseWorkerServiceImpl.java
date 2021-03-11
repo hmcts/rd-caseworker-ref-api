@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
-import uk.gov.hmcts.reform.cwrdapi.domain.RoleName;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
@@ -69,10 +67,7 @@ import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -83,7 +78,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SU
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FROM_UP;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SUSPEND_USER_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
@@ -431,44 +425,44 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public boolean updateUserRolesInIdam(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId) {
 
-        try {
-            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
-            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
-
-            Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-
-
-            if (!resultResponse.isPresent()
-                || (isNull(((UserProfileResponse) resultResponse.get())
-                .getIdamStatus()))
-                || (!STATUS_ACTIVE.equalsIgnoreCase(((UserProfileResponse) resultResponse.get())
-                .getIdamStatus()))) {
-                validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
-                return false;
-            }
-
-            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
-            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
-            Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
-            Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                new HashSet<>();
-            idamRolesCwr.addAll(mappedRoles);
-            if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
-                Set<RoleName> mergedRoles = idamRolesCwr.stream()
-                    .filter(s -> !(userProfileRoles.contains(s)))
-                    .map(RoleName::new)
-                    .collect(toSet());
-                if (isNotEmpty(mergedRoles)) {
-                    UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-                        .rolesAdd(mergedRoles).build();
-                    return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
-                        cwrProfileRequest.getRowId());
-                }
-            }
-        } catch (Exception exception) {
-            validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
-            return false;
-        }
+//        try {
+//            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+//            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
+//
+//            Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+//
+//
+//            if (!resultResponse.isPresent()
+//                || (isNull(((UserProfileResponse) resultResponse.get())
+//                .getIdamStatus()))
+//                || (!STATUS_ACTIVE.equalsIgnoreCase(((UserProfileResponse) resultResponse.get())
+//                .getIdamStatus()))) {
+//                validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
+//                return false;
+//            }
+//
+//            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
+//            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+//            Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
+//            Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
+//                new HashSet<>();
+//            idamRolesCwr.addAll(mappedRoles);
+//            if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
+//                Set<RoleName> mergedRoles = idamRolesCwr.stream()
+//                    .filter(s -> !(userProfileRoles.contains(s)))
+//                    .map(RoleName::new)
+//                    .collect(toSet());
+//                if (isNotEmpty(mergedRoles)) {
+//                    UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
+//                        .rolesAdd(mergedRoles).build();
+//                    return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
+//                        cwrProfileRequest.getRowId());
+//                }
+//            }
+//        } catch (Exception exception) {
+//            validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
+//            return false;
+//        }
         return true;
     }
 
