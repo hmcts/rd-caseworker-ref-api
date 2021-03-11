@@ -24,23 +24,19 @@ import javax.validation.constraints.NotNull;
 @Service
 public class TopicPublisher {
 
-    private final IValidationService validationService;
-    private final ServiceBusSenderClient serviceBusSenderClient;
+    @Autowired
+    private IValidationService validationService;
+    @Autowired
+    private ServiceBusSenderClient serviceBusSenderClient;
 
     @Value("${loggingComponentName}")
-    private String loggingComponentName;
+    String loggingComponentName;
 
     @Value("${crd.publisher.caseWorkerDataPerMessage}")
-    private int caseWorkerDataPerMessage;
+    int caseWorkerDataPerMessage;
 
     @Value("${crd.publisher.azure.service.bus.topic}")
-    private String topic;
-
-    @Autowired
-    public TopicPublisher(IValidationService validationService, ServiceBusSenderClient serviceBusSenderClient) {
-        this.validationService = validationService;
-        this.serviceBusSenderClient = serviceBusSenderClient;
-    }
+    String topic;
 
     public void sendMessage(@NotNull List<String> caseWorkerIds) {
         ServiceBusTransactionContext transactionContext = null;

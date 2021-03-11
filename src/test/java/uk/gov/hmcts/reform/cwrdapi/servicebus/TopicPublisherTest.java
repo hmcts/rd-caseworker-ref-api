@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
@@ -26,7 +27,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TopicPublisherTest {
@@ -38,7 +38,9 @@ public class TopicPublisherTest {
     private final ServiceBusTransactionContext transactionContext = mock(ServiceBusTransactionContext.class);
     private final ServiceBusMessageBatch messageBatch = mock(ServiceBusMessageBatch.class);
 
+    @InjectMocks
     private TopicPublisher topicPublisher;
+
     PublishCaseWorkerData publishCaseWorkerData;
     List<String> userIdList;
     List<ServiceBusMessage> serviceBusMessageList = new ArrayList<>();
@@ -52,9 +54,10 @@ public class TopicPublisherTest {
         }
         publishCaseWorkerData.setUserIds(userIdList);
         serviceBusMessageList.add(new ServiceBusMessage(new Gson().toJson(publishCaseWorkerData)));
-        topicPublisher = new TopicPublisher(validationService, serviceBusSenderClient);
-        setField(topicPublisher, "caseWorkerDataPerMessage", 2);
-        setField(topicPublisher, "topic", "dummyTopic");
+
+        topicPublisher.caseWorkerDataPerMessage = 2;
+        topicPublisher.loggingComponentName = "loggingComponent";
+        topicPublisher.topic = "dummyTopic";
     }
 
     @Test
