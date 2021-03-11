@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.JsrFileErrors;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
@@ -49,6 +50,9 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Autowired
     JdbcTemplate template;
 
+    String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
+            + "\"message_details\":\"4 record(s) uploaded\"}";
+
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
@@ -67,8 +71,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
 
-        String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
-            + "\"message_details\":\"4 record(s) uploaded\"}";
         Map<String, Object> response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -81,6 +83,16 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers).isEmpty();
+    }
+
+    @Test
+    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully_with_extra_spaces() throws IOException {
+        uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+
+        List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
+        CaseWorkerIdamRoleAssociation association = associations.get(0);
+        assertThat(association.getIdamRole()).isEqualTo("caseworker-iac");
+        assertThat(association.getServiceCode()).isEqualTo("BBA9");
     }
 
     @Test
