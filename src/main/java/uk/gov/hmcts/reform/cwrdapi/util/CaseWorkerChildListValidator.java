@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 
 import java.util.stream.Collectors;
@@ -10,12 +11,14 @@ import javax.validation.ConstraintValidatorContext;
 import static java.lang.Boolean.FALSE;
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.negate;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 
 public class CaseWorkerChildListValidator implements ConstraintValidator<ValidateCaseWorkerChildren,
@@ -58,6 +61,15 @@ public class CaseWorkerChildListValidator implements ConstraintValidator<Validat
                     .addPropertyNode(LOCATION_FIELD)
                     .addConstraintViolation();
             }
+        } else if (isEmpty(caseWorkerProfile.getLocations())
+                   || caseWorkerProfile.getLocations()
+                      .stream()
+                      .noneMatch(Location::isPrimary)) {
+
+            isValidLocations = false;
+            context.buildConstraintViolationWithTemplate(NO_PRIMARY_LOCATION_PRESENT)
+                   .addPropertyNode(LOCATION_FIELD)
+                   .addConstraintViolation();
         }
         return isValidLocations;
     }
