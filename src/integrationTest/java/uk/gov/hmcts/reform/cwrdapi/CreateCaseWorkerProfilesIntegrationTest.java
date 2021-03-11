@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.jms.UncategorizedJmsException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -80,9 +79,9 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
     public void shouldCreateCaseWorker() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
-        assertThat(caseWorkerProfileRepository.count()).isEqualTo(0L);
-        assertThat(caseWorkerLocationRepository.count()).isEqualTo(0L);
-        assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerProfileRepository.count()).isZero();
+        assertThat(caseWorkerLocationRepository.count()).isZero();
+        assertThat(caseWorkerWorkAreaRepository.count()).isZero();
 
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
@@ -112,17 +111,17 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
     @Test
     public void shouldRollbackCreateCaseWorkerInCaseOfException() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
-        Mockito.doThrow(new UncategorizedJmsException("jms exception"))
+        Mockito.doThrow(new RuntimeException("jms exception"))
                 .when(topicPublisher).sendMessage(Mockito.any());
-        assertThat(caseWorkerProfileRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerProfileRepository.count()).isZero();
 
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "500");
 
-        assertThat(caseWorkerProfileRepository.count()).isEqualTo(0L);
-        assertThat(caseWorkerLocationRepository.count()).isEqualTo(0L);
-        assertThat(caseWorkerRoleRepository.count()).isEqualTo(0L);
-        assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(0L);
+        assertThat(caseWorkerProfileRepository.count()).isZero();
+        assertThat(caseWorkerLocationRepository.count()).isZero();
+        assertThat(caseWorkerRoleRepository.count()).isZero();
+        assertThat(caseWorkerWorkAreaRepository.count()).isZero();
     }
 }
