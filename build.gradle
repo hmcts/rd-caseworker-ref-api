@@ -425,7 +425,7 @@ dependencies {
   contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
   contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
   contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.1.7'
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: '4.2.1'
   contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.1.7'
 
   contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
