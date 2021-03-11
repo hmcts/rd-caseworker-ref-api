@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
-import uk.gov.hmcts.reform.cwrdapi.config.MessagingConfig;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 
@@ -35,9 +34,6 @@ public class TopicPublisherTest {
     @Mock
     IValidationService validationService;
 
-    @Mock
-    MessagingConfig messagingConfig;
-
     private final ServiceBusSenderClient serviceBusSenderClient = mock(ServiceBusSenderClient.class);
     private final ServiceBusTransactionContext transactionContext = mock(ServiceBusTransactionContext.class);
     private final ServiceBusMessageBatch messageBatch = mock(ServiceBusMessageBatch.class);
@@ -56,7 +52,7 @@ public class TopicPublisherTest {
         }
         publishCaseWorkerData.setUserIds(userIdList);
         serviceBusMessageList.add(new ServiceBusMessage(new Gson().toJson(publishCaseWorkerData)));
-        topicPublisher = new TopicPublisher(validationService, messagingConfig);
+        topicPublisher = new TopicPublisher(validationService, serviceBusSenderClient);
         setField(topicPublisher, "caseWorkerDataPerMessage", 2);
         setField(topicPublisher, "topic", "dummyTopic");
     }
@@ -65,7 +61,6 @@ public class TopicPublisherTest {
     public void sendMessageCallsAzureSendMessage() {
 
         doReturn(1L).when(validationService).getAuditJobId();
-        doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
         doReturn(true).when(messageBatch).tryAddMessage(any());
         doReturn(1).when(messageBatch).getCount();
         doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
@@ -79,7 +74,6 @@ public class TopicPublisherTest {
     public void shouldThrowExceptionForConnectionIssues() {
 
         doReturn(1L).when(validationService).getAuditJobId();
-        doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
         doReturn(transactionContext).when(serviceBusSenderClient).createTransaction();
         doThrow(new RuntimeException("Some Exception")).when(serviceBusSenderClient).createMessageBatch();
 
@@ -91,7 +85,6 @@ public class TopicPublisherTest {
     public void sendLargeMessageCallsAzureSendMessage() {
 
         doReturn(1L).when(validationService).getAuditJobId();
-        doReturn(serviceBusSenderClient).when(messagingConfig).getServiceBusSenderClient();
         doReturn(1).when(messageBatch).getCount();
         lenient().doReturn(false).when(messageBatch).tryAddMessage(any());
         doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
-import uk.gov.hmcts.reform.cwrdapi.config.MessagingConfig;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import javax.validation.constraints.NotNull;
 
 @Slf4j
@@ -27,7 +25,7 @@ import javax.validation.constraints.NotNull;
 public class TopicPublisher {
 
     private final IValidationService validationService;
-    private final MessagingConfig messagingConfig;
+    private final ServiceBusSenderClient serviceBusSenderClient;
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -39,13 +37,12 @@ public class TopicPublisher {
     private String topic;
 
     @Autowired
-    public TopicPublisher(IValidationService validationService, MessagingConfig messagingConfig) {
+    public TopicPublisher(IValidationService validationService, ServiceBusSenderClient serviceBusSenderClient) {
         this.validationService = validationService;
-        this.messagingConfig = messagingConfig;
+        this.serviceBusSenderClient = serviceBusSenderClient;
     }
 
     public void sendMessage(@NotNull List<String> caseWorkerIds) {
-        ServiceBusSenderClient serviceBusSenderClient = null;
         ServiceBusTransactionContext transactionContext = null;
 
         try {
@@ -55,7 +52,6 @@ public class TopicPublisher {
             log.info("{}:: Job Id is: {}, Count of User Ids is: {} ",
                     loggingComponentName, validationService.getAuditJobId(), caseWorkerIds.size());
 
-            serviceBusSenderClient = messagingConfig.getServiceBusSenderClient();
             transactionContext = serviceBusSenderClient.createTransaction();
             publishMessageToTopic(caseWorkerIds, serviceBusSenderClient, transactionContext);
         } catch (Exception exception) {

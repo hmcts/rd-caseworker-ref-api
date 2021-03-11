@@ -5,6 +5,7 @@ import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class MessagingConfig {
     @Value("${crd.publisher.azure.service.bus.password}")
     String sharedAccessKeyValue;
 
+    @Bean
     public ServiceBusSenderClient getServiceBusSenderClient() {
         String connectionString = "Endpoint=sb://"
                 + host + ";SharedAccessKeyName=" + sharedAccessKeyName + ";SharedAccessKey=" + sharedAccessKeyValue;
