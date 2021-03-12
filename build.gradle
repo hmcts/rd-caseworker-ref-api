@@ -18,7 +18,7 @@ plugins {
     id 'org.sonarqube' version '3.1.1'
     id 'org.springframework.boot' version '2.3.9.RELEASE'
     id "org.flywaydb.flyway" version "7.0.2"
-    id 'au.com.dius.pact' version '4.1.7'
+    id 'au.com.dius.pact' version '4.2.1'
 }
 
 apply plugin: 'java'
