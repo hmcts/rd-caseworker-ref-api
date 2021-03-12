@@ -170,6 +170,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             .map(ServiceRoleMapping.class::cast)
             .map(ServiceRoleMapping::getServiceId)
             .filter(StringUtils::isNotEmpty)
+            .map(String::trim)
             .distinct()
             .count() > 1;
 
