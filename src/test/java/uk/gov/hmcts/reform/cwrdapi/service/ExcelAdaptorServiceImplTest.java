@@ -146,4 +146,14 @@ public class ExcelAdaptorServiceImplTest {
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(CaseWorkerConstants.FILE_MISSING_HEADERS);
     }
+
+    @Test
+    public void parseXlsxShouldThrowExceptionWhenBlankRowsPresentTest() throws IOException {
+        Workbook workbook = WorkbookFactory
+                .create(new File("src/test/resources/Staff Data Upload With Empty Rows.xlsx"));
+
+        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
+                .isExactlyInstanceOf(ExcelValidationException.class)
+                .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
+    }
 }

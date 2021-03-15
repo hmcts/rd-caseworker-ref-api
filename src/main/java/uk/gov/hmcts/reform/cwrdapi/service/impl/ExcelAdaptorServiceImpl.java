@@ -114,11 +114,34 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Field rowField = getRowIdField((Class<Object>) classType);
         Optional<Object> bean;
         while (rowIterator.hasNext()) {
-            bean = handleRowProcessing(classType, rowField, headers, rowIterator.next(), parentFieldMap,
-                childHeaderToCellMap, customObjectFieldsMapping);
-            bean.ifPresent(o -> objectList.add((T) o));
+            Row row = rowIterator.next();
+            if (!isBlankRow(row)) {
+                bean = handleRowProcessing(classType, rowField, headers, row, parentFieldMap,
+                        childHeaderToCellMap, customObjectFieldsMapping);
+                bean.ifPresent(o -> objectList.add((T) o));
+            } else {
+                break;
+            }
         }
         return objectList;
+    }
+
+    private boolean isBlankRow(Row row) {
+        boolean isEmptyRow = false;
+        try {
+            if (checkIfRowIsEmpty(row)) {
+                if (row.getRowNum() == 1) {
+                    throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
+                }
+                isEmptyRow = true;
+            }
+        } catch (ExcelValidationException e) {
+            throw e;
+        } catch (Exception ex) {
+            log.error("{}::{}:: Job Id {}", loggingComponentName, FILE_NO_DATA_ERROR_MESSAGE,
+                    validationServiceFacade.getAuditJobId());
+        }
+        return isEmptyRow;
     }
 
     public <T> Optional<Object> handleRowProcessing(Class<T> classType, Field rowField, List<String> headers, Row row,
@@ -128,9 +151,6 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                                                         customObjectFieldsMapping) {
         Object bean;
         try {
-            if (checkIfRowIsEmpty(row)) {
-                return empty(); //Skipping empty rows
-            }
             bean = populateDomainObject(classType, rowField, headers, row, parentFieldMap, childHeaderToCellMap,
                 customObjectFieldsMapping);
         } catch (Exception ex) {
@@ -315,7 +335,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
             Cell cell = row.getCell(cellNum);
             Object cellValue = getCellValue(cell);
-            if (nonNull(cellValue) && isNotEmpty(cellValue.toString())) {
+            if (nonNull(cellValue) && isNotEmpty(cellValue.toString().trim())) {
                 return false;
             }
         }
