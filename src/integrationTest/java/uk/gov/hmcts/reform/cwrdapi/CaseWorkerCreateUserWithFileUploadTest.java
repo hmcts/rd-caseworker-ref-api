@@ -128,6 +128,12 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
+    public void shouldReturn400WhenFileHasEmptyRows() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload With Empty Rows.xlsx",
+            TYPE_XLSX, "400", cwdAdmin);
+    }
+
+    @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             "application/octet-stream", "400", cwdAdmin);
