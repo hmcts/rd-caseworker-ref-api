@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -509,21 +510,29 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     // Idam_UP call.
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> createUserProfileInIdamUP(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
-
+        ResponseEntity<Object> responseEntity;
         Response response = null;
         Object clazz;
         try {
             long time1 = System.currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
             log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
-            if (response.status() == 201 || response.status() == 409) {
-                clazz = UserProfileCreationResponse.class;
-            } else {
-                clazz = ErrorResponse.class;
-                validationServiceFacade.logFailures(format(UP_CREATION_FAILED, response.status()),
-                    cwrdProfileRequest.getRowId());
+
+            clazz = (response.status() == 201 || response.status() == 409) ?
+                    UserProfileCreationResponse.class : ErrorResponse.class;
+            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            if (clazz == ErrorResponse.class) {
+                ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
+                if (nonNull(errorResponse) && nonNull(errorResponse.getErrorDescription())) {
+                    validationServiceFacade.logFailures(errorResponse.getErrorDescription(),
+                            cwrdProfileRequest.getRowId());
+                }
+                else {
+                    validationServiceFacade.logFailures(format(UP_CREATION_FAILED, response.status()),
+                            cwrdProfileRequest.getRowId());
+                }
             }
-            return toResponseEntity(response, clazz);
+            return responseEntity;
         } catch (Exception ex) {
             log.error("{}:: UserProfile api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
                     ex.getMessage(), validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
