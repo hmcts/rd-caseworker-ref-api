@@ -34,6 +34,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.util.ReflectionUtils.makeAccessible;
@@ -115,7 +116,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Optional<Object> bean;
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            if (!isBlankRow(row)) {
+            if (isNotTrue(isBlankRow(row))) {
                 bean = handleRowProcessing(classType, rowField, headers, row, parentFieldMap,
                         childHeaderToCellMap, customObjectFieldsMapping);
                 bean.ifPresent(o -> objectList.add((T) o));
