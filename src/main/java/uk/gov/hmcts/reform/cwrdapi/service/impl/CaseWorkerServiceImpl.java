@@ -523,7 +523,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     ? UserProfileCreationResponse.class : ErrorResponse.class;
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
-            if (clazz == ErrorResponse.class) {
+            if (clazz == ErrorResponse.class && nonNull(responseEntity.getBody())) {
                 ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
                 if (nonNull(errorResponse) && StringUtils.isNotEmpty(errorResponse.getErrorDescription())) {
                     validationServiceFacade.logFailures(errorResponse.getErrorDescription(),
