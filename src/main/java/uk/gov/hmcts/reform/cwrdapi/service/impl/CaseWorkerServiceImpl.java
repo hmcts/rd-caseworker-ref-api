@@ -519,8 +519,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 clazz = UserProfileCreationResponse.class;
             } else {
                 clazz = ErrorResponse.class;
-                validationServiceFacade.logFailures(format(UP_CREATION_FAILED, response.status()),
-                    cwrdProfileRequest.getRowId());
+                validationServiceFacade.logFailures(UP_CREATION_FAILED, cwrdProfileRequest.getRowId());
             }
             return toResponseEntity(response, clazz);
         } catch (Exception ex) {
