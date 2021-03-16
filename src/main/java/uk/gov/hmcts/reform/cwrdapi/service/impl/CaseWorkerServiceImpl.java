@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -518,16 +519,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
             log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
 
-            clazz = (response.status() == 201 || response.status() == 409) ?
-                    UserProfileCreationResponse.class : ErrorResponse.class;
+            clazz = (response.status() == 201 || response.status() == 409)
+                    ? UserProfileCreationResponse.class : ErrorResponse.class;
+
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (clazz == ErrorResponse.class) {
                 ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
-                if (nonNull(errorResponse) && nonNull(errorResponse.getErrorDescription())) {
+                if (nonNull(errorResponse) && StringUtils.isNotEmpty(errorResponse.getErrorDescription())) {
                     validationServiceFacade.logFailures(errorResponse.getErrorDescription(),
                             cwrdProfileRequest.getRowId());
-                }
-                else {
+                } else {
                     validationServiceFacade.logFailures(format(UP_CREATION_FAILED, response.status()),
                             cwrdProfileRequest.getRowId());
                 }
