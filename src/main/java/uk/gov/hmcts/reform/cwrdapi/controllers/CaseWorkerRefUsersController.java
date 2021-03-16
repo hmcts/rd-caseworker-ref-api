@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
@@ -94,25 +95,31 @@ public class CaseWorkerRefUsersController {
     @Transactional
     public ResponseEntity<Object> createCaseWorkerProfiles(@RequestBody List<CaseWorkersProfileCreationRequest>
                                                                    caseWorkersProfileCreationRequest) {
-        if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
 
+        if (CollectionUtils.isEmpty(caseWorkersProfileCreationRequest)) {
             throw new InvalidRequestException("Caseworker Profiles Request is empty");
         }
 
-        CaseWorkerProfileCreationResponse.CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
-                CaseWorkerProfileCreationResponse
-                        .builder();
+        CaseWorkerProfileCreationResponseBuilder caseWorkerProfileCreationResponse =
+                CaseWorkerProfileCreationResponse.builder();
+
         trimIdamRoles(caseWorkersProfileCreationRequest);
+
         long time1 = System.currentTimeMillis();
+
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+
         log.info("{}:: Time taken to process the given file is {}", loggingComponentName,
                 (System.currentTimeMillis() - time1));
+
         if (isNotEmpty(processedCwProfiles)) {
             long time2 = System.currentTimeMillis();
             caseWorkerService.publishCaseWorkerDataToTopic(processedCwProfiles);
+
             log.info("{}:: Time taken to publish the message is {}", loggingComponentName,
                     (System.currentTimeMillis() - time2));
+
             List<String> caseWorkerIds = processedCwProfiles.stream()
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
@@ -121,6 +128,7 @@ public class CaseWorkerRefUsersController {
                     .messageDetails(format(RECORDS_UPLOADED, caseWorkerIds.size()))
                     .caseWorkerIds(caseWorkerIds);
         }
+
         return ResponseEntity
                 .status(201)
                 .body(caseWorkerProfileCreationResponse.build());

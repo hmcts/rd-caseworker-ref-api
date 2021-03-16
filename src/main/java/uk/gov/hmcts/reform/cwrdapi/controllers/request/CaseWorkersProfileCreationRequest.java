@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.cwrdapi.config.TrimStringFields;
 
 import java.util.List;
 import java.util.Set;
+import javax.validation.constraints.Email;
 
 @Getter
 @Setter
@@ -20,6 +21,7 @@ public class CaseWorkersProfileCreationRequest {
     private String firstName;
     @JsonDeserialize(using = TrimStringFields.class)
     private String lastName;
+    @Email(regexp = "^.*[@].*[.].*$")
     @JsonDeserialize(using = TrimStringFields.class)
     private String emailId;
     private Integer regionId;
