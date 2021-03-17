@@ -10,18 +10,21 @@ import uk.gov.hmcts.reform.cwrdapi.config.TrimStringFields;
 
 import java.util.List;
 import java.util.Set;
-import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
+
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
 
 @Getter
 @Setter
 @Builder(builderMethodName = "caseWorkersProfileCreationRequest")
 public class CaseWorkersProfileCreationRequest {
 
+    @Pattern(regexp = NAME_REGEX)
     @JsonDeserialize(using = TrimStringFields.class)
     private String firstName;
+    @Pattern(regexp = NAME_REGEX)
     @JsonDeserialize(using = TrimStringFields.class)
     private String lastName;
-    @Email(regexp = "^.*[@].*[.].*$")
     @JsonDeserialize(using = TrimStringFields.class)
     private String emailId;
     private Integer regionId;
