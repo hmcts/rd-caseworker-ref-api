@@ -33,7 +33,7 @@ public class CaseWorkersProfileCreationRequestTest {
     @Test
     public void testUserProfileCreationRequestWithNameLongerThan150CharactersIsConstraintViolation() {
         CaseWorkersProfileCreationRequest request1 = new CaseWorkersProfileCreationRequest(
-                RandomStringUtils.randomAlphabetic(149) + "*","lastName",
+                RandomStringUtils.randomAlphabetic(151),"lastName",
                 "some@email.com", 1, UserTypeRequest.INTERNAL.name(), "region", false,
                 idamRoles, null, null, null, 1L);
 
