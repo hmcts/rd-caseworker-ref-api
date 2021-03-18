@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
@@ -102,4 +101,3 @@ public class ValidationServiceFacadeImplTest {
     }
 }
 
-*/

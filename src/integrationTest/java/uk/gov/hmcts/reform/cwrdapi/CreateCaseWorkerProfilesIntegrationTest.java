@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
@@ -126,4 +125,3 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         assertThat(caseWorkerWorkAreaRepository.count()).isZero();
     }
 }
-*/

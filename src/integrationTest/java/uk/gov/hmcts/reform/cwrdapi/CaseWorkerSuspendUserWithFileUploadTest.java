@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
@@ -85,4 +84,3 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
             exceptionCaseWorkers.get(0).getErrorDescription());
     }
 }
-*/

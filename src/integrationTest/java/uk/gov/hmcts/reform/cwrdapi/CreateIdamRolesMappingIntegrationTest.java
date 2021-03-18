@@ -1,4 +1,3 @@
-/*
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
@@ -77,4 +76,4 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
         assertThat(association.getIdamRole()).isEqualTo("test Role");
         assertThat(association.getServiceCode()).isEqualTo("BB A1");
     }
-}*/
+}
