@@ -247,7 +247,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
-                .withStatus(201)
+                .withStatus(403)
                 .withHeader("Content-Type", "application/json")));
 
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
