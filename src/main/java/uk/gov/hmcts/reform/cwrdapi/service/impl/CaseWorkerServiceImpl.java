@@ -523,9 +523,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (clazz == ErrorResponse.class && nonNull(responseEntity.getBody())) {
-                ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
-                if (nonNull(errorResponse) && StringUtils.isNotEmpty(errorResponse.getErrorDescription())) {
-                    validationServiceFacade.logFailures(errorResponse.getErrorDescription(),
+                if (responseEntity.getBody() instanceof ErrorResponse) {
+                    Optional<ErrorResponse> optional = Optional.of((ErrorResponse) responseEntity.getBody());
+                    validationServiceFacade.logFailures(optional.get().getErrorDescription(),
                             cwrdProfileRequest.getRowId());
                 } else {
                     validationServiceFacade.logFailures(UP_CREATION_FAILED, cwrdProfileRequest.getRowId());
