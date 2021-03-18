@@ -24,9 +24,10 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
         + "\"message_details\":\"%s record(s) suspended\"}";
 
     String expectedSuspendFailureResponse = "{\"message\":\"Request completed with partial success. "
-        + "Some records failed during validation and were ignored.\","
-        + "\"message_details\":\"%s record(s) failed validation\","
-        + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"suspend user in UP failed\"}]}";
+            + "Some records failed during validation and were ignored.\","
+            + "\"message_details\":\"%s record(s) failed validation\","
+            + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"An update to the user is not possible"
+            + " at this moment. Please try again later.\"}]}";
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
