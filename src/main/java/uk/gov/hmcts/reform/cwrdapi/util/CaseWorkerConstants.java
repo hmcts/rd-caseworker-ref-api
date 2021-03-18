@@ -108,10 +108,10 @@ public final class CaseWorkerConstants {
 
     public static final String FIRST_NAME_MISSING = "You must add a first name and upload the file again";
     public static final String LAST_NAME_MISSING = "You must add a last name and upload the file again";
-    public static final String FIRST_NAME_INVALID = "First Name is invalid - must be less than 128 characters"
-            + " and not contain unallowed special characters";
-    public static final String LAST_NAME_INVALID = "Last Name is invalid - must be less than 128 characters"
-            + " and not contain unallowed special characters";
+    public static final String FIRST_NAME_INVALID = "First Name is invalid - can only contain Alphabetic,"
+            + " empty space, ', - characters and must be less than 128 characters";
+    public static final String LAST_NAME_INVALID = "Last Name is invalid - can only contain Alphabetic,"
+            + " empty space, ', - characters and must be less than 128 characters";
     public static final String NAME_REGEX = "^[a-zA-Z' -]*$";
 
     public static final String MISSING_REGION = "You must add a region and upload the file again";
