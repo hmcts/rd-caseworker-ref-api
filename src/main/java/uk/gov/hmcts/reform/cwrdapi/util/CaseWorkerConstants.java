@@ -125,6 +125,6 @@ public final class CaseWorkerConstants {
 
     public static final String RESPONSE_BODY_MISSING_FROM_UP = "Response Body is missing from User Profile";
 
-    public static final String NAME_REGEX = "^[a-zA-Z' -]{1,150}$";
+    public static final String NAME_REGEX = "^[a-zA-Z' -]*$";
 
 }
