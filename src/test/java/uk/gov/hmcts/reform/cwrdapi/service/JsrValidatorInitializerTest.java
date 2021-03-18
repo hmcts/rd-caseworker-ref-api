@@ -46,4 +46,34 @@ public class JsrValidatorInitializerTest {
         assertEquals(1, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
+
+    @Test
+    public void testGetNoInvalidJsrRecords_whenEmailWithMixedCases() {
+        List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
+        CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
+        record.setOfficialEmail("tEst123-CRD3@JUSTICE.GOV.UK");
+        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
+        assertEquals(0, records.size());
+        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
+    }
+
+    @Test
+    public void testGetInvalidJsrRecords_whenEmailWithSpecialChars() {
+        List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
+        CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
+        record.setOfficialEmail("$%^&@justice.gov.uk");
+        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
+        assertEquals(1, records.size());
+        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
+    }
+
+    @Test
+    public void testGetInvalidJsrRecords_whenEmailWithSpaceInBetween() {
+        List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
+        CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
+        record.setOfficialEmail("user name@justice.gov.uk");
+        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
+        assertEquals(1, records.size());
+        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
+    }
 }

@@ -268,7 +268,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         }
         switch (cell.getCellType()) {
             case STRING:
-                return cell.getStringCellValue();
+                return cell.getStringCellValue().trim();
             case NUMERIC:
                 return Integer.valueOf((int) cell.getNumericCellValue());
             case FORMULA:
@@ -315,7 +315,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
             Cell cell = row.getCell(cellNum);
             Object cellValue = getCellValue(cell);
-            if (nonNull(cellValue) && isNotEmpty(cellValue.toString())) {
+            if (nonNull(cellValue) && isNotEmpty(cellValue.toString().trim())) {
                 return false;
             }
         }

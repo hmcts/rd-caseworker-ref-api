@@ -340,8 +340,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAudit_when_email_in_capital_letters() throws IOException {
-        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload" +
-                        " With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
+                        + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
         assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 1));
