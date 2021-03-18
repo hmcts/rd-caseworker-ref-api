@@ -10,9 +10,6 @@ import uk.gov.hmcts.reform.cwrdapi.config.TrimStringFields;
 
 import java.util.List;
 import java.util.Set;
-import javax.validation.constraints.Pattern;
-
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
 
 @Getter
 @Setter
