@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -244,7 +245,11 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
+                .willReturn(aResponse()
+                .withStatus(201)
+                .withHeader("Content-Type", "application/json")));
+
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
