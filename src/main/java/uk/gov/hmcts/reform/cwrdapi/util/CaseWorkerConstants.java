@@ -105,8 +105,15 @@ public final class CaseWorkerConstants {
     public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work"
             + " and upload the file again";
     public static final String NO_USER_TYPE_PRESENT = "You must add a user type and upload the file again";
+
     public static final String FIRST_NAME_MISSING = "You must add a first name and upload the file again";
     public static final String LAST_NAME_MISSING = "You must add a last name and upload the file again";
+    public static final String FIRST_NAME_INVALID = "First Name is invalid - must be less than 128 characters"
+            + " and not contain unallowed special characters";
+    public static final String LAST_NAME_INVALID = "Last Name is invalid - must be less than 128 characters"
+            + " and not contain unallowed special characters";
+    public static final String NAME_REGEX = "^[a-zA-Z' -]*$";
+
     public static final String MISSING_REGION = "You must add a region and upload the file again";
     public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
             + "Please try again or check with HMCTS Support Team";
@@ -125,6 +132,5 @@ public final class CaseWorkerConstants {
 
     public static final String RESPONSE_BODY_MISSING_FROM_UP = "Response Body is missing from User Profile";
 
-    public static final String NAME_REGEX = "^[a-zA-Z' -]*$";
 
 }

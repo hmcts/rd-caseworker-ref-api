@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import javax.validation.ConstraintViolationException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -59,12 +58,6 @@ public class ExceptionMapper {
     public ResponseEntity<Object> handlerForNoCaseWorkersFound(
             ResourceNotFoundException ex) {
         return errorDetailsResponseEntity(ex, NOT_FOUND, EMPTY_RESULT_DATA_ACCESS.getErrorMessage());
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handlerForConstraintViolation(
-            ConstraintViolationException ex) {
-        return errorDetailsResponseEntity(ex, BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(IdamRolesMappingException.class)

@@ -20,11 +20,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import static javax.persistence.CascadeType.ALL;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
 
 
 @Entity(name = "case_worker_profile")
@@ -41,12 +39,10 @@ public class CaseWorkerProfile implements Serializable {
 
     @Column(name = "first_name")
     @Size(max = 128)
-    @Pattern(regexp = NAME_REGEX)
     private String firstName;
 
     @Column(name = "last_name")
     @Size(max = 128)
-    @Pattern(regexp = NAME_REGEX)
     private String lastName;
 
     @Column(name = "email_id", unique = true)

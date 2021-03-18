@@ -157,31 +157,4 @@ public class CaseWorkerProfileTest {
 
         Assertions.assertThat(violations.size()).isEqualTo(1);
     }
-
-    @Test
-    public void testCaseWorkerProfileWithNameIncludingUnallowedSpecialCharactersIsConstraintViolation() {
-        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setCaseWorkerId("CWID1");
-        caseWorkerProfile.setFirstName(RandomStringUtils.randomAlphabetic(15) + "*");
-        caseWorkerProfile.setLastName("CWLastName");
-        caseWorkerProfile.setEmailId("CWtest@test.com");
-        caseWorkerProfile.setUserTypeId(1L);
-        caseWorkerProfile.setRegion("Region");
-        caseWorkerProfile.setRegionId(12);
-        caseWorkerProfile.setSuspended(true);
-        caseWorkerProfile.setCreatedDate(LocalDateTime.now());
-        caseWorkerProfile.setLastUpdate(LocalDateTime.now());
-
-        UserType userType = new UserType();
-        userType.setUserTypeId(1L);
-        userType.setDescription("Test Description");
-        userType.setCreatedDate(LocalDateTime.now());
-        userType.setLastUpdate(LocalDateTime.now());
-        caseWorkerProfile.setUserType(userType);
-
-        Set<ConstraintViolation<CaseWorkerProfile>> violations = validator
-                .validate(caseWorkerProfile);
-
-        Assertions.assertThat(violations.size()).isEqualTo(1);
-    }
 }
