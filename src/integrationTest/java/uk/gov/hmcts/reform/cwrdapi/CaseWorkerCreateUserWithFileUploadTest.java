@@ -218,10 +218,12 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         errors.add(JsrFileErrors.builder().rowId("14").filedInError(LOCATION_FIELD).errorDescription(
             NO_PRIMARY_LOCATION_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("15").filedInError("officialEmail").errorDescription(
+            INVALID_EMAIL).build());
 
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("12 record(s) failed validation and 1 record(s) uploaded")
+            .detailedMessage("13 record(s) failed validation and 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
@@ -342,10 +344,10 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
                         " With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
-        assertThat((List)response.get("error_details")).isEmpty();
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 1));
+        assertThat((List)response.get("error_details")).isNull();
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
-        assertThat(caseWorkerAudits.size()).isEqualTo(2);
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers).isEmpty();
