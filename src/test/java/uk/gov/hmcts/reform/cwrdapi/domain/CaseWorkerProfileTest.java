@@ -132,7 +132,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileWithNameLongerThan150CharactersIsConstraintViolation() {
+    public void testCaseWorkerProfileWithNameLongerThan128CharactersIsConstraintViolation() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName(RandomStringUtils.randomAlphabetic(129));

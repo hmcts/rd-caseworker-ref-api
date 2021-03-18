@@ -114,5 +114,4 @@ public class ExceptionMapperTest {
         assertEquals(exception.getMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
 
     }
-
 }
