@@ -245,7 +245,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
-
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
