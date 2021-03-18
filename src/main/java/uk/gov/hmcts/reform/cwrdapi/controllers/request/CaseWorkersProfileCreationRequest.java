@@ -19,10 +19,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
 @Builder(builderMethodName = "caseWorkersProfileCreationRequest")
 public class CaseWorkersProfileCreationRequest {
 
-    @Pattern(regexp = NAME_REGEX)
     @JsonDeserialize(using = TrimStringFields.class)
     private String firstName;
-    @Pattern(regexp = NAME_REGEX)
     @JsonDeserialize(using = TrimStringFields.class)
     private String lastName;
     @JsonDeserialize(using = TrimStringFields.class)
