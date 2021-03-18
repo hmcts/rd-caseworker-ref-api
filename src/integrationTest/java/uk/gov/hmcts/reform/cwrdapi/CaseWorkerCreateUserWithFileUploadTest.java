@@ -266,7 +266,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "Some records failed during validation and were ignored.\","
             + "\"message_details\":\"1 record(s) failed validation\","
             + "\"error_details\":[{\"row_id\":\"2\","
-            + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
+            + "\"error_description\":\"User creation is not possible at this moment. "
+                + "Please try again later or check with administrator.\"}]}";
 
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
