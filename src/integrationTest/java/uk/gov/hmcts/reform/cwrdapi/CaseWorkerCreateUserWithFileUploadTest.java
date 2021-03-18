@@ -245,10 +245,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
-                .willReturn(aResponse()
-                .withStatus(403)
-                .withHeader("Content-Type", "application/json")));
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
 
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
