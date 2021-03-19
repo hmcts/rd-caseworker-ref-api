@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -526,7 +525,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 if (responseEntity.getBody() instanceof ErrorResponse) {
                     Optional<ErrorResponse> optional = Optional.ofNullable((ErrorResponse) responseEntity.getBody());
                     validationServiceFacade.logFailures(
-                            optional.map(ErrorResponse::getErrorDescription).orElse(StringUtils.EMPTY),
+                            optional.map(ErrorResponse::getErrorDescription).orElse(UP_CREATION_FAILED),
                             cwrdProfileRequest.getRowId());
                 } else {
                     validationServiceFacade.logFailures(UP_CREATION_FAILED, cwrdProfileRequest.getRowId());
