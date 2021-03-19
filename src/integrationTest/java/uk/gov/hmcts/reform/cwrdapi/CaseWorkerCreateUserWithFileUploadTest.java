@@ -235,9 +235,9 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         errors.add(JsrFileErrors.builder().rowId("14").filedInError(LOCATION_FIELD).errorDescription(
             NO_PRIMARY_LOCATION_PRESENT).build());
-        errors.add(JsrFileErrors.builder().rowId("16").filedInError("firstName").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("15").filedInError("firstName").errorDescription(
                 FIRST_NAME_INVALID).build());
-        errors.add(JsrFileErrors.builder().rowId("17").filedInError("lastName").errorDescription(
+        errors.add(JsrFileErrors.builder().rowId("16").filedInError("lastName").errorDescription(
                 LAST_NAME_INVALID).build());
 
         return CaseWorkerFileCreationResponse.builder()
