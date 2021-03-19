@@ -22,12 +22,14 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.FILE_UPLOAD_IN_PROGRESS;
@@ -35,6 +37,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_EMAIL_PROFILES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
@@ -48,6 +51,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_ROLE_PRESE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TYPE_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_WORK_AREA_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
@@ -331,7 +335,23 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
         assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_FAILED, 4));
+        assertThat(response.get("message_details")).isEqualTo(format(RECORDS_FAILED, 4));
         assertThat((List)response.get("error_details")).hasSize(4);
+    }
+
+    @Test
+    public void shouldHandleDuplicateEmailProfiles() throws IOException {
+        Map<String, Object> response =
+                uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
+        assertThat(response.get("message_details")).isEqualTo(format(RECORDS_FAILED, 2)
+                .concat(" and ")
+                .concat(format(RECORDS_UPLOADED, 1)));
+        assertThat((List)response.get("error_details")).hasSize(2);
+        assertTrue(((List<?>) response.get("error_details")).get(0).toString()
+                .contains(format(DUPLICATE_EMAIL_PROFILES, 2)));
+        assertTrue(((List<?>) response.get("error_details")).get(1).toString()
+                .contains(format(DUPLICATE_EMAIL_PROFILES, 3)));
     }
 }
