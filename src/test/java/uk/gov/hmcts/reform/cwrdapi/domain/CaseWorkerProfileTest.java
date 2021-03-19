@@ -11,6 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class CaseWorkerProfileTest {
+
     @Test
     public void testCaseWorkerProfile() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
