@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
@@ -18,20 +18,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
 
-public class JsrValidatorInitializerTest {
+class JsrValidatorInitializerTest {
 
     @Spy
     @InjectMocks
     static JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
-    @Before
+    @BeforeEach
     public void init() {
         openMocks(this);
         jsrValidatorInitializer.initializeFactory();
     }
 
     @Test
-    public void testGetNoInvalidJsrRecords() {
+    void testGetNoInvalidJsrRecords() {
         List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         assertEquals(0, records.size());
@@ -39,7 +39,7 @@ public class JsrValidatorInitializerTest {
     }
 
     @Test
-    public void testGetInvalidJsrRecords() {
+    void testGetInvalidJsrRecords() {
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         profile.setOfficialEmail("abc.com");
@@ -51,7 +51,7 @@ public class JsrValidatorInitializerTest {
 
     @ParameterizedTest
     @CsvSource({"tEst123-CRD3@JUSTICE.GOV.UK,0", "$%^&@justice.gov.uk,1", "user name@justice.gov.uk,1"})
-    public void testGetInvalidJsrRecords_withDifferentEmails(String email, int expectedInvalidRecords) {
+    void testGetInvalidJsrRecords_withDifferentEmails(String email, int expectedInvalidRecords) {
         List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
         CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
         record.setOfficialEmail(email);
