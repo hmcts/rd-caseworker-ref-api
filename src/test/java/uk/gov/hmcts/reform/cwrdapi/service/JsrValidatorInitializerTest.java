@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
@@ -34,7 +34,7 @@ class JsrValidatorInitializerTest {
     void testGetNoInvalidJsrRecords() {
         List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(0, records.size());
+        Assertions.assertEquals(0, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 
@@ -45,7 +45,7 @@ class JsrValidatorInitializerTest {
         profile.setOfficialEmail("abc.com");
         caseWorkerProfiles.add(profile);
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(1, records.size());
+        Assertions.assertEquals(1, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 
@@ -56,7 +56,7 @@ class JsrValidatorInitializerTest {
         CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
         record.setOfficialEmail(email);
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(expectedInvalidRecords, records.size());
+        Assertions.assertEquals(expectedInvalidRecords, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 
