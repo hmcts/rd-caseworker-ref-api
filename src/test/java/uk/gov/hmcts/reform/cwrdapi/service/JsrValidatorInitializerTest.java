@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
@@ -20,7 +22,7 @@ public class JsrValidatorInitializerTest {
 
     @Spy
     @InjectMocks
-    JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
+    static JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
     @Before
     public void init() {
@@ -47,33 +49,15 @@ public class JsrValidatorInitializerTest {
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 
-    @Test
-    public void testGetNoInvalidJsrRecords_whenEmailWithMixedCases() {
+    @ParameterizedTest
+    @CsvSource({"tEst123-CRD3@JUSTICE.GOV.UK,0", "$%^&@justice.gov.uk,1", "user name@justice.gov.uk,1"})
+    public void testGetInvalidJsrRecords_withDifferentEmails(String email, int expectedInvalidRecords) {
         List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
         CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
-        record.setOfficialEmail("tEst123-CRD3@JUSTICE.GOV.UK");
+        record.setOfficialEmail(email);
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(0, records.size());
+        assertEquals(expectedInvalidRecords, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
 
-    @Test
-    public void testGetInvalidJsrRecords_whenEmailWithSpecialChars() {
-        List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
-        CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
-        record.setOfficialEmail("$%^&@justice.gov.uk");
-        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(1, records.size());
-        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
-    }
-
-    @Test
-    public void testGetInvalidJsrRecords_whenEmailWithSpaceInBetween() {
-        List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
-        CaseWorkerProfile record = (CaseWorkerProfile) caseWorkerProfiles.get(0);
-        record.setOfficialEmail("user name@justice.gov.uk");
-        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
-        assertEquals(1, records.size());
-        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
-    }
 }
