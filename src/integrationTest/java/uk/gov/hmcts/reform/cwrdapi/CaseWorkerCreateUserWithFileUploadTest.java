@@ -350,8 +350,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
                 .concat(format(RECORDS_UPLOADED, 1)));
         assertThat((List)response.get("error_details")).hasSize(2);
         assertTrue(((List<?>) response.get("error_details")).get(0).toString()
-                .contains(format(DUPLICATE_EMAIL_PROFILES, 2)));
-        assertTrue(((List<?>) response.get("error_details")).get(1).toString()
                 .contains(format(DUPLICATE_EMAIL_PROFILES, 3)));
+        assertTrue(((List<?>) response.get("error_details")).get(1).toString()
+                .contains(format(DUPLICATE_EMAIL_PROFILES, 4)));
     }
 }
