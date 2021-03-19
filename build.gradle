@@ -232,6 +232,7 @@ task runProviderPactVerification(type: Test) {
   logger.lifecycle("Runs pact Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
+  systemProperty 'pact.provider.version', project.pactVersion
 }
 
 runProviderPactVerification.dependsOn contractTest
