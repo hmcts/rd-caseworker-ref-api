@@ -38,8 +38,10 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_INVALID;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_MISSING;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_INVALID;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_MISSING;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.MISSING_REGION;
@@ -101,6 +103,23 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         CaseWorkerIdamRoleAssociation association = associations.get(0);
         assertThat(association.getIdamRole()).isEqualTo("caseworker-iac");
         assertThat(association.getServiceCode()).isEqualTo("BBA9");
+    }
+
+    @Test
+    public void shouldReturn200PartialSuccessWhenNameIsLongerThan128AndNameHasInvalidCharacter() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile(
+                "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
+                CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
+        assertThat(response.get("message_details"))
+                .isEqualTo(String.format("2 record(s) failed validation and 1 record(s) uploaded", 2));
+        assertThat(response.get("error_details").toString()).contains(FIRST_NAME_INVALID);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers).isNotEmpty();
     }
 
     @Test
@@ -222,10 +241,14 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
         errors.add(JsrFileErrors.builder().rowId("14").filedInError(LOCATION_FIELD).errorDescription(
             NO_PRIMARY_LOCATION_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("15").filedInError("firstName").errorDescription(
+                FIRST_NAME_INVALID).build());
+        errors.add(JsrFileErrors.builder().rowId("16").filedInError("lastName").errorDescription(
+                LAST_NAME_INVALID).build());
 
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("12 record(s) failed validation and 1 record(s) uploaded")
+            .detailedMessage("14 record(s) failed validation and 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
@@ -268,7 +291,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "Some records failed during validation and were ignored.\","
             + "\"message_details\":\"1 record(s) failed validation\","
             + "\"error_details\":[{\"row_id\":\"2\","
-            + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
+            + "\"error_description\":\"User creation is not possible at this moment. "
+                + "Please try again later or check with administrator.\"}]}";
 
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
