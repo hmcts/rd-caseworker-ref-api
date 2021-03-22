@@ -3,14 +3,12 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
@@ -84,7 +82,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FROM_UP;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SUSPEND_USER_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
@@ -274,12 +271,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             .map(CaseWorkerProfile::getCaseWorkerId)
             .collect(Collectors.toUnmodifiableList());
 
-        PublishCaseWorkerData publishCaseWorkerData = new PublishCaseWorkerData();
-        ListUtils.partition(caseWorkerIds, caseWorkerDataPerMessage)
-            .forEach(data -> {
-                publishCaseWorkerData.setUserIds(data);
-                topicPublisher.sendMessage(publishCaseWorkerData);
-            });
+        topicPublisher.sendMessage(caseWorkerIds);
     }
 
     /**
@@ -527,8 +519,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 clazz = UserProfileCreationResponse.class;
             } else {
                 clazz = ErrorResponse.class;
-                validationServiceFacade.logFailures(format(UP_CREATION_FAILED, response.status()),
-                    cwrdProfileRequest.getRowId());
+                validationServiceFacade.logFailures(UP_CREATION_FAILED, cwrdProfileRequest.getRowId());
             }
             return toResponseEntity(response, clazz);
         } catch (Exception ex) {
@@ -557,14 +548,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .getAttributeResponse()))
                 || (!(((UserProfileRolesResponse) resultResponse.get())
                 .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.OK.value())))) {
-                validationServiceFacade.logFailures(SUSPEND_USER_FAILED, rowId);
+                validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
                 status = false;
             }
 
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
                 loggingComponentName, rowId, ex.getMessage(),validationServiceFacade.getAuditJobId());
-            validationServiceFacade.logFailures(SUSPEND_USER_FAILED, rowId);
+            validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
             status = false;
         }
         return status;
@@ -587,7 +578,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
                 loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
-            validationServiceFacade.logFailures("can't modify roles for user in UP", rowId);
+            validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
             return false;
         }
         return true;

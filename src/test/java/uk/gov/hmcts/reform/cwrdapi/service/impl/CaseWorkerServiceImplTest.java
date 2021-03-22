@@ -302,7 +302,7 @@ public class CaseWorkerServiceImplTest {
         caseWorkerProfiles.add(caseWorkerProfile);
         caseWorkerProfiles.add(secondCaseWorkerProfile);
         caseWorkerServiceImpl.publishCaseWorkerDataToTopic(caseWorkerProfiles);
-        verify(topicPublisher, times(2)).sendMessage(any());
+        verify(topicPublisher, times(1)).sendMessage(any());
     }
 
 

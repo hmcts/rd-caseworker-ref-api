@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.JsrFileErrors;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
@@ -37,7 +38,17 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_INVALID;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_MISSING;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_INVALID;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_MISSING;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.MISSING_REGION;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_ROLE_PRESENT;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TYPE_PRESENT;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_WORK_AREA_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
@@ -48,6 +59,9 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Autowired
     JdbcTemplate template;
+
+    String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
+            + "\"message_details\":\"4 record(s) uploaded\"}";
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
@@ -67,8 +81,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
 
-        String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
-            + "\"message_details\":\"4 record(s) uploaded\"}";
         Map<String, Object> response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -81,6 +93,33 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers).isEmpty();
+    }
+
+    @Test
+    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully_with_extra_spaces() throws IOException {
+        uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+
+        List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
+        CaseWorkerIdamRoleAssociation association = associations.get(0);
+        assertThat(association.getIdamRole()).isEqualTo("caseworker-iac");
+        assertThat(association.getServiceCode()).isEqualTo("BBA9");
+    }
+
+    @Test
+    public void shouldReturn200PartialSuccessWhenNameIsLongerThan128AndNameHasInvalidCharacter() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile(
+                "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
+                CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
+        assertThat(response.get("message_details"))
+                .isEqualTo(String.format("2 record(s) failed validation and 1 record(s) uploaded", 2));
+        assertThat(response.get("error_details").toString()).contains(FIRST_NAME_INVALID);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers).isNotEmpty();
     }
 
     @Test
@@ -172,31 +211,38 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     private CaseWorkerFileCreationResponse createCaseWorkerExpectedErrorDetails() {
         LinkedList<JsrFileErrors> errors = new LinkedList<>();
-        errors.add(JsrFileErrors.builder().rowId("3").filedInError("locations").errorDescription(
-            CaseWorkerConstants.NO_LOCATION_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("3").filedInError(LOCATION_FIELD).errorDescription(
+            NO_PRIMARY_LOCATION_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("4").filedInError("roles").errorDescription(
-            CaseWorkerConstants.NO_ROLE_PRESENT).build());
+            NO_ROLE_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("5").filedInError("workAreas").errorDescription(
-            CaseWorkerConstants.NO_WORK_AREA_PRESENT).build());
+            NO_WORK_AREA_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("6").filedInError("userType").errorDescription(
-            CaseWorkerConstants.NO_USER_TYPE_PRESENT).build());
+            NO_USER_TYPE_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("7").filedInError("firstName").errorDescription(
-            CaseWorkerConstants.FIRST_NAME_MISSING).build());
+            FIRST_NAME_MISSING).build());
         errors.add(JsrFileErrors.builder().rowId("8").filedInError("lastName").errorDescription(
-            CaseWorkerConstants.LAST_NAME_MISSING).build());
+            LAST_NAME_MISSING).build());
         errors.add(JsrFileErrors.builder().rowId("9").filedInError("officialEmail").errorDescription(
-            CaseWorkerConstants.INVALID_EMAIL).build());
+            INVALID_EMAIL).build());
         errors.add(JsrFileErrors.builder().rowId("10").filedInError("regionName").errorDescription(
-            CaseWorkerConstants.MISSING_REGION).build());
+            MISSING_REGION).build());
         errors.add(JsrFileErrors.builder().rowId("12").filedInError(ROLE_FIELD).errorDescription(
             DUPLICATE_PRIMARY_AND_SECONDARY_ROLES).build());
         errors.add(JsrFileErrors.builder().rowId("11").filedInError(LOCATION_FIELD).errorDescription(
             DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS).build());
         errors.add(JsrFileErrors.builder().rowId("13").filedInError(AREA_OF_WORK_FIELD).errorDescription(
             DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK).build());
+        errors.add(JsrFileErrors.builder().rowId("14").filedInError(LOCATION_FIELD).errorDescription(
+            NO_PRIMARY_LOCATION_PRESENT).build());
+        errors.add(JsrFileErrors.builder().rowId("15").filedInError("firstName").errorDescription(
+                FIRST_NAME_INVALID).build());
+        errors.add(JsrFileErrors.builder().rowId("16").filedInError("lastName").errorDescription(
+                LAST_NAME_INVALID).build());
+
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("11 record(s) failed validation and 1 record(s) uploaded")
+            .detailedMessage("14 record(s) failed validation and 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
@@ -239,7 +285,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "Some records failed during validation and were ignored.\","
             + "\"message_details\":\"1 record(s) failed validation\","
             + "\"error_details\":[{\"row_id\":\"2\","
-            + "\"error_description\":\"Failed to create in UP with response status 404\"}]}";
+            + "\"error_description\":\"User creation is not possible at this moment. "
+                + "Please try again later or check with administrator.\"}]}";
 
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
