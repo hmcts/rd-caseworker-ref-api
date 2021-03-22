@@ -155,7 +155,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
                 .collect(groupingBy(CaseWorkerProfile::getOfficialEmail)).values().stream()
                 .filter(duplicateEmailProfile -> duplicateEmailProfile.size() > 1)
                 .forEach(duplicateEmailProfiles::addAll);
-        if (!duplicateEmailProfiles.isEmpty()) {
+        if (isNotEmpty(duplicateEmailProfiles)) {
             duplicateEmailProfiles.forEach(p -> validationServiceFacadeImpl
                     .logFailures(format(DUPLICATE_EMAIL_PROFILES, p.getRowId()), p.getRowId()));
             caseWorkerRequest.removeAll(duplicateEmailProfiles);
