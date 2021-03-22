@@ -149,12 +149,12 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
     }
 
     private void validateDuplicateEmailProfiles(List<CaseWorkerDomain> caseWorkerRequest) {
-        List<CaseWorkerDomain> duplicateEmailProfiles = new ArrayList<>();
-        caseWorkerRequest.stream()
+        List<CaseWorkerDomain> duplicateEmailProfiles = caseWorkerRequest.stream()
                 .map(CaseWorkerProfile.class::cast)
                 .collect(groupingBy(CaseWorkerProfile::getOfficialEmail)).values().stream()
                 .filter(duplicateEmailProfile -> duplicateEmailProfile.size() > 1)
-                .forEach(duplicateEmailProfiles::addAll);
+                .collect(ArrayList::new, List::addAll, List::addAll);
+
         if (isNotEmpty(duplicateEmailProfiles)) {
             duplicateEmailProfiles.forEach(p -> validationServiceFacadeImpl
                     .logFailures(format(DUPLICATE_EMAIL_PROFILES, p.getRowId()), p.getRowId()));
