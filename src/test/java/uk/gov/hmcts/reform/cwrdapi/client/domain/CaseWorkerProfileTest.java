@@ -85,9 +85,9 @@ public class CaseWorkerProfileTest {
         assertNotNull(caseWorkerProfile.getLocations());
 
         String caseWorkerProfileString = CaseWorkerProfile.builder()
-                .id("CWID1").build().toString();
+                .id("CWID1").toString();
 
-        assertTrue(caseWorkerProfileString.contains("uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile"));
+        assertTrue(caseWorkerProfileString.contains("CaseWorkerProfile.CaseWorkerProfileBuilder(id=CWID1"));
     }
 
     @Test
