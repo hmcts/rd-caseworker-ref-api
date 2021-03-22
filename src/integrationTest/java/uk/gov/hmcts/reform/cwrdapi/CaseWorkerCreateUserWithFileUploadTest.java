@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.gson.Gson;
-import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -269,9 +268,10 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldCreateCaseWorkerAuditFailureForBadIdamRoles() throws IOException {
         //create invalid stub of UP for Exception validation
+        String errorMessageFromIdam = "The role to be assigned does not exist.";
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .errorCode(500)
-                .errorDescription("The role to be assigned does not exist.").build();
+                .errorCode(404)
+                .errorDescription(errorMessageFromIdam).build();
 
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
@@ -279,13 +279,14 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
                 .withBody(new Gson().toJson(errorResponse).getBytes())));
         
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
-                TYPE_XLSX, "200", cwdAdmin);
+                TYPE_XLSX, "200 OK", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
-        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(FAILURE.getStatus());
-        assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(1);
         assertNotNull(exceptionCaseWorkers.get(0).getErrorDescription());
+        assertEquals(exceptionCaseWorkers.get(0).getErrorDescription(), errorMessageFromIdam);
     }
 
     @Test
