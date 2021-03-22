@@ -160,6 +160,8 @@ pmd {
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
+  minHeapSize = "128m"
+  maxHeapSize = "2000m"
   finalizedBy aggregate
 }
 
