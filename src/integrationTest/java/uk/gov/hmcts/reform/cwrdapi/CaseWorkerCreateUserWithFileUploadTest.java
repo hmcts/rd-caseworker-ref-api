@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.google.gson.Gson;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -255,6 +258,28 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "500", cwdAdmin);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(FAILURE.getStatus());
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
+        assertNotNull(exceptionCaseWorkers.get(0).getErrorDescription());
+    }
+
+    @Test
+    public void shouldCreateCaseWorkerAuditFailureForBadIdamRoles() throws IOException {
+        //create invalid stub of UP for Exception validation
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .errorCode(500)
+                .errorDescription("The role to be assigned does not exist.").build();
+
+        userProfileService.resetAll();
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
+                .willReturn(aResponse().withStatus(500)
+                .withBody(new Gson().toJson(errorResponse).getBytes())));
+        
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+                TYPE_XLSX, "200", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
