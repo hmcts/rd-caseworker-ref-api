@@ -65,7 +65,7 @@ public class FetchCaseworkersByIdProviderTest {
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
-        if(context != null) {
+        if (context != null) {
             context.verifyInteraction();
         }
     }
@@ -77,7 +77,7 @@ public class FetchCaseworkersByIdProviderTest {
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", caseWorkerServiceImpl));
-        if(context != null) {
+        if (context != null) {
             context.setTarget(testTarget);
         }
     }
