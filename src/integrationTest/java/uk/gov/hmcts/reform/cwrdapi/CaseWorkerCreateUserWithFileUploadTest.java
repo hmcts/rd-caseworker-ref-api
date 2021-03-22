@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -376,5 +377,13 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
                 .contains(format(DUPLICATE_EMAIL_PROFILES, 3)));
         assertTrue(((List<?>) response.get("error_details")).get(1).toString()
                 .contains(format(DUPLICATE_EMAIL_PROFILES, 4)));
+
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
+        Assertions.assertEquals(format(DUPLICATE_EMAIL_PROFILES, 3), exceptionCaseWorkers.get(0).getErrorDescription());
+        Assertions.assertEquals(format(DUPLICATE_EMAIL_PROFILES, 4), exceptionCaseWorkers.get(1).getErrorDescription());
     }
 }
