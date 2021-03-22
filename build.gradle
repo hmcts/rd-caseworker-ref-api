@@ -253,7 +253,8 @@ pitest {
   targetClasses = ['uk.gov.hmcts.reform.*']
   excludedClasses = [
     'uk.gov.hmcts.reform.cwrdapi.config.*',
-    'uk.gov.hmcts.reform.cwrdapi.controller.*',
+    'uk.gov.hmcts.reform.cwrdapi.domain.*',
+    'uk.gov.hmcts.reform.cwrdapi.controllers.*',
     'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
   ]
   threads = 10
