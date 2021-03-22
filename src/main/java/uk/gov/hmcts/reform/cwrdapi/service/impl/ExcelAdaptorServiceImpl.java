@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.micrometer.core.instrument.util.StringUtils.isNotEmpty;
 import static java.lang.String.format;
@@ -114,46 +115,40 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         rowIterator.next();//skip header
         Field rowField = getRowIdField((Class<Object>) classType);
         Optional<Object> bean;
+        int blankRowCount = 0;
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            if (isNotTrue(isBlankRow(row))) {
-                bean = handleRowProcessing(classType, rowField, headers, row, parentFieldMap,
-                        childHeaderToCellMap, customObjectFieldsMapping);
-                bean.ifPresent(o -> objectList.add((T) o));
-            } else {
-                break;
+            try {
+                if (isNotTrue(checkIfRowIsEmpty(row))) {
+                    bean = handleRowProcessing(classType, rowField, headers, row, parentFieldMap,
+                           childHeaderToCellMap, customObjectFieldsMapping);
+                    bean.ifPresent(o -> objectList.add((T) o));
+                } else {
+                    blankRowCount++;
+                }
+            } catch (Exception ex) {
+                validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
+                        row.getRowNum());
             }
+        }
+
+        //throw exception if all rows in the file are blank
+        if (blankRowCount == sheet.getLastRowNum()) {
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
         return objectList;
     }
 
-    private boolean isBlankRow(Row row) {
-        boolean isEmptyRow = false;
-        try {
-            if (checkIfRowIsEmpty(row)) {
-                if (row.getRowNum() == 1) {
-                    throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
-                }
-                isEmptyRow = true;
-            }
-        } catch (ExcelValidationException e) {
-            throw e;
-        } catch (Exception ex) {
-            log.error("{}::{}:: Job Id {}", loggingComponentName, FILE_NO_DATA_ERROR_MESSAGE,
-                    validationServiceFacade.getAuditJobId());
-        }
-        return isEmptyRow;
-    }
 
     public <T> Optional<Object> handleRowProcessing(Class<T> classType, Field rowField, List<String> headers, Row row,
                                                     Map<String, Field> parentFieldMap,
                                                     Map<String, Object> childHeaderToCellMap,
                                                     List<Triple<String, Field, List<Field>>>
-                                                        customObjectFieldsMapping) {
+                                                    customObjectFieldsMapping) {
         Object bean;
         try {
             bean = populateDomainObject(classType, rowField, headers, row, parentFieldMap, childHeaderToCellMap,
-                customObjectFieldsMapping);
+                   customObjectFieldsMapping);
         } catch (Exception ex) {
             validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
                 row.getRowNum());
