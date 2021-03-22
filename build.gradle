@@ -161,7 +161,7 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
   minHeapSize = "128m"
-  maxHeapSize = "1025m"
+  maxHeapSize = "1024m"
   finalizedBy aggregate
 }
 
