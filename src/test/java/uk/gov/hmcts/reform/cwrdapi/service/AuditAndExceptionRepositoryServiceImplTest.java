@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -72,11 +73,20 @@ public class AuditAndExceptionRepositoryServiceImplTest {
 
     @Test
     public void testGetAllExceptions() {
+        List<ExceptionCaseWorker> exceptionCaseWorkers = new ArrayList<>();
         ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
         exceptionCaseWorker.setJobId(1L);
+        exceptionCaseWorkers.add(exceptionCaseWorker);
+
         when(caseWorkerExceptionRepository.save(exceptionCaseWorker)).thenReturn(exceptionCaseWorker);
+        when(caseWorkerExceptionRepository.findByJobId(1L)).thenReturn(exceptionCaseWorkers);
+
         auditAndExceptionRepositoryServiceImpl.auditException(exceptionCaseWorker);
-        auditAndExceptionRepositoryServiceImpl.getAllExceptions(1L);
+        List<ExceptionCaseWorker> caseWorkers =
+                auditAndExceptionRepositoryServiceImpl.getAllExceptions(1L);
+
+        assertThat(caseWorkers).isNotEmpty();
+
         verify(auditAndExceptionRepositoryServiceImpl).getAllExceptions(1L);
     }
 }
