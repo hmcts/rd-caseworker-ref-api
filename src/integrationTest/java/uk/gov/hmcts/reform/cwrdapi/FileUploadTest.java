@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -34,7 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired

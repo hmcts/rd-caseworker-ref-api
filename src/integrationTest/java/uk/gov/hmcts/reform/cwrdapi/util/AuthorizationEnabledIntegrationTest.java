@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
     "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
