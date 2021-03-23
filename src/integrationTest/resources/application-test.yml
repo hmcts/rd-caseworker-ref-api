@@ -18,6 +18,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
+        ddl-auto: create-drop
         order_updates: true
         order_inserts: true
         jdbc:
