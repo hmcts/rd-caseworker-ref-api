@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ExceptionCaseWorkerTest {
 
@@ -37,5 +38,34 @@ public class ExceptionCaseWorkerTest {
         ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
         exceptionCaseWorker.setCaseWorkerAudit(caseWorkerAudit);
         assertNotNull(exceptionCaseWorker.getCaseWorkerAudit());
+    }
+
+    @Test
+    public void testExceptionCaseWorkerBuilder() {
+        ExceptionCaseWorker exceptionCaseWorker = ExceptionCaseWorker.builder()
+                .id(1L)
+                .jobId(1L)
+                .excelRowId("ExcelRow1")
+                .keyField("Test@test.com")
+                .fieldInError("Field1")
+                .errorDescription("Invalid Email")
+                .updatedTimeStamp(LocalDateTime.now())
+                .caseWorkerAudit(CaseWorkerAudit.builder().jobId(1L).build())
+                .build();
+
+        assertNotNull(exceptionCaseWorker);
+        assertThat(exceptionCaseWorker.getId(), is(1L));
+        assertThat(exceptionCaseWorker.getJobId(), is(1L));
+        assertThat(exceptionCaseWorker.getExcelRowId(), is("ExcelRow1"));
+        assertThat(exceptionCaseWorker.getKeyField(), is("Test@test.com"));
+        assertThat(exceptionCaseWorker.getFieldInError(), is("Field1"));
+        assertThat(exceptionCaseWorker.getErrorDescription(), is("Invalid Email"));
+        assertNotNull(exceptionCaseWorker.getUpdatedTimeStamp());
+        assertNotNull(exceptionCaseWorker.getCaseWorkerAudit());
+
+        String exceptionCaseWorkerString = ExceptionCaseWorker.builder().id(1L).toString();
+
+        assertTrue(exceptionCaseWorkerString.contains("ExceptionCaseWorker.ExceptionCaseWorkerBuilder(id=1"));
+
     }
 }
