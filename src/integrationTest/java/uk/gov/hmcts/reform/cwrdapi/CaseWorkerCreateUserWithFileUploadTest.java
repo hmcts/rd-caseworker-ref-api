@@ -275,7 +275,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
-                .willReturn(aResponse().withStatus(500)
+                .willReturn(aResponse().withStatus(404)
                 .withBody(new Gson().toJson(errorResponse).getBytes())));
         
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
