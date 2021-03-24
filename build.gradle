@@ -36,7 +36,6 @@ def versions = [
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
   springBoot         : '2.3.9.RELEASE',
-  springHystrix      : '2.1.1.RELEASE',
   springfoxSwagger   : '2.9.2',
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.2.2",
@@ -160,6 +159,8 @@ pmd {
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
+  minHeapSize = "128m"
+  maxHeapSize = "1024m"
   finalizedBy aggregate
 }
 
@@ -310,8 +311,6 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: versions.springBoot
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
-  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: versions.springHystrix
-  compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
 
 

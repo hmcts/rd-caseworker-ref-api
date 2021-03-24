@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +83,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FROM_UP;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SUSPEND_USER_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
@@ -527,21 +527,30 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     // Idam_UP call.
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> createUserProfileInIdamUP(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
-
+        ResponseEntity<Object> responseEntity;
         Response response = null;
         Object clazz;
         try {
             long time1 = currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
-            log.info("{}:: Time taken to call UP is {}", loggingComponentName, (currentTimeMillis() - time1));
-            if (response.status() == 201 || response.status() == 409) {
-                clazz = UserProfileCreationResponse.class;
-            } else {
-                clazz = ErrorResponse.class;
-                validationServiceFacade.logFailures(format(UP_CREATION_FAILED, response.status()),
-                    cwrdProfileRequest.getRowId());
+            log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
+
+            clazz = (response.status() == 201 || response.status() == 409)
+                    ? UserProfileCreationResponse.class : ErrorResponse.class;
+
+            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+            if (clazz == ErrorResponse.class) {
+                Object responseBody = responseEntity.getBody();
+                if (nonNull(responseBody) && responseBody instanceof ErrorResponse) {
+                    Optional<ErrorResponse> optional = Optional.ofNullable((ErrorResponse) responseBody);
+                    validationServiceFacade.logFailures(
+                            optional.map(ErrorResponse::getErrorDescription).orElse(UP_CREATION_FAILED),
+                            cwrdProfileRequest.getRowId());
+                } else {
+                    validationServiceFacade.logFailures(UP_CREATION_FAILED, cwrdProfileRequest.getRowId());
+                }
             }
-            return toResponseEntity(response, clazz);
+            return responseEntity;
         } catch (Exception ex) {
             log.error("{}:: UserProfile api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
                     ex.getMessage(), validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
@@ -568,14 +577,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .getAttributeResponse()))
                 || (!(((UserProfileRolesResponse) resultResponse.get())
                 .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.OK.value())))) {
-                validationServiceFacade.logFailures(SUSPEND_USER_FAILED, rowId);
+                validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
                 status = false;
             }
 
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
                 loggingComponentName, rowId, ex.getMessage(),validationServiceFacade.getAuditJobId());
-            validationServiceFacade.logFailures(SUSPEND_USER_FAILED, rowId);
+            validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
             status = false;
         }
         return status;
@@ -598,7 +607,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
                 loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
-            validationServiceFacade.logFailures("can't modify roles for user in UP", rowId);
+            validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
             return false;
         }
         return true;
