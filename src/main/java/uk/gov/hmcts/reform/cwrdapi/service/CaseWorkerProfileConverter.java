@@ -70,7 +70,7 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
         return caseWorkersProfileCreationRequests;
     }
 
-    public boolean isSuspended(CaseWorkerProfile obj) {
+    private boolean isSuspended(CaseWorkerProfile obj) {
         return "Y".equals(obj.getSuspended());
     }
 
@@ -117,7 +117,7 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
         return caseWorkerLocationRequests;
     }
 
-    public Set<String> generateIdamRoles(String idamRoles) {
+    private Set<String> generateIdamRoles(String idamRoles) {
         return idamRoles.contains(CaseWorkerConstants.DELIMITER_COMMA)
             ? Stream.of(idamRoles.split(CaseWorkerConstants.DELIMITER_COMMA))
             .collect(Collectors.toUnmodifiableSet())

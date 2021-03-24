@@ -3,16 +3,13 @@ package uk.gov.hmcts.reform.cwrdapi.service;
 import org.junit.Test;
 import uk.gov.hmcts.reform.cwrdapi.TestSupport;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -85,34 +82,6 @@ public class CaseWorkerProfileConverterTest {
         assertThat(suspendedRowIds).isNotEmpty();
         assertThat(suspendedRowIds.size()).isNotZero();
         assertThat(suspendedRowIds.get(0)).isZero();
-    }
-
-    @Test
-    public void testGenerateIdamRoles() {
-        Set<String> roles = caseWorkerProfileConverter.generateIdamRoles("role,role1,role2");
-
-        assertNotNull(roles);
-        assertFalse(roles.isEmpty());
-        assertThat(roles.size()).isNotZero();
-
-        Set<String> roles1 = caseWorkerProfileConverter.generateIdamRoles("role");
-
-        assertNotNull(roles1);
-        assertFalse(roles1.isEmpty());
-        assertThat(roles1.size()).isNotZero();
-    }
-
-    @Test
-    public void testIsSuspended() {
-        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setSuspended("Y");
-
-        assertTrue(caseWorkerProfileConverter.isSuspended(caseWorkerProfile));
-
-        CaseWorkerProfile caseWorkerProfile1 = new CaseWorkerProfile();
-        caseWorkerProfile.setSuspended("N");
-
-        assertFalse(caseWorkerProfileConverter.isSuspended(caseWorkerProfile1));
     }
 
     @Test
