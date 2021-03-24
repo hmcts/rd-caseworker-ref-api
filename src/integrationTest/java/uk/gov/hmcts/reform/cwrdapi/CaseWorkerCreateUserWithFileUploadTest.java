@@ -149,6 +149,12 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
+    public void shouldReturn400WhenFileHasAllEmptyRows() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload With All Empty Rows.xlsx",
+            TYPE_XLSX, "400", cwdAdmin);
+    }
+
+    @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             "application/octet-stream", "400", cwdAdmin);
@@ -362,6 +368,26 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat((List)response.get("error_details")).hasSize(4);
     }
 
+    @Test
+    public void shouldUploadStaffDataXlsxFileSuccessfully_whenEmptyRowsInBetween() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response.get("error_details")).isNull();
+    }
+
+    @Test
+    public void shouldUploadStaffDataXlsxFileSuccessfully_whenNoEmptyRowsInBetween() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response.get("error_details")).isNull();
+    }
+    
     @Test
     public void shouldCreateCaseWorkerAudit_when_email_in_capital_letters() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
