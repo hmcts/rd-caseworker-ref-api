@@ -79,6 +79,12 @@ public class CaseWorkerProfileConverterTest {
                 .getRoles().get(0).isPrimaryFlag());
         assertTrue(caseWorkersProfileCreationRequest
                 .isSuspended());
+
+        List<Long> suspendedRowIds = caseWorkerProfileConverter.getSuspendedRowIds();
+        assertNotNull(suspendedRowIds);
+        assertThat(suspendedRowIds).isNotEmpty();
+        assertThat(suspendedRowIds.size()).isNotZero();
+        assertThat(suspendedRowIds.get(0)).isEqualTo(0L);
     }
 
     @Test
@@ -118,6 +124,7 @@ public class CaseWorkerProfileConverterTest {
 
         List<Long> suspendedRowIds = caseWorkerProfileConverterMock.getSuspendedRowIds();
         assertNotNull(suspendedRowIds);
+        assertThat(suspendedRowIds).isNotEmpty();
         assertThat(suspendedRowIds.size()).isNotZero();
         assertThat(suspendedRowIds.get(0)).isEqualTo(1L);
     }

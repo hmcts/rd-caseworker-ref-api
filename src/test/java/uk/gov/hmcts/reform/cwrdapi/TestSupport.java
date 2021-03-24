@@ -18,27 +18,57 @@ public class TestSupport {
     public static List<CaseWorkerDomain> buildCaseWorkerProfileData() {
 
         ImmutableList<Location> locations = ImmutableList.of(
-            Location.builder().baseLocationId(1)
-                .locationName("1").isPrimary(true).build());
+                Location.builder().baseLocationId(1)
+                        .locationName("1").isPrimary(true).build());
 
         ImmutableList<WorkArea> workAreas = ImmutableList.of(
-            WorkArea.builder().serviceCode("AAA1").areaOfWork("area1").build());
+                WorkArea.builder().serviceCode("AAA1").areaOfWork("area1").build());
 
 
         ImmutableList<Role> roles = ImmutableList.of(
-            Role.builder().isPrimary(true)
-                .roleName("rl1").build());
+                Role.builder().isPrimary(true)
+                        .roleName("rl1").build());
 
         return ImmutableList.of(CaseWorkerProfile.builder()
-            .firstName("test").lastName("test")
-            .officialEmail("test@justice.gov.uk")
-            .regionId(1)
-            .regionName("test")
-            .userType("testUser")
-            .workAreas(workAreas)
-            .locations(locations)
-            .roles(roles)
-            .idamRoles("role1, role2")
-            .build());
+                .firstName("test").lastName("test")
+                .officialEmail("test@justice.gov.uk")
+                .regionId(1)
+                .regionName("test")
+                .userType("testUser")
+                .workAreas(workAreas)
+                .locations(locations)
+                .roles(roles)
+                .idamRoles("role1, role2")
+                .build());
+    }
+
+    public static List<CaseWorkerDomain> buildSuspendedCaseWorkerProfileData() {
+
+        ImmutableList<Location> locations = ImmutableList.of(
+                Location.builder().baseLocationId(1)
+                        .locationName("1").isPrimary(true).build());
+
+        ImmutableList<WorkArea> workAreas = ImmutableList.of(
+                WorkArea.builder().serviceCode("AAA1").areaOfWork("area1").build());
+
+
+        ImmutableList<Role> roles = ImmutableList.of(
+                Role.builder().isPrimary(true)
+                        .roleName("rl1").build(),
+                Role.builder().isPrimary(true)
+                        .roleName("").build());
+
+        return ImmutableList.of(CaseWorkerProfile.builder()
+                .firstName("test").lastName("test")
+                .officialEmail("test@justice.gov.uk")
+                .regionId(1)
+                .suspended("Y")
+                .regionName("test")
+                .userType("testUser")
+                .workAreas(workAreas)
+                .locations(locations)
+                .roles(roles)
+                .idamRoles("role1, role2")
+                .build());
     }
 }
