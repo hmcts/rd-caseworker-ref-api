@@ -20,11 +20,27 @@ public interface IValidationService {
      *
      * @param jobId long
      */
-    void auditJsr(long jobId);
+    void saveJsrExceptionsForCaseworkerJob(long jobId);
 
-    long startAuditJob(final AuditStatus auditStatus, final String fileName);
+    /**
+     * Create CWR Audit entry with in-progress Status.
+     *
+     * @param auditStatus AuditStatus
+     * @param fileName    String
+     * @return JobId long
+     */
+    long startCaseworkerAuditing(final AuditStatus auditStatus, final String fileName);
 
-    long insertAudit(final AuditStatus auditStatus, final String fileName);
+    /**
+     * Update Audit status with Success/Failure/PartialSuccess.
+     *
+     * @param auditStatus AuditStatus
+     * @param fileName    String
+     * @return JobId long
+     */
+    long updateCaseWorkerAuditStatus(final AuditStatus auditStatus, final String fileName);
 
-    long getJobId();
+    long getAuditJobId();
+
+    void logFailures(String message, long rowId);
 }

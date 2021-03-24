@@ -18,10 +18,13 @@ spring:
     show-sql: false
     properties:
       hibernate:
+        order_updates: true
+        order_inserts: true
         jdbc:
           lob:
             non_contextual_creation: true
           batch_size: 10
+          time_zone: UTC
   main:
     allow-bean-definition-overriding: true
   application:

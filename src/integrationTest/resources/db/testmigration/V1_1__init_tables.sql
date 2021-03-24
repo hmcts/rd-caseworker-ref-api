@@ -89,9 +89,9 @@ create table case_worker_idam_role_assoc(
 
 create table case_worker_audit (
     job_id serial,
-    authenticated_user_id varchar(32),
+    authenticated_user_id varchar(36),
     job_start_time timestamp not null,
-    file_name varchar(64) not null,
+    file_name varchar(128) not null,
     job_end_time timestamp,
     status varchar(32),
     comments varchar(512),

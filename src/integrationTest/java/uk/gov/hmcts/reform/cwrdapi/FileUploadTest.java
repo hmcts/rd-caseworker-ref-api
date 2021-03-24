@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +16,9 @@ import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.repository.AuditRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
@@ -35,10 +38,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
-    protected SimpleJpaRepository<CaseWorkerAudit, Long> caseWorkerAuditRepository;
+    protected AuditRepository caseWorkerAuditRepository;
 
     @Autowired
-    protected SimpleJpaRepository<ExceptionCaseWorker, Long> caseWorkerExceptionRepository;
+    protected ExceptionCaseWorkerRepository caseWorkerExceptionRepository;
+
+    @Autowired
+    protected CaseWorkerProfileRepository caseWorkerProfileRepository;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -52,6 +58,16 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
     public void validateAuditCaseWorkerCreate() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
+        validateAuditCaseWorker();
+    }
+
+    public void validateAuditCaseWorkerConflict() throws IOException {
+
+        userProfileCreateUserWireMock(HttpStatus.CONFLICT);
+        validateAuditCaseWorker();
+    }
+
+    private void validateAuditCaseWorker() throws IOException {
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -66,9 +82,9 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
     }
 
     public Map<String, Object> uploadCaseWorkerFile(String fileName,
-                                                     String fileType,
-                                                     String status,
-                                                     String role) throws IOException {
+                                                    String fileType,
+                                                    String status,
+                                                    String role) throws IOException {
 
         response.clear();
         File file = getFile("src/integrationTest/resources/" + fileName);
@@ -101,5 +117,15 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
         Gson gson = new Gson();
         String json = gson.toJson(response.get("body"));
         return json;
+    }
+
+    protected Object getJsonResponse(Map<String, Object> response, String body, Class clazz) {
+        Gson gson = new Gson();
+        return gson.fromJson(removeQuotesAndUnescape(gson.toJson(response.get(body))), clazz);
+    }
+
+    private String removeQuotesAndUnescape(String uncleanJson) {
+        String noQuotes = uncleanJson.replaceAll("^\"|\"$", "");
+        return StringEscapeUtils.unescapeJava(noQuotes);
     }
 }

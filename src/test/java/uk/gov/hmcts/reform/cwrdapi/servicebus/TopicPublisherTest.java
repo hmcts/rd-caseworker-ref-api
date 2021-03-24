@@ -1,22 +1,30 @@
+
 package uk.gov.hmcts.reform.cwrdapi.servicebus;
 
+import com.azure.messaging.servicebus.ServiceBusMessage;
+import com.azure.messaging.servicebus.ServiceBusMessageBatch;
+import com.azure.messaging.servicebus.ServiceBusSenderClient;
+import com.azure.messaging.servicebus.ServiceBusTransactionContext;
+import com.google.gson.Gson;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.jms.IllegalStateException;
-import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.core.JmsTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 
-import java.net.NoRouteToHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -24,45 +32,70 @@ import static org.mockito.Mockito.verify;
 public class TopicPublisherTest {
 
     @Mock
-    PublishCaseWorkerData publishCaseWorkerData;
-
-    @Mock
     IValidationService validationService;
 
-    private static final String DESTINATION = "Bermuda";
-    private final JmsTemplate jmsTemplate = mock(JmsTemplate.class);
+    private final ServiceBusSenderClient serviceBusSenderClient = mock(ServiceBusSenderClient.class);
+    private final ServiceBusTransactionContext transactionContext = mock(ServiceBusTransactionContext.class);
+    private final ServiceBusMessageBatch messageBatch = mock(ServiceBusMessageBatch.class);
+
+    @InjectMocks
     private TopicPublisher topicPublisher;
 
-    @Test
-    public void sendMessageCallsTheJmsTemplate() {
-        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
-        doReturn(1L).when(validationService).getJobId();
-        topicPublisher.sendMessage(publishCaseWorkerData);
+    PublishCaseWorkerData publishCaseWorkerData;
+    List<String> userIdList;
+    List<ServiceBusMessage> serviceBusMessageList = new ArrayList<>();
 
-        verify(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
+    @Before
+    public void beforeTest() {
+        publishCaseWorkerData = new PublishCaseWorkerData();
+        userIdList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            userIdList.add(UUID.randomUUID().toString());
+        }
+        publishCaseWorkerData.setUserIds(userIdList);
+        serviceBusMessageList.add(new ServiceBusMessage(new Gson().toJson(publishCaseWorkerData)));
+
+        topicPublisher.caseWorkerDataPerMessage = 2;
+        topicPublisher.loggingComponentName = "loggingComponent";
+        topicPublisher.topic = "dummyTopic";
+    }
+
+    @Test
+    public void sendMessageCallsAzureSendMessage() {
+
+        doReturn(1L).when(validationService).getAuditJobId();
+        doReturn(true).when(messageBatch).tryAddMessage(any());
+        doReturn(1).when(messageBatch).getCount();
+        doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
+
+        topicPublisher.sendMessage(userIdList);
+
+        verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }
 
     @Test(expected = CaseworkerMessageFailedException.class)
-    public void recoverMessageThrowsThePassedException() throws Throwable {
-        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
-        Exception exception = new NoRouteToHostException("");
-        topicPublisher.recoverMessage(exception);
+    public void shouldThrowExceptionForConnectionIssues() {
+
+        doReturn(1L).when(validationService).getAuditJobId();
+        doReturn(transactionContext).when(serviceBusSenderClient).createTransaction();
+        doThrow(new RuntimeException("Some Exception")).when(serviceBusSenderClient).createMessageBatch();
+
+        topicPublisher.sendMessage(userIdList);
+        verify(serviceBusSenderClient, times(1)).rollbackTransaction(any());
     }
 
     @Test
-    public void sendMessageWhenThrowExceptionWhenConnectionFactoryInstanceDifferent() {
-        SingleConnectionFactory connectionFactory = mock(SingleConnectionFactory.class);
-        doThrow(IllegalStateException.class).when(jmsTemplate).convertAndSend(DESTINATION, publishCaseWorkerData);
-        doReturn(1L).when(validationService).getJobId();
+    public void sendLargeMessageCallsAzureSendMessage() {
 
-        topicPublisher = new TopicPublisher(jmsTemplate, DESTINATION, validationService);
+        doReturn(1L).when(validationService).getAuditJobId();
+        doReturn(1).when(messageBatch).getCount();
+        lenient().doReturn(false).when(messageBatch).tryAddMessage(any());
+        doReturn(messageBatch).when(serviceBusSenderClient).createMessageBatch();
 
-        try {
-            topicPublisher.sendMessage(publishCaseWorkerData);
-        } catch (Exception e) {
-            verify(connectionFactory, never()).resetConnection();
-            verify(jmsTemplate, times(1)).convertAndSend(DESTINATION, publishCaseWorkerData);
-        }
+        topicPublisher.sendMessage(userIdList);
+
+        verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }
 }
+
 

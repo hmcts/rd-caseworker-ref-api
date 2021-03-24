@@ -24,9 +24,10 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
         + "\"message_details\":\"%s record(s) suspended\"}";
 
     String expectedSuspendFailureResponse = "{\"message\":\"Request completed with partial success. "
-        + "Some records failed during validation and were ignored.\","
-        + "\"message_details\":\"%s record(s) failed validation\","
-        + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"suspend user in UP failed\"}]}";
+            + "Some records failed during validation and were ignored.\","
+            + "\"message_details\":\"%s record(s) failed validation\","
+            + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"An update to the user is not possible"
+            + " at this moment. Please try again later.\"}]}";
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
@@ -50,7 +51,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1,1),
+            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -65,7 +66,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1,1),
+            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -80,7 +81,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         assertThat(exceptionCaseWorkers.size()).isEqualTo(1);
-        assertEquals(format(CaseWorkerConstants.NO_USER_TO_SUSPEND, 1),
+        assertEquals(format(CaseWorkerConstants.NO_USER_TO_SUSPEND, 2),
             exceptionCaseWorkers.get(0).getErrorDescription());
     }
 }

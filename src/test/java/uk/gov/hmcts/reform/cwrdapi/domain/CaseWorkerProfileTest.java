@@ -1,9 +1,15 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
@@ -11,6 +17,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class CaseWorkerProfileTest {
+
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
     public void testCaseWorkerProfile() {
@@ -121,5 +129,32 @@ public class CaseWorkerProfileTest {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setSuspended(false);
         assertFalse(caseWorkerProfile.getSuspended());
+    }
+
+    @Test
+    public void testCaseWorkerProfileWithNameLongerThan128CharactersIsConstraintViolation() {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName(RandomStringUtils.randomAlphabetic(129));
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("CWtest@test.com");
+        caseWorkerProfile.setUserTypeId(1L);
+        caseWorkerProfile.setRegion("Region");
+        caseWorkerProfile.setRegionId(12);
+        caseWorkerProfile.setSuspended(true);
+        caseWorkerProfile.setCreatedDate(LocalDateTime.now());
+        caseWorkerProfile.setLastUpdate(LocalDateTime.now());
+
+        UserType userType = new UserType();
+        userType.setUserTypeId(1L);
+        userType.setDescription("Test Description");
+        userType.setCreatedDate(LocalDateTime.now());
+        userType.setLastUpdate(LocalDateTime.now());
+        caseWorkerProfile.setUserType(userType);
+
+        Set<ConstraintViolation<CaseWorkerProfile>> violations = validator
+                .validate(caseWorkerProfile);
+
+        Assertions.assertThat(violations.size()).isEqualTo(1);
     }
 }

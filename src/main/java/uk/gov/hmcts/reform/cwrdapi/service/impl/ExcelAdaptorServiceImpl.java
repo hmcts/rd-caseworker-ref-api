@@ -7,12 +7,14 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.lang.reflect.Field;
@@ -23,17 +25,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static io.micrometer.core.instrument.util.StringUtils.isNotEmpty;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.util.ReflectionUtils.makeAccessible;
 import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADERS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
@@ -56,12 +64,13 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
 
     private FormulaEvaluator evaluator;
 
+    @Autowired
+    IValidationService validationServiceFacade;
+
+
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         evaluator = workbook.getCreationHelper().createFormulaEvaluator();
         List<String> validHeaders;
-        if (workbook.getNumberOfSheets() < 1) { // check at least 1 sheet present
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
-        }
         Sheet sheet;
         if (classType.isAssignableFrom(CaseWorkerProfile.class)) {
             sheet = workbook.getSheet(REQUIRED_CW_SHEET_NAME);
@@ -87,7 +96,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         //but current code is better from debugging standpoint.
         validHeaders.forEach(acceptableHeader -> {
             if (!headersToBeValidated.contains(acceptableHeader)) {
-                log.error("{}::{}", loggingComponentName, FILE_MISSING_HEADERS);
+                log.error("{}::{}:: Job Id {}", loggingComponentName, FILE_MISSING_HEADERS,
+                        validationServiceFacade.getAuditJobId());
                 throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_MISSING_HEADERS);
             }
         });
@@ -103,22 +113,61 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Iterator<Row> rowIterator = sheet.rowIterator();
         rowIterator.next();//skip header
         Field rowField = getRowIdField((Class<Object>) classType);
+        Optional<Object> bean;
+        int blankRowCount = 0;
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-            //Skipping empty rows
-            if (checkIfRowIsEmpty(row)) {
-                continue;
+            try {
+                if (isNotTrue(checkIfRowIsEmpty(row))) {
+                    bean = handleRowProcessing(classType, rowField, headers, row, parentFieldMap,
+                           childHeaderToCellMap, customObjectFieldsMapping);
+                    bean.ifPresent(o -> objectList.add((T) o));
+                } else {
+                    blankRowCount++;
+                }
+            } catch (Exception ex) {
+                validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
+                        row.getRowNum());
             }
-            Object bean = getInstanceOf(classType.getName());//create parent object
-            setFieldValue(rowField, bean, row.getRowNum());
-            for (int i = 0; i < headers.size(); i++) { //set all parent fields
-                setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap,
-                    childHeaderToCellMap);
-            }
-            populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
-            objectList.add((T) bean);
+        }
+
+        //throw exception if all rows in the file are blank
+        if (blankRowCount == sheet.getLastRowNum()) {
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
         return objectList;
+    }
+
+
+    public <T> Optional<Object> handleRowProcessing(Class<T> classType, Field rowField, List<String> headers, Row row,
+                                                    Map<String, Field> parentFieldMap,
+                                                    Map<String, Object> childHeaderToCellMap,
+                                                    List<Triple<String, Field, List<Field>>>
+                                                    customObjectFieldsMapping) {
+        Object bean;
+        try {
+            bean = populateDomainObject(classType, rowField, headers, row, parentFieldMap, childHeaderToCellMap,
+                   customObjectFieldsMapping);
+        } catch (Exception ex) {
+            validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
+                row.getRowNum());
+            return empty();
+        }
+        return ofNullable(bean);
+    }
+
+    public <T> Object populateDomainObject(Class<T> classType, Field rowField, List<String> headers, Row row,
+                                           Map<String, Field> parentFieldMap, Map<String, Object> childHeaderToCellMap,
+                                           List<Triple<String, Field, List<Field>>> customObjectFieldsMapping) {
+        Object bean = getInstanceOf(classType.getName());//create parent object
+        //Incrementing the row id by 1 because in the excel, first row will always contain headers.
+        //Actual record containing user details will be starting from row 2.
+        setFieldValue(rowField, bean, row.getRowNum() + 1);// set row id to parent field
+        for (int i = 0; i < headers.size(); i++) { //set all parent fields
+            setParentFields(getCellValue(row.getCell(i)), bean, headers.get(i), parentFieldMap, childHeaderToCellMap);
+        }
+        populateChildDomainObjects(bean, customObjectFieldsMapping, childHeaderToCellMap);
+        return bean;
     }
 
     private void populateChildDomainObjects(
@@ -281,7 +330,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
             Cell cell = row.getCell(cellNum);
             Object cellValue = getCellValue(cell);
-            if (nonNull(cellValue) && isNotEmpty(cellValue.toString())) {
+            if (nonNull(cellValue) && isNotEmpty(cellValue.toString().trim())) {
                 return false;
             }
         }

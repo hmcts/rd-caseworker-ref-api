@@ -14,11 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
+import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileConverter;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelValidatorService;
@@ -60,13 +62,13 @@ public class CaseWorkerServiceFacadeImplTest {
     @InjectMocks
     CaseWorkerServiceFacadeImpl caseWorkerServiceFacade;
     @Mock
-    AuditAndExceptionRepositoryServiceImpl auditAndExceptionRepositoryService;
+    ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
 
     @Test
     public void shouldProcessCaseWorkerFile() throws IOException {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
 
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(new ArrayList<>());
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(new ArrayList<>());
 
         ResponseEntity<Object> responseEntity =
             caseWorkerServiceFacade.processFile(multipartFile);
@@ -82,7 +84,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
         List<ExceptionCaseWorker> exceptionCaseWorkers =
             ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(exceptionCaseWorkers);
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -90,8 +92,7 @@ public class CaseWorkerServiceFacadeImplTest {
     @Test(expected = Exception.class)
     public void shouldProcessCaseWorkerFileFailure() throws IOException {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong()))
-            .thenThrow(new RuntimeException("Failure test"));
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenThrow(new RuntimeException("Failure test"));
         caseWorkerServiceFacade.processFile(multipartFile);
         verify(caseWorkerServiceFacade).processFile(multipartFile);
 
@@ -121,7 +122,7 @@ public class CaseWorkerServiceFacadeImplTest {
             .parseExcel(workbook, ServiceRoleMapping.class))
             .thenReturn(serviceRoleMappings);
 
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(new ArrayList<>());
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(new ArrayList<>());
 
         ResponseEntity<Object> responseEntity =
             caseWorkerServiceFacade.processFile(multipartFile);
@@ -137,12 +138,12 @@ public class CaseWorkerServiceFacadeImplTest {
         serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA2").build());
 
         MultipartFile multipartFile =
-                getMultipartFile("src/test/resources/ServiceRoleMapping_Multiple_Ids.xls", TYPE_XLS);
+            getMultipartFile("src/test/resources/ServiceRoleMapping_Multiple_Ids.xls", TYPE_XLS);
         when(excelValidatorService.validateExcelFile(multipartFile))
-                .thenReturn(workbook);
+            .thenReturn(workbook);
         when(excelAdaptorService
-                .parseExcel(workbook, ServiceRoleMapping.class))
-                .thenReturn(serviceRoleMappings);
+            .parseExcel(workbook, ServiceRoleMapping.class))
+            .thenReturn(serviceRoleMappings);
         caseWorkerServiceFacade.processFile(multipartFile);
     }
 
@@ -165,7 +166,8 @@ public class CaseWorkerServiceFacadeImplTest {
         List<CaseWorkerProfile> caseWorkerDomains = new ArrayList<>();
         caseWorkerDomains.add(caseWorkerProfile1);
         caseWorkerDomains.add(caseWorkerProfile2);
-        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(ImmutableList.of(caseWorkerProfile1));
+        List<CaseWorkerDomain> caseWorkerList = ImmutableList.of(caseWorkerProfile1);
+        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(caseWorkerList);
         MultipartFile multipartFile =
             getMultipartFile("src/test/resources/" + fileName, TYPE_XLS);
         when(excelValidatorService.validateExcelFile(multipartFile))
@@ -176,20 +178,20 @@ public class CaseWorkerServiceFacadeImplTest {
     @Test
     public void shouldProcessCaseWorkerFileWithSuspendedRowFailed() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
-                .firstName("test").lastName("test")
-                .officialEmail("test@justice.gov.uk")
-                .regionId(1)
-                .regionName("test")
-                .userType("testUser")
-                .build();
+            .firstName("test").lastName("test")
+            .officialEmail("test@justice.gov.uk")
+            .regionId(1)
+            .regionName("test")
+            .userType("testUser")
+            .build();
 
         CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
-                .firstName("test1").lastName("test1")
-                .officialEmail("test1@justice.gov.uk")
-                .regionId(1)
-                .regionName("test1")
-                .userType("testUser")
-                .build();
+            .firstName("test1").lastName("test1")
+            .officialEmail("test1@justice.gov.uk")
+            .regionId(1)
+            .regionName("test1")
+            .userType("testUser")
+            .build();
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
 
         caseWorkerProfiles.add(caseWorkerProfile1);
@@ -197,11 +199,11 @@ public class CaseWorkerServiceFacadeImplTest {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
 
         List<ExceptionCaseWorker> exceptionCaseWorkers =
-                ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+            ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(exceptionCaseWorkers);
         when(excelAdaptorService
-                .parseExcel(workbook, CaseWorkerProfile.class))
-                .thenReturn(caseWorkerProfiles);
+            .parseExcel(workbook, CaseWorkerProfile.class))
+            .thenReturn(caseWorkerProfiles);
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
         when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
@@ -214,20 +216,20 @@ public class CaseWorkerServiceFacadeImplTest {
     @Test
     public void shouldProcessCaseWorkerFileWithUploadedAndSuspendedMessage() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
-                .firstName("test").lastName("test")
-                .officialEmail("test@justice.gov.uk")
-                .regionId(1)
-                .regionName("test")
-                .userType("testUser")
-                .build();
+            .firstName("test").lastName("test")
+            .officialEmail("test@justice.gov.uk")
+            .regionId(1)
+            .regionName("test")
+            .userType("testUser")
+            .build();
 
         CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
-                .firstName("test1").lastName("test1")
-                .officialEmail("test1@justice.gov.uk")
-                .regionId(1)
-                .regionName("test1")
-                .userType("testUser")
-                .build();
+            .firstName("test1").lastName("test1")
+            .officialEmail("test1@justice.gov.uk")
+            .regionId(1)
+            .regionName("test1")
+            .userType("testUser")
+            .build();
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
 
         caseWorkerProfiles.add(caseWorkerProfile1);
@@ -235,8 +237,8 @@ public class CaseWorkerServiceFacadeImplTest {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
 
         when(excelAdaptorService
-                .parseExcel(workbook, CaseWorkerProfile.class))
-                .thenReturn(caseWorkerProfiles);
+            .parseExcel(workbook, CaseWorkerProfile.class))
+            .thenReturn(caseWorkerProfiles);
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
         when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
@@ -249,20 +251,20 @@ public class CaseWorkerServiceFacadeImplTest {
     @Test
     public void shouldProcessCaseWorkerFileWithSuspendedFailedMessage() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
-                .firstName("test").lastName("test")
-                .officialEmail("test@justice.gov.uk")
-                .regionId(1)
-                .regionName("test")
-                .userType("testUser")
-                .build();
+            .firstName("test").lastName("test")
+            .officialEmail("test@justice.gov.uk")
+            .regionId(1)
+            .regionName("test")
+            .userType("testUser")
+            .build();
 
         CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
-                .firstName("test1").lastName("test1")
-                .officialEmail("test1@justice.gov.uk")
-                .regionId(1)
-                .regionName("test1")
-                .userType("testUser")
-                .build();
+            .firstName("test1").lastName("test1")
+            .officialEmail("test1@justice.gov.uk")
+            .regionId(1)
+            .regionName("test1")
+            .userType("testUser")
+            .build();
 
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         caseWorkerProfiles.add(caseWorkerProfile1);
@@ -270,12 +272,12 @@ public class CaseWorkerServiceFacadeImplTest {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
 
         when(excelAdaptorService
-                .parseExcel(workbook, CaseWorkerProfile.class))
-                .thenReturn(caseWorkerProfiles);
+            .parseExcel(workbook, CaseWorkerProfile.class))
+            .thenReturn(caseWorkerProfiles);
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
         List<ExceptionCaseWorker> exceptionCaseWorkers =
-                ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+            ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(exceptionCaseWorkers);
         when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(2L));
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -287,28 +289,28 @@ public class CaseWorkerServiceFacadeImplTest {
     @Test
     public void shouldProcessCaseWorkerFileWithUploadedFailedSuspendedMessage() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
-                .firstName("test").lastName("test")
-                .officialEmail("test@justice.gov.uk")
-                .regionId(1)
-                .regionName("test")
-                .userType("testUser")
-                .build();
+            .firstName("test").lastName("test")
+            .officialEmail("test@justice.gov.uk")
+            .regionId(1)
+            .regionName("test")
+            .userType("testUser")
+            .build();
 
         CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
-                .firstName("test1").lastName("test1")
-                .officialEmail("test1@justice.gov.uk")
-                .regionId(1)
-                .regionName("test1")
-                .userType("testUser")
-                .build();
+            .firstName("test1").lastName("test1")
+            .officialEmail("test1@justice.gov.uk")
+            .regionId(1)
+            .regionName("test1")
+            .userType("testUser")
+            .build();
 
         CaseWorkerProfile caseWorkerProfile3 = CaseWorkerProfile.builder()
-                .firstName("test").lastName("test")
-                .officialEmail("test@justice.gov.uk")
-                .regionId(1)
-                .regionName("test")
-                .userType("testUser")
-                .build();
+            .firstName("test").lastName("test")
+            .officialEmail("test@justice.gov.uk")
+            .regionId(1)
+            .regionName("test")
+            .userType("testUser")
+            .build();
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
 
         caseWorkerProfiles.add(caseWorkerProfile1);
@@ -317,11 +319,11 @@ public class CaseWorkerServiceFacadeImplTest {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
 
         List<ExceptionCaseWorker> exceptionCaseWorkers =
-                ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
-        when(auditAndExceptionRepositoryService.getAllExceptions(anyLong())).thenReturn(exceptionCaseWorkers);
+            ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(exceptionCaseWorkers);
         when(excelAdaptorService
-                .parseExcel(workbook, CaseWorkerProfile.class))
-                .thenReturn(caseWorkerProfiles);
+            .parseExcel(workbook, CaseWorkerProfile.class))
+            .thenReturn(caseWorkerProfiles);
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
         when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(2L));
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
@@ -329,6 +331,6 @@ public class CaseWorkerServiceFacadeImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String responseString = mapper.writeValueAsString(responseEntity.getBody());
         assertTrue(responseString.contains("1 record(s) failed validation, 1 record(s) uploaded, and "
-                + "1 record(s) suspended"));
+            + "1 record(s) suspended"));
     }
 }

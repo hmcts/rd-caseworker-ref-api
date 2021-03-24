@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.RestTemplateConfiguration;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 
@@ -102,6 +103,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    protected CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
 
     @Before
     public void setUpClient() {
@@ -208,15 +212,15 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
 
     public void userProfileCreateUserWireMock(HttpStatus status) {
-        String body = null;
-        int returnHttpStaus = status.value();
-        if (status.is2xxSuccessful()) {
-            body = "{"
-                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
-                + "  \"idamRegistrationResponse\":\"201\""
-                + "}";
-            returnHttpStaus = 201;
-        }
+
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withStatus(status.value())
+                .withBody("{"
+                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                    + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
+                    + "}")));
     }
 
     public static class CaseWorkerTransformer extends ResponseTransformer {

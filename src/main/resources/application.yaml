@@ -18,11 +18,13 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        order_updates: true
+        order_inserts: true
         jdbc:
           lob:
             non_contextual_creation: true
-          batch_size: 5
-          order_inserts: true
+          batch_size: 30
+          time_zone: UTC
   application:
     name: RD Caseworker Ref API
   main:
@@ -54,6 +56,13 @@ spring:
     min-idle: 1
     properties:
       charSet: UTF-8
+    hikari:
+      minimumIdle: 2
+      maximumPoolSize: 10
+      idleTimeout: 600000
+      poolName: CWHikariCP
+      maxLifetime: 1800000
+      connectionTimeout: 30000
     tomcat:
       max-active: 10
       max-idle: 10

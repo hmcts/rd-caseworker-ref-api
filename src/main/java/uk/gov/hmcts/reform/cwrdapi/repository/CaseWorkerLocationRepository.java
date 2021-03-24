@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface CaseWorkerLocationRepository extends JpaRepository<CaseWorkerLocation, Long> {
     void deleteByCaseWorkerProfileIn(List<CaseWorkerProfile> caseWorkerProfileList);
+
 }

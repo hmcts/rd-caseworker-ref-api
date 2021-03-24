@@ -18,8 +18,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_INVALID;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_MISSING;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_INVALID;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_MISSING;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
 
 @Builder
 @Getter
@@ -35,11 +40,13 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String id;
 
     @MappingField(columnName = "First Name")
-    @NotEmpty(message = CaseWorkerConstants.FIRST_NAME_MISSING)
+    @Pattern(regexp = NAME_REGEX, message = FIRST_NAME_INVALID)
+    @NotEmpty(message = FIRST_NAME_MISSING)
     private String firstName;
 
     @MappingField(columnName = "Last Name")
-    @NotEmpty(message = CaseWorkerConstants.LAST_NAME_MISSING)
+    @Pattern(regexp = NAME_REGEX, message = LAST_NAME_INVALID)
+    @NotEmpty(message = LAST_NAME_MISSING)
     private String lastName;
 
     @MappingField(columnName = "Email", position = 1)
@@ -52,7 +59,6 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String officialEmail;
 
     @MappingField(columnName = "Region ID")
-    @NotNull(message = CaseWorkerConstants.MISSING_REGION)
     private Integer regionId;
 
     @MappingField(columnName = "Region")
@@ -61,7 +67,6 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String regionName;
 
     @MappingField(clazz = Location.class, objectCount = 2)
-    @NotEmpty(message = CaseWorkerConstants.NO_LOCATION_PRESENT)
     @JsonProperty("base_location")
     private List<Location> locations;
 

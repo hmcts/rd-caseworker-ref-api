@@ -18,10 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
 
-    String exceptedResponseUpdate = "{\"message\":\"Request completed with partial success. "
-        + "Some records failed during validation and were ignored.\","
-        + "\"message_details\":\"%s record(s) failed validation\","
-        + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"can't modify roles for user in UP\"}]}";
+    String expectedResponse = "{\"message\":\"Request completed with partial success. "
+            + "Some records failed during validation and were ignored.\","
+            + "\"message_details\":\"%s record(s) failed validation\","
+            + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"An update to the user is not possible at"
+            + " this moment. Please try again later.\"}]}";
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
@@ -31,7 +32,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
@@ -46,11 +47,11 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("STALE", roles);
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 1),
+            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -62,11 +63,11 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 1),
+            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
@@ -79,11 +80,11 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         userProfileGetUserWireMock("ACTIVE", roles);
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
-        response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(exceptedResponseUpdate, 1, 1),
+            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);

@@ -9,7 +9,6 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication;
@@ -20,8 +19,8 @@ import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
+import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
@@ -32,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
@@ -45,20 +45,17 @@ public class ValidationServiceFacadeImplTest {
 
     @Spy
     @Autowired
-    ValidationServiceFacadeImpl validationServiceFacadeImpl;
+    IValidationService validationServiceFacadeImpl;
 
     @Autowired
     JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
     @Autowired
-    SimpleJpaRepository<ExceptionCaseWorker, Long> simpleJpaRepositoryException;
-
+    ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
 
     @MockBean
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    @Autowired
-    private IAuditAndExceptionRepositoryService auditAndExceptionRepositoryService;
 
     @Test
     public void testAuditJsr() {
@@ -69,7 +66,7 @@ public class ValidationServiceFacadeImplTest {
         profile.setOfficialEmail("test@abc.com");
         caseWorkerProfiles.add(profile);
 
-        long jobId = validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, "test");
+        long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.IN_PROGRESS, "test");
         CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder()
             .fileName("test.xlsx")
             .jobStartTime(LocalDateTime.now())
@@ -78,28 +75,29 @@ public class ValidationServiceFacadeImplTest {
 
         validationServiceFacadeImpl.getInvalidRecords(caseWorkerProfiles);
 
-        auditAndExceptionRepositoryService.auditSchedulerStatus(caseWorkerAudit);
-        ValidationServiceFacadeImpl validationServiceFacadeImplSpy = spy(validationServiceFacadeImpl);
-        validationServiceFacadeImplSpy.auditJsr(jobId);
-        List<ExceptionCaseWorker> exceptionCaseWorkers = auditAndExceptionRepositoryService.getAllExceptions(jobId);
+        validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "");
+        IValidationService validationServiceFacadeImplSpy = spy(validationServiceFacadeImpl);
+        validationServiceFacadeImplSpy.saveJsrExceptionsForCaseworkerJob(jobId);
+        List<ExceptionCaseWorker> exceptionCaseWorkers = exceptionCaseWorkerRepository.findByJobId(jobId);
         assertNotNull(exceptionCaseWorkers);
         String error = exceptionCaseWorkers.stream()
             .filter(s -> s.getFieldInError().equalsIgnoreCase("firstName"))
             .map(field -> field.getErrorDescription())
             .collect(Collectors.toList()).get(0);
         assertEquals(CaseWorkerConstants.FIRST_NAME_MISSING, error);
-        verify(validationServiceFacadeImplSpy).auditJsr(jobId);
-        assertNotNull(validationServiceFacadeImplSpy.getJsrExceptionCaseWorkers());
+        verify(validationServiceFacadeImplSpy).saveJsrExceptionsForCaseworkerJob(jobId);
     }
 
     @Test
     public void testInsertAudit() {
-        assertNotNull(validationServiceFacadeImpl.insertAudit(AuditStatus.IN_PROGRESS, "test"));
+        assertTrue(validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.IN_PROGRESS, "test")
+            > 0);
     }
 
     @Test
     public void testStartAuditJob() {
-        assertNotNull(validationServiceFacadeImpl.startAuditJob(AuditStatus.IN_PROGRESS, "test"));
+        assertTrue(validationServiceFacadeImpl.startCaseworkerAuditing(AuditStatus.IN_PROGRESS, "test")
+            > 0);
     }
 }
 
