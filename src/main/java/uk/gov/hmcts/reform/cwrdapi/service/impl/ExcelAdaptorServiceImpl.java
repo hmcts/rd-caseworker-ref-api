@@ -34,6 +34,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.util.ReflectionUtils.makeAccessible;
@@ -113,26 +114,40 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         rowIterator.next();//skip header
         Field rowField = getRowIdField((Class<Object>) classType);
         Optional<Object> bean;
+        int blankRowCount = 0;
         while (rowIterator.hasNext()) {
-            bean = handleRowProcessing(classType, rowField, headers, rowIterator.next(), parentFieldMap,
-                childHeaderToCellMap, customObjectFieldsMapping);
-            bean.ifPresent(o -> objectList.add((T) o));
+            Row row = rowIterator.next();
+            try {
+                if (isNotTrue(checkIfRowIsEmpty(row))) {
+                    bean = handleRowProcessing(classType, rowField, headers, row, parentFieldMap,
+                           childHeaderToCellMap, customObjectFieldsMapping);
+                    bean.ifPresent(o -> objectList.add((T) o));
+                } else {
+                    blankRowCount++;
+                }
+            } catch (Exception ex) {
+                validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
+                        row.getRowNum());
+            }
+        }
+
+        //throw exception if all rows in the file are blank
+        if (blankRowCount == sheet.getLastRowNum()) {
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_DATA_ERROR_MESSAGE);
         }
         return objectList;
     }
+
 
     public <T> Optional<Object> handleRowProcessing(Class<T> classType, Field rowField, List<String> headers, Row row,
                                                     Map<String, Field> parentFieldMap,
                                                     Map<String, Object> childHeaderToCellMap,
                                                     List<Triple<String, Field, List<Field>>>
-                                                        customObjectFieldsMapping) {
+                                                    customObjectFieldsMapping) {
         Object bean;
         try {
-            if (checkIfRowIsEmpty(row)) {
-                return empty(); //Skipping empty rows
-            }
             bean = populateDomainObject(classType, rowField, headers, row, parentFieldMap, childHeaderToCellMap,
-                customObjectFieldsMapping);
+                   customObjectFieldsMapping);
         } catch (Exception ex) {
             validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
                 row.getRowNum());
@@ -315,7 +330,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
             Cell cell = row.getCell(cellNum);
             Object cellValue = getCellValue(cell);
-            if (nonNull(cellValue) && isNotEmpty(cellValue.toString())) {
+            if (nonNull(cellValue) && isNotEmpty(cellValue.toString().trim())) {
                 return false;
             }
         }

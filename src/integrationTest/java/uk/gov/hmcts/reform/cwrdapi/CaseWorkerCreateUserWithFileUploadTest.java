@@ -50,6 +50,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_ROLE_PRESE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TYPE_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_WORK_AREA_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
@@ -143,6 +145,12 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
+            TYPE_XLSX, "400", cwdAdmin);
+    }
+
+    @Test
+    public void shouldReturn400WhenFileHasAllEmptyRows() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload With All Empty Rows.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
     }
 
@@ -356,5 +364,25 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
         assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_FAILED, 4));
         assertThat((List)response.get("error_details")).hasSize(4);
+    }
+
+    @Test
+    public void shouldUploadStaffDataXlsxFileSuccessfully_whenEmptyRowsInBetween() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response.get("error_details")).isNull();
+    }
+
+    @Test
+    public void shouldUploadStaffDataXlsxFileSuccessfully_whenNoEmptyRowsInBetween() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response.get("error_details")).isNull();
     }
 }
