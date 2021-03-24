@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.gson.Gson;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -250,13 +249,15 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         errors.add(JsrFileErrors.builder().rowId("14").filedInError(LOCATION_FIELD).errorDescription(
             NO_PRIMARY_LOCATION_PRESENT).build());
         errors.add(JsrFileErrors.builder().rowId("15").filedInError("firstName").errorDescription(
-                FIRST_NAME_INVALID).build());
+            FIRST_NAME_INVALID).build());
         errors.add(JsrFileErrors.builder().rowId("16").filedInError("lastName").errorDescription(
-                LAST_NAME_INVALID).build());
+            LAST_NAME_INVALID).build());
+        errors.add(JsrFileErrors.builder().rowId("17").filedInError("officialEmail").errorDescription(
+            INVALID_EMAIL).build());
 
         return CaseWorkerFileCreationResponse.builder()
             .errorDetails(errors)
-            .detailedMessage("14 record(s) failed validation and 1 record(s) uploaded")
+            .detailedMessage("15 record(s) failed validation and 1 record(s) uploaded")
             .message("Request completed with partial success."
                 + " Some records failed during validation and were ignored.")
             .build();
@@ -415,6 +416,21 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
         assertThat(response.get("error_details")).isNull();
     }
+    
+    @Test
+    public void shouldCreateCaseWorkerAudit_when_email_in_capital_letters() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
+                        + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 1));
+        assertThat((List)response.get("error_details")).isNull();
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers).isEmpty();
+    }
 
     @Test
     public void shouldHandleDuplicateEmailProfiles() throws IOException {
@@ -436,7 +452,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
-        Assertions.assertEquals(format(DUPLICATE_EMAIL_PROFILES, 3), exceptionCaseWorkers.get(0).getErrorDescription());
-        Assertions.assertEquals(format(DUPLICATE_EMAIL_PROFILES, 4), exceptionCaseWorkers.get(1).getErrorDescription());
+        assertEquals(format(DUPLICATE_EMAIL_PROFILES, 3), exceptionCaseWorkers.get(0).getErrorDescription());
+        assertEquals(format(DUPLICATE_EMAIL_PROFILES, 4), exceptionCaseWorkers.get(1).getErrorDescription());
     }
+
 }
