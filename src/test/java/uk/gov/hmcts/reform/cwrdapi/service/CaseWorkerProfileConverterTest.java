@@ -84,7 +84,7 @@ public class CaseWorkerProfileConverterTest {
         assertNotNull(suspendedRowIds);
         assertThat(suspendedRowIds).isNotEmpty();
         assertThat(suspendedRowIds.size()).isNotZero();
-        assertThat(suspendedRowIds.get(0)).isEqualTo(0L);
+        assertThat(suspendedRowIds.get(0)).isZero();
     }
 
     @Test
