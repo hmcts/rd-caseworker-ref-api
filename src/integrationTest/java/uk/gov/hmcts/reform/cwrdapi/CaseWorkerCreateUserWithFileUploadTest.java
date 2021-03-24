@@ -415,6 +415,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
         assertThat(response.get("error_details")).isNull();
     }
+
     @Test
     public void shouldHandleDuplicateEmailProfiles() throws IOException {
         Map<String, Object> response =
