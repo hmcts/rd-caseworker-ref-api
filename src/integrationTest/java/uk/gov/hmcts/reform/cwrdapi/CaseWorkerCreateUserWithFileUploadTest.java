@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.google.gson.Gson;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.lang.String.format;
@@ -55,6 +57,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TYPE_
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_WORK_AREA_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
@@ -148,6 +151,12 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
+            TYPE_XLSX, "400", cwdAdmin);
+    }
+
+    @Test
+    public void shouldReturn400WhenFileHasAllEmptyRows() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload With All Empty Rows.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
     }
 
@@ -269,6 +278,30 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
+    public void shouldCreateCaseWorkerAuditFailureForBadIdamRoles() throws IOException {
+        //create invalid stub of UP for Exception validation
+        String errorMessageFromIdam = "The role to be assigned does not exist.";
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .errorCode(404)
+                .errorDescription(errorMessageFromIdam).build();
+
+        userProfileService.resetAll();
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
+                .willReturn(aResponse().withStatus(404)
+                .withBody(new Gson().toJson(errorResponse).getBytes())));
+        
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(1);
+        assertNotNull(exceptionCaseWorkers.get(0).getErrorDescription());
+        assertEquals(exceptionCaseWorkers.get(0).getErrorDescription(), errorMessageFromIdam);
+    }
+
+    @Test
     public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
@@ -359,15 +392,34 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
         assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details")).isEqualTo(format(RECORDS_FAILED, 4));
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_FAILED, 4));
         assertThat((List)response.get("error_details")).hasSize(4);
     }
 
     @Test
+    public void shouldUploadStaffDataXlsxFileSuccessfully_whenEmptyRowsInBetween() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response.get("error_details")).isNull();
+    }
+
+    @Test
+    public void shouldUploadStaffDataXlsxFileSuccessfully_whenNoEmptyRowsInBetween() throws IOException {
+        Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
+        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response.get("error_details")).isNull();
+    }
+    @Test
     public void shouldHandleDuplicateEmailProfiles() throws IOException {
         Map<String, Object> response =
                 uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
-                TYPE_XLSX, "200 OK", cwdAdmin);
+                        TYPE_XLSX, "200 OK", cwdAdmin);
         assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
         assertThat(response.get("message_details")).isEqualTo(format(RECORDS_FAILED, 2)
                 .concat(" and ")
