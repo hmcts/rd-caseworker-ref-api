@@ -17,6 +17,11 @@ public class TestSupport {
 
     public static List<CaseWorkerDomain> buildCaseWorkerProfileData() {
 
+        return ImmutableList.of(buildCaseWorkerProfileData("test@justice.gov.uk"));
+    }
+
+    public static CaseWorkerDomain buildCaseWorkerProfileData(String email) {
+
         ImmutableList<Location> locations = ImmutableList.of(
                 Location.builder().baseLocationId(1)
                         .locationName("1").isPrimary(true).build());
@@ -29,9 +34,9 @@ public class TestSupport {
                 Role.builder().isPrimary(true)
                         .roleName("rl1").build());
 
-        return ImmutableList.of(CaseWorkerProfile.builder()
+        return CaseWorkerProfile.builder()
                 .firstName("test").lastName("test")
-                .officialEmail("test@justice.gov.uk")
+                .officialEmail(email)
                 .regionId(1)
                 .regionName("test")
                 .userType("testUser")
@@ -39,7 +44,7 @@ public class TestSupport {
                 .locations(locations)
                 .roles(roles)
                 .idamRoles("role1, role2")
-                .build());
+                .build();
     }
 
     public static List<CaseWorkerDomain> buildSuspendedCaseWorkerProfileData() {

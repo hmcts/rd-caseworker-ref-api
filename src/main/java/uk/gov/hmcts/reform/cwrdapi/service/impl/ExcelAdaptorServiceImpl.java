@@ -283,7 +283,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         }
         switch (cell.getCellType()) {
             case STRING:
-                return cell.getStringCellValue();
+                return cell.getStringCellValue().trim();
             case NUMERIC:
                 return Integer.valueOf((int) cell.getNumericCellValue());
             case FORMULA:
