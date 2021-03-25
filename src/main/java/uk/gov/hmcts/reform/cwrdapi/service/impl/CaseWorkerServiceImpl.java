@@ -317,7 +317,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
                 .build());
         }
-        log.info("{}::Time taken for DTO for FetchCaseworkersById {}", loggingComponentName,
+        log.info("{}::Time taken By DTO for FetchCaseworkersById {}", loggingComponentName,
                 (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return caseWorkerProfilesDto;
     }
