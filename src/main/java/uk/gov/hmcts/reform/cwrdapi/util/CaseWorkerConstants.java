@@ -132,6 +132,6 @@ public final class CaseWorkerConstants {
     public static final String AND = "and";
 
     public static final String RESPONSE_BODY_MISSING_FROM_UP = "Response Body is missing from User Profile";
-
-
+    public static final String DUPLICATE_EMAIL_PROFILES = "User record in row ID %s is duplicate to another row. "
+            + "Please ensure that the record is not duplicate and try again";
 }
