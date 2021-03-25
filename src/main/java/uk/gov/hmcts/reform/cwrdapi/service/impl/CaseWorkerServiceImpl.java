@@ -283,16 +283,19 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
      */
     @Override
     public ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds) {
+        long startTime = System.currentTimeMillis();
         List<CaseWorkerProfile> caseWorkerProfileList = caseWorkerProfileRepo.findByCaseWorkerIdIn(caseWorkerIds);
         if (isEmpty(caseWorkerProfileList)) {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
         }
-
+        log.info("{}::Time taken for fetching the records from DB for FetchCaseworkersById {}",
+                loggingComponentName, (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
     }
 
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
         List<CaseWorkerProfile> caseWorkerProfileList) {
+        long startTime = System.currentTimeMillis();
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfilesDto =
             new ArrayList<>();
         for (CaseWorkerProfile profile : caseWorkerProfileList) {
@@ -314,6 +317,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
                 .build());
         }
+        log.info("{}::Time taken By DTO for FetchCaseworkersById {}", loggingComponentName,
+                (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return caseWorkerProfilesDto;
     }
 
