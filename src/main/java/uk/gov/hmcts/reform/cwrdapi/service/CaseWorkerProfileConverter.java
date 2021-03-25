@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;

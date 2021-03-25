@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Component

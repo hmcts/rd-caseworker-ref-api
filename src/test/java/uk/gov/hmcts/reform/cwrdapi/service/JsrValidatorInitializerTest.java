@@ -46,4 +46,20 @@ public class JsrValidatorInitializerTest {
         assertEquals(1, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
     }
+
+    @Test
+    public void testGetInvalidJsrRecords_withDifferentEmails() {
+        List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
+        CaseWorkerDomain profile1 = buildCaseWorkerProfileData("tEst123-CRD3@JUSTICE.GOV.UK");
+        CaseWorkerDomain profile2 = buildCaseWorkerProfileData("$%^&@justice.gov.uk");
+        CaseWorkerDomain profile3 = buildCaseWorkerProfileData("user name@justice.gov.uk");
+        caseWorkerProfiles.add(profile1);
+        caseWorkerProfiles.add(profile2);
+        caseWorkerProfiles.add(profile3);
+
+        List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
+        assertEquals(2, records.size());
+        verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
+    }
+
 }
