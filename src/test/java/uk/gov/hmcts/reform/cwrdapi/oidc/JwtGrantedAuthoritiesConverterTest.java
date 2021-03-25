@@ -111,6 +111,9 @@ public class JwtGrantedAuthoritiesConverterTest {
         verify(userInfoMock, times(1)).getRoles();
         verify(idamRepositoryMock, times(1)).getUserInfo(anyString());
 
+        UserInfo userInfo = converter.getUserInfo();
+
+        assertNotNull(userInfo);
     }
 
 }
