@@ -168,11 +168,18 @@ public class CaseWorkerRefUsersController {
     )
     @Secured({"cwd-system-user"})
     public ResponseEntity<Object> fetchCaseworkersById(@RequestBody UserRequest userRequest) {
-
+        log.info("Fetching the details of {} users", userRequest.getUserIds().size());
+        long startTime = System.currentTimeMillis();
         if (CollectionUtils.isEmpty(userRequest.getUserIds())) {
             throw new InvalidRequestException("Caseworker request is empty");
         }
-        return caseWorkerService.fetchCaseworkersById(userRequest.getUserIds());
+        ResponseEntity<Object> responseEntity =
+                caseWorkerService.fetchCaseworkersById(userRequest.getUserIds());
+        log.info("{}::Time taken to fetch {} users is {}",loggingComponentName,
+                userRequest.getUserIds().size(),
+                (Math.subtractExact(System.currentTimeMillis(), startTime)));
+        return responseEntity;
+
     }
 
 }
