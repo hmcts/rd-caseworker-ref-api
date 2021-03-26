@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
-import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.util.List;
 
@@ -14,6 +13,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
@@ -28,18 +28,20 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
         validateAuditCaseWorkerCreate();
-        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
 
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
             .isEqualTo(objectMapper.readValue(format(exceptedResponse, 1), CaseWorkerFileCreationResponse.class));
-        List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
-        assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
+
+        assertThat(caseWorkerProfileRepository.findAll()).hasSize(1);
+        assertThat(caseWorkerLocationRepository.findAll()).hasSize(2);
+        assertThat(caseWorkerWorkAreaRepository.findAll()).hasSize(2);
+        assertThat(caseWorkerRoleRepository.findAll()).hasSize(2);
+        assertThat(caseWorkerAuditRepository.findAll().size()).isEqualTo(2);
     }
 
     @Test
@@ -48,12 +50,12 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("STALE", roles);
         modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
             .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
+
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
     }
@@ -65,11 +67,17 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
             .willReturn(null));
         modifyUserRoles();
         response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
             .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
                 CaseWorkerFileCreationResponse.class));
+        //make sure that existing records are retained
+        assertThat(caseWorkerProfileRepository.findAll()).hasSize(1);
+        assertThat(caseWorkerLocationRepository.findAll()).hasSizeGreaterThan(0);
+        assertThat(caseWorkerWorkAreaRepository.findAll()).hasSizeGreaterThan(0);
+        assertThat(caseWorkerRoleRepository.findAll()).hasSizeGreaterThan(0);
+
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
     }
@@ -82,7 +90,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
         response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
             .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
