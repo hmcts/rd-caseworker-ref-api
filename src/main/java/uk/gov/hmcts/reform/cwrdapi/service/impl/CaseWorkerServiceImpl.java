@@ -65,11 +65,11 @@ import java.util.stream.Collectors;
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isTrue;
@@ -200,26 +200,45 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                                             List<CaseWorkerProfile> updateCaseWorkerProfiles,
                                                             Map<String, CaseWorkersProfileCreationRequest> requestMap) {
         List<CaseWorkerProfile> processedCwProfiles = null;
-        if (isNotEmpty(updateCaseWorkerProfiles)) {
-            caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
+        // update roles in sidam and filter if failed in User profile
+        List<CaseWorkerProfile> filteredUpdateCwProfiles = updateSidamRoles(updateCaseWorkerProfiles, requestMap);
+
+        if (isNotEmpty(filteredUpdateCwProfiles)) {
+            caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(filteredUpdateCwProfiles);
+            caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(filteredUpdateCwProfiles);
+            caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(filteredUpdateCwProfiles);
             cwrCommonRepository.flush();
 
-            //Skipping UP failed records as they already logged with logUpFailures
-            newCaseWorkerProfiles.addAll(updateCaseWorkerProfiles.stream().filter(updatedProfile ->
-                updateUserProfile(requestMap.get(updatedProfile.getEmailId()), updatedProfile) == Boolean.TRUE)
-                .collect(toList()));
+            //update existing user profiles
+            for (CaseWorkerProfile dbProfile : filteredUpdateCwProfiles) {
+                updateUserProfile(requestMap.get(dbProfile.getEmailId()), dbProfile);
+            }
+            newCaseWorkerProfiles.addAll(filteredUpdateCwProfiles);
         }
+
         if (isNotEmpty(newCaseWorkerProfiles)) {
-            long time1 = System.currentTimeMillis();
+            long time1 = currentTimeMillis();
             processedCwProfiles = caseWorkerProfileRepo.saveAll(newCaseWorkerProfiles);
             log.info("{}:: {} case worker profiles inserted :: Job Id {}", loggingComponentName,
                     processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
             log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
-                (System.currentTimeMillis() - time1));
+                (currentTimeMillis() - time1));
         }
         return processedCwProfiles;
+    }
+
+    // update roles in sidam and filter if failed in User profile
+    public List<CaseWorkerProfile> updateSidamRoles(List<CaseWorkerProfile> updateCaseWorkerProfiles,
+                                 Map<String, CaseWorkersProfileCreationRequest> requestMap) {
+        List<CaseWorkerProfile> filteredUpdateCwProfiles = new ArrayList<>();
+        for (CaseWorkerProfile dbProfile : updateCaseWorkerProfiles) {
+            boolean isAddRoleSuccess = updateUserRolesInIdam(requestMap.get(dbProfile.getEmailId()),
+                    dbProfile.getCaseWorkerId());
+            if (isAddRoleSuccess) {
+                filteredUpdateCwProfiles.add(dbProfile);
+            }
+        }
+        return filteredUpdateCwProfiles;
     }
 
     /**
@@ -416,15 +435,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return caseWorkerWorkAreas;
     }
 
-    public boolean updateUserProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest,
+    public CaseWorkerProfile updateUserProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest,
                                      CaseWorkerProfile caseWorkerProfile) {
         caseWorkerProfile.getCaseWorkerLocations().clear();
         caseWorkerProfile.getCaseWorkerWorkAreas().clear();
         caseWorkerProfile.getCaseWorkerRoles().clear();
         //update existing profile with file values
         populateCaseWorkerProfile(cwrdProfileRequest, caseWorkerProfile, caseWorkerProfile.getCaseWorkerId());
-        // update roles in sidam
-        return updateUserRolesInIdam(cwrdProfileRequest, caseWorkerProfile.getCaseWorkerId());
+        return caseWorkerProfile;
     }
 
     public boolean updateUserRolesInIdam(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId) {
@@ -518,7 +536,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Response response = null;
         Object clazz;
         try {
-            long time1 = System.currentTimeMillis();
+            long time1 = currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
             log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
 
