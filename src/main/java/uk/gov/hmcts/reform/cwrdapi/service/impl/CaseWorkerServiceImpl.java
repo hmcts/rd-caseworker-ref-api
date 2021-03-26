@@ -77,6 +77,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
@@ -429,13 +430,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse) {
+                UserProfileResponse userProfileResponse = (UserProfileResponse) resultResponse.get();
+                if (!(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+                    validationServiceFacade.logFailures(String.format(IDAM_STATUS,
+                            userProfileResponse.getIdamStatusCode(), userProfileResponse.getIdamStatus()),
+                            cwrProfileRequest.getRowId());
+                    return false;
+                }
 
-
-            if (!resultResponse.isPresent()
-                || (isNull(((UserProfileResponse) resultResponse.get())
-                .getIdamStatus()))
-                || (!STATUS_ACTIVE.equalsIgnoreCase(((UserProfileResponse) resultResponse.get())
-                .getIdamStatus()))) {
+            } else {
                 validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
                 return false;
             }
@@ -444,21 +448,24 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                new HashSet<>();
+                    new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
             if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
                 Set<RoleName> mergedRoles = idamRolesCwr.stream()
-                    .filter(s -> !(userProfileRoles.contains(s)))
-                    .map(RoleName::new)
-                    .collect(toSet());
+                        .filter(s -> !(userProfileRoles.contains(s)))
+                        .map(RoleName::new)
+                        .collect(toSet());
                 if (isNotEmpty(mergedRoles)) {
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-                        .rolesAdd(mergedRoles).build();
+                            .rolesAdd(mergedRoles).build();
                     return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
-                        cwrProfileRequest.getRowId());
+                            cwrProfileRequest.getRowId());
                 }
             }
         } catch (Exception exception) {
+            log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
+                    exception.getMessage(), validationServiceFacade.getAuditJobId(), cwrProfileRequest.getRowId());
+
             validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
             return false;
         }
