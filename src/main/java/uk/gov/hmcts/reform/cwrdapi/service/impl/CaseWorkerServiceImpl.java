@@ -433,8 +433,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse) {
                 UserProfileResponse userProfileResponse = (UserProfileResponse) resultResponse.get();
                 if (!(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
-                    validationServiceFacade.logFailures(String.format(IDAM_STATUS,
-                            userProfileResponse.getIdamStatusCode(), userProfileResponse.getIdamStatus()),
+                    validationServiceFacade.logFailures(String.format(IDAM_STATUS, userProfileResponse.getIdamStatus()),
                             cwrProfileRequest.getRowId());
                     return false;
                 }
