@@ -24,12 +24,14 @@ import java.util.Map;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.lang.String.format;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.FILE_UPLOAD_IN_PROGRESS;
@@ -37,6 +39,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AREA_OF_WORK_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_EMAIL_PROFILES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
@@ -427,6 +430,30 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers).isEmpty();
+    }
+
+    @Test
+    public void shouldHandleDuplicateEmailProfiles() throws IOException {
+        Map<String, Object> response =
+                uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
+                        TYPE_XLSX, "200 OK", cwdAdmin);
+        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
+        assertThat(response.get("message_details")).isEqualTo(format(RECORDS_FAILED, 2)
+                .concat(" and ")
+                .concat(format(RECORDS_UPLOADED, 1)));
+        assertThat((List)response.get("error_details")).hasSize(2);
+        assertTrue(((List<?>) response.get("error_details")).get(0).toString()
+                .contains(format(DUPLICATE_EMAIL_PROFILES, 3)));
+        assertTrue(((List<?>) response.get("error_details")).get(1).toString()
+                .contains(format(DUPLICATE_EMAIL_PROFILES, 4)));
+
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isEqualTo(1);
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
+        assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
+        assertEquals(format(DUPLICATE_EMAIL_PROFILES, 3), exceptionCaseWorkers.get(0).getErrorDescription());
+        assertEquals(format(DUPLICATE_EMAIL_PROFILES, 4), exceptionCaseWorkers.get(1).getErrorDescription());
     }
 
 }
