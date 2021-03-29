@@ -11,11 +11,13 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationRe
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.JsrFileErrors;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,9 +76,12 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findAll().get(0);
+        int totalZoneSecondsFromUtc = caseWorkerProfile.getCreatedDate().atZone(ZoneId.of("Europe/London")).getOffset()
+                .getTotalSeconds();
         //to check UTC time is persisted in db
-        assertThat(caseWorkerProfileRepository.findAll().get(0).getCreatedDate())
-                .isCloseToUtcNow(within(10, SECONDS));
+        assertThat(caseWorkerProfile.getCreatedDate())
+                .isCloseToUtcNow(within(totalZoneSecondsFromUtc + 10, SECONDS));
     }
 
     @Test
@@ -454,6 +459,17 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
         assertEquals(format(DUPLICATE_EMAIL_PROFILES, 3), exceptionCaseWorkers.get(0).getErrorDescription());
         assertEquals(format(DUPLICATE_EMAIL_PROFILES, 4), exceptionCaseWorkers.get(1).getErrorDescription());
+    }
+
+    @Test
+    public void shouldFailToCreateAuditForInvalidRole() throws IOException {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+                        TYPE_XLSX, "403", "invalid");
+
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isZero();
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
 }
