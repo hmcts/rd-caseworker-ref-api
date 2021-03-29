@@ -127,13 +127,14 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 
-        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR)).hasSize(6);
-        assertThat(response).contains(entry("message_details",
-            format("2 record(s) failed validation and 1 record(s) uploaded", 2))).hasSize(6);
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR))
+            .contains(entry("message_details",
+                format("2 record(s) failed validation and 1 record(s) uploaded", 2))).hasSize(6);
         assertThat(response.get("error_details").toString()).contains(FIRST_NAME_INVALID);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
-        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus()).hasSize(15);;
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus()).hasSize(15);
+        ;
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers).isNotEmpty();
     }
@@ -402,8 +403,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR)).hasSize(6);
-        assertThat(response).contains(entry("message_details", format(RECORDS_FAILED, 4))).hasSize(6);
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR))
+            .contains(entry("message_details", format(RECORDS_FAILED, 4))).hasSize(6);
         assertThat((List) response.get("error_details")).hasSize(4);
     }
 
@@ -412,8 +413,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY)).hasSize(6);
-        assertThat(response).contains(entry("message_details", format(RECORDS_UPLOADED, 2)));
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY))
+            .contains(entry("message_details", format(RECORDS_UPLOADED, 2))).hasSize(6);
         assertThat(response.get("error_details")).isNull();
     }
 
@@ -422,8 +423,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY)).hasSize(6);
-        assertThat(response).contains(entry("message_details", format(RECORDS_UPLOADED, 2))).hasSize(6);
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY))
+            .contains(entry("message_details", format(RECORDS_UPLOADED, 2))).hasSize(6);
         assertThat(response.get("error_details")).isNull();
     }
 
@@ -432,8 +433,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
             + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY)).hasSize(6);
-        assertThat(response).contains(entry("message_details", format(RECORDS_UPLOADED, 1))).hasSize(6);
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY))
+            .contains(entry("message_details", format(RECORDS_UPLOADED, 1))).hasSize(6);
         assertThat((List) response.get("error_details")).isNull();
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
@@ -448,10 +449,10 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR)).hasSize(6);
-        assertThat(response).contains(entry("message_details", format(RECORDS_FAILED, 2)
-            .concat(" and ")
-            .concat(format(RECORDS_UPLOADED, 1)))).hasSize(6);
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR))
+            .contains(entry("message_details", format(RECORDS_FAILED, 2).concat(" and ")
+                .concat(format(RECORDS_UPLOADED, 1))))
+            .hasSize(6);
 
         assertThat((List) response.get("error_details")).hasSize(2);
         assertTrue(((List<?>) response.get("error_details")).get(0).toString()
