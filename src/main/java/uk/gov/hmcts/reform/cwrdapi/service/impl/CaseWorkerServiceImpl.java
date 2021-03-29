@@ -162,9 +162,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     //when profile is new then create new user profile
                     caseWorkerProfile = createCaseWorkerProfile(cwrRequest);
                     //Avoid select Insert for new Inserts
-                    if (nonNull(caseWorkerProfile)) {
-                        caseWorkerProfile.setNew(true);
-                    }
+                    setNewCaseWorkerProfileFlag(caseWorkerProfile);
                     newCaseWorkerProfiles.add(caseWorkerProfile);
 
                 } else if (isTrue(caseWorkerProfile.getSuspended())) {
@@ -198,6 +196,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             throw exp;
         }
         return processedCwProfiles;
+    }
+
+    private void setNewCaseWorkerProfileFlag(CaseWorkerProfile caseWorkerProfile) {
+        if (nonNull(caseWorkerProfile)) {
+            caseWorkerProfile.setNew(true);
+        }
     }
 
     public List<CaseWorkerProfile> persistCaseWorkerInBatch(List<CaseWorkerProfile> newCaseWorkerProfiles,

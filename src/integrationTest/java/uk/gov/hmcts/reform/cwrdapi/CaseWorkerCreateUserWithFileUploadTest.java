@@ -128,7 +128,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
         assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
         assertThat(response.get("message_details"))
-            .isEqualTo(String.format("2 record(s) failed validation and 1 record(s) uploaded", 2));
+            .isEqualTo(format("2 record(s) failed validation and 1 record(s) uploaded", 2));
         assertThat(response.get("error_details").toString()).contains(FIRST_NAME_INVALID);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
