@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.Persistable;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -30,7 +32,7 @@ import static javax.persistence.CascadeType.ALL;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseWorkerProfile implements Serializable {
+public class CaseWorkerProfile implements Persistable<String>, Serializable {
 
     @Id
     @Column(name = "case_worker_id")
@@ -75,12 +77,12 @@ public class CaseWorkerProfile implements Serializable {
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile", cascade = ALL,
-            orphanRemoval = true)
+        orphanRemoval = true)
     private List<CaseWorkerLocation> caseWorkerLocations = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerWorkArea.class, mappedBy = "caseWorkerProfile", cascade = ALL,
-            orphanRemoval = true)
+        orphanRemoval = true)
     private List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
@@ -89,7 +91,19 @@ public class CaseWorkerProfile implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_type_id", referencedColumnName = "user_type_id",
-            insertable = false, updatable = false, nullable = false)
+        insertable = false, updatable = false, nullable = false)
     private UserType userType;
 
+    @Transient
+    private boolean isNew = false;
+
+    @Override
+    public String getId() {
+        return caseWorkerId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
 }
