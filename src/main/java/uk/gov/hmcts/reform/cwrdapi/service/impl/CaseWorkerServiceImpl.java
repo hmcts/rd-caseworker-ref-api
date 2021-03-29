@@ -62,7 +62,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
@@ -610,8 +609,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
                 UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())) {
-                    if (userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
-                            .equals(valueOf(HttpStatus.CREATED.value())) == FALSE) {
+                    if (!userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                            .equals(valueOf(HttpStatus.CREATED.value()))) {
 
                         validationServiceFacade.logFailures(String.format(IDAM_STATUS,
                                 userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()), rowId);
