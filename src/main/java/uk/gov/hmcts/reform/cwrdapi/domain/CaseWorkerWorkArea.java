@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +28,7 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 @SequenceGenerator(name = "case_worker_work_area_id_seq", sequenceName = "case_worker_work_area_id_seq",
-        allocationSize = 1)
+    allocationSize = 1)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "service_code"}))
 public class CaseWorkerWorkArea implements Serializable {
 
@@ -57,9 +58,9 @@ public class CaseWorkerWorkArea implements Serializable {
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "case_worker_id", referencedColumnName = "case_worker_id",
-            insertable = false, updatable = false, nullable = false)
+        insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
 
     public CaseWorkerWorkArea(String caseWorkerId, String areaOfWork, String serviceCode) {
