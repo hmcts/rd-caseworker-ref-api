@@ -602,27 +602,30 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
                                      String origin, long rowId) {
+
+        // boolean shouldLogDefaultFailureMessage = true;
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
                 UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
-                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
-                        && !userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
-                        .equals(valueOf(HttpStatus.CREATED.value()))) {
+                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())) {
+                    if (!userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                            .equals(valueOf(HttpStatus.CREATED.value()))) {
 
-                    validationServiceFacade.logFailures(String.format(IDAM_STATUS,
-                            userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()), rowId);
-                    return false;
+                        validationServiceFacade.logFailures(String.format(IDAM_STATUS,
+                                userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()), rowId);
+                    } else {
+                        validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                    }
+                } else {
+                    validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
                 }
-            } else {
-                validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
                 return false;
             }
-
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
-                loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
+                    loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
             validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
             return false;
         }
