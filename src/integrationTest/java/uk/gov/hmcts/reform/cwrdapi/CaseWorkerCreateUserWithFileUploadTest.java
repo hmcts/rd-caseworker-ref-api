@@ -470,6 +470,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isZero();
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+
     }
 
 }
