@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,8 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.domain.Persistable;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +28,7 @@ import static javax.persistence.CascadeType.ALL;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class CaseWorkerProfile implements Serializable {
+public class CaseWorkerProfile implements Persistable {
 
     @Id
     @Column(name = "case_worker_id")
@@ -75,12 +73,12 @@ public class CaseWorkerProfile implements Serializable {
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerLocation.class, mappedBy = "caseWorkerProfile", cascade = ALL,
-            orphanRemoval = true)
+        orphanRemoval = true)
     private List<CaseWorkerLocation> caseWorkerLocations = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerWorkArea.class, mappedBy = "caseWorkerProfile", cascade = ALL,
-            orphanRemoval = true)
+        orphanRemoval = true)
     private List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
@@ -89,7 +87,47 @@ public class CaseWorkerProfile implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_type_id", referencedColumnName = "user_type_id",
-            insertable = false, updatable = false, nullable = false)
+        insertable = false, updatable = false, nullable = false)
     private UserType userType;
+
+    private transient boolean isNew = false;
+
+    @Override
+    public Object getId() {
+        return caseWorkerId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
+    //Added this as lombok can't generate some args constructor and we have to exclude isNew field
+    public CaseWorkerProfile(final String caseWorkerId, final String firstName, final String lastName,
+                             final String emailId, final Long userTypeId, final String region,
+                             final Integer regionId, final Boolean suspended, final LocalDateTime createdDate,
+                             final LocalDateTime lastUpdate, final List<CaseWorkerLocation> caseWorkerLocations,
+                             final List<CaseWorkerWorkArea> caseWorkerWorkAreas,
+                             final List<CaseWorkerRole> caseWorkerRoles,
+                             final UserType userType) {
+        this.caseWorkerId = caseWorkerId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailId = emailId;
+        this.userTypeId = userTypeId;
+        this.region = region;
+        this.regionId = regionId;
+        this.suspended = suspended;
+        this.createdDate = createdDate;
+        this.lastUpdate = lastUpdate;
+        this.caseWorkerLocations = caseWorkerLocations;
+        this.caseWorkerWorkAreas = caseWorkerWorkAreas;
+        this.caseWorkerRoles = caseWorkerRoles;
+        this.userType = userType;
+    }
 
 }

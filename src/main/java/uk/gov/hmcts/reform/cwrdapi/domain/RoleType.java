@@ -51,6 +51,4 @@ public class RoleType implements Serializable {
     public RoleType(String description) {
         this.description = description;
     }
-
-
 }
