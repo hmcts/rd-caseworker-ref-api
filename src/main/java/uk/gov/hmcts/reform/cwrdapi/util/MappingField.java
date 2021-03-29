@@ -10,7 +10,7 @@ public @interface MappingField {
 
     String isPrimary() default "";
 
-    Class clazz() default Object.class;
+    Class<?> clazz() default Object.class;
 
     int objectCount() default 0;
 
