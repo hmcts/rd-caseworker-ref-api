@@ -29,6 +29,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.lang.String.format;
 import static java.time.ZoneId.of;
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.util.Map.entry;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
@@ -126,10 +127,11 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details"))
-            .isEqualTo(format("2 record(s) failed validation and 1 record(s) uploaded", 2));
-        assertThat(response.get("error_details").toString()).contains(FIRST_NAME_INVALID);
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR));
+
+        assertThat(response).contains(entry("message_details",
+            format("2 record(s) failed validation and 1 record(s) uploaded", 2)));
+        assertThat(response).contains(entry("error_details", FIRST_NAME_INVALID));
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
@@ -400,8 +402,9 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldHandlePartialSuccessWhenFileHasBadFormulaRecord() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
-        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_FAILED, 4));
+
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR));
+        assertThat(response).contains(entry("message_details", format(RECORDS_FAILED, 4)));
         assertThat((List) response.get("error_details")).hasSize(4);
     }
 
@@ -410,8 +413,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY));
+        assertThat(response).contains(entry("message_details", format(RECORDS_UPLOADED, 2)));
         assertThat(response.get("error_details")).isNull();
     }
 
@@ -420,8 +423,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY));
+        assertThat(response).contains(entry("message_details", format(RECORDS_UPLOADED, 2)));
         assertThat(response.get("error_details")).isNull();
     }
 
@@ -430,8 +433,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
             + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 1));
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY));
+        assertThat(response).contains(entry("message_details", format(RECORDS_UPLOADED, 1)));
         assertThat((List) response.get("error_details")).isNull();
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
@@ -445,10 +448,13 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         Map<String, Object> response =
             uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
-        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details")).isEqualTo(format(RECORDS_FAILED, 2)
+
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR));
+
+        assertThat(response).contains(entry("message_details", format(RECORDS_FAILED, 2)
             .concat(" and ")
-            .concat(format(RECORDS_UPLOADED, 1)));
+            .concat(format(RECORDS_UPLOADED, 1))));
+
         assertThat((List) response.get("error_details")).hasSize(2);
         assertTrue(((List<?>) response.get("error_details")).get(0).toString()
             .contains(format(DUPLICATE_EMAIL_PROFILES, 3)));
