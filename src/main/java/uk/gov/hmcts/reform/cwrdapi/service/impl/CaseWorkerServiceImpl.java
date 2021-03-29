@@ -62,6 +62,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
@@ -602,35 +603,38 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
                                      String origin, long rowId) {
-
-        // boolean shouldLogDefaultFailureMessage = true;
+        boolean isEachRoleUpdated = true;
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
                 UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())) {
-                    if (!userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
-                            .equals(valueOf(HttpStatus.CREATED.value()))) {
+                    if (userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                            .equals(valueOf(HttpStatus.CREATED.value())) == FALSE) {
 
                         validationServiceFacade.logFailures(String.format(IDAM_STATUS,
                                 userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()), rowId);
-                    } else {
-                        validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                        isEachRoleUpdated = false;
                     }
                 } else {
                     validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                    isEachRoleUpdated = false;
                 }
-                return false;
+            } else {
+                validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                isEachRoleUpdated = false;
             }
+
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
                     loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
             validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
-            return false;
+            isEachRoleUpdated = false;
         }
-        return true;
+        return isEachRoleUpdated;
     }
+
 
     private Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
                                                           String userId, String origin) {
