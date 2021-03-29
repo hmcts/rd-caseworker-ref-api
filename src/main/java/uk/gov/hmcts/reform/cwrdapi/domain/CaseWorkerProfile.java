@@ -106,8 +106,4 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     public boolean isNew() {
         return isNew;
     }
-
-    public void setNew(boolean isNew) {
-        this.isNew = isNew;
-    }
 }

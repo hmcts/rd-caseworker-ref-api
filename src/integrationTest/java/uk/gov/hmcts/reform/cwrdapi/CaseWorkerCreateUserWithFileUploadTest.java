@@ -134,7 +134,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus()).hasSize(15);
-        ;
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers).isNotEmpty();
     }
