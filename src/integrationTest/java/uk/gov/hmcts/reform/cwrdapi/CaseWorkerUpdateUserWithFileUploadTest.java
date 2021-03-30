@@ -1,4 +1,3 @@
-
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
@@ -69,7 +68,6 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateFailedExceptionInFetchingUser() throws Exception {
-
         validateAuditCaseWorkerCreate();
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
@@ -107,4 +105,3 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
     }
 }
-
