@@ -54,8 +54,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         String expectedResponse = "{\"message\":\"Request completed with partial success. "
                 + "Some records failed during validation and were ignored.\","
                 + "\"message_details\":\"%s record(s) failed validation\","
-                + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"The IDAM status"
-                + " code of user is STALE\"}]}";
+                + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"The IDAM status of the user is :: 'STALE'\"}]}";
 
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
