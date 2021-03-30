@@ -46,6 +46,12 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateStaleUser() throws Exception {
+        String expectedResponse = "{\"message\":\"Request completed with partial success. "
+                + "Some records failed during validation and were ignored.\","
+                + "\"message_details\":\"%s record(s) failed validation\","
+                + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"The IDAM status"
+                + " code of user is STALE\"}]}";
+
         validateAuditCaseWorkerCreate();
         String roles = "[\"Senior Tribunal Caseworker\"]";
         userProfileGetUserWireMock("STALE", roles);
@@ -62,6 +68,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateFailedExceptionInFetchingUser() throws Exception {
+
         validateAuditCaseWorkerCreate();
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
