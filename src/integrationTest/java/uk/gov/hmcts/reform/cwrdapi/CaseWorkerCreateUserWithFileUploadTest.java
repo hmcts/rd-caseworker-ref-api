@@ -468,4 +468,15 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertEquals(format(DUPLICATE_EMAIL_PROFILES, 4), exceptionCaseWorkers.get(1).getErrorDescription());
     }
 
+    @Test
+    public void shouldFailToCreateAuditForInvalidRole() throws IOException {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+                        TYPE_XLSX, "403", "invalid");
+
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isZero();
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+    }
+
 }
