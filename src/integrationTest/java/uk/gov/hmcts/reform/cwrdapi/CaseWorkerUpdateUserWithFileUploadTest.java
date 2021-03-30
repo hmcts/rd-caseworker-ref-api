@@ -1,4 +1,4 @@
-/*
+
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
@@ -99,4 +99,4 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
     }
 }
-*/
+
