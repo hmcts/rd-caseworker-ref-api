@@ -46,21 +46,22 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateStaleUser() throws Exception {
+        validateAuditCaseWorkerCreate();
+        String roles = "[\"Senior Tribunal Caseworker\"]";
+        userProfileGetUserWireMock("STALE", roles);
+        modifyUserRoles();
+        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+
         String expectedResponse = "{\"message\":\"Request completed with partial success. "
                 + "Some records failed during validation and were ignored.\","
                 + "\"message_details\":\"%s record(s) failed validation\","
                 + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"The IDAM status"
                 + " code of user is STALE\"}]}";
 
-        validateAuditCaseWorkerCreate();
-        String roles = "[\"Senior Tribunal Caseworker\"]";
-        userProfileGetUserWireMock("STALE", roles);
-        modifyUserRoles();
-        response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
-                CaseWorkerFileCreationResponse.class));
+                .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
+                        CaseWorkerFileCreationResponse.class));
 
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
