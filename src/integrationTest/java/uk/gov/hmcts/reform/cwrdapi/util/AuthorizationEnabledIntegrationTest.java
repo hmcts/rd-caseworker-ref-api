@@ -191,16 +191,16 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
 
-
-
+    //removed UUID mock here and put in Test config,hence use this only for insert integration testing
+    //for update use insert response UUID in test or other mock methods
     @Before
     public void userProfilePostUserWireMock() {
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+            .inScenario("")
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withStatus(201)
                 .withBody("{"
-                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
                     + "  \"idamRegistrationResponse\":\"201\""
                     + "}")));
     }
@@ -211,6 +211,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     }
 
 
+    //removed UUID mock here and put in Test config,hence use this only for insert integration testing
+    //for update use insert response UUID in test or other mock methods
     public void userProfileCreateUserWireMock(HttpStatus status) {
 
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
@@ -218,7 +220,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .withHeader("Content-Type", "application/json")
                 .withStatus(status.value())
                 .withBody("{"
-                    + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
                     + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
                     + "}")));
     }

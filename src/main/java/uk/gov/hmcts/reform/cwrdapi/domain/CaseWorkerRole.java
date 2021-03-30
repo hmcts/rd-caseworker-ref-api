@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -52,12 +53,12 @@ public class CaseWorkerRole implements Serializable {
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "case_worker_id", referencedColumnName = "case_worker_id",
             insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "role_id",
             insertable = false, updatable = false, nullable = false)
     private RoleType roleType;
