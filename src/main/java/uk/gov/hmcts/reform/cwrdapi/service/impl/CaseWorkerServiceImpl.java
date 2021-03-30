@@ -170,7 +170,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     emailToRequestMap, cwDbProfiles);
             // persist in db
             processedCwProfiles = persistCaseWorkerInBatch(newCaseWorkerProfiles, updateAndSuspendedLists.getLeft(),
-                    updateAndSuspendedLists.getRight(), emailToRequestMap);
+                    updateAndSuspendedLists.getRight());
         } catch (Exception exp) {
             log.error("{}:: createCaseWorkerUserProfiles failed :: Job Id {} ::{}", loggingComponentName,
                     validationServiceFacade.getAuditJobId(), exp);
