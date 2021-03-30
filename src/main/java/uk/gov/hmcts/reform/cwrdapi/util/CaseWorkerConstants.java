@@ -76,7 +76,7 @@ public final class CaseWorkerConstants {
     public static final String UP_FAILURE_ROLES = "An update to the user is not possible at this moment."
             + " Please try again later.";
 
-    public static final String IDAM_STATUS = "The IDAM status of user is :: '%s'";
+    public static final String IDAM_STATUS = "The IDAM status of the user is :: '%s'";
 
     public static final String STATUS_ACTIVE = "ACTIVE";
 
