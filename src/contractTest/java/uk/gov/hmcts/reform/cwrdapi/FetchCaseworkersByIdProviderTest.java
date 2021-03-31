@@ -41,7 +41,7 @@ import static org.mockito.Mockito.doReturn;
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "master")})
+    @VersionSelector(tag = "Dev")})
 @Import(CaseWorkerProviderTestConfiguration.class)
 @SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 @IgnoreNoPactsToVerify
@@ -73,7 +73,6 @@ public class FetchCaseworkersByIdProviderTest {
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        //System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", caseWorkerServiceImpl));
