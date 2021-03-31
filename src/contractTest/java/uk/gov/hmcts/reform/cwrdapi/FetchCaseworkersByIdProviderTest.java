@@ -123,7 +123,7 @@ public class FetchCaseworkersByIdProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType(1L, "HMCTS"));
+                new UserType(1L, "HMCTS"), false);
     }
 
 }

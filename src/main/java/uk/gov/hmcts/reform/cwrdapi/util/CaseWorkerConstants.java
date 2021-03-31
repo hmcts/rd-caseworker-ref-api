@@ -90,7 +90,8 @@ public final class CaseWorkerConstants {
     public static final String RECORDS_SUSPENDED = "%s record(s) suspended";
 
     public static final String DOMAIN_JUSTICE_GOV_UK = "justice.gov.uk";
-    public static final String USER_NAME_PATTERN = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
+    public static final String USER_NAME_PATTERN = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+"
+        + "(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
     public static final String INVALID_EMAIL = "You must add a valid justice.gov.uk email"
             + " address and upload the file again";
 
@@ -112,7 +113,7 @@ public final class CaseWorkerConstants {
             + " empty space, ', - characters and must be less than 128 characters";
     public static final String LAST_NAME_INVALID = "Last Name is invalid - can only contain Alphabetic,"
             + " empty space, ', - characters and must be less than 128 characters";
-    public static final String NAME_REGEX = "^[a-zA-Z' -]{1,128}$";
+    public static final String NAME_REGEX = "^[a-zA-Z' .-]{1,127}$";
 
     public static final String MISSING_REGION = "You must add a region and upload the file again";
     public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
@@ -131,6 +132,6 @@ public final class CaseWorkerConstants {
     public static final String AND = "and";
 
     public static final String RESPONSE_BODY_MISSING_FROM_UP = "Response Body is missing from User Profile";
-
-
+    public static final String DUPLICATE_EMAIL_PROFILES = "User record in row ID %s is duplicate to another row. "
+            + "Please ensure that the record is not duplicate and try again";
 }

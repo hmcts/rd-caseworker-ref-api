@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_EMAIL_PROFILES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.MULTIPLE_SERVICE_CODES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_SUSPENDED;
@@ -119,10 +121,13 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             }
             if (isNotEmpty(caseWorkerRequest)) {
                 if (isCaseWorker) {
-                    List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests
-                        = caseWorkerProfileConverter.convert(caseWorkerRequest);
-                    caseWorkerInternalClient
-                        .postRequest(caseWorkersProfileCreationRequests, "/users");
+                    validateDuplicateEmailProfiles(caseWorkerRequest);
+                    if (isNotEmpty(caseWorkerRequest)) {
+                        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests
+                                = caseWorkerProfileConverter.convert(caseWorkerRequest);
+                        caseWorkerInternalClient
+                                .postRequest(caseWorkersProfileCreationRequests, "/users");
+                    }
                 } else {
                     validateServiceRoleMappingSheet(caseWorkerRequest);
                     caseWorkerInternalClient.postRequest(caseWorkerRequest, "/idam-roles-mapping");
@@ -140,6 +145,20 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             auditLog(file, ex);
 
             throw ex;
+        }
+    }
+
+    private void validateDuplicateEmailProfiles(List<CaseWorkerDomain> caseWorkerRequest) {
+        List<CaseWorkerDomain> duplicateEmailProfiles = caseWorkerRequest.stream()
+                .map(CaseWorkerProfile.class::cast)
+                .collect(groupingBy(CaseWorkerProfile::getOfficialEmail)).values().stream()
+                .filter(duplicateEmailProfile -> duplicateEmailProfile.size() > 1)
+                .collect(ArrayList::new, List::addAll, List::addAll);
+
+        if (isNotEmpty(duplicateEmailProfiles)) {
+            duplicateEmailProfiles.forEach(p -> validationServiceFacadeImpl
+                    .logFailures(format(DUPLICATE_EMAIL_PROFILES, p.getRowId()), p.getRowId()));
+            caseWorkerRequest.removeAll(duplicateEmailProfiles);
         }
     }
 

@@ -65,11 +65,11 @@ import java.util.stream.Collectors;
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isTrue;
@@ -161,6 +161,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     }
                     //when profile is new then create new user profile
                     caseWorkerProfile = createCaseWorkerProfile(cwrRequest);
+                    //Avoid select Insert for new Inserts
+                    setNewCaseWorkerProfileFlag(caseWorkerProfile);
                     newCaseWorkerProfiles.add(caseWorkerProfile);
 
                 } else if (isTrue(caseWorkerProfile.getSuspended())) {
@@ -190,36 +192,61 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             processedCwProfiles = persistCaseWorkerInBatch(newCaseWorkerProfiles, updateCaseWorkerProfiles, requestMap);
         } catch (Exception exp) {
             log.error("{}:: createCaseWorkerUserProfiles failed :: Job Id {} ::{}", loggingComponentName,
-                    validationServiceFacade.getAuditJobId(),exp);
+                validationServiceFacade.getAuditJobId(), exp);
             throw exp;
         }
         return processedCwProfiles;
+    }
+
+    private void setNewCaseWorkerProfileFlag(CaseWorkerProfile caseWorkerProfile) {
+        if (nonNull(caseWorkerProfile)) {
+            caseWorkerProfile.setNew(true);
+        }
     }
 
     public List<CaseWorkerProfile> persistCaseWorkerInBatch(List<CaseWorkerProfile> newCaseWorkerProfiles,
                                                             List<CaseWorkerProfile> updateCaseWorkerProfiles,
                                                             Map<String, CaseWorkersProfileCreationRequest> requestMap) {
         List<CaseWorkerProfile> processedCwProfiles = null;
-        if (isNotEmpty(updateCaseWorkerProfiles)) {
-            caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
+        // update roles in sidam and filter if failed in User profile
+        List<CaseWorkerProfile> filteredUpdateCwProfiles = updateSidamRoles(updateCaseWorkerProfiles, requestMap);
+
+        if (isNotEmpty(filteredUpdateCwProfiles)) {
+            caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(filteredUpdateCwProfiles);
+            caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(filteredUpdateCwProfiles);
+            caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(filteredUpdateCwProfiles);
             cwrCommonRepository.flush();
 
-            //Skipping UP failed records as they already logged with logUpFailures
-            newCaseWorkerProfiles.addAll(updateCaseWorkerProfiles.stream().filter(updatedProfile ->
-                updateUserProfile(requestMap.get(updatedProfile.getEmailId()), updatedProfile) == Boolean.TRUE)
-                .collect(toList()));
+            //update existing user profiles
+            for (CaseWorkerProfile dbProfile : filteredUpdateCwProfiles) {
+                updateUserProfile(requestMap.get(dbProfile.getEmailId()), dbProfile);
+            }
+            newCaseWorkerProfiles.addAll(filteredUpdateCwProfiles);
         }
+
         if (isNotEmpty(newCaseWorkerProfiles)) {
-            long time1 = System.currentTimeMillis();
+            long time1 = currentTimeMillis();
             processedCwProfiles = caseWorkerProfileRepo.saveAll(newCaseWorkerProfiles);
             log.info("{}:: {} case worker profiles inserted :: Job Id {}", loggingComponentName,
-                    processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
+                processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
             log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
-                (System.currentTimeMillis() - time1));
+                (currentTimeMillis() - time1));
         }
         return processedCwProfiles;
+    }
+
+    // update roles in sidam and filter if failed in User profile
+    public List<CaseWorkerProfile> updateSidamRoles(List<CaseWorkerProfile> updateCaseWorkerProfiles,
+                                                    Map<String, CaseWorkersProfileCreationRequest> requestMap) {
+        List<CaseWorkerProfile> filteredUpdateCwProfiles = new ArrayList<>();
+        for (CaseWorkerProfile dbProfile : updateCaseWorkerProfiles) {
+            boolean isAddRoleSuccess = updateUserRolesInIdam(requestMap.get(dbProfile.getEmailId()),
+                dbProfile.getCaseWorkerId());
+            if (isAddRoleSuccess) {
+                filteredUpdateCwProfiles.add(dbProfile);
+            }
+        }
+        return filteredUpdateCwProfiles;
     }
 
     /**
@@ -256,7 +283,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         } catch (Exception e) {
             log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}:: Job Id {}::Reason:: {}",
-                loggingComponentName, serviceCodes.toString(), validationServiceFacade.getAuditJobId(),e.getMessage());
+                loggingComponentName, serviceCodes.toString(), validationServiceFacade.getAuditJobId(), e.getMessage());
             throw new IdamRolesMappingException(e.getMessage());
         }
     }
@@ -283,16 +310,19 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
      */
     @Override
     public ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds) {
+        long startTime = System.currentTimeMillis();
         List<CaseWorkerProfile> caseWorkerProfileList = caseWorkerProfileRepo.findByCaseWorkerIdIn(caseWorkerIds);
         if (isEmpty(caseWorkerProfileList)) {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
         }
-
+        log.info("{}::Time taken for fetching the records from DB for FetchCaseworkersById {}",
+            loggingComponentName, (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
     }
 
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
         List<CaseWorkerProfile> caseWorkerProfileList) {
+        long startTime = System.currentTimeMillis();
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfilesDto =
             new ArrayList<>();
         for (CaseWorkerProfile profile : caseWorkerProfileList) {
@@ -314,6 +344,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
                 .build());
         }
+        log.info("{}::Time taken By DTO for FetchCaseworkersById {}", loggingComponentName,
+            (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return caseWorkerProfilesDto;
     }
 
@@ -382,7 +414,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             } else {
                 validationServiceFacade.logFailures(RESPONSE_BODY_MISSING_FROM_UP, cwrdProfileRequest.getRowId());
                 log.error("{}:: {}:: Job Id {}:: Row Id {}", RESPONSE_BODY_MISSING_FROM_UP, loggingComponentName,
-                        validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
+                    validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
             }
         }
         return caseWorkerProfile;
@@ -411,15 +443,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return caseWorkerWorkAreas;
     }
 
-    public boolean updateUserProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest,
-                                     CaseWorkerProfile caseWorkerProfile) {
+    public CaseWorkerProfile updateUserProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest,
+                                               CaseWorkerProfile caseWorkerProfile) {
         caseWorkerProfile.getCaseWorkerLocations().clear();
         caseWorkerProfile.getCaseWorkerWorkAreas().clear();
         caseWorkerProfile.getCaseWorkerRoles().clear();
         //update existing profile with file values
         populateCaseWorkerProfile(cwrdProfileRequest, caseWorkerProfile, caseWorkerProfile.getCaseWorkerId());
-        // update roles in sidam
-        return updateUserRolesInIdam(cwrdProfileRequest, caseWorkerProfile.getCaseWorkerId());
+        return caseWorkerProfile;
     }
 
     public boolean updateUserRolesInIdam(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId) {
@@ -513,12 +544,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Response response = null;
         Object clazz;
         try {
-            long time1 = System.currentTimeMillis();
+            long time1 = currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
             log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
 
             clazz = (response.status() == 201 || response.status() == 409)
-                    ? UserProfileCreationResponse.class : ErrorResponse.class;
+                ? UserProfileCreationResponse.class : ErrorResponse.class;
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (clazz == ErrorResponse.class) {
@@ -526,8 +557,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 if (nonNull(responseBody) && responseBody instanceof ErrorResponse) {
                     Optional<ErrorResponse> optional = Optional.ofNullable((ErrorResponse) responseBody);
                     validationServiceFacade.logFailures(
-                            optional.map(ErrorResponse::getErrorDescription).orElse(UP_CREATION_FAILED),
-                            cwrdProfileRequest.getRowId());
+                        optional.map(ErrorResponse::getErrorDescription).orElse(UP_CREATION_FAILED),
+                        cwrdProfileRequest.getRowId());
                 } else {
                     validationServiceFacade.logFailures(UP_CREATION_FAILED, cwrdProfileRequest.getRowId());
                 }
@@ -535,7 +566,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             return responseEntity;
         } catch (Exception ex) {
             log.error("{}:: UserProfile api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
-                    ex.getMessage(), validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
+                ex.getMessage(), validationServiceFacade.getAuditJobId(), cwrdProfileRequest.getRowId());
             //Log UP failures
             validationServiceFacade.logFailures(ex.getMessage(), cwrdProfileRequest.getRowId());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -565,7 +596,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
-                loggingComponentName, rowId, ex.getMessage(),validationServiceFacade.getAuditJobId());
+                loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
             validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
             status = false;
         }
@@ -599,7 +630,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                                           String userId, String origin) {
         Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
         log.info("{}:: UserProfile update roles :: status code {}:: Job Id {}", loggingComponentName,
-                response.status(), validationServiceFacade.getAuditJobId());
+            response.status(), validationServiceFacade.getAuditJobId());
 
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
 

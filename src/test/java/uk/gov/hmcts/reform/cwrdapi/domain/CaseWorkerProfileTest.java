@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
