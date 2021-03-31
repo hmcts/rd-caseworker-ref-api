@@ -70,9 +70,9 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toSet;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
@@ -462,7 +462,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse) {
                 UserProfileResponse userProfileResponse = (UserProfileResponse) resultResponse.get();
-                if (!(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+                if (isNotTrue(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
                     validationServiceFacade.logFailures(String.format(IDAM_STATUS, userProfileResponse.getIdamStatus()),
                             cwrProfileRequest.getRowId());
                     return false;
