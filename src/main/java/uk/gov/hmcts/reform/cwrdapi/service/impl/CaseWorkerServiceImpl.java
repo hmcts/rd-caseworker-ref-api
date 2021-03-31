@@ -617,8 +617,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
                 UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())) {
-                    if (!userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
-                            .equals(valueOf(HttpStatus.CREATED.value()))) {
+                    if (isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                            .equals(valueOf(HttpStatus.CREATED.value())))) {
 
                         validationServiceFacade.logFailures(String.format(IDAM_STATUS,
                                 userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage()), rowId);
