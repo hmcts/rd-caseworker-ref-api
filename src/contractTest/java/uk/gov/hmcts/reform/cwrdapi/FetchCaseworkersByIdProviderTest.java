@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
+import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
+import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -32,14 +34,17 @@ import java.util.Collections;
 import java.util.List;
 import javax.sql.DataSource;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(SpringExtension.class)
-@Provider("crd_case_worker_ref_service")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}", host = "${PACT_BROKER_URL:localhost}",
-        port = "${PACT_BROKER_PORT:9292}")
+@Provider("referenceData_caseworkerRefUsers")
+@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
+    host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+    @VersionSelector(tag = "Dev")})
 @Import(CaseWorkerProviderTestConfiguration.class)
 @SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
+@IgnoreNoPactsToVerify
 public class FetchCaseworkersByIdProviderTest {
 
     @Autowired
@@ -60,24 +65,26 @@ public class FetchCaseworkersByIdProviderTest {
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
-        context.verifyInteraction();
+        if (context != null) {
+            context.verifyInteraction();
+        }
     }
 
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", caseWorkerServiceImpl));
-        context.setTarget(testTarget);
+        if (context != null) {
+            context.setTarget(testTarget);
+        }
     }
 
     @State({"A list of users for CRD request"})
     public void fetchListOfUsersById() {
         List<CaseWorkerProfile> caseWorkerProfile = Collections.singletonList(getCaseWorkerProfile(USER_ID));
-        List<String> userRequest = Collections.singletonList(USER_ID);
-        doReturn(caseWorkerProfile).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(userRequest);
+        doReturn(caseWorkerProfile).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(anyList());
     }
 
     @State({"A list of multiple users for CRD request"})

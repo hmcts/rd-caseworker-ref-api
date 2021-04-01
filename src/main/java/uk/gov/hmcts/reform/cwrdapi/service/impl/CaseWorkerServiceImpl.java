@@ -63,7 +63,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
@@ -79,6 +78,7 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
@@ -495,13 +495,15 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse) {
+                UserProfileResponse userProfileResponse = (UserProfileResponse) resultResponse.get();
+                if (isNotTrue(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+                    validationServiceFacade.logFailures(String.format(IDAM_STATUS, userProfileResponse.getIdamStatus()),
+                            cwrProfileRequest.getRowId());
+                    return false;
+                }
 
-
-            if (!resultResponse.isPresent()
-                || (isNull(((UserProfileResponse) resultResponse.get())
-                .getIdamStatus()))
-                || (!STATUS_ACTIVE.equalsIgnoreCase(((UserProfileResponse) resultResponse.get())
-                .getIdamStatus()))) {
+            } else {
                 validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
                 return false;
             }
@@ -510,21 +512,24 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                new HashSet<>();
+                    new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
             if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
                 Set<RoleName> mergedRoles = idamRolesCwr.stream()
-                    .filter(s -> !(userProfileRoles.contains(s)))
-                    .map(RoleName::new)
-                    .collect(toSet());
+                        .filter(s -> !(userProfileRoles.contains(s)))
+                        .map(RoleName::new)
+                        .collect(toSet());
                 if (isNotEmpty(mergedRoles)) {
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-                        .rolesAdd(mergedRoles).build();
+                            .rolesAdd(mergedRoles).build();
                     return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
-                        cwrProfileRequest.getRowId());
+                            cwrProfileRequest.getRowId());
                 }
             }
         } catch (Exception exception) {
+            log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
+                    exception.getMessage(), validationServiceFacade.getAuditJobId(), cwrProfileRequest.getRowId());
+
             validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
             return false;
         }
@@ -640,26 +645,38 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
                                      String origin, long rowId) {
+        boolean isEachRoleUpdated = true;
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
-            if (!resultResponse.isPresent()
-                || (isNull(((UserProfileRolesResponse) resultResponse.get())
-                .getRoleAdditionResponse()))
-                || (((UserProfileRolesResponse) resultResponse.get()).getRoleAdditionResponse()
-                .getIdamStatusCode().equals(valueOf(HttpStatus.CREATED.value())) == FALSE)) {
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
+                UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
+                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())) {
+                    if (isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                            .equals(valueOf(HttpStatus.CREATED.value())))) {
+
+                        validationServiceFacade.logFailures(String.format(IDAM_STATUS,
+                                userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage()), rowId);
+                        isEachRoleUpdated = false;
+                    }
+                } else {
+                    validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                    isEachRoleUpdated = false;
+                }
+            } else {
                 validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
-                return false;
+                isEachRoleUpdated = false;
             }
 
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
-                loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
+                    loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
             validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
-            return false;
+            isEachRoleUpdated = false;
         }
-        return true;
+        return isEachRoleUpdated;
     }
+
 
     private Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
                                                           String userId, String origin) {
