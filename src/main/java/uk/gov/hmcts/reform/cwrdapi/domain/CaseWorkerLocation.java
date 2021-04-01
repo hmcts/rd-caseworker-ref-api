@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,7 +22,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 
 @Entity(name = "case_worker_location")
 @Getter
@@ -59,7 +59,7 @@ public class CaseWorkerLocation implements Serializable {
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "case_worker_id",referencedColumnName = "case_worker_id",insertable = false,
             updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
@@ -71,7 +71,6 @@ public class CaseWorkerLocation implements Serializable {
         this.locationId = locationId;
         this.location = location;
         this.primaryFlag = primaryFlag;
-
     }
 
 }

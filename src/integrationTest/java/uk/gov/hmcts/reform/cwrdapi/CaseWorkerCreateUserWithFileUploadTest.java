@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationRe
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.JsrFileErrors;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
@@ -20,12 +21,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.lang.String.format;
+import static java.time.ZoneId.of;
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.util.Map.entry;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
@@ -68,15 +72,20 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     JdbcTemplate template;
 
     String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
-            + "\"message_details\":\"4 record(s) uploaded\"}";
+        + "\"message_details\":\"4 record(s) uploaded\"}";
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
+
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findAll().get(0);
+        TimeZone systemZone = TimeZone.getDefault();
+        int totalZoneSecondsFromUtc = caseWorkerProfile.getCreatedDate().atZone(of(systemZone.getID())).getOffset()
+            .getTotalSeconds();
         //to check UTC time is persisted in db
-        assertThat(caseWorkerProfileRepository.findAll().get(0).getCreatedDate())
-                .isCloseToUtcNow(within(10, SECONDS));
+        assertThat(caseWorkerProfile.getCreatedDate())
+            .isCloseToUtcNow(within(totalZoneSecondsFromUtc + 10, SECONDS));
     }
 
     @Test
@@ -115,16 +124,16 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldReturn200PartialSuccessWhenNameIsLongerThan128AndNameHasInvalidCharacter() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile(
-                "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
-                CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
+            "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
+            CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details"))
-                .isEqualTo(String.format("2 record(s) failed validation and 1 record(s) uploaded", 2));
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR))
+            .contains(entry("message_details",
+                format("2 record(s) failed validation and 1 record(s) uploaded", 2))).hasSize(6);
         assertThat(response.get("error_details").toString()).contains(FIRST_NAME_INVALID);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
-        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus());
+        assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(PARTIAL_SUCCESS.getStatus()).hasSize(15);
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(exceptionCaseWorkers).isNotEmpty();
     }
@@ -283,16 +292,16 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         //create invalid stub of UP for Exception validation
         String errorMessageFromIdam = "The role to be assigned does not exist.";
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .errorCode(404)
-                .errorDescription(errorMessageFromIdam).build();
+            .errorCode(404)
+            .errorDescription(errorMessageFromIdam).build();
 
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
-                .willReturn(aResponse().withStatus(404)
+            .willReturn(aResponse().withStatus(404)
                 .withBody(new Gson().toJson(errorResponse).getBytes())));
-        
+
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
-                TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         List<ExceptionCaseWorker> exceptionCaseWorkers = caseWorkerExceptionRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
@@ -325,7 +334,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "\"message_details\":\"1 record(s) failed validation\","
             + "\"error_details\":[{\"row_id\":\"2\","
             + "\"error_description\":\"User creation is not possible at this moment. "
-                + "Please try again later or check with administrator.\"}]}";
+            + "Please try again later or check with administrator.\"}]}";
 
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
@@ -391,40 +400,41 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldHandlePartialSuccessWhenFileHasBadFormulaRecord() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
-                TYPE_XLSX, "200 OK", cwdAdmin);
-        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_FAILED, 4));
-        assertThat((List)response.get("error_details")).hasSize(4);
+            TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR))
+            .contains(entry("message_details", format(RECORDS_FAILED, 4))).hasSize(6);
+        assertThat((List) response.get("error_details")).hasSize(4);
     }
 
     @Test
     public void shouldUploadStaffDataXlsxFileSuccessfully_whenEmptyRowsInBetween() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
-                TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY))
+            .contains(entry("message_details", format(RECORDS_UPLOADED, 2))).hasSize(6);
         assertThat(response.get("error_details")).isNull();
     }
 
     @Test
     public void shouldUploadStaffDataXlsxFileSuccessfully_whenNoEmptyRowsInBetween() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
-                TYPE_XLSX, "200 OK", cwdAdmin);
+            TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 2));
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY))
+            .contains(entry("message_details", format(RECORDS_UPLOADED, 2))).hasSize(6);
         assertThat(response.get("error_details")).isNull();
     }
-    
+
     @Test
     public void shouldCreateCaseWorkerAudit_when_email_in_capital_letters() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
-                        + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+            + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
-        assertThat(response.get("message")).isEqualTo(REQUEST_COMPLETED_SUCCESSFULLY);
-        assertThat(response.get("message_details")).isEqualTo(String.format(RECORDS_UPLOADED, 1));
-        assertThat((List)response.get("error_details")).isNull();
+        assertThat(response).contains(entry("message", REQUEST_COMPLETED_SUCCESSFULLY))
+            .contains(entry("message_details", format(RECORDS_UPLOADED, 1))).hasSize(6);
+        assertThat((List) response.get("error_details")).isNull();
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
         assertThat(caseWorkerAudits.get(0).getStatus()).isEqualTo(SUCCESS.getStatus());
@@ -435,17 +445,19 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldHandleDuplicateEmailProfiles() throws IOException {
         Map<String, Object> response =
-                uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
-                        TYPE_XLSX, "200 OK", cwdAdmin);
-        assertThat(response.get("message")).isEqualTo(REQUEST_FAILED_FILE_UPLOAD_JSR);
-        assertThat(response.get("message_details")).isEqualTo(format(RECORDS_FAILED, 2)
-                .concat(" and ")
-                .concat(format(RECORDS_UPLOADED, 1)));
-        assertThat((List)response.get("error_details")).hasSize(2);
+            uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR))
+            .contains(entry("message_details", format(RECORDS_FAILED, 2).concat(" and ")
+                .concat(format(RECORDS_UPLOADED, 1))))
+            .hasSize(6);
+
+        assertThat((List) response.get("error_details")).hasSize(2);
         assertTrue(((List<?>) response.get("error_details")).get(0).toString()
-                .contains(format(DUPLICATE_EMAIL_PROFILES, 3)));
+            .contains(format(DUPLICATE_EMAIL_PROFILES, 3)));
         assertTrue(((List<?>) response.get("error_details")).get(1).toString()
-                .contains(format(DUPLICATE_EMAIL_PROFILES, 4)));
+            .contains(format(DUPLICATE_EMAIL_PROFILES, 4)));
 
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isEqualTo(1);
@@ -454,6 +466,17 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         assertThat(exceptionCaseWorkers.size()).isEqualTo(2);
         assertEquals(format(DUPLICATE_EMAIL_PROFILES, 3), exceptionCaseWorkers.get(0).getErrorDescription());
         assertEquals(format(DUPLICATE_EMAIL_PROFILES, 4), exceptionCaseWorkers.get(1).getErrorDescription());
+    }
+
+    @Test
+    public void shouldFailToCreateAuditForInvalidRole() throws IOException {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        uploadCaseWorkerFile("Staff Data Upload.xlsx",
+                        TYPE_XLSX, "403", "invalid");
+
+        List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
+        assertThat(caseWorkerAudits.size()).isZero();
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
 }
