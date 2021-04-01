@@ -485,7 +485,6 @@ public class CaseWorkerServiceImplTest {
         CaseWorkerProfile profile = new CaseWorkerProfile();
         profile.setCaseWorkerId("1");
         profile.setEmailId(cwProfileCreationRequest.getEmailId());
-        profile.setSuspended(true);
 
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
