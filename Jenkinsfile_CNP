@@ -81,9 +81,14 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    enablePactAs([
-    AppPipelineDsl.PactRoles.PROVIDER,
-    AppPipelineDsl.PactRoles.CONSUMER
-    ])
-
+    onMaster() {
+        enablePactAs([
+            AppPipelineDsl.PactRoles.PROVIDER
+        ])
+    }
+    onPR() {
+        enablePactAs([
+                AppPipelineDsl.PactRoles.PROVIDER
+        ])
+    }
 }
