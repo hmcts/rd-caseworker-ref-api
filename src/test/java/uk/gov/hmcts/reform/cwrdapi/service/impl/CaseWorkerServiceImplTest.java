@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.emptyList;
@@ -64,6 +65,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -459,6 +461,251 @@ public class CaseWorkerServiceImplTest {
         verify(caseWorkerLocationRepository, times(1)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerWorkAreaRepository, times(1)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerRoleRepository, times(1)).deleteByCaseWorkerProfileIn(any());
+
+    }
+
+    @Test
+    public void updateRoleFailsForInvalidResponseFromIdam_Scenario1() throws JsonProcessingException {
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("1");
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("1");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(IDAM_STATUS_SUSPENDED);
+        userProfileResponse.setRoles(roles);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("1");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setEmailId(cwProfileCreationRequest.getEmailId());
+
+        String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
+                .thenReturn(profile);
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+        caseWorkerServiceImpl.processCaseWorkerProfiles(singletonList(cwProfileCreationRequest));
+
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(0)).modifyUserRoles(any(), any(), any());
+        verify(caseWorkerProfileRepository, times(0)).saveAll(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+
+    }
+
+    @Test
+    public void updateRoleFailsForInvalidResponseFromIdam_Scenario2() throws JsonProcessingException {
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("1");
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("1");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+        userProfileResponse.setRoles(roles);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("1");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("400");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setEmailId(cwProfileCreationRequest.getEmailId());
+        profile.setSuspended(false);
+
+        String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
+                .thenReturn(profile);
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+        String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileRolesResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+        caseWorkerServiceImpl.processCaseWorkerProfiles(singletonList(cwProfileCreationRequest));
+
+        verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+
+        verify(caseWorkerProfileRepository, times(0)).saveAll(any());
+        verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+
+    }
+
+    @Test
+    public void updateRoleFailsForInvalidResponseFromIdam_Scenario3() throws JsonProcessingException {
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("1");
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("1");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+        userProfileResponse.setRoles(roles);
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setEmailId(cwProfileCreationRequest.getEmailId());
+        profile.setSuspended(false);
+
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
+                .thenReturn(profile);
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("1");
+        String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+        String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileRolesResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+        caseWorkerServiceImpl.processCaseWorkerProfiles(singletonList(cwProfileCreationRequest));
+
+        verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+
+        verify(caseWorkerProfileRepository, times(0)).saveAll(any());
+        verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+
+    }
+
+    @Test
+    public void updateRoleFailsForInvalidResponseFromIdam_Scenario4() throws JsonProcessingException {
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("1");
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("1");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+        userProfileResponse.setRoles(roles);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("1");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setEmailId(cwProfileCreationRequest.getEmailId());
+        profile.setSuspended(false);
+
+        String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
+                .thenReturn(profile);
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(Optional.empty().toString(), Charset.defaultCharset())
+                        .status(200).build());
+
+        caseWorkerServiceImpl.processCaseWorkerProfiles(singletonList(cwProfileCreationRequest));
+
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(caseWorkerProfileRepository, times(0)).saveAll(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+
+
+    }
+
+    @Test
+    public void updateRoleFailsForInvalidResponseFromIdam_Scenario5() throws JsonProcessingException {
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("1");
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("1");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+        userProfileResponse.setRoles(roles);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("1");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setEmailId(cwProfileCreationRequest.getEmailId());
+        profile.setSuspended(false);
+
+        String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+        when(caseWorkerProfileRepository.findByEmailId(cwProfileCreationRequest.getEmailId()))
+                .thenReturn(profile);
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(userProfileResponseBody, Charset.defaultCharset())
+                        .status(200).build());
+
+
+        doThrow(new RuntimeException()).when(userProfileFeignClient).modifyUserRoles(any(), any(), any());
+
+        caseWorkerServiceImpl.processCaseWorkerProfiles(singletonList(cwProfileCreationRequest));
+
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(caseWorkerProfileRepository, times(0)).saveAll(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailId(any());
+        verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+        verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());
+
 
     }
 
