@@ -4,13 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.poi.util.IOUtils;
+import org.flywaydb.core.Flyway;
+import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -37,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired
@@ -60,6 +61,15 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Autowired
+    Flyway flyway;
+
+    @Before
+    public void initialiseResources() {
+        flyway.clean();
+        flyway.migrate();
+    }
 
     protected Map<String, Object> response = new HashMap<>();
 

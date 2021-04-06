@@ -11,6 +11,7 @@ import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.flywaydb.core.Flyway;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
     "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -107,14 +107,20 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     protected CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
 
+    @Autowired
+    Flyway flyway;
+
     @Before
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
         doNothing().when(topicPublisher).sendMessage(any());
+        flyway.clean();
+        flyway.migrate();
     }
 
     @Before
     public void setupIdamStubs() throws Exception {
+
 
         s2sService.stubFor(get(urlEqualTo("/details"))
             .willReturn(aResponse()
@@ -214,7 +220,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
     //for update use insert response UUID in test or other mock methods
     public void userProfileCreateUserWireMock(HttpStatus status) {
-
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
