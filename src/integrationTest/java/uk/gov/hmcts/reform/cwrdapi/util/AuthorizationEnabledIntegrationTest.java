@@ -98,8 +98,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @MockBean
     AuthTokenGenerator authTokenGenerator;
 
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
-
     @Autowired
     ObjectMapper objectMapper;
 
