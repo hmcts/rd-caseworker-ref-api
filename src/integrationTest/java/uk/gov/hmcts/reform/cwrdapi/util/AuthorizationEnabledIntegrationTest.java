@@ -180,6 +180,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(201)
                 .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
@@ -195,6 +196,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(201)
                 .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
@@ -207,6 +209,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             .inScenario("")
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(201)
                 .withBody("{"
                     + "  \"idamRegistrationResponse\":\"201\""
@@ -226,6 +229,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(status.value())
                 .withBody("{"
                     + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
