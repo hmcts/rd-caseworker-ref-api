@@ -120,7 +120,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Before
     public void setupIdamStubs() throws Exception {
 
-
         s2sService.stubFor(get(urlEqualTo("/details"))
             .willReturn(aResponse()
                 .withStatus(200)
@@ -219,6 +218,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
     //for update use insert response UUID in test or other mock methods
     public void userProfileCreateUserWireMock(HttpStatus status) {
+
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
