@@ -38,7 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest {
 
     @Autowired

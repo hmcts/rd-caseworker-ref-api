@@ -13,7 +13,6 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     String expectedResponse = "{\"message\":\"Request completed with partial success. "

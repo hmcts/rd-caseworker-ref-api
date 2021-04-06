@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     String exceptedSuspenseResponse = "{\"message\":\"Request Completed Successfully\","
