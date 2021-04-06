@@ -655,8 +655,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                     if (isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
                             .equals(valueOf(HttpStatus.CREATED.value())))) {
 
-                        validationServiceFacade.logFailures(String.format(IDAM_STATUS,
-                                userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage()), rowId);
+                        validationServiceFacade.logFailures(
+                                userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage(), rowId);
                         isEachRoleUpdated = false;
                     }
                 } else {
