@@ -51,6 +51,7 @@ public class IntegrationTestOidcSecurityConfig extends ContextCleanupListener {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
                         .withBody(
                                 "  {"
                                 + "  \"issuer\": \"http://0.0.0.0:6000/o\","

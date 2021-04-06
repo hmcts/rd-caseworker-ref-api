@@ -124,12 +124,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withBody("rd_caseworker_ref_api")));
 
         sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withBody("{"
                     + "  \"id\": \"%s\","
                     + "  \"uid\": \"%s\","
@@ -147,6 +149,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withBody(getDynamicJwksResponse())));
     }
 
@@ -154,6 +157,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(200)
                 .withBody("{"
                     + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","

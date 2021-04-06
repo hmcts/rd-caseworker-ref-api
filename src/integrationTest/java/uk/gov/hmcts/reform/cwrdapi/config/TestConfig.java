@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.config;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +13,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
-import java.net.SocketException;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -54,16 +51,5 @@ public class TestConfig {
                 super.populateCaseWorkerProfile(cwrdProfileRequest, caseWorkerProfile, idamId);
             }
         };
-    }
-
-    @Bean
-    @Primary
-    public HttpClient testClient() {
-        return HttpClientBuilder.create().setRetryHandler((exception, executionCount, context) -> {
-            if (executionCount > 5) {
-                return false;
-            }
-            return exception instanceof org.apache.http.NoHttpResponseException || exception instanceof SocketException;
-        }).build();
     }
 }
