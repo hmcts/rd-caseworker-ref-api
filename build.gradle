@@ -375,7 +375,7 @@ dependencies {
   implementation('io.netty:netty-resolver:4.1.60.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport:4.1.60.Final') {
+  implementation('io.netty:netty-transport:4.1.63.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   implementation('io.netty:netty-transport-native-epoll:4.1.60.Final') {
