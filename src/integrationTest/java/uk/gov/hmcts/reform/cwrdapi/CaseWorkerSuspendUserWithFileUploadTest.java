@@ -27,6 +27,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
             + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"An update to the user is not possible"
             + " at this moment. Please try again later.\"}]}";
 
+
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
         validateAuditCaseWorkerCreate();
