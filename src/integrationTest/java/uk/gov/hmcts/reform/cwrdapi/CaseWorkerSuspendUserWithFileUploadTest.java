@@ -29,6 +29,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
+
         validateAuditCaseWorkerCreate();
         modifyUserStatus(200);
         response = uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",
