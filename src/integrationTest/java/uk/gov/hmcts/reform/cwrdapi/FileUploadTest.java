@@ -66,7 +66,6 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
 
 
     public void validateAuditCaseWorkerCreate() throws IOException {
-
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         validateAuditCaseWorker();
     }
