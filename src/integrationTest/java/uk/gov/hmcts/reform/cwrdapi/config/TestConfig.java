@@ -66,5 +66,4 @@ public class TestConfig {
             return exception instanceof org.apache.http.NoHttpResponseException || exception instanceof SocketException;
         }).build();
     }
-
 }
