@@ -75,7 +75,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @ClassRule
     public static WireMockRule s2sService = new WireMockRule(wireMockConfig().port(8990));
 
-
     @ClassRule
     public static WireMockRule userProfileService = new WireMockRule(wireMockConfig().port(8091));
 
