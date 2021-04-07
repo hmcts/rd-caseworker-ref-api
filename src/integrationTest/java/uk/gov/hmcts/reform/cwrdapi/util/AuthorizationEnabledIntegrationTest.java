@@ -215,7 +215,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @After
     public void cleanupTestData() {
-
     }
 
 
