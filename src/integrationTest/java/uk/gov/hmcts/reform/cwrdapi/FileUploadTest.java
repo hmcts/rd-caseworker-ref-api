@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.poi.util.IOUtils;
-import org.flywaydb.core.Flyway;
-import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -60,15 +58,6 @@ public abstract class FileUploadTest extends AuthorizationEnabledIntegrationTest
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @Autowired
-    Flyway flyway;
-
-    @Before
-    public void initialiseResources() {
-        flyway.clean();
-        flyway.migrate();
-    }
 
     protected Map<String, Object> response = new HashMap<>();
 
