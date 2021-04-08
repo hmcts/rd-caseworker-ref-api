@@ -106,6 +106,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     Flyway flyway;
 
+
     @Before
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
