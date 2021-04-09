@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -179,6 +180,20 @@ public class CaseWorkerApiClient {
         response.then()
                 .assertThat()
                 .statusCode(201);
+
+        return response;
+    }
+
+    public Response deleteCaseworkerByIdOrEmailPattern(String path, HttpStatus statusCode) {
+        Response response = getMultipleAuthHeadersInternal()
+                .delete(path)
+                .andReturn();
+
+        log.info(":: delete user profile response status code :: " + response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(statusCode.value());
 
         return response;
     }
