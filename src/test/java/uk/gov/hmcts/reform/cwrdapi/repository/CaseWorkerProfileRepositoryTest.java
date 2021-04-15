@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,8 +17,8 @@ public class CaseWorkerProfileRepositoryTest {
 
     @Test
     public void findByServiceCodeTest() {
-        when(cwProfileRepository.findByEmailId(anyString())).thenReturn(new CaseWorkerProfile());
-        assertNotNull(cwProfileRepository.findByEmailId(anyString()));
-        verify(cwProfileRepository, times(1)).findByEmailId(anyString());
+        when(cwProfileRepository.findByEmailIdIn(any())).thenReturn(new ArrayList<>());
+        assertNotNull(cwProfileRepository.findByEmailIdIn(any()));
+        verify(cwProfileRepository, times(1)).findByEmailIdIn(any());
     }
 }

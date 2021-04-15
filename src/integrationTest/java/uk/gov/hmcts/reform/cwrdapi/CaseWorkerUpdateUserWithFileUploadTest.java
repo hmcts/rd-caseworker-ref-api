@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 
@@ -14,9 +13,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
-
 
     String expectedResponse = "{\"message\":\"Request completed with partial success. "
             + "Some records failed during validation and were ignored.\","
@@ -50,10 +47,17 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
         userProfileGetUserWireMock("STALE", roles);
         modifyUserRoles();
         response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+
+        String expectedResponse = "{\"message\":\"Request completed with partial success. "
+                + "Some records failed during validation and were ignored.\","
+                + "\"message_details\":\"%s record(s) failed validation\","
+                + "\"error_details\":[{\"row_id\":\"%s\",\"error_description\":\"The IDAM status of the user is"
+                + " :: 'STALE'\"}]}";
+
         String json = getJsonResponse(response);
         assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
-                CaseWorkerFileCreationResponse.class));
+                .isEqualTo(objectMapper.readValue(format(expectedResponse, 1, 2),
+                        CaseWorkerFileCreationResponse.class));
 
         List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
