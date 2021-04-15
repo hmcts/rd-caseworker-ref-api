@@ -73,7 +73,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
     public static final String DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN =
-            "CaseWorkerRefController.deleteCaseWorkerProfileByIdOrEmailPattern";
+            "CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern";
     public static List<String> caseWorkerIds = new ArrayList<>();
 
     @Test
