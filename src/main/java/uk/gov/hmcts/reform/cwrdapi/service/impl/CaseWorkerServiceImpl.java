@@ -652,14 +652,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             throw new ResourceNotFoundException("No User Profiles found for email pattern: " + emailPattern);
         }
 
-        Response idamResponse = userProfileFeignClient.deleteUserProfileByEmailPattern(emailPattern);
+        Response userProfileResponse = userProfileFeignClient.deleteUserProfileByEmailPattern(emailPattern);
 
-        if (idamResponse.status() == NO_CONTENT.value() || idamResponse.status() == NOT_FOUND.value()) {
+        if (userProfileResponse.status() == NO_CONTENT.value() || userProfileResponse.status() == NOT_FOUND.value()) {
             return deleteUserProfiles(userProfiles);
 
         } else {
             deletionResponse.setMessage("UP Delete request failed for emailPattern: " + emailPattern);
-            deletionResponse.setStatusCode(idamResponse.status());
+            deletionResponse.setStatusCode(userProfileResponse.status());
             return deletionResponse;
         }
     }
