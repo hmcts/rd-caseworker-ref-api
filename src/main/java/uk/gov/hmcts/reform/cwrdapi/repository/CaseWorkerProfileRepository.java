@@ -5,12 +5,16 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerProfile, Long> {
 
-
     CaseWorkerProfile findByEmailId(String emailId);
 
     List<CaseWorkerProfile> findByCaseWorkerIdIn(List<String> caseWorkerId);
+
+    Optional<CaseWorkerProfile> findByCaseWorkerId(String caseWorkerId);
+
+    List<CaseWorkerProfile> findByEmailIdIgnoreCaseContaining(String emailPattern);
 }
