@@ -249,17 +249,17 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             long time1 = currentTimeMillis();
             processedCwProfiles = caseWorkerProfileRepo.saveAll(profilesToBePersisted);
             log.info("{}:: {} case worker profiles inserted :: Job Id {}", loggingComponentName,
-                processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
+                    processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
             log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
-                (currentTimeMillis() - time1));
+                    (currentTimeMillis() - time1));
         }
         return processedCwProfiles;
     }
 
     // deletes children and updates caseworker profile
     private List<CaseWorkerProfile> deleteChildrenAndUpdateCwProfiles(List<CaseWorkerProfile> updateCaseWorkerProfiles,
-                                                              Map<String, CaseWorkersProfileCreationRequest>
-                                              emailToRequestMap) {
+                                                                      Map<String, CaseWorkersProfileCreationRequest>
+                                                                              emailToRequestMap) {
         List<CaseWorkerProfile> updatedProfiles = new ArrayList<>();
         if (isNotEmpty(updateCaseWorkerProfiles)) {
             caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
@@ -308,20 +308,21 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         try {
             idamRoleMappingService.deleteExistingRecordForServiceCode(serviceCodes);
             log.info("{}::" + CaseWorkerConstants.DELETE_RECORD_FOR_SERVICE_ID + " ::{}", loggingComponentName,
-                serviceCodes.toString());
+                    serviceCodes.toString());
 
             idamRoleMappingService.buildIdamRoleAssociation(caseWorkerIdamRoleAssociations);
             log.info("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + "::{}", loggingComponentName,
-                serviceCodes.toString());
+                    serviceCodes.toString());
 
             return IdamRolesMappingResponse.builder()
-                .message(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString())
-                .statusCode(HttpStatus.CREATED.value())
-                .build();
+                    .message(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCodes.toString())
+                    .statusCode(HttpStatus.CREATED.value())
+                    .build();
 
         } catch (Exception e) {
             log.error("{}::" + CaseWorkerConstants.IDAM_ROLE_MAPPINGS_FAILURE + " ::{}:: Job Id {}::Reason:: {}",
-                loggingComponentName, serviceCodes.toString(), validationServiceFacade.getAuditJobId(), e.getMessage());
+                    loggingComponentName, serviceCodes.toString(), validationServiceFacade.getAuditJobId(),
+                    e.getMessage());
             throw new IdamRolesMappingException(e.getMessage());
         }
     }
@@ -334,8 +335,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Override
     public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
         List<String> caseWorkerIds = caseWorkerData.stream()
-            .map(CaseWorkerProfile::getCaseWorkerId)
-            .collect(Collectors.toUnmodifiableList());
+                .map(CaseWorkerProfile::getCaseWorkerId)
+                .collect(Collectors.toUnmodifiableList());
 
         topicPublisher.sendMessage(caseWorkerIds);
     }
@@ -354,36 +355,36 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
         }
         log.info("{}::Time taken for fetching the records from DB for FetchCaseworkersById {}",
-            loggingComponentName, (Math.subtractExact(System.currentTimeMillis(), startTime)));
+                loggingComponentName, (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
     }
 
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
-        List<CaseWorkerProfile> caseWorkerProfileList) {
+            List<CaseWorkerProfile> caseWorkerProfileList) {
         long startTime = System.currentTimeMillis();
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfilesDto =
-            new ArrayList<>();
+                new ArrayList<>();
         for (CaseWorkerProfile profile : caseWorkerProfileList) {
 
             caseWorkerProfilesDto.add(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
-                .id(profile.getCaseWorkerId())
-                .firstName(profile.getFirstName())
-                .lastName(profile.getLastName())
-                .officialEmail(profile.getEmailId())
-                .regionId(profile.getRegionId())
-                .regionName(profile.getRegion())
-                .userType(profile.getUserType().getDescription())
-                .userId(profile.getUserTypeId())
-                .suspended(profile.getSuspended().toString())
-                .createdTime(profile.getCreatedDate())
-                .lastUpdatedTime(profile.getLastUpdate())
-                .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
-                .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
-                .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
-                .build());
+                    .id(profile.getCaseWorkerId())
+                    .firstName(profile.getFirstName())
+                    .lastName(profile.getLastName())
+                    .officialEmail(profile.getEmailId())
+                    .regionId(profile.getRegionId())
+                    .regionName(profile.getRegion())
+                    .userType(profile.getUserType().getDescription())
+                    .userId(profile.getUserTypeId())
+                    .suspended(profile.getSuspended().toString())
+                    .createdTime(profile.getCreatedDate())
+                    .lastUpdatedTime(profile.getLastUpdate())
+                    .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
+                    .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
+                    .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
+                    .build());
         }
         log.info("{}::Time taken By DTO for FetchCaseworkersById {}", loggingComponentName,
-            (Math.subtractExact(System.currentTimeMillis(), startTime)));
+                (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return caseWorkerProfilesDto;
     }
 
@@ -517,18 +518,18 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                new HashSet<>();
+                    new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
             if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
                 Set<RoleName> mergedRoles = idamRolesCwr.stream()
-                    .filter(s -> !(userProfileRoles.contains(s)))
-                    .map(RoleName::new)
-                    .collect(toSet());
+                        .filter(s -> !(userProfileRoles.contains(s)))
+                        .map(RoleName::new)
+                        .collect(toSet());
                 if (isNotEmpty(mergedRoles)) {
                     UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-                        .rolesAdd(mergedRoles).build();
+                            .rolesAdd(mergedRoles).build();
                     return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
-                        cwrProfileRequest.getRowId());
+                            cwrProfileRequest.getRowId());
                 }
             }
         } catch (Exception exception) {
@@ -561,7 +562,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         cwRequest.getBaseLocations().forEach(location -> {
 
             CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation(idamId,
-                location.getLocationId(), location.getLocation(), location.isPrimaryFlag());
+                    location.getLocationId(), location.getLocation(), location.isPrimaryFlag());
             cwLocations.add(caseWorkerLocation);
         });
         return cwLocations;
@@ -753,7 +754,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                                           String userId, String origin) {
         Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
         log.info("{}:: UserProfile update roles :: status code {}:: Job Id {}", loggingComponentName,
-            response.status(), validationServiceFacade.getAuditJobId());
+                response.status(), validationServiceFacade.getAuditJobId());
 
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
 
@@ -764,7 +765,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public UserProfileCreationRequest createUserProfileRequest(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
-            new HashSet<>();
+                new HashSet<>();
         userRoles.add(ROLE_CWD_USER);
         Set<String> idamRoles = getUserRolesByRoleId(cwrdProfileRequest);
         if (isNotEmpty(idamRoles)) {
@@ -788,18 +789,18 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         // get Roles Types
         List<RoleType> roleTypeList = new ArrayList<>();
         cwProfileRequest.getRoles().forEach(role -> roleTypeList.addAll(
-            caseWorkerStaticValueRepositoryAccessor
-                .getRoleTypes()
-                .stream()
-                .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                .collect(toList()))
+                caseWorkerStaticValueRepositoryAccessor
+                        .getRoleTypes()
+                        .stream()
+                        .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                        .collect(toList()))
         );
 
         // get work area codes
         List<String> serviceCodes = cwProfileRequest.getWorkerWorkAreaRequests()
-            .stream()
-            .map(CaseWorkerWorkAreaRequest::getServiceCode)
-            .collect(toList());
+                .stream()
+                .map(CaseWorkerWorkAreaRequest::getServiceCode)
+                .collect(toList());
 
 
         // get all assoc records matching role id and service code, finally return idam roles associated
