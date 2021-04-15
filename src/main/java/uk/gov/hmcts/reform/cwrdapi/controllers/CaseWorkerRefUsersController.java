@@ -219,7 +219,6 @@ public class CaseWorkerRefUsersController {
     })
 
     @DeleteMapping(
-            path = "/users",
             produces = APPLICATION_JSON_VALUE
     )
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
