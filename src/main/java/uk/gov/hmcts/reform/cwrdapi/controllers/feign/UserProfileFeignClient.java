@@ -37,16 +37,10 @@ public interface UserProfileFeignClient {
         "Content-Type: application/json"})
     Response getUserProfileWithRolesById(@PathVariable String id);
 
-    @DeleteMapping(value = "/v1/userprofile/users?userId={userId}")
-    @RequestLine("DELETE /v1/userprofile/users?userId={userId}")
+    @DeleteMapping(value = "/v1/userprofile/users")
+    @RequestLine("DELETE /v1/userprofile/users")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
         "Content-Type: application/json"})
-    Response deleteUserProfileById(@PathVariable String userId);
-
-    @DeleteMapping(value = "/v1/userprofile/users?emailPattern={emailPattern}")
-    @RequestLine("DELETE /v1/userprofile/users?emailPattern={emailPattern}")
-    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
-        "Content-Type: application/json"})
-    Response deleteUserProfileByEmailPattern(@PathVariable String emailPattern);
-
+    Response deleteUserProfile(@RequestParam(value = "userId", required = false) String userId,
+                               @RequestParam(value = "emailPattern", required = false) String emailPattern);
 }

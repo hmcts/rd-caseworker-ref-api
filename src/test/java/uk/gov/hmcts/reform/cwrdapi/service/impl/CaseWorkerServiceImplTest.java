@@ -765,7 +765,7 @@ public class CaseWorkerServiceImplTest {
         deletionResponse.setMessage("Case Worker Profiles successfully deleted");
         deletionResponse.setStatusCode(NO_CONTENT.value());
 
-        when(userProfileFeignClient.deleteUserProfileById(caseWorkerProfile.getCaseWorkerId()))
+        when(userProfileFeignClient.deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null))
                 .thenReturn(responseMock);
         when(responseMock.status()).thenReturn(NO_CONTENT.value());
         when(caseWorkerProfileRepository.findByCaseWorkerId(any(String.class)))
@@ -781,7 +781,7 @@ public class CaseWorkerServiceImplTest {
         verify(caseWorkerProfileRepository, times(1)).deleteAll(any());
         verify(responseMock, times(2)).status();
         verify(userProfileFeignClient, times(1))
-                .deleteUserProfileById(caseWorkerProfile.getCaseWorkerId());
+                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
     }
 
     @Test
@@ -792,7 +792,7 @@ public class CaseWorkerServiceImplTest {
         deletionResponse.setMessage("Case Worker Profiles successfully deleted");
         deletionResponse.setStatusCode(NO_CONTENT.value());
 
-        when(userProfileFeignClient.deleteUserProfileById(caseWorkerProfile.getCaseWorkerId()))
+        when(userProfileFeignClient.deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null))
                 .thenReturn(responseMock);
         when(responseMock.status()).thenReturn(NOT_FOUND.value());
         when(caseWorkerProfileRepository.findByCaseWorkerId(any(String.class)))
@@ -808,7 +808,7 @@ public class CaseWorkerServiceImplTest {
         verify(caseWorkerProfileRepository, times(1)).deleteAll(any());
         verify(responseMock, times(3)).status();
         verify(userProfileFeignClient, times(1))
-                .deleteUserProfileById(caseWorkerProfile.getCaseWorkerId());
+                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
     }
 
     @Test
@@ -820,7 +820,7 @@ public class CaseWorkerServiceImplTest {
 
         Response responseMock = mock(Response.class);
 
-        when(userProfileFeignClient.deleteUserProfileById(caseWorkerProfile.getCaseWorkerId()))
+        when(userProfileFeignClient.deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null))
                 .thenReturn(responseMock);
         when(responseMock.status()).thenReturn(BAD_REQUEST.value());
 
@@ -832,9 +832,9 @@ public class CaseWorkerServiceImplTest {
 
         verify(responseMock, times(3)).status();
         verify(userProfileFeignClient, times(1))
-                .deleteUserProfileById(caseWorkerProfile.getCaseWorkerId());
+                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
         verify(userProfileFeignClient, times(1))
-                .deleteUserProfileById(caseWorkerProfile.getCaseWorkerId());
+                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
     }
 
     @Test
@@ -848,7 +848,7 @@ public class CaseWorkerServiceImplTest {
         deletionResponse.setMessage("Case Worker Profiles successfully deleted");
         deletionResponse.setStatusCode(NO_CONTENT.value());
 
-        when(userProfileFeignClient.deleteUserProfileByEmailPattern(COMMON_EMAIL_PATTERN))
+        when(userProfileFeignClient.deleteUserProfile(null, COMMON_EMAIL_PATTERN))
                 .thenReturn(responseMock);
         when(responseMock.status()).thenReturn(NO_CONTENT.value());
         when(caseWorkerProfileRepository
@@ -861,7 +861,7 @@ public class CaseWorkerServiceImplTest {
         assertThat(deletionResp.getMessage()).isEqualTo(deletionResponse.getMessage());
 
         verify(userProfileFeignClient, times(1))
-                .deleteUserProfileByEmailPattern(COMMON_EMAIL_PATTERN);
+                .deleteUserProfile(null, COMMON_EMAIL_PATTERN);
         verify(responseMock, times(1)).status();
         verify(caseWorkerProfileRepository, times(1))
                 .findByEmailIdIgnoreCaseContaining(any(String.class));
@@ -879,7 +879,7 @@ public class CaseWorkerServiceImplTest {
         deletionResponse.setMessage("Case Worker Profiles successfully deleted");
         deletionResponse.setStatusCode(NO_CONTENT.value());
 
-        when(userProfileFeignClient.deleteUserProfileByEmailPattern(COMMON_EMAIL_PATTERN))
+        when(userProfileFeignClient.deleteUserProfile(null, COMMON_EMAIL_PATTERN))
                 .thenReturn(responseMock);
         when(responseMock.status()).thenReturn(NOT_FOUND.value());
         when(caseWorkerProfileRepository
@@ -892,7 +892,7 @@ public class CaseWorkerServiceImplTest {
         assertThat(deletionResp.getMessage()).isEqualTo(deletionResponse.getMessage());
 
         verify(userProfileFeignClient, times(1))
-                .deleteUserProfileByEmailPattern(COMMON_EMAIL_PATTERN);
+                .deleteUserProfile(null, COMMON_EMAIL_PATTERN);
         verify(responseMock, times(2)).status();
         verify(caseWorkerProfileRepository, times(1))
                 .findByEmailIdIgnoreCaseContaining(any(String.class));

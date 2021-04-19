@@ -627,7 +627,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public CaseWorkerProfilesDeletionResponse deleteByUserId(String userId) {
         CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
 
-        Response userProfileResponse = userProfileFeignClient.deleteUserProfileById(userId);
+        Response userProfileResponse = userProfileFeignClient.deleteUserProfile(userId, null);
 
         if (userProfileResponse.status() == NO_CONTENT.value() || userProfileResponse.status() == NOT_FOUND.value()) {
             Optional<CaseWorkerProfile> caseWorkerProfile = caseWorkerProfileRepo.findByCaseWorkerId(userId.trim());
@@ -652,7 +652,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             throw new ResourceNotFoundException("No User Profiles found for email pattern: " + emailPattern);
         }
 
-        Response userProfileResponse = userProfileFeignClient.deleteUserProfileByEmailPattern(emailPattern);
+        Response userProfileResponse = userProfileFeignClient.deleteUserProfile(null, emailPattern);
 
         if (userProfileResponse.status() == NO_CONTENT.value() || userProfileResponse.status() == NOT_FOUND.value()) {
             return deleteUserProfiles(userProfiles);
