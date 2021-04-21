@@ -94,7 +94,6 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
         log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
         log.info("Configured S2S microservice: " + s2sName);
         log.info("Configured S2S URL: " + s2sUrl);
-        log.info("User Profile URL::::: " + baseUrlUserProfile);
 
         idamOpenIdClient = new IdamOpenIdClient(configProperties);
 
