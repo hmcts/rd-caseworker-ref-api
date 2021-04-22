@@ -191,6 +191,7 @@ public class CaseWorkerRefUsersController {
     }
 
     @ApiOperation(value = "Delete Case Worker Profiles by User ID or Email Pattern",
+            notes = "This API is only for use in non Prod environments",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
