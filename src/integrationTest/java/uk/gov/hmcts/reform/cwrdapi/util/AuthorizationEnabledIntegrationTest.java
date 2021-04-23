@@ -11,6 +11,7 @@ import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.flywaydb.core.Flyway;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -57,7 +57,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
     "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -75,7 +74,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @ClassRule
     public static WireMockRule s2sService = new WireMockRule(wireMockConfig().port(8990));
-
 
     @ClassRule
     public static WireMockRule userProfileService = new WireMockRule(wireMockConfig().port(8091));
@@ -99,18 +97,21 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @MockBean
     AuthTokenGenerator authTokenGenerator;
 
-    protected static final String ACCESS_IS_DENIED_ERROR_MESSAGE = "Access is denied";
-
     @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
     protected CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
 
+    @Autowired
+    Flyway flyway;
+
     @Before
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
         doNothing().when(topicPublisher).sendMessage(any());
+        flyway.clean();
+        flyway.migrate();
     }
 
     @Before
@@ -120,12 +121,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withBody("rd_caseworker_ref_api")));
 
         sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withBody("{"
                     + "  \"id\": \"%s\","
                     + "  \"uid\": \"%s\","
@@ -143,6 +146,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withBody(getDynamicJwksResponse())));
     }
 
@@ -150,6 +154,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(200)
                 .withBody("{"
                     + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
@@ -172,6 +177,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(201)
                 .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
@@ -187,6 +193,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(201)
                 .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
@@ -199,6 +206,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             .inScenario("")
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(201)
                 .withBody("{"
                     + "  \"idamRegistrationResponse\":\"201\""
@@ -207,7 +215,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @After
     public void cleanupTestData() {
-
     }
 
 
@@ -218,6 +225,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
+                    .withHeader("Connection", "close")
                 .withStatus(status.value())
                 .withBody("{"
                     + "  \"idamRegistrationResponse\":\"" + status.value() + "\""

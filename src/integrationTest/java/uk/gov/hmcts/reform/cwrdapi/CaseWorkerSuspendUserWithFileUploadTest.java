@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
@@ -17,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     String exceptedSuspenseResponse = "{\"message\":\"Request Completed Successfully\","
@@ -31,6 +29,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
+
         validateAuditCaseWorkerCreate();
         modifyUserStatus(200);
         response = uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",

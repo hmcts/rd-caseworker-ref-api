@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,9 +91,10 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         assertThat(caseWorkerProfileRepository.count()).isEqualTo(1L);
         assertThat(caseWorkerLocationRepository.count()).isEqualTo(1L);
         assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(1L);
-
+        Set<String> emails = new HashSet<>();
+        emails.add("test.inttest@hmcts.gov.uk");
         CaseWorkerProfile profile =
-                caseWorkerProfileRepository.findByEmailId("test.inttest@hmcts.gov.uk");
+                caseWorkerProfileRepository.findByEmailIdIn(emails).get(0);
         assertThat(profile.getFirstName()).isEqualTo("firstName");
         assertThat(profile.getLastName()).isEqualTo("lastName");
         assertThat(profile.getEmailId()).isEqualTo("test.inttest@hmcts.gov.uk");
