@@ -41,7 +41,7 @@ import static org.mockito.Mockito.doReturn;
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
     host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "Dev")})
+    @VersionSelector(tag = "master")})
 @Import(CaseWorkerProviderTestConfiguration.class)
 @SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 @IgnoreNoPactsToVerify
