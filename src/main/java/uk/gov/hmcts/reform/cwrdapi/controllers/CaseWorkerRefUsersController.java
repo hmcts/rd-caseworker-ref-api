@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,6 +39,7 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.API_IS_NOT_AVAILABLE_IN_PROD_ENV;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
@@ -52,12 +54,15 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 )
 @RestController
 @Slf4j
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class CaseWorkerRefUsersController {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
+
+    @Value("${environment_name}")
+    private String environmentName;
 
     @Autowired
     CaseWorkerService caseWorkerService;
@@ -232,6 +237,12 @@ public class CaseWorkerRefUsersController {
         /**
          * This API will need to be revisited if it is to be used for business functionality.
          */
+
+        log.info("ENVIRONMENT NAME:::::: " + environmentName);
+
+        if (environmentName.equalsIgnoreCase("PROD")) {
+            throw new AccessDeniedException(API_IS_NOT_AVAILABLE_IN_PROD_ENV);
+        }
 
         CaseWorkerProfilesDeletionResponse resource;
 

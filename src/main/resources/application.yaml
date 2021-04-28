@@ -107,6 +107,8 @@ idam:
 
 oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
+environment_name: ${ENVIRONMENT_NAME:prod}
+
 loggingComponentName: RD-Caseworker-Ref-Api
 feign:
   allow:
