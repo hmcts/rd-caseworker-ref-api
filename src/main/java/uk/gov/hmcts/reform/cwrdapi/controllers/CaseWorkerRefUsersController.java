@@ -240,7 +240,7 @@ public class CaseWorkerRefUsersController {
 
         log.info("ENVIRONMENT NAME:::::: " + environmentName);
 
-        if (environmentName.equalsIgnoreCase("PROD")) {
+        if ("PROD".equalsIgnoreCase(environmentName)) {
             throw new AccessDeniedException(API_IS_NOT_AVAILABLE_IN_PROD_ENV);
         }
 
