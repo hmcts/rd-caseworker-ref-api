@@ -9,4 +9,4 @@ oauth2.client.secret: ${CA_REF_OAUTH2_CLIENT_SECRET:}
 idam.auth.clientId: ${CA_REF_OAUTH2_CLIENT_ID:}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/oauth2redirect}
 s2s-secret: ${S2S_SECRET:}
-userProfUrl: http://rd-user-profile-api-pr-664.service.core-compute-preview.internal
+userProfUrl: http://rd-user-profile-api-aat.service.core-compute-aat.internal
