@@ -460,7 +460,7 @@ dependencies {
   smokeTestCompile sourceSets.test.runtimeClasspath
 
   contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
-  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.20'
   contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
   contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
   contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.1.7'
