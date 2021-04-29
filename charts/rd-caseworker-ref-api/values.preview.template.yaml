@@ -13,7 +13,7 @@ java:
     CWRD_MQ_TRUST_ALL_CERTS: false
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
-    ENVIRONMENT_NAME: "preview"
+    ENVIRONMENT_NAME: "prod"
   postgresql:
     enabled: true
     postgresqlUsername: dbrdcaseworker
