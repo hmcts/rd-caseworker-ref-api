@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 public class FeatureToggleServiceImpl implements FeatureToggleService {
 
     public static final String CWD_UPLOAD_FILE_FLAG = "cwd-upload-file-flag";
+    public static final String CWD_DELETE_BY_ID_OR_EMAILPATTERN_FLAG = "delete-caseworker-by-id-or-emailpattern";
 
     @Autowired
     private final LDClient ldClient;
@@ -43,6 +44,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 CWD_UPLOAD_FILE_FLAG);
         launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
                 CWD_UPLOAD_FILE_FLAG);
+        launchDarklyMap.put("CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern",
+                CWD_DELETE_BY_ID_OR_EMAILPATTERN_FLAG);
     }
 
     @Override

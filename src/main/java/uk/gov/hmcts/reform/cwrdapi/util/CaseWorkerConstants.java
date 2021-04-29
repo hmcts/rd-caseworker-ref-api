@@ -136,4 +136,6 @@ public final class CaseWorkerConstants {
     public static final String RESPONSE_BODY_MISSING_FROM_UP = "Response Body is missing from User Profile";
     public static final String DUPLICATE_EMAIL_PROFILES = "User record in row ID %s is duplicate to another row. "
             + "Please ensure that the record is not duplicate and try again";
+
+    public static final String API_IS_NOT_AVAILABLE_IN_PROD_ENV = "This API is not available in Production Environment";
 }

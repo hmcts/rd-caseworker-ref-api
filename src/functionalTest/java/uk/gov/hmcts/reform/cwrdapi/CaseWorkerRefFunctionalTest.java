@@ -37,9 +37,12 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
@@ -58,8 +61,10 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefUsersController.createCaseWorkerProfiles";
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
-    public static List<String> caseWorkerIds = new ArrayList<>();
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
+    public static final String DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN =
+            "CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern";
+    public static List<String> caseWorkerIds = new ArrayList<>();
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
@@ -161,7 +166,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
+    //this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() {
         if (isEmpty(caseWorkerIds)) {
@@ -313,6 +318,76 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
                 403, exceptionMessage,
                 TYPE_XLSX, ROLE_CWD_ADMIN);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
+    //this test verifies that a User Profile is deleted by ID
+    public void deleteCaseworkerById() {
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
+                caseWorkerApiClient.createCaseWorkerProfiles();
+
+        // create user
+        Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                createResponse.getBody().as(CaseWorkerProfileCreationResponse.class);
+
+        List<String> caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+        assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
+
+        //delete user
+        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?userId=" + caseWorkerIds.get(0), NO_CONTENT);
+
+        //search for deleted user
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(caseWorkerIds).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+
+        //assert that delete user is not found
+        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
+    //this test verifies that a User Profile is deleted by Email Pattern
+    public void deleteCaseworkerByEmailPattern() {
+        String emailPattern = "deleteTest1234";
+        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
+                caseWorkerApiClient.createCaseWorkerProfiles(email);
+
+        // create user with email pattern
+        Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                createResponse.getBody().as(CaseWorkerProfileCreationResponse.class);
+
+        List<String> caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+        assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
+
+        //delete user by email pattern
+        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?emailPattern=" + emailPattern, NO_CONTENT);
+
+        //search for deleted user
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(caseWorkerIds).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+
+        //assert that delete user is not found
+        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = false)
+    public void deleteCaseworkerReturns403WhenToggledOff() {
+        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?emailPattern=ForbiddenException", FORBIDDEN);
     }
 
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,

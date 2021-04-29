@@ -75,7 +75,7 @@ public class FetchCaseworkersByIdProviderTest {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
-                        "RD-Caseworker-Ref-Api", caseWorkerServiceImpl));
+                        "RD-Caseworker-Ref-Api", "preview", caseWorkerServiceImpl));
         if (context != null) {
             context.setTarget(testTarget);
         }
