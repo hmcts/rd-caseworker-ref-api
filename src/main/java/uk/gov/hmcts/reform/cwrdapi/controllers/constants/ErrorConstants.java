@@ -20,7 +20,9 @@ public enum ErrorConstants {
     RUNTIME_EXCEPTION("8 : Sorry, there is a problem with the service. Try again later"),
 
     FILE_UPLOAD_IN_PROGRESS("9 : File upload is already in progress."
-                                + " Please try again once existing file upload is completed");
+                                + " Please try again once existing file upload is completed"),
+
+    NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE("No User ID or Email Pattern provided to delete the User(s)");
 
 
     private final String errorMessage;

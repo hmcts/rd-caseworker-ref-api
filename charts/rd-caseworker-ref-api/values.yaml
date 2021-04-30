@@ -15,6 +15,7 @@ java:
     CWRD_MQ_TRUST_ALL_CERTS: false
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "{{ .Values.global.environment }}"
+    ENVIRONMENT_NAME: "{{ .Values.global.environment }}"
     IDAM_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     USER_PROFILE_URL: http://rd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     OIDC_ISSUER_URL: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts

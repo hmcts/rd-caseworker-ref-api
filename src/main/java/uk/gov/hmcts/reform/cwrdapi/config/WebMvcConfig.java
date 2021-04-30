@@ -25,17 +25,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     AuditInterceptor auditInterceptor;
 
-    /**
-     * add here entry in registry and api endpoint path pattern like below
-     * registry.addInterceptor(featureConditionEvaluation)
-     * .addPathPatterns("/refdata/case-worker/users/fetchUsersById","/refdata/case-worker/idam-roles-mapping");
-     * @param registry registry
-     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        //Launch Darkly Feature Toggle goes here
-
+        //Launch Darkly Feature Toggle
+        registry.addInterceptor(featureConditionEvaluation)
+                .addPathPatterns(
+                        "/refdata/case-worker/users");
 
         //Audit Interceptor
         registry.addInterceptor(auditInterceptor)

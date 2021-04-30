@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import com.launchdarkly.sdk.server.LDClient;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class FeatureToggleServiceImplTest {
@@ -22,6 +22,6 @@ public class FeatureToggleServiceImplTest {
     public void mapServiceToFlagTest() {
         flaFeatureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
         flaFeatureToggleService.mapServiceToFlag();
-        assertTrue(flaFeatureToggleService.getLaunchDarklyMap().isEmpty());
+        assertThat(flaFeatureToggleService.getLaunchDarklyMap()).hasSize(1);
     }
 }

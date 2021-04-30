@@ -14,6 +14,8 @@ import javax.annotation.PostConstruct;
 @Service
 public class FeatureToggleServiceImpl implements FeatureToggleService {
 
+    public static final String CWD_DELETE_BY_ID_OR_EMAILPATTERN_FLAG = "delete-caseworker-by-id-or-emailpattern";
+
     @Autowired
     private final LDClient ldClient;
 
@@ -30,13 +32,11 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
         this.userName = userName;
     }
 
-    /**
-     * add controller.method name, flag name  in map to apply ld flag on api like below
-     * launchDarklyMap.put("CaseWorkerRefUsersController.fetchCaseworkersById",CWD_UPLOAD_FILE_FLAG);
-     */
     @PostConstruct
     public void mapServiceToFlag() {
         launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern",
+                CWD_DELETE_BY_ID_OR_EMAILPATTERN_FLAG);
     }
 
     @Override
