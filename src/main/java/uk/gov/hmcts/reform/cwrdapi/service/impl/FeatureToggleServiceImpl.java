@@ -14,8 +14,6 @@ import javax.annotation.PostConstruct;
 @Service
 public class FeatureToggleServiceImpl implements FeatureToggleService {
 
-    public static final String CWD_UPLOAD_FILE_FLAG = "cwd-upload-file-flag";
-
     @Autowired
     private final LDClient ldClient;
 

@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +34,6 @@ import static org.assertj.core.api.Assertions.within;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.FILE_UPLOAD_IN_PROGRESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.FAILURE;
 import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.PARTIAL_SUCCESS;
@@ -180,6 +177,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
+    /*
+    Sample test for toggle OFF
     @Test
     public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
@@ -191,7 +190,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             TYPE_XLSX, "403", cwdAdmin);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
-    }
+    }*/
 
 
     @Test

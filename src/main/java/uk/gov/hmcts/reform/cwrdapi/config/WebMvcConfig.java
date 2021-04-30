@@ -34,6 +34,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        // add entry
+        //Launch Darkly Feature Toggle goes here
+
+
+        //Audit Interceptor
+        registry.addInterceptor(auditInterceptor)
+            .addPathPatterns("/refdata/case-worker/upload-file");
     }
 }
