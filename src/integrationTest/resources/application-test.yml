@@ -100,10 +100,9 @@ oidc:
   issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
   expiration: 14400000 # milliseconds 4 hours
 
-environment_name: ${ENVIRONMENT_NAME:preview}
-
 ## user profile feign connection
 userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
+locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://127.0.0.1:8092}
 loggingComponentName: RD-Caseworker-Ref-Api
 feign:
   allow:
@@ -128,8 +127,12 @@ crd:
 
 excel:
   acceptableCaseWorkerHeaders: ${EXCEL_ACCEPTABLE_CW_HEADERS:First Name,Last Name,Email,Region,Region ID,Primary Base Location Name,
-                          Primary Base Location ID,Secondary Location,Secondary Location ID,User type,Primary Role,Secondary Role,Area of Work1,
-                          Area of Work1 ID,Area of Work2,Area of Work2 ID,Area of Work2,Area of Work2 ID,Area of Work4,Area of Work4 ID,
-                          Area of Work5,Area of Work5 ID,Area of Work6,Area of Work6 ID,Area of Work7,Area of Work7 ID,Area of Work8,
-                          Area of Work8 ID,IDAM Roles,Suspended}
+    Primary Base Location ID,Secondary Location,Secondary Location ID,User type,Primary Role,Secondary Role,Area of Work1,
+    Area of Work1 ID,Area of Work2,Area of Work2 ID,Area of Work2,Area of Work2 ID,Area of Work4,Area of Work4 ID,
+    Area of Work5,Area of Work5 ID,Area of Work6,Area of Work6 ID,Area of Work7,Area of Work7 ID,Area of Work8,
+    Area of Work8 ID,IDAM Roles,Suspended}
   acceptableServiceRoleMappingHeaders: ${EXCEL_ACCEPTABLE_SERVICE_ROLE_MAPPING_HEADERS:Service ID,Role,IDAM Roles}
+
+refresh:
+  pageSize: 20
+  sortColumn: caseWorkerId

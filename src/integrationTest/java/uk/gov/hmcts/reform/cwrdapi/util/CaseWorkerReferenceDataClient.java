@@ -12,6 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
 
@@ -64,10 +64,6 @@ public class CaseWorkerReferenceDataClient {
         return postRequest(baseUrl + "/users/", request, role, null);
     }
 
-    public Map<String, Object> deleteCaseWorker(String path) {
-        return deleteRequest(baseUrl + path, null);
-    }
-
     public Map<String, Object> createIdamRolesAssoc(List<ServiceRoleMapping> serviceRoleMapping, String role) {
         return postRequest(baseUrl + "/idam-roles-mapping/", serviceRoleMapping, role, null);
     }
@@ -82,19 +78,61 @@ public class CaseWorkerReferenceDataClient {
         return sendRequest(uriPath, request);
     }
 
+    public Map<String, Object> fetchStaffProfileByCcdServiceName(String ccdServiceNames, Integer pageSize,
+                                                                 Integer pageNumber, String sortDirection,
+                                                                 String sortColumn, String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("/get-users-by-service-name");
+        if(StringUtils.isNotBlank(ccdServiceNames)) {
+            stringBuilder.append("?ccd_service_names=");
+            stringBuilder.append(ccdServiceNames);
+        }
+        if(pageSize != null) {
+            stringBuilder.append("&page_size=");
+            stringBuilder.append(pageSize);
+        }
+        if(pageNumber != null) {
+            stringBuilder.append("&page_number=");
+            stringBuilder.append(pageNumber);
+        }
+        if(StringUtils.isNotBlank(sortDirection)) {
+            stringBuilder.append("&sort_direction=");
+            stringBuilder.append(sortDirection);
+        }
+        if(StringUtils.isNotBlank(sortColumn)) {
+            stringBuilder.append("&sort_column=");
+            stringBuilder.append(sortColumn);
+        }
+
+        ResponseEntity<Map> responseEntity;
+        HttpEntity<String> request =
+                new HttpEntity<>(getMultipleAuthHeadersWithoutContentType(role, null));
+
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl + "/users" + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    Map.class
+            );
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
 
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
         HttpEntity<T> request = new HttpEntity<>(requestBody, getMultipleAuthHeaders(role, userId));
 
         return sendRequest(uriPath, request);
-    }
-
-    private <T> Map<String, Object> deleteRequest(String uriPath, String role) {
-
-        HttpEntity<T> request = new HttpEntity<>(null, getMultipleAuthHeaders(role, null));
-
-        return sendDeleteRequest(uriPath, request);
     }
 
     private <T> Map<String, Object> sendRequest(String uriPath, HttpEntity<T> request) {
@@ -117,31 +155,29 @@ public class CaseWorkerReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    private <T> Map<String, Object> sendDeleteRequest(String uriPath, HttpEntity<T> request) {
-        ResponseEntity<Map> responseEntity;
-
-        try {
-
-            responseEntity = restTemplate.exchange(
-                    uriPath,
-                    DELETE,
-                    request,
-                    Map.class);
-
-        } catch (RestClientResponseException ex) {
-            HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
-            statusAndBody.put("response_body", ex.getResponseBodyAsString());
-            return statusAndBody;
-        }
-
-        return getDeleteResponse(responseEntity);
-    }
-
     private HttpHeaders getMultipleAuthHeaders(String role, String userId) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
+        if (StringUtils.isBlank(JWT_TOKEN)) {
+
+            JWT_TOKEN = generateS2SToken(serviceName);
+        }
+
+        headers.add("ServiceAuthorization", JWT_TOKEN);
+
+        if (StringUtils.isBlank(bearerToken)) {
+            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+                    : userId, role));
+        }
+        headers.add("Authorization", bearerToken);
+
+        return headers;
+    }
+
+    private HttpHeaders getMultipleAuthHeadersWithoutContentType(String role, String userId) {
+
+        HttpHeaders headers = new HttpHeaders();
         if (StringUtils.isBlank(JWT_TOKEN)) {
 
             JWT_TOKEN = generateS2SToken(serviceName);
@@ -173,15 +209,6 @@ public class CaseWorkerReferenceDataClient {
         response.put("http_status", responseEntity.getStatusCode().toString());
         response.put("headers", responseEntity.getHeaders().toString());
         response.put("body", responseEntity.getBody());
-        return response;
-    }
-
-    private Map getDeleteResponse(ResponseEntity<Map> responseEntity) {
-
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("status", responseEntity.getStatusCode().toString());
-        response.put("headers", responseEntity.getHeaders().toString());
         return response;
     }
 
