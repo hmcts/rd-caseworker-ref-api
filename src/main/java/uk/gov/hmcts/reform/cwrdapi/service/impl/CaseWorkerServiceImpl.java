@@ -3,14 +3,19 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.LrdOrgInfoService;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
@@ -19,6 +24,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -134,6 +140,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
+
+    @Autowired
+    private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
     @Autowired
     private TopicPublisher topicPublisher;
@@ -359,6 +368,51 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
     }
 
+    /**
+     * Returns the staff details for Refresh Assignments.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Object> fetchCaseworkersForRoleRefresh(String ccdServiceNames, PageRequest pageRequest) {
+        List<PaginatedStaffProfile.StaffProfileWithServiceName> staffProfileList;
+        Response lrdOrgInfoServiceResponse = locationReferenceDataFeignClient.getLocationRefServiceMapping(ccdServiceNames);
+        ResponseEntity<Object> responseEntity = toResponseEntity(lrdOrgInfoServiceResponse, List.class);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful() && nonNull(responseEntity.getBody())
+                && responseEntity.getBody() instanceof List) {
+            List<Object> listLrdServiceMapping = (List<Object>) responseEntity.getBody();
+            if (CollectionUtils.isNotEmpty(listLrdServiceMapping)) {
+                Map<String, String> serviceNameToCodeMapping =
+                        listLrdServiceMapping.stream()
+                                .filter(Objects::nonNull)
+                                .map(LrdOrgInfoService::castToClazz)
+                                .distinct()
+                                .collect(Collectors.toMap(LrdOrgInfoService::getServiceCode, LrdOrgInfoService::getCcdServiceName));
+                Page<CaseWorkerWorkArea> workAreaPage = caseWorkerWorkAreaRepository.findByServiceCodeIn(
+                        serviceNameToCodeMapping.keySet()
+                        , pageRequest);
+
+                staffProfileList = new ArrayList<>();
+                workAreaPage.forEach(workArea -> staffProfileList.add(PaginatedStaffProfile
+                        .StaffProfileWithServiceName.builder()
+                        .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
+                        .staffProfile(mapCaseWorkerProfile(workArea.getCaseWorkerProfile()))
+                        .build()));
+
+                if (staffProfileList.isEmpty()) {
+                    throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+                }
+
+                return ResponseEntity.ok(PaginatedStaffProfile.builder()
+                        .totalRecords(workAreaPage.getTotalElements())
+                        .totalPages(workAreaPage.getTotalPages())
+                        .staffProfiles(staffProfileList)
+                        .build());
+            }
+        }
+        throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+    }
+
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
             List<CaseWorkerProfile> caseWorkerProfileList) {
         long startTime = System.currentTimeMillis();
@@ -388,6 +442,26 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return caseWorkerProfilesDto;
     }
 
+    private uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile mapCaseWorkerProfile(
+            CaseWorkerProfile profile) {
+        return uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
+                .id(profile.getCaseWorkerId())
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
+                .officialEmail(profile.getEmailId())
+                .regionId(profile.getRegionId())
+                .regionName(profile.getRegion())
+                .userType(profile.getUserType().getDescription())
+                .userId(profile.getUserTypeId())
+                .suspended(profile.getSuspended().toString())
+                .createdTime(profile.getCreatedDate())
+                .lastUpdatedTime(profile.getLastUpdate())
+                .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
+                .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
+                .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
+                .build();
+
+    }
     private List<WorkArea> mapWorkAreasToDto(List<CaseWorkerWorkArea> caseWorkerWorkAreas) {
         List<WorkArea> workAreasDtoList = new ArrayList<>();
         for (CaseWorkerWorkArea area : caseWorkerWorkAreas) {

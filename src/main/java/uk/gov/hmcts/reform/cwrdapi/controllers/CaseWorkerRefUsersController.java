@@ -8,38 +8,35 @@ import io.swagger.annotations.Authorization;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotEmpty;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.API_IS_NOT_AVAILABLE_IN_PROD_ENV;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
@@ -54,15 +51,12 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 )
 @RestController
 @Slf4j
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class CaseWorkerRefUsersController {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
-
-    @Value("${environment_name}")
-    private String environmentName;
 
     @Autowired
     CaseWorkerService caseWorkerService;
@@ -195,68 +189,57 @@ public class CaseWorkerRefUsersController {
 
     }
 
-    @ApiOperation(value = "Delete Case Worker Profiles by User ID or Email Pattern",
-            notes = "This API is only for use in non Prod environments",
+    @ApiOperation(
+            value = "This API returns the Staff(Case Worker) profiles based on Service Name and Pagination parameters",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
-            })
+            }
+    )
     @ApiResponses({
             @ApiResponse(
-                    code = 204,
-                    message = "Case Worker Profiles deleted successfully",
-                    response = CaseWorkerProfilesDeletionResponse.class
+                    code = 200,
+                    message = "The caseworker profiles have been retrieved successfully",
+                    response = PaginatedStaffProfile.class
             ),
             @ApiResponse(
                     code = 400,
-                    message = "An invalid request has been provided"
+                    message = BAD_REQUEST
             ),
             @ApiResponse(
                     code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+                    message = UNAUTHORIZED_ERROR
             ),
             @ApiResponse(
                     code = 403,
-                    message = "Forbidden Error: Access denied"
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 404,
+                    message = NO_DATA_FOUND
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error"
+                    message = INTERNAL_SERVER_ERROR
             )
     })
-
-    @DeleteMapping(
+    @GetMapping(
+            path = "/get-users-by-service-name",
             produces = APPLICATION_JSON_VALUE
     )
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @ResponseBody
-    public ResponseEntity<CaseWorkerProfilesDeletionResponse> deleteCaseWorkerProfileByIdOrEmailPattern(
-            @RequestParam(value = "userId", required = false) String userId,
-            @RequestParam(value = "emailPattern", required = false) String emailPattern) {
-
-        /**
-         * This API will need to be revisited if it is to be used for business functionality.
-         */
-
-        log.info("ENVIRONMENT NAME:::::: " + environmentName);
-
-        if ("PROD".equalsIgnoreCase(environmentName)) {
-            throw new AccessDeniedException(API_IS_NOT_AVAILABLE_IN_PROD_ENV);
+    @Secured("cwd-system-user")
+    public ResponseEntity<Object> fetchStaffByCcdServiceNames(
+            @RequestParam(name = "ccd_service_names") @NotEmpty String ccdServiceNames,
+            @RequestParam(name = "page_size", required = false) Integer pageSize,
+            @RequestParam(name = "page_number", required = false) Integer pageNumber,
+            @RequestParam(name = "sort_direction", required = false) String sortDirection,
+            @RequestParam(name = "sort_column", required = false) String sortColumn
+    ) {
+        if(StringUtils.isBlank(ccdServiceNames)) {
+            throw new InvalidRequestException("The required parameter 'ccd_service_names' is empty");
         }
-
-        CaseWorkerProfilesDeletionResponse resource;
-
-        if (isNotBlank(userId)) {
-            resource = caseWorkerService.deleteByUserId(userId);
-
-        } else if (isNotBlank(emailPattern)) {
-            resource = caseWorkerService.deleteByEmailPattern(emailPattern);
-
-        } else {
-            throw new InvalidRequestException(NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE.getErrorMessage());
-        }
-
-        return ResponseEntity.status(resource.getStatusCode()).body(resource);
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(pageNumber, pageSize,
+                sortColumn, sortDirection);
+        return caseWorkerService.fetchCaseworkersForRoleRefresh(ccdServiceNames, pageRequest);
     }
-
 }

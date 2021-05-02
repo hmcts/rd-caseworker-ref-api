@@ -20,4 +20,5 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
     Optional<CaseWorkerProfile> findByCaseWorkerId(String caseWorkerId);
 
     List<CaseWorkerProfile> findByEmailIdIgnoreCaseContaining(String emailPattern);
+
 }

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public interface CaseWorkerService {
 
     List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
-                                                          caseWorkersProfileCreationRequest);
+                                                              caseWorkersProfileCreationRequest);
 
     /**
      * Builds the idam role mappings for case worker roles.
@@ -39,20 +39,14 @@ public interface CaseWorkerService {
      */
     ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds);
 
-    /**
-     * Deletes a caseworker by their ID.
-     *
-     * @param userId String
-     * @return CaseWorkerProfilesDeletionResponse
-     */
-    CaseWorkerProfilesDeletionResponse deleteByUserId(String userId);
 
     /**
-     * Deletes caseworkers by associated email pattern.
+     * Returns the caseworker details for Refresh Assignments.
      *
-     * @param emailPattern String
-     * @return CaseWorkerProfilesDeletionResponse
+     * @param ccdServiceNames ccdServiceNames
+     * @param pageRequest pageRequest
+     * @return CaseWorkerProfile
      */
-    CaseWorkerProfilesDeletionResponse deleteByEmailPattern(String emailPattern);
+    ResponseEntity<Object> fetchCaseworkersForRoleRefresh(String ccdServiceNames, PageRequest pageRequest);
 }
 

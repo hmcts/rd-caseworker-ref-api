@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
 
@@ -62,6 +63,10 @@ public class CaseWorkerReferenceDataClient {
 
     public Map<String, Object> createCaseWorkerProfile(List<CaseWorkersProfileCreationRequest> request, String role) {
         return postRequest(baseUrl + "/users/", request, role, null);
+    }
+
+    public Map<String, Object> deleteCaseWorker(String path) {
+        return deleteRequest(baseUrl + path, null);
     }
 
     public Map<String, Object> createIdamRolesAssoc(List<ServiceRoleMapping> serviceRoleMapping, String role) {
@@ -135,6 +140,13 @@ public class CaseWorkerReferenceDataClient {
         return sendRequest(uriPath, request);
     }
 
+    private <T> Map<String, Object> deleteRequest(String uriPath, String role) {
+
+        HttpEntity<T> request = new HttpEntity<>(null, getMultipleAuthHeaders(role, null));
+
+        return sendDeleteRequest(uriPath, request);
+    }
+
     private <T> Map<String, Object> sendRequest(String uriPath, HttpEntity<T> request) {
         ResponseEntity<Map> responseEntity;
 
@@ -153,6 +165,27 @@ public class CaseWorkerReferenceDataClient {
         }
 
         return getResponse(responseEntity);
+    }
+
+    private <T> Map<String, Object> sendDeleteRequest(String uriPath, HttpEntity<T> request) {
+        ResponseEntity<Map> responseEntity;
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    uriPath,
+                    DELETE,
+                    request,
+                    Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getDeleteResponse(responseEntity);
     }
 
     private HttpHeaders getMultipleAuthHeaders(String role, String userId) {
@@ -209,6 +242,15 @@ public class CaseWorkerReferenceDataClient {
         response.put("http_status", responseEntity.getStatusCode().toString());
         response.put("headers", responseEntity.getHeaders().toString());
         response.put("body", responseEntity.getBody());
+        return response;
+    }
+
+    private Map getDeleteResponse(ResponseEntity<Map> responseEntity) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("status", responseEntity.getStatusCode().toString());
+        response.put("headers", responseEntity.getHeaders().toString());
         return response;
     }
 
