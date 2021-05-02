@@ -5,7 +5,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -82,6 +81,16 @@ public class CaseWorkerApiClient {
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
+    public RequestSpecification getMultipleAuthHeaders1(String role) {
+        String userToken = idamOpenIdClient.getOpenIdTokenByRole(role);
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(caseWorkerApiUrl)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
+
 
     public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String... email) {
         List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest
@@ -93,9 +102,20 @@ public class CaseWorkerApiClient {
                 .caseWorkerRoleRequest()
                 .role("Tribunal Caseworker").isPrimaryFlag(true).build());
 
-        List<CaseWorkerWorkAreaRequest> areaRequests = ImmutableList.of(CaseWorkerWorkAreaRequest
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest = CaseWorkerWorkAreaRequest
                 .caseWorkerWorkAreaRequest()
-                .serviceCode("BAA1").areaOfWork("Non-Money Claims").build());
+                .serviceCode("BAA1").areaOfWork("Non-Money Claims").build();
+
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("AAA6").areaOfWork("Specified Money Claims").build();
+
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("ABA2").areaOfWork("Financial Remedy").build();
+
+        List<CaseWorkerWorkAreaRequest> areaRequests =
+                ImmutableList.of(workerWorkAreaRequest, workerWorkAreaRequest1, workerWorkAreaRequest2);
 
         Set<String> idamRoles = new HashSet<>();
 
@@ -180,20 +200,6 @@ public class CaseWorkerApiClient {
         response.then()
                 .assertThat()
                 .statusCode(201);
-
-        return response;
-    }
-
-    public Response deleteCaseworkerByIdOrEmailPattern(String path, HttpStatus statusCode) {
-        Response response = getMultipleAuthHeadersInternal()
-                .delete(path)
-                .andReturn();
-
-        log.info(":: delete user profile response status code :: " + response.statusCode());
-
-        response.then()
-                .assertThat()
-                .statusCode(statusCode.value());
 
         return response;
     }

@@ -12,13 +12,21 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -34,15 +42,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
@@ -61,10 +71,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefUsersController.createCaseWorkerProfiles";
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
-    public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
-    public static final String DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN =
-            "CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern";
     public static List<String> caseWorkerIds = new ArrayList<>();
+    public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
@@ -104,6 +112,95 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         UserProfileResponse upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         Assertions.assertThat(upResponse.getRoles())
                 .containsExactlyInAnyOrderElementsOf(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN));
+    }
+
+    @Test
+    @Ignore
+    //this test verifies User profile is updated when user is already present in CW, UP and SIDAM
+    public void createCwWhenUserExistsInCwrAndUpAndExistsInSidam_Ac3() {
+
+        List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
+        String email = profileCreateRequests.get(0).getEmailId();
+        CaseWorkersProfileCreationRequest updatedReq = caseWorkerApiClient.updateCaseWorkerProfileRequest(email).get(0);
+        Set<String> idamRole = updatedReq.getIdamRoles();
+        idamRole.add(CASEWORKER_IAC);
+        idamRole.add(CASEWORKER_IAC_BULKSCAN);
+        updatedReq.setIdamRoles(idamRole);
+
+        caseWorkerApiClient.createUserProfiles(Collections.singletonList(updatedReq));
+
+        UserProfileResponse upResponse = getUserProfileFromUp(email);
+        assertEquals(ImmutableList.of(CASEWORKER_IAC,CWD_USER,CASEWORKER_IAC_BULKSCAN), upResponse.getRoles());
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> cwProfiles = getUserProfilesFromCw(
+                UserRequest.builder().userIds(asList(upResponse.getIdamId())).build(), 200);
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile cwProfile = cwProfiles.get(0);
+        assertThat(cwProfile.getId()).isEqualTo(upResponse.getIdamId());
+        assertThat(cwProfile.getFirstName()).isEqualTo(updatedReq.getFirstName());
+        assertThat(cwProfile.getLastName()).isEqualTo(updatedReq.getLastName());
+        assertThat(cwProfile.getOfficialEmail()).isEqualTo(updatedReq.getEmailId());
+        assertThat(cwProfile.getRegionId()).isEqualTo(updatedReq.getRegionId());
+        assertThat(cwProfile.getRegionName()).isEqualTo(updatedReq.getRegion());
+        assertThat(cwProfile.getUserId()).isEqualTo(2);
+        assertThat(cwProfile.getUserType()).isEqualTo(updatedReq.getUserType());
+        assertThat(cwProfile.getSuspended()).isEqualTo(String.valueOf(updatedReq.isSuspended()));
+        assertThat(cwProfile.getLocations()).hasSize(2);
+        for (CaseWorkerLocationRequest locationRequest : updatedReq.getBaseLocations()) {
+            List<Location> responseLocation = cwProfile.getLocations().stream().filter(fit ->
+                    locationRequest.getLocationId().equals(fit.getBaseLocationId())).collect(Collectors.toList());
+            assertThat(responseLocation).isNotEmpty().hasSize(1);
+            assertThat(responseLocation.get(0).getLocationName()).isEqualTo(locationRequest.getLocation());
+            assertThat(responseLocation.get(0).isPrimary()).isEqualTo(locationRequest.isPrimaryFlag());
+        }
+        assertThat(cwProfile.getWorkAreas()).hasSize(2);
+        for (CaseWorkerWorkAreaRequest workAreaRequest : updatedReq.getWorkerWorkAreaRequests()) {
+            List<WorkArea> responseWorkAreas = cwProfile.getWorkAreas().stream().filter(fit ->
+                    workAreaRequest.getServiceCode().equals(fit.getServiceCode())).collect(Collectors.toList());
+            assertThat(responseWorkAreas).isNotEmpty().hasSize(1);
+            assertThat(responseWorkAreas.get(0).getAreaOfWork()).isEqualTo(workAreaRequest.getAreaOfWork());
+        }
+        assertThat(cwProfile.getRoles()).hasSize(2);
+        for (CaseWorkerRoleRequest roleRequest : updatedReq.getRoles()) {
+            List<Role> responseRoles = cwProfile.getRoles().stream().filter(fit ->
+                    roleRequest.getRole().equals(fit.getRoleName())).collect(Collectors.toList());
+            assertThat(responseRoles).isNotEmpty().hasSize(1);
+            assertThat(responseRoles.get(0).getRoleId()).isNotNull();
+            assertThat(responseRoles.get(0).isPrimary()).isEqualTo(roleRequest.isPrimaryFlag());
+        }
+    }
+
+    @Test
+    @Ignore
+    // this test verifies User profile is updated when user is already present in CW, UP , SIDAM and delete
+    // flag is sent is request then user should be suspended in UP and SIDAM
+    public void createCwWhenUserExistsInCwrAndUpAndExistsInSidamAndDeleteFlagTrue_Ac4() {
+
+        List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
+        profileCreateRequests.get(0).setSuspended(true);
+        caseWorkerApiClient.createUserProfiles(profileCreateRequests);
+
+        UserProfileResponse upResponseForExistingUser = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        assertEquals(USER_STATUS_SUSPENDED, upResponseForExistingUser.getIdamStatus());
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> cwProfiles = getUserProfilesFromCw(
+                UserRequest.builder().userIds(asList(upResponseForExistingUser.getIdamId())).build(), 200);
+
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile cwProfile = cwProfiles.get(0);
+        assertThat(cwProfile.getSuspended()).isEqualTo("true");
+    }
+
+    @Test
+    @Ignore
+    // this test verifies User profile is updated when user is already present in CW, UP , SIDAM and roles are same as
+    // SIDAM, then just update user in CWR
+    public void createCwWhenUserExistsInCwrAndUpAndExistsInSidamAndRolesAreSame_Ac5() {
+
+        List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
+
+        caseWorkerApiClient.createUserProfiles(profileCreateRequests);
+
+        UserProfileResponse upResponseForExistingUser = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        assertEquals(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN), upResponseForExistingUser.getRoles());
     }
 
     @Test
@@ -166,24 +263,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    //this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
+    // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() {
         if (isEmpty(caseWorkerIds)) {
-            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                    caseWorkerApiClient.createCaseWorkerProfiles();
-
-            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
-                    .body(caseWorkersProfileCreationRequests)
-                    .post("/refdata/case-worker/users")
-                    .andReturn();
-            response.then()
-                    .assertThat()
-                    .statusCode(201);
-
-            CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
-                    response.getBody().as(CaseWorkerProfileCreationResponse.class);
-            caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+            createCaseWorkerIds();
         }
         List<String> tempCwIds = new ArrayList<>(caseWorkerIds);
         tempCwIds.add("randomId");
@@ -286,7 +370,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(caseWorkerProfileCreationResponse.getMessage()
                 .contains(REQUEST_COMPLETED_SUCCESSFULLY));
         assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
-                .contains(format(RECORDS_UPLOADED, 4)));
+                .contains(format(RECORDS_UPLOADED,4)));
     }
 
     @Test
@@ -321,73 +405,59 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
-    //this test verifies that a User Profile is deleted by ID
-    public void deleteCaseworkerById() {
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                caseWorkerApiClient.createCaseWorkerProfiles();
-
-        // create user
-        Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
-
-        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
-                createResponse.getBody().as(CaseWorkerProfileCreationResponse.class);
-
-        List<String> caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
-        assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
-
-        //delete user
-        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?userId=" + caseWorkerIds.get(0), NO_CONTENT);
-
-        //search for deleted user
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
-                .body(UserRequest.builder().userIds(caseWorkerIds).build())
-                .post("/refdata/case-worker/users/fetchUsersById/")
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
+    public void shouldFetchStaffProfileByCcdServiceNames() {
+        if (isEmpty(caseWorkerIds)) {
+            createCaseWorkerIds();
+        }
+        List<String> expectedServiceNames = List.of("cmc", "divorce");
+        String ccdServiceNames = String.join(",", expectedServiceNames);
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeaders1(ROLE_CWD_SYSTEM_USER)
+                .get("/refdata/case-worker/users/get-users-by-service-name?" +
+                        "ccd_service_names=" + ccdServiceNames)
                 .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+        PaginatedStaffProfile paginatedStaffProfile =
+                fetchResponse.getBody()
+                        .as(PaginatedStaffProfile.class);
 
-        //assert that delete user is not found
-        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
+        assertFalse(paginatedStaffProfile.getStaffProfiles().isEmpty());
+        List<String> actualServiceNames = new ArrayList<>();
+        paginatedStaffProfile
+                .getStaffProfiles()
+                .forEach(p -> actualServiceNames.add(p.getCcdServiceName()));
+
+        assertTrue(actualServiceNames.containsAll(expectedServiceNames));
     }
 
     @Test
-    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
-    //this test verifies that a User Profile is deleted by Email Pattern
-    public void deleteCaseworkerByEmailPattern() {
-        String emailPattern = "deleteTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                caseWorkerApiClient.createCaseWorkerProfiles(email);
-
-        // create user with email pattern
-        Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
-
-        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
-                createResponse.getBody().as(CaseWorkerProfileCreationResponse.class);
-
-        List<String> caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
-        assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
-
-        //delete user by email pattern
-        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?emailPattern=" + emailPattern, NO_CONTENT);
-
-        //search for deleted user
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
-                .body(UserRequest.builder().userIds(caseWorkerIds).build())
-                .post("/refdata/case-worker/users/fetchUsersById/")
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
+    public void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                .get("/refdata/case-worker/users/get-users-by-service-name?" +
+                        "ccd_service_names=cmc")
                 .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(403);
 
-        //assert that delete user is not found
-        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
     }
 
     @Test
-    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = false)
-    public void deleteCaseworkerReturns403WhenToggledOff() {
-        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?emailPattern=ForbiddenException", FORBIDDEN);
+    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
+    public void shouldReturn404WhenNoCcdServiceNameFound() {
+        if (isEmpty(caseWorkerIds)) {
+            createCaseWorkerIds();
+        }
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeaders1(ROLE_CWD_SYSTEM_USER)
+                .get("/refdata/case-worker/users/get-users-by-service-name?" +
+                        "ccd_service_names=invalid")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(404);
     }
 
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
@@ -395,7 +465,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                                                                String messageBody,
                                                                String header,
                                                                String role) throws IOException {
-        MultiPartSpecification multiPartSpec = getMultipartFile(filePath, header);
+        MultiPartSpecification multiPartSpec =  getMultipartFile(filePath, header);
 
         Response response = caseWorkerApiClient.getMultiPartWithAuthHeaders(role)
                 .multiPart(multiPartSpec)
@@ -414,10 +484,27 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                                                     String headerValue) throws IOException {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
-        MultiPartSpecBuilder multiPartSpecBuilder = new MultiPartSpecBuilder(IOUtils.toByteArray(input))
+        MultiPartSpecBuilder multiPartSpecBuilder =  new MultiPartSpecBuilder(IOUtils.toByteArray(input))
                 .fileName(file.getName())
                 .header("Content-Type",
                         headerValue);
         return multiPartSpecBuilder.build();
+    }
+
+    private void createCaseWorkerIds() {
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
+                caseWorkerApiClient.createCaseWorkerProfiles();
+
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+                .body(caseWorkersProfileCreationRequests)
+                .post("/refdata/case-worker/users")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(201);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                response.getBody().as(CaseWorkerProfileCreationResponse.class);
+        caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
     }
 }
