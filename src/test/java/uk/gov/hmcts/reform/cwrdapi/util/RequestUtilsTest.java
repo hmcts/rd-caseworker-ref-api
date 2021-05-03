@@ -55,7 +55,7 @@ public class RequestUtilsTest {
     @Test(expected = InvalidRequestException.class)
     public void testInvalidRequestExceptionForInvalidSortDirection() {
         validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "Invalid", "test",
                 20, "id");
     }
 

@@ -12,20 +12,26 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
@@ -36,7 +42,10 @@ import javax.validation.constraints.NotEmpty;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.API_IS_NOT_AVAILABLE_IN_PROD_ENV;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
@@ -61,9 +70,11 @@ public class CaseWorkerRefUsersController {
     @Value("${refresh.pageSize}")
     private int configPageSize;
 
-
     @Value("${refresh.sortColumn}")
     private String configSortColumn;
+
+    @Value("${environment_name}")
+    private String environmentName;
 
     @Autowired
     CaseWorkerService caseWorkerService;
@@ -194,6 +205,70 @@ public class CaseWorkerRefUsersController {
                 (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return responseEntity;
 
+    }
+
+    @ApiOperation(value = "Delete Case Worker Profiles by User ID or Email Pattern",
+            notes = "This API is only for use in non Prod environments",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            })
+    @ApiResponses({
+            @ApiResponse(
+                    code = 204,
+                    message = "Case Worker Profiles deleted successfully",
+                    response = CaseWorkerProfilesDeletionResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "An invalid request has been provided"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+
+    @DeleteMapping(
+            produces = APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public ResponseEntity<CaseWorkerProfilesDeletionResponse> deleteCaseWorkerProfileByIdOrEmailPattern(
+            @RequestParam(value = "userId", required = false) String userId,
+            @RequestParam(value = "emailPattern", required = false) String emailPattern) {
+
+        /**
+         * This API will need to be revisited if it is to be used for business functionality.
+         */
+
+        log.info("ENVIRONMENT NAME:::::: " + environmentName);
+
+        if ("PROD".equalsIgnoreCase(environmentName)) {
+            throw new AccessDeniedException(API_IS_NOT_AVAILABLE_IN_PROD_ENV);
+        }
+
+        CaseWorkerProfilesDeletionResponse resource;
+
+        if (isNotBlank(userId)) {
+            resource = caseWorkerService.deleteByUserId(userId);
+
+        } else if (isNotBlank(emailPattern)) {
+            resource = caseWorkerService.deleteByEmailPattern(emailPattern);
+
+        } else {
+            throw new InvalidRequestException(NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE.getErrorMessage());
+        }
+
+        return ResponseEntity.status(resource.getStatusCode()).body(resource);
     }
 
     @ApiOperation(

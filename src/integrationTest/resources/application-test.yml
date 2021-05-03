@@ -100,6 +100,8 @@ oidc:
   issuer: ${OIDC_ISSUER:http://127.0.0.1:5000/openam/oauth2/hmcts}
   expiration: 14400000 # milliseconds 4 hours
 
+environment_name: ${ENVIRONMENT_NAME:preview}
+
 ## user profile feign connection
 userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
 locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://127.0.0.1:8092}

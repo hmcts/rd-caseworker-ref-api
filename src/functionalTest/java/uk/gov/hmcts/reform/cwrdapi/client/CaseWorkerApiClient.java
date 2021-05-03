@@ -81,7 +81,7 @@ public class CaseWorkerApiClient {
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
-    public RequestSpecification getMultipleAuthHeaders1(String role) {
+    public RequestSpecification getMultipleAuthHeadersWithoutContentType(String role) {
         String userToken = idamOpenIdClient.getOpenIdTokenByRole(role);
         return SerenityRest.with()
                 .relaxedHTTPSValidation()

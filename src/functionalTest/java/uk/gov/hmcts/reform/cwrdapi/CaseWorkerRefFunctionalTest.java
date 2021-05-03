@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,7 +52,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS;
@@ -410,11 +410,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
-        List<String> expectedServiceNames = List.of("cmc", "divorce");
+        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
         String ccdServiceNames = String.join(",", expectedServiceNames);
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeaders1(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/get-users-by-service-name?" +
-                        "ccd_service_names=" + ccdServiceNames)
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                        + "ccd_service_names=" + ccdServiceNames)
                 .andReturn();
         fetchResponse.then()
                 .assertThat()
@@ -424,10 +424,10 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                         .as(PaginatedStaffProfile.class);
 
         assertFalse(paginatedStaffProfile.getStaffProfiles().isEmpty());
-        List<String> actualServiceNames = new ArrayList<>();
+        Set<String> actualServiceNames = new HashSet<>();
         paginatedStaffProfile
                 .getStaffProfiles()
-                .forEach(p -> actualServiceNames.add(p.getCcdServiceName()));
+                .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
 
         assertTrue(actualServiceNames.containsAll(expectedServiceNames));
     }
@@ -436,8 +436,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .get("/refdata/case-worker/users/get-users-by-service-name?" +
-                        "ccd_service_names=cmc")
+                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                        + "ccd_service_names=cmc")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -451,9 +451,9 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeaders1(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/get-users-by-service-name?" +
-                        "ccd_service_names=invalid")
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                        + "ccd_service_names=invalid")
                 .andReturn();
         fetchResponse.then()
                 .assertThat()

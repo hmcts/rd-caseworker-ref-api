@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
@@ -39,6 +40,21 @@ public interface CaseWorkerService {
      */
     ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds);
 
+    /**
+     * Deletes a caseworker by their ID.
+     *
+     * @param userId String
+     * @return CaseWorkerProfilesDeletionResponse
+     */
+    CaseWorkerProfilesDeletionResponse deleteByUserId(String userId);
+
+    /**
+     * Deletes caseworkers by associated email pattern.
+     *
+     * @param emailPattern String
+     * @return CaseWorkerProfilesDeletionResponse
+     */
+    CaseWorkerProfilesDeletionResponse deleteByEmailPattern(String emailPattern);
 
     /**
      * Returns the caseworker details for Refresh Assignments.

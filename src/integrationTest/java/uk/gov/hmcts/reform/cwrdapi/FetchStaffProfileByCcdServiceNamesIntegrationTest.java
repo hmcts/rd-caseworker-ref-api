@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.util.Map;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
@@ -18,6 +22,16 @@ public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends Authoriza
     @Before
     public void setUpClient() {
         super.setUpClient();
+    }
+
+    @BeforeClass
+    public static void setup() {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @Test

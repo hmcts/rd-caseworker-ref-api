@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -88,23 +89,23 @@ public class CaseWorkerReferenceDataClient {
                                                                  String sortColumn, String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("/get-users-by-service-name");
-        if(StringUtils.isNotBlank(ccdServiceNames)) {
+        if (StringUtils.isNotBlank(ccdServiceNames)) {
             stringBuilder.append("?ccd_service_names=");
             stringBuilder.append(ccdServiceNames);
         }
-        if(pageSize != null) {
+        if (pageSize != null) {
             stringBuilder.append("&page_size=");
             stringBuilder.append(pageSize);
         }
-        if(pageNumber != null) {
+        if (pageNumber != null) {
             stringBuilder.append("&page_number=");
             stringBuilder.append(pageNumber);
         }
-        if(StringUtils.isNotBlank(sortDirection)) {
+        if (StringUtils.isNotBlank(sortDirection)) {
             stringBuilder.append("&sort_direction=");
             stringBuilder.append(sortDirection);
         }
-        if(StringUtils.isNotBlank(sortColumn)) {
+        if (StringUtils.isNotBlank(sortColumn)) {
             stringBuilder.append("&sort_column=");
             stringBuilder.append(sortColumn);
         }
@@ -190,39 +191,8 @@ public class CaseWorkerReferenceDataClient {
 
     private HttpHeaders getMultipleAuthHeaders(String role, String userId) {
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getMultipleAuthHeadersWithoutContentType(role, userId);
         headers.setContentType(APPLICATION_JSON);
-        if (StringUtils.isBlank(JWT_TOKEN)) {
-
-            JWT_TOKEN = generateS2SToken(serviceName);
-        }
-
-        headers.add("ServiceAuthorization", JWT_TOKEN);
-
-        if (StringUtils.isBlank(bearerToken)) {
-            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
-                    : userId, role));
-        }
-        headers.add("Authorization", bearerToken);
-
-        return headers;
-    }
-
-    private HttpHeaders getMultipleAuthHeadersWithoutContentType(String role, String userId) {
-
-        HttpHeaders headers = new HttpHeaders();
-        if (StringUtils.isBlank(JWT_TOKEN)) {
-
-            JWT_TOKEN = generateS2SToken(serviceName);
-        }
-
-        headers.add("ServiceAuthorization", JWT_TOKEN);
-
-        if (StringUtils.isBlank(bearerToken)) {
-            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
-                    : userId, role));
-        }
-        headers.add("Authorization", bearerToken);
 
         return headers;
     }
@@ -230,6 +200,25 @@ public class CaseWorkerReferenceDataClient {
     private HttpHeaders getMultipleAuthHeaders(String role) {
 
         return getMultipleAuthHeaders(role, null);
+    }
+
+
+    @NotNull
+    private HttpHeaders getMultipleAuthHeadersWithoutContentType(String role, String userId) {
+        HttpHeaders headers = new HttpHeaders();
+        if (StringUtils.isBlank(JWT_TOKEN)) {
+
+            JWT_TOKEN = generateS2SToken(serviceName);
+        }
+
+        headers.add("ServiceAuthorization", JWT_TOKEN);
+
+        if (StringUtils.isBlank(bearerToken)) {
+            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+                    : userId, role));
+        }
+        headers.add("Authorization", bearerToken);
+        return headers;
     }
 
     private Map getResponse(ResponseEntity<Map> responseEntity) {
