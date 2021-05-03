@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,11 +34,29 @@ public class JsonFeignResponseUtil {
         }
     }
 
+    public static List<Object> mapObjectToList(Response response, Object clazz) {
+        try {
+            JavaType type = json.getTypeFactory().constructCollectionType(List.class, (Class<?>) clazz);
+            return json.readValue(response.body().asReader(Charset.defaultCharset()), type);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
     public static ResponseEntity<Object> toResponseEntity(Response response, Object clazz) {
         Optional<Object>  payload = decode(response, clazz);
 
         return new ResponseEntity<>(
                 payload.orElse("unknown"),
+                convertHeaders(response.headers()),
+                HttpStatus.valueOf(response.status()));
+    }
+
+    public static ResponseEntity<Object> toResponseEntityWithListBody(Response response, Object clazz) {
+        List<Object> payload = mapObjectToList(response, clazz);
+
+        return new ResponseEntity<>(
+                payload,
                 convertHeaders(response.headers()),
                 HttpStatus.valueOf(response.status()));
     }

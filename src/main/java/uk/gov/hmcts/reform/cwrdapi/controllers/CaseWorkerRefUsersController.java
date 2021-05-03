@@ -58,6 +58,13 @@ public class CaseWorkerRefUsersController {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+    @Value("${refresh.pageSize}")
+    private int configPageSize;
+
+
+    @Value("${refresh.sortColumn}")
+    private String configSortColumn;
+
     @Autowired
     CaseWorkerService caseWorkerService;
 
@@ -235,11 +242,11 @@ public class CaseWorkerRefUsersController {
             @RequestParam(name = "sort_direction", required = false) String sortDirection,
             @RequestParam(name = "sort_column", required = false) String sortColumn
     ) {
-        if(StringUtils.isBlank(ccdServiceNames)) {
+        if (StringUtils.isBlank(ccdServiceNames)) {
             throw new InvalidRequestException("The required parameter 'ccd_service_names' is empty");
         }
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(pageNumber, pageSize,
-                sortColumn, sortDirection);
-        return caseWorkerService.fetchCaseworkersForRoleRefresh(ccdServiceNames, pageRequest);
+                sortColumn, sortDirection, loggingComponentName, configPageSize, configSortColumn);
+        return caseWorkerService.fetchStaffProfilesForRoleRefresh(ccdServiceNames, pageRequest);
     }
 }

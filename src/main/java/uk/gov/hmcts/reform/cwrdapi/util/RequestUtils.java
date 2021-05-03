@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
@@ -20,31 +18,11 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
 
-//@SuppressWarnings("HideUtilityClassConstructor")
-@Service
 @Slf4j
 @Getter
 public class RequestUtils {
 
-    @Value("${loggingComponentName}")
-    static String loggingComponentName;
-
-    @Value("${refresh.pageSize}")
-    static int configPageSize;
-
-
-    @Value("${refresh.sortColumn}")
-    static String configSortColumn;
-
-    public RequestUtils(@Value("${loggingComponentName}") String loggingComponentName,
-                        @Value("${refresh.pageSize}")
-                                int configPageSize,
-                        @Value("${refresh.sortColumn}")
-                                String configSortColumn) {
-        RequestUtils.loggingComponentName = loggingComponentName;
-        RequestUtils.configPageSize = configPageSize;
-        RequestUtils.configSortColumn = configSortColumn;
-
+    private RequestUtils() {
     }
 
     /**
@@ -64,8 +42,13 @@ public class RequestUtils {
         });
     }
 
-    public static PageRequest validateAndBuildPaginationObject(Integer pageNumber, Integer pageSize, String sortColumn,
-                                                               String sortDirection) {
+    public static PageRequest validateAndBuildPaginationObject(Integer pageNumber,
+                                                               Integer pageSize,
+                                                               String sortColumn,
+                                                               String sortDirection,
+                                                               String loggingComponentName,
+                                                               int configPageSize,
+                                                               String configSortColumn) {
 
         if (pageNumber != null && pageNumber < 0) {
             log.info("{}:: Invalid Page Number", loggingComponentName);

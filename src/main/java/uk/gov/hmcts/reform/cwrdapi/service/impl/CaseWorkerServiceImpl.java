@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.LrdOrgInfoService;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
@@ -34,6 +33,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationReques
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
@@ -99,6 +99,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntityWithListBody;
 
 @Service
 @Slf4j
@@ -373,24 +374,29 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Object> fetchCaseworkersForRoleRefresh(String ccdServiceNames, PageRequest pageRequest) {
+    public ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest) {
         List<PaginatedStaffProfile.StaffProfileWithServiceName> staffProfileList;
         Response lrdOrgInfoServiceResponse = locationReferenceDataFeignClient.getLocationRefServiceMapping(ccdServiceNames);
-        ResponseEntity<Object> responseEntity = toResponseEntity(lrdOrgInfoServiceResponse, List.class);
+        ResponseEntity<Object> responseEntity = toResponseEntityWithListBody(lrdOrgInfoServiceResponse,
+                LrdOrgInfoServiceResponse.class);
 
-        if (responseEntity.getStatusCode().is2xxSuccessful() && nonNull(responseEntity.getBody())
+        if (responseEntity.getStatusCode().is2xxSuccessful()
+                && nonNull(responseEntity.getBody())
                 && responseEntity.getBody() instanceof List) {
-            List<Object> listLrdServiceMapping = (List<Object>) responseEntity.getBody();
+            List<LrdOrgInfoServiceResponse> listLrdServiceMapping =
+                    (List<LrdOrgInfoServiceResponse>)responseEntity.getBody();
             if (CollectionUtils.isNotEmpty(listLrdServiceMapping)) {
                 Map<String, String> serviceNameToCodeMapping =
-                        listLrdServiceMapping.stream()
-                                .filter(Objects::nonNull)
-                                .map(LrdOrgInfoService::castToClazz)
-                                .distinct()
-                                .collect(Collectors.toMap(LrdOrgInfoService::getServiceCode, LrdOrgInfoService::getCcdServiceName));
+                        listLrdServiceMapping
+                                .stream()
+                                .collect(Collectors.toMap(LrdOrgInfoServiceResponse::getServiceCode,
+                                        LrdOrgInfoServiceResponse::getCcdServiceName));
                 Page<CaseWorkerWorkArea> workAreaPage = caseWorkerWorkAreaRepository.findByServiceCodeIn(
-                        serviceNameToCodeMapping.keySet()
-                        , pageRequest);
+                        serviceNameToCodeMapping.keySet(), pageRequest);
+
+                if (workAreaPage.isEmpty()) {
+                    throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+                }
 
                 staffProfileList = new ArrayList<>();
                 workAreaPage.forEach(workArea -> staffProfileList.add(PaginatedStaffProfile
@@ -398,10 +404,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
                         .staffProfile(mapCaseWorkerProfile(workArea.getCaseWorkerProfile()))
                         .build()));
-
-                if (staffProfileList.isEmpty()) {
-                    throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
-                }
 
                 return ResponseEntity.ok(PaginatedStaffProfile.builder()
                         .totalRecords(workAreaPage.getTotalElements())

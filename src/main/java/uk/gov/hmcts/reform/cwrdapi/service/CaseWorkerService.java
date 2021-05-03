@@ -47,6 +47,6 @@ public interface CaseWorkerService {
      * @param pageRequest pageRequest
      * @return CaseWorkerProfile
      */
-    ResponseEntity<Object> fetchCaseworkersForRoleRefresh(String ccdServiceNames, PageRequest pageRequest);
+    ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest);
 }
 
