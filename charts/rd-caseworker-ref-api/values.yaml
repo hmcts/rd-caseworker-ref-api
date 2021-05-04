@@ -18,6 +18,7 @@ java:
     ENVIRONMENT_NAME: "{{ .Values.global.environment }}"
     IDAM_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     USER_PROFILE_URL: http://rd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    LOCATION_REF_DATA_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     OIDC_ISSUER_URL: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
     OPEN_ID_API_BASE_URI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o
     REFRESH_PAGE_SIZE: 20
