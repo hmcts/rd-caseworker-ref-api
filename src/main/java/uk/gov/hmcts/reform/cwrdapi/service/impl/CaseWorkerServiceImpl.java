@@ -397,6 +397,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         serviceNameToCodeMapping.keySet(), pageRequest);
 
                 if (workAreaPage.isEmpty()) {
+                    log.error("{}:: No data found in CRD for the ccd service name {}",
+                            loggingComponentName, ccdServiceNames);
                     throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
                 }
 
@@ -406,12 +408,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
                         .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
                         .build()));
+                log.info("{}:: Successfully fetched the staff details to refresh role assignment "
+                                + "for ccd service names {}", loggingComponentName, ccdServiceNames);
                 return ResponseEntity
                         .ok()
                         .header("total_records", String.valueOf(workAreaPage.getTotalElements()))
                         .body(staffProfileList);
             }
         }
+        log.error("{}:: No data found in LRD for the ccd service name {} :: Status code {}", loggingComponentName,
+                ccdServiceNames, responseEntity.getStatusCode());
         throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
     }
 

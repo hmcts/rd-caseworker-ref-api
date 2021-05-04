@@ -282,7 +282,7 @@ public class CaseWorkerRefUsersController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-                    message = "The caseworker profiles have been retrieved successfully",
+                    message = "The Staff profiles have been retrieved successfully",
                     response = StaffProfileWithServiceName.class
             ),
             @ApiResponse(
@@ -318,6 +318,8 @@ public class CaseWorkerRefUsersController {
             @RequestParam(name = "sort_direction", required = false) String sortDirection,
             @RequestParam(name = "sort_column", required = false) String sortColumn
     ) {
+        log.info("{}:: Fetching the staff details to refresh role assignment for ccd service names {}",
+                loggingComponentName, ccdServiceNames);
         if (StringUtils.isBlank(ccdServiceNames)) {
             throw new InvalidRequestException(REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY);
         }

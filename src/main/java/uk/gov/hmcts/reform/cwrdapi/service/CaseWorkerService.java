@@ -57,11 +57,11 @@ public interface CaseWorkerService {
     CaseWorkerProfilesDeletionResponse deleteByEmailPattern(String emailPattern);
 
     /**
-     * Returns the caseworker details for Refresh Assignments.
+     * Returns the staff details for Refresh Assignments.
      *
      * @param ccdServiceNames ccdServiceNames
      * @param pageRequest pageRequest
-     * @return CaseWorkerProfile
+     * @return StaffProfile
      */
     ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest);
 }
