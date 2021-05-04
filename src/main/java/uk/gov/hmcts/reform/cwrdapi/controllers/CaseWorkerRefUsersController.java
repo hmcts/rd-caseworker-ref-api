@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERV
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 
@@ -282,7 +283,7 @@ public class CaseWorkerRefUsersController {
             @ApiResponse(
                     code = 200,
                     message = "The caseworker profiles have been retrieved successfully",
-                    response = PaginatedStaffProfile.class
+                    response = StaffProfileWithServiceName.class
             ),
             @ApiResponse(
                     code = 400,
@@ -318,7 +319,7 @@ public class CaseWorkerRefUsersController {
             @RequestParam(name = "sort_column", required = false) String sortColumn
     ) {
         if (StringUtils.isBlank(ccdServiceNames)) {
-            throw new InvalidRequestException("The required parameter 'ccd_service_names' is empty");
+            throw new InvalidRequestException(REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY);
         }
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(pageNumber, pageSize,
                 sortColumn, sortDirection, loggingComponentName, configPageSize, configSortColumn);

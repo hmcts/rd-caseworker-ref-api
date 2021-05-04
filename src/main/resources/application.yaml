@@ -145,5 +145,5 @@ launchdarkly:
     user: rd
 
 refresh:
-  pageSize: 20
-  sortColumn: caseWorkerId
+  pageSize: ${REFRESH_PAGE_SIZE:20}
+  sortColumn: ${REFRESH_SORT_COLUMN:caseWorkerId}

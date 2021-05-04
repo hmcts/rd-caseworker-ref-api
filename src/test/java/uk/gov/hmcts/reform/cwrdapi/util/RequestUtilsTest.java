@@ -34,8 +34,8 @@ public class RequestUtilsTest {
                 validateAndBuildPaginationObject(0, 1,
                         "caseWorkerId", "ASC", "test",
                         20, "id");
-        assertEquals(pageRequest.first().getPageNumber(), 0);
-        assertEquals(pageRequest.first().getPageSize(), 1);
+        assertEquals(0, pageRequest.first().getPageNumber());
+        assertEquals(1, pageRequest.first().getPageSize());
     }
 
     @Test(expected = InvalidRequestException.class)

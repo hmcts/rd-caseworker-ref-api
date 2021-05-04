@@ -20,8 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -73,6 +73,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
     public static List<String> caseWorkerIds = new ArrayList<>();
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
+    public static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
+            "CaseWorkerRefUsersController.fetchStaffByCcdServiceNames";
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
@@ -405,7 +407,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     public void shouldFetchStaffProfileByCcdServiceNames() {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
@@ -419,21 +421,19 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         fetchResponse.then()
                 .assertThat()
                 .statusCode(200);
-        PaginatedStaffProfile paginatedStaffProfile =
-                fetchResponse.getBody()
-                        .as(PaginatedStaffProfile.class);
+        List<StaffProfileWithServiceName> paginatedStaffProfile =
+                Arrays.asList(fetchResponse.getBody().as(StaffProfileWithServiceName[].class));
 
-        assertFalse(paginatedStaffProfile.getStaffProfiles().isEmpty());
+        assertFalse(paginatedStaffProfile.isEmpty());
         Set<String> actualServiceNames = new HashSet<>();
         paginatedStaffProfile
-                .getStaffProfiles()
                 .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
 
         assertTrue(actualServiceNames.containsAll(expectedServiceNames));
     }
 
     @Test
-    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .get("/refdata/case-worker/users/get-users-by-service-name?"
@@ -446,7 +446,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     public void shouldReturn404WhenNoCcdServiceNameFound() {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
@@ -458,6 +458,24 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         fetchResponse.then()
                 .assertThat()
                 .statusCode(404);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = false)
+    public void shouldReturn403WhenFetchStaffProfileByCcdServiceNamesApiToggledOff() {
+
+        String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
+                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
+
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                        + "ccd_service_names=cmc")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(403);
+
+        assertThat(fetchResponse.getBody().asString()).contains(exceptionMessage);
     }
 
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,

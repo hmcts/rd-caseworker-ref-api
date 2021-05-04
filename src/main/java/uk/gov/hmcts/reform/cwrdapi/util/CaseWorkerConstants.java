@@ -142,4 +142,7 @@ public final class CaseWorkerConstants {
     public static final String PAGE_SIZE = "Page Size";
     public static final String SORT_DIRECTION = "Sort Direction";
     public static final String API_IS_NOT_AVAILABLE_IN_PROD_ENV = "This API is not available in Production Environment";
+    public static final String REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY =
+            "The required parameter 'ccd_service_names' is empty";
+
 }

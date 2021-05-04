@@ -14,9 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.PaginatedStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
@@ -375,7 +375,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Override
     @SuppressWarnings("unchecked")
     public ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest) {
-        List<PaginatedStaffProfile.StaffProfileWithServiceName> staffProfileList;
+        List<StaffProfileWithServiceName> staffProfileList;
         Response lrdOrgInfoServiceResponse =
                 locationReferenceDataFeignClient.getLocationRefServiceMapping(ccdServiceNames);
         ResponseEntity<Object> responseEntity = toResponseEntityWithListBody(lrdOrgInfoServiceResponse,
@@ -401,17 +401,15 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 }
 
                 staffProfileList = new ArrayList<>();
-                workAreaPage.forEach(workArea -> staffProfileList.add(PaginatedStaffProfile
-                        .StaffProfileWithServiceName.builder()
+                workAreaPage.forEach(workArea -> staffProfileList.add(
+                        StaffProfileWithServiceName.builder()
                         .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
                         .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
                         .build()));
-
-                return ResponseEntity.ok(PaginatedStaffProfile.builder()
-                        .totalRecords(workAreaPage.getTotalElements())
-                        .totalPages(workAreaPage.getTotalPages())
-                        .staffProfiles(staffProfileList)
-                        .build());
+                return ResponseEntity
+                        .ok()
+                        .header("total_records", String.valueOf(workAreaPage.getTotalElements()))
+                        .body(staffProfileList);
             }
         }
         throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
