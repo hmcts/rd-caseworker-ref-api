@@ -34,7 +34,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/refdata/case-worker/idam-roles-mapping",
                         "/refdata/case-worker/users",
                         "/refdata/case-worker/upload-file",
-                        "/refdata/case-worker/users/get-users-by-service-name");
+                        "/refdata/case-worker/users/staffByServiceName");
 
         //Audit Interceptor
         registry.addInterceptor(auditInterceptor)

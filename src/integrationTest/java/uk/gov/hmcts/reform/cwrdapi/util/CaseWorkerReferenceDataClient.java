@@ -88,7 +88,7 @@ public class CaseWorkerReferenceDataClient {
                                                                  Integer pageNumber, String sortDirection,
                                                                  String sortColumn, String role) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("/get-users-by-service-name");
+        stringBuilder.append("/staffByServiceName");
         if (StringUtils.isNotBlank(ccdServiceNames)) {
             stringBuilder.append("?ccd_service_names=");
             stringBuilder.append(ccdServiceNames);

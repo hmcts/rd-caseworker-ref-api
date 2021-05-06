@@ -14,8 +14,6 @@ java:
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
     ENVIRONMENT_NAME: "preview"
-    REFRESH_PAGE_SIZE: 20
-    REFRESH_SORT_COLUMN: caseWorkerId
   postgresql:
     enabled: true
     postgresqlUsername: dbrdcaseworker

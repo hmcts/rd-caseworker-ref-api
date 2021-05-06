@@ -307,7 +307,7 @@ public class CaseWorkerRefUsersController {
             )
     })
     @GetMapping(
-            path = "/get-users-by-service-name",
+            path = "/staffByServiceName",
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("cwd-system-user")

@@ -392,7 +392,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         Set<String> expectedServiceNames = Set.of("cmc", "divorce");
         String ccdServiceNames = String.join(",", expectedServiceNames);
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                .get("/refdata/case-worker/users/staffByServiceName?"
                         + "ccd_service_names=" + ccdServiceNames)
                 .andReturn();
         fetchResponse.then()
@@ -413,7 +413,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                .get("/refdata/case-worker/users/staffByServiceName?"
                         + "ccd_service_names=cmc")
                 .andReturn();
         response.then()
@@ -429,7 +429,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             createCaseWorkerIds();
         }
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                .get("/refdata/case-worker/users/staffByServiceName?"
                         + "ccd_service_names=invalid")
                 .andReturn();
         fetchResponse.then()
@@ -445,7 +445,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/get-users-by-service-name?"
+                .get("/refdata/case-worker/users/staffByServiceName?"
                         + "ccd_service_names=cmc")
                 .andReturn();
         fetchResponse.then()
