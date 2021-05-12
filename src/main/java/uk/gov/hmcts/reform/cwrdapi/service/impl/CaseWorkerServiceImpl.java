@@ -4,6 +4,7 @@ import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -391,6 +392,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         listLrdServiceMapping
                                 .stream()
                                 .distinct()
+                                .filter(r -> StringUtils.isNotBlank(r.getServiceCode())
+                                        && StringUtils.isNotBlank(r.getCcdServiceName()))
                                 .collect(Collectors.toMap(LrdOrgInfoServiceResponse::getServiceCode,
                                         LrdOrgInfoServiceResponse::getCcdServiceName));
                 Page<CaseWorkerWorkArea> workAreaPage = caseWorkerWorkAreaRepository.findByServiceCodeIn(
