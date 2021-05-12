@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
@@ -34,24 +36,29 @@ import java.util.Collections;
 import java.util.List;
 import javax.sql.DataSource;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+    host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:9293}", consumerVersionSelectors = {
     @VersionSelector(tag = "master")})
 @Import(CaseWorkerProviderTestConfiguration.class)
 @SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 @IgnoreNoPactsToVerify
-public class FetchCaseworkersByIdProviderTest {
+public class StaffReferenceDataProviderTest {
 
     @Autowired
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
 
     @Autowired
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
+
+    @Autowired
+    private CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
 
     @Autowired
     private DataSource ds;
@@ -73,6 +80,7 @@ public class FetchCaseworkersByIdProviderTest {
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
@@ -96,6 +104,20 @@ public class FetchCaseworkersByIdProviderTest {
         List<String> userRequest = Arrays.asList(USER_ID, USER_ID2);
         doReturn(caseWorkerProfiles).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(userRequest);
     }
+
+    @State({"A list of staff profiles for CRD request by service names"})
+    public void fetchListOfStaffProfilesByServiceNames() {
+        CaseWorkerProfile caseWorkerProfile = getCaseWorkerProfile(USER_ID);
+        List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
+        CaseWorkerWorkArea caseWorkerWorkArea  = new CaseWorkerWorkArea();
+        caseWorkerWorkArea.setCaseWorkerId("cwId");
+        caseWorkerWorkArea.setCaseWorkerProfile(caseWorkerProfile);
+        caseWorkerWorkAreas.add(caseWorkerWorkArea);
+
+        PageImpl<CaseWorkerWorkArea> page = new PageImpl<>(caseWorkerWorkAreas);
+        doReturn(page).when(caseWorkerWorkAreaRepository).findByServiceCodeIn(anySet(), any());
+    }
+
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
         LocalDateTime timeNow = LocalDateTime.now();
