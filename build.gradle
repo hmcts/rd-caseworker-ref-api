@@ -190,7 +190,6 @@ task contract(type: Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/cwrdapi/**"
-  exclude "uk/gov/hmcts/reform/cwrdapi/*ProviderTest*"
   systemProperty 'pact.rootDir', "pacts"
 }
 
@@ -227,8 +226,6 @@ task contractTest(type: Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-  include "uk/gov/hmcts/reform/cwrdapi/*ConsumerTest*"
-  exclude "uk/gov/hmcts/reform/cwrdapi/*ProviderTest*"
 }
 
 task runProviderPactVerification(type: Test) {
