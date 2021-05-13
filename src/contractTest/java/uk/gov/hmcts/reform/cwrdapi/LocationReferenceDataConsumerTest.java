@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -38,7 +37,6 @@ import static org.junit.Assert.assertNotNull;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @PactTestFor(providerName = "referenceData_location")
 @PactFolder("pacts")
-@SpringBootTest
 public class LocationReferenceDataConsumerTest {
 
     private static final String LRD_URL = "/refdata/location/orgServices";
