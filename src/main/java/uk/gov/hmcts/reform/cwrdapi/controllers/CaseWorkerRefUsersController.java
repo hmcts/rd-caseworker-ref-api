@@ -8,17 +8,14 @@ import io.swagger.annotations.Authorization;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
@@ -34,11 +30,9 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
-import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.constraints.NotEmpty;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -52,7 +46,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERV
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 
@@ -270,61 +263,5 @@ public class CaseWorkerRefUsersController {
         }
 
         return ResponseEntity.status(resource.getStatusCode()).body(resource);
-    }
-
-    @ApiOperation(
-            value = "This API returns the Staff(Case Worker) profiles based on Service Name and Pagination parameters",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-                    message = "The Staff profiles have been retrieved successfully",
-                    response = StaffProfileWithServiceName.class
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
-            ),
-            @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
-            ),
-            @ApiResponse(
-                    code = 404,
-                    message = NO_DATA_FOUND
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
-            )
-    })
-    @GetMapping(
-            path = "/staffByServiceName",
-            produces = APPLICATION_JSON_VALUE
-    )
-    @Secured("cwd-system-user")
-    public ResponseEntity<Object> fetchStaffByCcdServiceNames(
-            @RequestParam(name = "ccd_service_names") @NotEmpty String ccdServiceNames,
-            @RequestParam(name = "page_size", required = false) Integer pageSize,
-            @RequestParam(name = "page_number", required = false) Integer pageNumber,
-            @RequestParam(name = "sort_direction", required = false) String sortDirection,
-            @RequestParam(name = "sort_column", required = false) String sortColumn
-    ) {
-        log.info("{}:: Fetching the staff details to refresh role assignment for ccd service names {}",
-                loggingComponentName, ccdServiceNames);
-        if (StringUtils.isBlank(ccdServiceNames)) {
-            throw new InvalidRequestException(REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY);
-        }
-        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(pageNumber, pageSize,
-                sortColumn, sortDirection, loggingComponentName, configPageSize, configSortColumn);
-        return caseWorkerService.fetchStaffProfilesForRoleRefresh(ccdServiceNames, pageRequest);
     }
 }

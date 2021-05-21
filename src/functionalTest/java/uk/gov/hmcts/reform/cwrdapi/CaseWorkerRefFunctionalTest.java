@@ -68,6 +68,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
     public static final String DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN =
             "CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern";
+    public static final String STAFF_BY_SERVICE_NAME_URL = "/refdata/internal/staff/usersByServiceName";
     public static List<String> caseWorkerIds = new ArrayList<>();
     public static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
             "CaseWorkerRefUsersController.fetchStaffByCcdServiceNames";
@@ -392,8 +393,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         Set<String> expectedServiceNames = Set.of("cmc", "divorce");
         String ccdServiceNames = String.join(",", expectedServiceNames);
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/staffByServiceName?"
-                        + "ccd_service_names=" + ccdServiceNames)
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=" + ccdServiceNames)
                 .andReturn();
         fetchResponse.then()
                 .assertThat()
@@ -413,8 +414,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     public void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
-                .get("/refdata/case-worker/users/staffByServiceName?"
-                        + "ccd_service_names=cmc")
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=cmc")
                 .andReturn();
         response.then()
                 .assertThat()
@@ -429,8 +430,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             createCaseWorkerIds();
         }
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/staffByServiceName?"
-                        + "ccd_service_names=invalid")
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=invalid")
                 .andReturn();
         fetchResponse.then()
                 .assertThat()
@@ -445,8 +446,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-                .get("/refdata/case-worker/users/staffByServiceName?"
-                        + "ccd_service_names=cmc")
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=cmc")
                 .andReturn();
         fetchResponse.then()
                 .assertThat()

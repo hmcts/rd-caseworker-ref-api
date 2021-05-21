@@ -38,12 +38,14 @@ import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
 public class CaseWorkerReferenceDataClient {
 
     private static final String APP_BASE_PATH = "/refdata/case-worker";
+    private static final String APP_INTERNAL_BASE_PATH = "/refdata/internal/staff";
     private static String JWT_TOKEN = null;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private RestTemplate restTemplate;
     private String baseUrl;
+    private String baseInternalUrl;
     @Value("${oidc.issuer}")
     private String issuer;
     @Value("${oidc.expiration}")
@@ -56,6 +58,7 @@ public class CaseWorkerReferenceDataClient {
 
     public CaseWorkerReferenceDataClient(int port) {
         this.baseUrl = "http://localhost:" + port + APP_BASE_PATH;
+        this.baseInternalUrl = "http://localhost:" + port + APP_INTERNAL_BASE_PATH;
     }
 
     public Map<String, Object> createCaseWorkerProfile(CaseWorkersProfileCreationRequest request, String role) {
@@ -88,7 +91,7 @@ public class CaseWorkerReferenceDataClient {
                                                                  Integer pageNumber, String sortDirection,
                                                                  String sortColumn, String role) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("/staffByServiceName");
+        stringBuilder.append("/usersByServiceName");
         if (StringUtils.isNotBlank(ccdServiceNames)) {
             stringBuilder.append("?ccd_service_names=");
             stringBuilder.append(ccdServiceNames);
@@ -118,7 +121,7 @@ public class CaseWorkerReferenceDataClient {
         try {
 
             responseEntity = restTemplate.exchange(
-                    baseUrl + "/users" + stringBuilder.toString(),
+                    baseInternalUrl  + stringBuilder.toString(),
                     HttpMethod.GET, request,
                     Map.class
             );

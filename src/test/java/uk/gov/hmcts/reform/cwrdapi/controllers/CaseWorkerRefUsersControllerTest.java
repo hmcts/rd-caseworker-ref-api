@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
-import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -164,31 +162,5 @@ public class CaseWorkerRefUsersControllerTest {
         verify(caseWorkerServiceMock, times(1))
                 .fetchCaseworkersById(Arrays.asList(
                         "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
-    }
-
-    @Test
-    public void shouldFetchStaffByCcdServiceNames() {
-        responseEntity = ResponseEntity.ok().body(null);
-        when(caseWorkerServiceMock.fetchStaffProfilesForRoleRefresh(any(), any()))
-                .thenReturn(responseEntity);
-
-        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
-                20, "id");
-
-        ResponseEntity<?> actual = caseWorkerRefUsersController
-                .fetchStaffByCcdServiceNames("cmc", 1, 0,
-                        "ASC", "caseWorkerId");
-
-        assertNotNull(actual);
-        verify(caseWorkerServiceMock, times(1))
-                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
-    }
-
-    @Test(expected = InvalidRequestException.class)
-    public void shouldThrowInvalidRequestExceptionForEmptyServiceName() {
-        caseWorkerRefUsersController
-                .fetchStaffByCcdServiceNames("", 1, 0,
-                        "ASC", "caseWorkerId");
     }
 }
