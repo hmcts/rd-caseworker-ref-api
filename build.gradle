@@ -134,13 +134,13 @@ idea {
 }
 
 configurations {
-  integrationTestCompile.extendsFrom testCompile
+  integrationTestImplementation.extendsFrom testCompile
   integrationTestRuntime.extendsFrom testRuntime
-  functionalTestCompile.extendsFrom testCompile
+  functionalTestImplementation.extendsFrom testCompile
   functionalTestRuntime.extendsFrom testRuntime
-  contractTestCompile.extendsFrom testCompile
-  contractTestRuntime.extendsFrom testRuntime
-  pactTestCompile.extendsFrom testCompile
+  contractTestImplementation.extendsFrom testCompile
+  contractTestRuntimeOnly.extendsFrom testRuntime
+  pactTestImplementation.extendsFrom testCompile
   pactTestRuntime.extendsFrom testRuntime
 }
 
@@ -424,8 +424,8 @@ dependencies {
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-  contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.6.2")
-  contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+  contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
 
   testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
@@ -450,30 +450,30 @@ dependencies {
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 
-  integrationTestCompile sourceSets.main.runtimeClasspath
-  integrationTestCompile sourceSets.test.runtimeClasspath
+  integrationTestImplementation sourceSets.main.runtimeClasspath
+  integrationTestImplementation sourceSets.test.runtimeClasspath
 
-  functionalTestCompile sourceSets.main.runtimeClasspath
-  functionalTestCompile sourceSets.test.runtimeClasspath
+  functionalTestImplementation sourceSets.main.runtimeClasspath
+  functionalTestImplementation sourceSets.test.runtimeClasspath
 
-  smokeTestCompile sourceSets.main.runtimeClasspath
-  smokeTestCompile sourceSets.test.runtimeClasspath
+  smokeTestImplementation sourceSets.main.runtimeClasspath
+  smokeTestImplementation sourceSets.test.runtimeClasspath
 
-  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
-  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
-  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
-  contractTestRuntime group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.1.7'
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'spring', version: '4.1.7'
-  contractTestCompile group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.1.7'
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.1.7'
+  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: '4.1.7'
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: '4.1.7'
+  contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: '4.1.7'
 
-  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-  contractTestCompile sourceSets.main.runtimeClasspath
-  contractTestCompile sourceSets.test.runtimeClasspath
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 
-  pactTestCompile sourceSets.main.runtimeClasspath
-  pactTestCompile sourceSets.test.runtimeClasspath
+  pactTestImplementation sourceSets.main.runtimeClasspath
+  pactTestImplementation sourceSets.test.runtimeClasspath
 }
 
 dependencyCheck {
@@ -496,7 +496,7 @@ dependencyUpdates.resolutionStrategy = {
 gradle.startParameter.continueOnFailure = true
 
 bootJar {
-  archiveName = jarName
+  archiveFileName = jarName
   manifest {
     attributes('Implementation-Version': project.version.toString())
   }
