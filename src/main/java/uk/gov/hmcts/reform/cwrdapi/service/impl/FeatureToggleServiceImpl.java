@@ -47,7 +47,7 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 CWD_UPLOAD_FILE_FLAG);
         launchDarklyMap.put("CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern",
                 CWD_DELETE_BY_ID_OR_EMAILPATTERN_FLAG);
-        launchDarklyMap.put("CaseWorkerRefUsersController.fetchStaffByCcdServiceNames",
+        launchDarklyMap.put("StaffReferenceInternalController.fetchStaffByCcdServiceNames",
                 CWD_FETCH_STAFF_BY_CCD_SERVICE_NAMES);
     }
 
