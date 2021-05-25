@@ -71,7 +71,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public static final String STAFF_BY_SERVICE_NAME_URL = "/refdata/internal/staff/usersByServiceName";
     public static List<String> caseWorkerIds = new ArrayList<>();
     public static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
-            "CaseWorkerRefUsersController.fetchStaffByCcdServiceNames";
+            "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
