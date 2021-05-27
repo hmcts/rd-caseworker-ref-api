@@ -145,4 +145,6 @@ public final class CaseWorkerConstants {
     public static final String REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY =
             "The required parameter 'ccd_service_names' is empty";
 
+    public static final String ERROR_IN_PARSING_THE_FEIGN_RESPONSE = "Error in parsing %s Feign Response";
+
 }

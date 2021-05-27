@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -978,7 +979,7 @@ public class CaseWorkerServiceImplTest {
 
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test(expected = StaffReferenceException.class)
     public void testRefreshRoleAllocationWhenLrdResponseIsNon200() {
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
@@ -988,7 +989,7 @@ public class CaseWorkerServiceImplTest {
                 .thenReturn(Response.builder()
                         .request(mock(Request.class)).body("body", defaultCharset()).status(400).build());
 
-        ResponseEntity<Object> responseEntity = caseWorkerServiceImpl
+        caseWorkerServiceImpl
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
 
     }

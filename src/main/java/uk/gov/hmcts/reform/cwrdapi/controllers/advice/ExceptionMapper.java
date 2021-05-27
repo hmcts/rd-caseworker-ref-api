@@ -89,6 +89,11 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST_EXCEPTION.getErrorMessage());
     }
 
+    @ExceptionHandler(StaffReferenceException.class)
+    public ResponseEntity<Object> handleJsonFeignResponseException(StaffReferenceException ex) {
+        return errorDetailsResponseEntity(ex, ex.getStatus(), ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, UNKNOWN_EXCEPTION.getErrorMessage());

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -50,11 +51,11 @@ public class RequestUtils {
                                                                int configPageSize,
                                                                String configSortColumn) {
 
-        if (pageNumber != null && pageNumber < 0) {
+        if (Objects.nonNull(pageNumber) && pageNumber < 0) {
             log.info("{}:: Invalid Page Number", loggingComponentName);
             throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_NUMBER));
         }
-        if (pageSize != null && pageSize <= 0) {
+        if (Objects.nonNull(pageSize) && pageSize <= 0) {
             log.info("{}:: Invalid Page Size", loggingComponentName);
             throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_SIZE));
         }
@@ -66,10 +67,10 @@ public class RequestUtils {
                 throw new InvalidRequestException(String.format(INVALID_FIELD, SORT_DIRECTION));
             }
         }
-        return PageRequest.of(pageNumber == null ? 0 : pageNumber,
-                pageSize == null ? configPageSize : pageSize,
-                sortDirection == null ? Sort.Direction.ASC : Sort.Direction.fromString(sortDirection),
-                StringUtils.isEmpty(sortColumn) ? configSortColumn : sortColumn);
+        return PageRequest.of(Objects.isNull(pageNumber) ? 0 : pageNumber,
+                Objects.isNull(pageSize) ? configPageSize : pageSize,
+                StringUtils.isBlank(sortDirection) ? Sort.Direction.ASC : Sort.Direction.fromString(sortDirection),
+                StringUtils.isBlank(sortColumn) ? configSortColumn : sortColumn);
     }
 
 }

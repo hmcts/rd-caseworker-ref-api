@@ -5,6 +5,7 @@ import feign.Response;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 
@@ -143,23 +144,16 @@ public class JsonFeignResponseUtilTest {
         assertFalse(listLrdServiceMapping.isEmpty());
     }
 
-    @Test
-    @SuppressWarnings("unchecked")
+    @Test(expected = StaffReferenceException.class)
     public void test_mapObjectToEmptyList() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put("content-encoding", list);
         String responseBody = "";
-
         Response response = Response.builder().status(200).reason("OK").headers(header)
                 .body(responseBody, UTF_8).request(mock(Request.class)).build();
-        ResponseEntity<Object> responseEntity =
-                JsonFeignResponseUtil.toResponseEntityWithListBody(
+        JsonFeignResponseUtil.toResponseEntityWithListBody(
                         response,
                         LrdOrgInfoServiceResponse.class);
-
-        List<LrdOrgInfoServiceResponse> listLrdServiceMapping =
-                (List<LrdOrgInfoServiceResponse>)responseEntity.getBody();
-        assertTrue(listLrdServiceMapping.isEmpty());
     }
 }

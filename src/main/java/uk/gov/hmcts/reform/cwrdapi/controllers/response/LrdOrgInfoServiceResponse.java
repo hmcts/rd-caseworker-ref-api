@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -36,23 +35,4 @@ public class LrdOrgInfoServiceResponse {
     private String lastUpdate;
 
     private List<String> ccdCaseTypes;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof LrdOrgInfoServiceResponse)) {
-            return false;
-        }
-        LrdOrgInfoServiceResponse that = (LrdOrgInfoServiceResponse) o;
-        return Objects.equals(getServiceCode(), that.getServiceCode())
-                && Objects.equals(getCcdServiceName(), that.getCcdServiceName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getCcdServiceName(), getServiceCode());
-    }
-
 }

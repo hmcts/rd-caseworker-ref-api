@@ -391,7 +391,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 Map<String, String> serviceNameToCodeMapping =
                         listLrdServiceMapping
                                 .stream()
-                                .distinct()
                                 .filter(r -> StringUtils.isNotBlank(r.getServiceCode())
                                         && StringUtils.isNotBlank(r.getCcdServiceName()))
                                 .collect(Collectors.toMap(LrdOrgInfoServiceResponse::getServiceCode,
