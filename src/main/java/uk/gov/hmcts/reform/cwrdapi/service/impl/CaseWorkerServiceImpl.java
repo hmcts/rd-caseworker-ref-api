@@ -379,14 +379,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         List<StaffProfileWithServiceName> staffProfileList;
         Response lrdOrgInfoServiceResponse =
                 locationReferenceDataFeignClient.getLocationRefServiceMapping(ccdServiceNames);
-        ResponseEntity<Object> responseEntity = toResponseEntityWithListBody(lrdOrgInfoServiceResponse,
-                LrdOrgInfoServiceResponse.class);
+        if (HttpStatus.valueOf(lrdOrgInfoServiceResponse.status()).is2xxSuccessful()) {
+            ResponseEntity<Object> responseEntity = toResponseEntityWithListBody(lrdOrgInfoServiceResponse,
+                    LrdOrgInfoServiceResponse.class);
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()
-                && nonNull(responseEntity.getBody())
-                && responseEntity.getBody() instanceof List) {
             List<LrdOrgInfoServiceResponse> listLrdServiceMapping =
-                    (List<LrdOrgInfoServiceResponse>)responseEntity.getBody();
+                    (List<LrdOrgInfoServiceResponse>) responseEntity.getBody();
             if (CollectionUtils.isNotEmpty(listLrdServiceMapping)) {
                 Map<String, String> serviceNameToCodeMapping =
                         listLrdServiceMapping
@@ -407,11 +405,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 staffProfileList = new ArrayList<>();
                 workAreaPage.forEach(workArea -> staffProfileList.add(
                         StaffProfileWithServiceName.builder()
-                        .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
-                        .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
-                        .build()));
+                                .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
+                                .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
+                                .build()));
                 log.info("{}:: Successfully fetched the staff details to refresh role assignment "
-                                + "for ccd service names {}", loggingComponentName, ccdServiceNames);
+                        + "for ccd service names {}", loggingComponentName, ccdServiceNames);
                 return ResponseEntity
                         .ok()
                         .header("total_records", String.valueOf(workAreaPage.getTotalElements()))
@@ -419,7 +417,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             }
         }
         log.error("{}:: No data found in LRD for the ccd service name {} :: Status code {}", loggingComponentName,
-                ccdServiceNames, responseEntity.getStatusCode());
+                ccdServiceNames, HttpStatus.valueOf(lrdOrgInfoServiceResponse.status()));
         throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
     }
 
