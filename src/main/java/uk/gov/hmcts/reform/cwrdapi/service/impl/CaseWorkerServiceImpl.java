@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -403,7 +404,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 }
 
                 List<StaffProfileWithServiceName> staffProfileList = new ArrayList<>();
-                Set<CaseWorkerWorkArea> caseWorkerWorkArea = new HashSet<>();
+                Set<CaseWorkerWorkArea> caseWorkerWorkArea = new LinkedHashSet<>();
 
                 staffProfilePage.forEach(caseWorkerProfile -> caseWorkerProfile.getCaseWorkerWorkAreas()
                         .stream()
