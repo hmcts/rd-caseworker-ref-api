@@ -958,18 +958,13 @@ public class CaseWorkerServiceImplTest {
 
 
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
-        List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
-        CaseWorkerWorkArea caseWorkerWorkArea  = new CaseWorkerWorkArea();
-        caseWorkerWorkArea.setCaseWorkerId("cwId");
-        caseWorkerWorkArea.setCaseWorkerProfile(caseWorkerProfile);
-        caseWorkerWorkAreas.add(caseWorkerWorkArea);
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
                 "caseWorkerId", "ASC", "test",
                 20, "id");
 
-        PageImpl<CaseWorkerWorkArea> page = new PageImpl<>(caseWorkerWorkAreas);
-        when(caseWorkerWorkAreaRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
+        PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.singletonList(caseWorkerProfile));
+        when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
                 .thenReturn(page);
         ResponseEntity<Object> responseEntity = caseWorkerServiceImpl
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
@@ -1006,16 +1001,12 @@ public class CaseWorkerServiceImplTest {
                 .thenReturn(Response.builder()
                         .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
 
-
-        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
-        List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
-
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
                 "caseWorkerId", "ASC", "test",
                 20, "id");
 
-        PageImpl<CaseWorkerWorkArea> page = new PageImpl<>(caseWorkerWorkAreas);
-        when(caseWorkerWorkAreaRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
+        PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.emptyList());
+        when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
                 .thenReturn(page);
         caseWorkerServiceImpl
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);

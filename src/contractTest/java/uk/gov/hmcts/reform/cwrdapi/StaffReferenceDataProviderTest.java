@@ -137,7 +137,7 @@ public class StaffReferenceDataProviderTest {
         caseWorkerWorkArea.setCaseWorkerProfile(caseWorkerProfile);
 
         PageImpl<CaseWorkerWorkArea> page = new PageImpl<>(List.of(caseWorkerWorkArea));
-        doReturn(page).when(caseWorkerWorkAreaRepository).findByServiceCodeIn(anySet(), any());
+        doReturn(page).when(caseWorkerProfileRepo).findByServiceCodeIn(anySet(), any());
     }
 
 

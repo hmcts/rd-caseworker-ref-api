@@ -376,7 +376,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     @Override
     @SuppressWarnings("unchecked")
     public ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest) {
-        List<StaffProfileWithServiceName> staffProfileList;
         Response lrdOrgInfoServiceResponse =
                 locationReferenceDataFeignClient.getLocationRefServiceMapping(ccdServiceNames);
         if (HttpStatus.valueOf(lrdOrgInfoServiceResponse.status()).is2xxSuccessful()) {
@@ -393,17 +392,25 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                         && StringUtils.isNotBlank(r.getCcdServiceName()))
                                 .collect(Collectors.toMap(LrdOrgInfoServiceResponse::getServiceCode,
                                         LrdOrgInfoServiceResponse::getCcdServiceName));
-                Page<CaseWorkerWorkArea> workAreaPage = caseWorkerWorkAreaRepository.findByServiceCodeIn(
+
+                Page<CaseWorkerProfile> staffProfilePage = caseWorkerProfileRepo.findByServiceCodeIn(
                         serviceNameToCodeMapping.keySet(), pageRequest);
 
-                if (workAreaPage.isEmpty()) {
+                if (staffProfilePage.isEmpty()) {
                     log.error("{}:: No data found in CRD for the ccd service name {}",
                             loggingComponentName, ccdServiceNames);
                     throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
                 }
 
-                staffProfileList = new ArrayList<>();
-                workAreaPage.forEach(workArea -> staffProfileList.add(
+                List<StaffProfileWithServiceName> staffProfileList = new ArrayList<>();
+                Set<CaseWorkerWorkArea> caseWorkerWorkArea = new HashSet<>();
+
+                staffProfilePage.forEach(caseWorkerProfile -> caseWorkerProfile.getCaseWorkerWorkAreas()
+                        .stream()
+                        .filter(cw -> serviceNameToCodeMapping.containsKey(cw.getServiceCode()))
+                        .forEach(caseWorkerWorkArea::add));
+
+                caseWorkerWorkArea.forEach(workArea -> staffProfileList.add(
                         StaffProfileWithServiceName.builder()
                                 .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
                                 .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
@@ -412,7 +419,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         + "for ccd service names {}", loggingComponentName, ccdServiceNames);
                 return ResponseEntity
                         .ok()
-                        .header("total_records", String.valueOf(workAreaPage.getTotalElements()))
+                        .header("total_records", String.valueOf(staffProfilePage.getTotalElements()))
                         .body(staffProfileList);
             }
         }
