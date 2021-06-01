@@ -56,6 +56,7 @@ public class StaffReferenceInternalController {
 
     @ApiOperation(
             value = "This API returns the Staff(Case Worker) profiles based on Service Name and Pagination parameters",
+            notes = "**IDAM Role to access API** :\n cwd-system-user",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
