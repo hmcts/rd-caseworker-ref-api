@@ -137,5 +137,14 @@ public final class CaseWorkerConstants {
     public static final String DUPLICATE_EMAIL_PROFILES = "User record in row ID %s is duplicate to another row. "
             + "Please ensure that the record is not duplicate and try again";
 
+    public static final String INVALID_FIELD = "The field %s is invalid. Please provide a valid value.";
+    public static final String PAGE_NUMBER = "Page Number";
+    public static final String PAGE_SIZE = "Page Size";
+    public static final String SORT_DIRECTION = "Sort Direction";
     public static final String API_IS_NOT_AVAILABLE_IN_PROD_ENV = "This API is not available in Production Environment";
+    public static final String REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY =
+            "The required parameter 'ccd_service_names' is empty";
+
+    public static final String ERROR_IN_PARSING_THE_FEIGN_RESPONSE = "Error in parsing %s Feign Response";
+
 }

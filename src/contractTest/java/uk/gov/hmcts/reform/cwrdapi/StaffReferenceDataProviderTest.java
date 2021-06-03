@@ -8,15 +8,23 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
+import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -24,6 +32,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
@@ -34,24 +43,35 @@ import java.util.Collections;
 import java.util.List;
 import javax.sql.DataSource;
 
+import static java.nio.charset.Charset.defaultCharset;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-    host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-    @VersionSelector(tag = "master")})
+        host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+        @VersionSelector(tag = "master")})
 @Import(CaseWorkerProviderTestConfiguration.class)
 @SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 @IgnoreNoPactsToVerify
-public class FetchCaseworkersByIdProviderTest {
+public class StaffReferenceDataProviderTest {
 
     @Autowired
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
 
     @Autowired
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
+
+    @MockBean
+    private CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
+
+    @MockBean
+    private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
     @Autowired
     private DataSource ds;
@@ -75,7 +95,8 @@ public class FetchCaseworkersByIdProviderTest {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
-                        "RD-Caseworker-Ref-Api", "preview", caseWorkerServiceImpl));
+                        "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
+                        "preview", caseWorkerServiceImpl));
         if (context != null) {
             context.setTarget(testTarget);
         }
@@ -95,6 +116,30 @@ public class FetchCaseworkersByIdProviderTest {
         List<String> userRequest = Arrays.asList(USER_ID, USER_ID2);
         doReturn(caseWorkerProfiles).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(userRequest);
     }
+
+    @State({"A list of staff profiles for CRD request by service names"})
+    public void fetchListOfStaffProfilesByServiceNames() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        LrdOrgInfoServiceResponse lrdOrgInfoServiceResponse = new LrdOrgInfoServiceResponse();
+        lrdOrgInfoServiceResponse.setServiceCode("BAA1");
+        lrdOrgInfoServiceResponse.setCcdServiceName("CMC");
+        String body = mapper.writeValueAsString(List.of(lrdOrgInfoServiceResponse));
+
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping(any()))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
+
+        CaseWorkerProfile caseWorkerProfile = getCaseWorkerProfile(USER_ID);
+        CaseWorkerWorkArea caseWorkerWorkArea  = new CaseWorkerWorkArea();
+        caseWorkerWorkArea.setCaseWorkerId("cwId");
+        caseWorkerWorkArea.setServiceCode("BAA1");
+        caseWorkerWorkArea.setCaseWorkerProfile(caseWorkerProfile);
+
+        PageImpl<CaseWorkerWorkArea> page = new PageImpl<>(List.of(caseWorkerWorkArea));
+        doReturn(page).when(caseWorkerProfileRepo).findByServiceCodeIn(anySet(), any());
+    }
+
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
         LocalDateTime timeNow = LocalDateTime.now();

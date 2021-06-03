@@ -33,7 +33,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/refdata/case-worker/users/fetchUsersById",
                         "/refdata/case-worker/idam-roles-mapping",
                         "/refdata/case-worker/users",
-                        "/refdata/case-worker/upload-file");
+                        "/refdata/case-worker/upload-file",
+                        "/refdata/internal/staff/usersByServiceName");
 
         //Audit Interceptor
         registry.addInterceptor(auditInterceptor)

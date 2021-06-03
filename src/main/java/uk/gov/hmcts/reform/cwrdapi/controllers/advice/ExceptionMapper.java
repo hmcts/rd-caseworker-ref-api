@@ -6,6 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +45,7 @@ public class ExceptionMapper {
 
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<Object> customValidationError(
-        InvalidRequestException ex) {
+            InvalidRequestException ex) {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST_EXCEPTION.getErrorMessage());
     }
 
@@ -83,6 +84,16 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, FORBIDDEN, ACCESS_EXCEPTION.getErrorMessage());
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Object> handleMissingRequestParamException(Exception ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST_EXCEPTION.getErrorMessage());
+    }
+
+    @ExceptionHandler(StaffReferenceException.class)
+    public ResponseEntity<Object> handleJsonFeignResponseException(StaffReferenceException ex) {
+        return errorDetailsResponseEntity(ex, ex.getStatus(), ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         return errorDetailsResponseEntity(ex, INTERNAL_SERVER_ERROR, UNKNOWN_EXCEPTION.getErrorMessage());
@@ -104,7 +115,7 @@ public class ExceptionMapper {
 
         log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
         ErrorResponse errorDetails = new ErrorResponse(httpStatus.value(),httpStatus.getReasonPhrase(),errorMsg,
-                                                       getRootException(ex).getLocalizedMessage(),
+                getRootException(ex).getLocalizedMessage(),
                 getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, httpStatus);

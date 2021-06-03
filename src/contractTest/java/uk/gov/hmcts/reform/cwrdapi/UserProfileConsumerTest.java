@@ -22,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -38,7 +37,6 @@ import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @PactTestFor(providerName = "rd_user_profile_api_service")
 @PactFolder("pacts")
-@SpringBootTest
 public class UserProfileConsumerTest {
 
     private static final String UP_URL = "/v1/userprofile/";

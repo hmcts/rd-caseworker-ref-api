@@ -1,15 +1,26 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
 
-@SuppressWarnings("HideUtilityClassConstructor")
+@Slf4j
+@Getter
 public class RequestUtils {
 
     private RequestUtils() {
@@ -17,6 +28,7 @@ public class RequestUtils {
 
     /**
      * trims idam roles for all requests.
+     *
      * @param requests cw requests
      */
     public static void trimIdamRoles(List<CaseWorkersProfileCreationRequest> requests) {
@@ -30,4 +42,35 @@ public class RequestUtils {
             }
         });
     }
+
+    public static PageRequest validateAndBuildPaginationObject(Integer pageNumber,
+                                                               Integer pageSize,
+                                                               String sortColumn,
+                                                               String sortDirection,
+                                                               String loggingComponentName,
+                                                               int configPageSize,
+                                                               String configSortColumn) {
+
+        if (Objects.nonNull(pageNumber) && pageNumber < 0) {
+            log.info("{}:: Invalid Page Number", loggingComponentName);
+            throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_NUMBER));
+        }
+        if (Objects.nonNull(pageSize) && pageSize <= 0) {
+            log.info("{}:: Invalid Page Size", loggingComponentName);
+            throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_SIZE));
+        }
+        if (!StringUtils.isEmpty(sortDirection)) {
+            try {
+                Sort.Direction.fromString(sortDirection);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                log.info("{}:: Invalid Sort Direction", loggingComponentName);
+                throw new InvalidRequestException(String.format(INVALID_FIELD, SORT_DIRECTION));
+            }
+        }
+        return PageRequest.of(Objects.isNull(pageNumber) ? 0 : pageNumber,
+                Objects.isNull(pageSize) ? configPageSize : pageSize,
+                StringUtils.isBlank(sortDirection) ? Sort.Direction.ASC : Sort.Direction.fromString(sortDirection),
+                StringUtils.isBlank(sortColumn) ? configSortColumn : sortColumn);
+    }
+
 }

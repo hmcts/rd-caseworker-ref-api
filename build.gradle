@@ -191,12 +191,14 @@ task contract(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
   include "uk/gov/hmcts/reform/cwrdapi/**"
   systemProperty 'pact.rootDir', "pacts"
-  exclude "uk/gov/hmcts/reform/cwrdapi/*ProviderTest*"
 }
 
 task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
+  useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
+  include "uk/gov/hmcts/reform/cwrdapi/**"
+  systemProperty 'pact.rootDir', "pacts"
 }
 
 runAndPublishConsumerPactTests.finalizedBy pactPublish
@@ -213,7 +215,7 @@ pact {
   publish {
     pactDirectory = 'pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
-    tags = ['Dev']
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = "1.0"
   }
 }
@@ -224,7 +226,6 @@ task contractTest(type: Test) {
   useJUnitPlatform()
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
-  exclude "uk/gov/hmcts/reform/cwrdapi/*UserProfileConsumerTest*"
 }
 
 task runProviderPactVerification(type: Test) {
@@ -233,6 +234,8 @@ task runProviderPactVerification(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
   systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
   systemProperty 'pact.provider.version', project.pactVersion
+  include "uk/gov/hmcts/reform/cwrdapi/*ProviderTest*"
+  exclude "uk/gov/hmcts/reform/cwrdapi/*ConsumerTest*"
 }
 
 runProviderPactVerification.dependsOn contractTest
