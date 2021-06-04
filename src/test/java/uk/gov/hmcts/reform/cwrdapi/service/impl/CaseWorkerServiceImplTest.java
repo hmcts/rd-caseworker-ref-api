@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
@@ -1024,6 +1025,30 @@ public class CaseWorkerServiceImplTest {
 
 
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
+
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
+                "caseWorkerId", "ASC", "test",
+                20, "id", CaseWorkerProfile.class);
+
+        caseWorkerServiceImpl
+                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+    }
+
+    @Test(expected = StaffReferenceException.class)
+    public void testRefreshRoleAllocationWhenLrdResponseReturns400() throws JsonProcessingException {
+        ErrorResponse errorResponse = ErrorResponse
+                .builder()
+                .errorCode(400)
+                .errorDescription("testErrorDesc")
+                .errorMessage("testErrorMsg")
+                .build()
+                ;
+        String body = mapper.writeValueAsString(errorResponse);
+
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class)).body(body, defaultCharset()).status(400).build());
+
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
                 "caseWorkerId", "ASC", "test",

@@ -71,4 +71,11 @@ public class RequestUtilsTest {
         assertTrue(pageRequest.getSort().get().anyMatch(i -> i.getDirection().isAscending()));
         assertTrue(pageRequest.getSort().get().anyMatch(i -> i.getProperty().equals("caseWorkerId")));
     }
+
+    @Test(expected = InvalidRequestException.class)
+    public void testInvalidRequestExceptionForInvalidSortColumn() {
+        validateAndBuildPaginationObject(0, 1,
+                "invalid", "ASC", "test",
+                20, "invalid", CaseWorkerProfile.class);
+    }
 }
