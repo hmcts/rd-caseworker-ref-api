@@ -109,8 +109,7 @@ public class StaffReferenceInternalController {
         }
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(pageNumber, pageSize,
-                sortColumn, sortDirection, loggingComponentName, configPageSize, configSortColumn,
-                CaseWorkerProfile.class);
+                sortColumn, sortDirection, configPageSize, configSortColumn, CaseWorkerProfile.class);
 
 
         return caseWorkerService.fetchStaffProfilesForRoleRefresh(ccdServiceNames, pageRequest);

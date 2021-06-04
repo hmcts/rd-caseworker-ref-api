@@ -33,7 +33,7 @@ public class RequestUtilsTest {
     public void testValidateAndBuildPaginationObject() {
         PageRequest pageRequest =
                 validateAndBuildPaginationObject(0, 1,
-                        "caseWorkerId", "ASC", "test",
+                        "caseWorkerId", "ASC",
                         20, "id", CaseWorkerProfile.class);
         assertEquals(0, pageRequest.first().getPageNumber());
         assertEquals(1, pageRequest.first().getPageSize());
@@ -42,21 +42,21 @@ public class RequestUtilsTest {
     @Test(expected = InvalidRequestException.class)
     public void testInvalidRequestExceptionForInvalidPageNumber() {
         validateAndBuildPaginationObject(-1, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
     }
 
     @Test(expected = InvalidRequestException.class)
     public void testInvalidRequestExceptionForInvalidPageSize() {
         validateAndBuildPaginationObject(0, -1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
     }
 
     @Test(expected = InvalidRequestException.class)
     public void testInvalidRequestExceptionForInvalidSortDirection() {
         validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "Invalid", "test",
+                "caseWorkerId", "Invalid",
                 20, "id", CaseWorkerProfile.class);
     }
 
@@ -64,7 +64,7 @@ public class RequestUtilsTest {
     public void testConfigValueWhenPaginationParametersNotProvided() {
         PageRequest pageRequest =
                 validateAndBuildPaginationObject(null, null,
-                        null, null, "test",
+                        null, null,
                         20, "caseWorkerId", CaseWorkerProfile.class);
         assertEquals(0, pageRequest.getPageNumber());
         assertEquals(20, pageRequest.getPageSize());
@@ -75,7 +75,7 @@ public class RequestUtilsTest {
     @Test(expected = InvalidRequestException.class)
     public void testInvalidRequestExceptionForInvalidSortColumn() {
         validateAndBuildPaginationObject(0, 1,
-                "invalid", "ASC", "test",
+                "invalid", "ASC",
                 20, "invalid", CaseWorkerProfile.class);
     }
 }

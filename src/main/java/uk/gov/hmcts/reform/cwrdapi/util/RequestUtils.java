@@ -50,30 +50,25 @@ public class RequestUtils {
                                                                Integer pageSize,
                                                                String sortColumn,
                                                                String sortDirection,
-                                                               String loggingComponentName,
                                                                int configPageSize,
                                                                String configSortColumn,
                                                                Class<?> entityClass) {
 
         if (Objects.nonNull(pageNumber) && pageNumber < 0) {
-            log.info("{}:: Invalid Page Number {}", loggingComponentName, pageNumber);
             throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_NUMBER));
         }
         if (Objects.nonNull(pageSize) && pageSize <= 0) {
-            log.info("{}:: Invalid Page Size {}", loggingComponentName, pageSize);
             throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_SIZE));
         }
         if (!StringUtils.isEmpty(sortDirection)) {
             try {
                 Sort.Direction.fromString(sortDirection);
             } catch (IllegalArgumentException illegalArgumentException) {
-                log.info("{}:: Invalid Sort Direction {}", loggingComponentName, sortDirection);
                 throw new InvalidRequestException(String.format(INVALID_FIELD, SORT_DIRECTION));
             }
         }
         String finalSortColumn = StringUtils.isBlank(sortColumn) ? configSortColumn : sortColumn;
         if (!isValidSortColumn(finalSortColumn, entityClass)) {
-            log.info("{}:: Invalid Sort Column {}", loggingComponentName, finalSortColumn);
             throw new InvalidRequestException(String.format(INVALID_FIELD, SORT_COLUMN));
         }
         return PageRequest.of(Objects.isNull(pageNumber) ? 0 : pageNumber,
@@ -87,5 +82,4 @@ public class RequestUtils {
         Field field = ReflectionUtils.findField(entityClass, finalSortColumn);
         return Objects.nonNull(field);
     }
-
 }

@@ -962,7 +962,7 @@ public class CaseWorkerServiceImplTest {
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
 
         PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.singletonList(caseWorkerProfile));
@@ -979,7 +979,7 @@ public class CaseWorkerServiceImplTest {
     public void testRefreshRoleAllocationWhenLrdResponseIsNon200() {
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
         when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
                 .thenReturn(Response.builder()
@@ -1004,7 +1004,7 @@ public class CaseWorkerServiceImplTest {
                         .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
 
         PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.emptyList());
@@ -1027,7 +1027,7 @@ public class CaseWorkerServiceImplTest {
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
 
         caseWorkerServiceImpl
@@ -1051,7 +1051,7 @@ public class CaseWorkerServiceImplTest {
 
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
 
         caseWorkerServiceImpl

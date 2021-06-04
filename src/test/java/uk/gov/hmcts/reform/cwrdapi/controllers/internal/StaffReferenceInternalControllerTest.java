@@ -33,7 +33,7 @@ public class StaffReferenceInternalControllerTest {
                 .thenReturn(responseEntity);
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
+                "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
 
         ResponseEntity<?> actual = staffReferenceInternalController
