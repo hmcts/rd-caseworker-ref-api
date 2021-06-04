@@ -11,9 +11,10 @@ public class StaffReferenceExceptionTest {
     public void test_handle_json_feign_response_parsing_exception() {
         StaffReferenceException staffReferenceException =
                 new StaffReferenceException(HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Parsing exception", new RuntimeException());
+                        "Parsing exception", "Parsing exception");
         assertThat(staffReferenceException).isNotNull();
-        assertEquals("Parsing exception", staffReferenceException.getMessage());
+        assertEquals("Parsing exception", staffReferenceException.getErrorMessage());
+        assertEquals("Parsing exception", staffReferenceException.getErrorDescription());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, staffReferenceException.getStatus());
     }
 }

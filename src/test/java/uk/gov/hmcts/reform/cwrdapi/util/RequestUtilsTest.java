@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class RequestUtilsTest {
         PageRequest pageRequest =
                 validateAndBuildPaginationObject(0, 1,
                         "caseWorkerId", "ASC", "test",
-                        20, "id");
+                        20, "id", CaseWorkerProfile.class);
         assertEquals(0, pageRequest.first().getPageNumber());
         assertEquals(1, pageRequest.first().getPageSize());
     }
@@ -42,21 +43,21 @@ public class RequestUtilsTest {
     public void testInvalidRequestExceptionForInvalidPageNumber() {
         validateAndBuildPaginationObject(-1, 1,
                 "caseWorkerId", "ASC", "test",
-                20, "id");
+                20, "id", CaseWorkerProfile.class);
     }
 
     @Test(expected = InvalidRequestException.class)
     public void testInvalidRequestExceptionForInvalidPageSize() {
         validateAndBuildPaginationObject(0, -1,
                 "caseWorkerId", "ASC", "test",
-                20, "id");
+                20, "id", CaseWorkerProfile.class);
     }
 
     @Test(expected = InvalidRequestException.class)
     public void testInvalidRequestExceptionForInvalidSortDirection() {
         validateAndBuildPaginationObject(0, 1,
                 "caseWorkerId", "Invalid", "test",
-                20, "id");
+                20, "id", CaseWorkerProfile.class);
     }
 
     @Test
@@ -64,7 +65,7 @@ public class RequestUtilsTest {
         PageRequest pageRequest =
                 validateAndBuildPaginationObject(null, null,
                         null, null, "test",
-                        20, "caseWorkerId");
+                        20, "caseWorkerId", CaseWorkerProfile.class);
         assertEquals(0, pageRequest.getPageNumber());
         assertEquals(20, pageRequest.getPageSize());
         assertTrue(pageRequest.getSort().get().anyMatch(i -> i.getDirection().isAscending()));

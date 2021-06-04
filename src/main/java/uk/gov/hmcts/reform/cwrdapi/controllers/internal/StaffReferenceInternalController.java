@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
@@ -106,8 +107,12 @@ public class StaffReferenceInternalController {
         if (StringUtils.isBlank(ccdServiceNames)) {
             throw new InvalidRequestException(REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY);
         }
+
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(pageNumber, pageSize,
-                sortColumn, sortDirection, loggingComponentName, configPageSize, configSortColumn);
+                sortColumn, sortDirection, loggingComponentName, configPageSize, configSortColumn,
+                CaseWorkerProfile.class);
+
+
         return caseWorkerService.fetchStaffProfilesForRoleRefresh(ccdServiceNames, pageRequest);
     }
 }

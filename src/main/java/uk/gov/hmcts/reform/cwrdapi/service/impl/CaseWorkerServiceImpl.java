@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -93,6 +94,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LRD_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FROM_UP;
@@ -379,7 +381,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest) {
         Response lrdOrgInfoServiceResponse =
                 locationReferenceDataFeignClient.getLocationRefServiceMapping(ccdServiceNames);
-        if (HttpStatus.valueOf(lrdOrgInfoServiceResponse.status()).is2xxSuccessful()) {
+        HttpStatus httpStatus = HttpStatus.valueOf(lrdOrgInfoServiceResponse.status());
+        if (httpStatus.is2xxSuccessful()) {
             ResponseEntity<Object> responseEntity = toResponseEntityWithListBody(lrdOrgInfoServiceResponse,
                     LrdOrgInfoServiceResponse.class);
 
@@ -424,9 +427,20 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .body(staffProfileList);
             }
         }
-        log.error("{}:: No data found in LRD for the ccd service name {} :: Status code {}", loggingComponentName,
-                ccdServiceNames, HttpStatus.valueOf(lrdOrgInfoServiceResponse.status()));
-        throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+        log.error("{}:: Error in getting the data from LRD for the ccd service name {} :: Status code {}",
+                loggingComponentName, ccdServiceNames, httpStatus);
+
+        ResponseEntity<Object> responseEntity = JsonFeignResponseUtil.toResponseEntity(lrdOrgInfoServiceResponse,
+                ErrorResponse.class);
+        Object responseBody = responseEntity.getBody();
+        if (nonNull(responseBody) && responseBody instanceof ErrorResponse) {
+            ErrorResponse errorResponse = (ErrorResponse) responseBody;
+            throw new StaffReferenceException(httpStatus, errorResponse.getErrorMessage(),
+                    errorResponse.getErrorDescription());
+        } else {
+            throw new StaffReferenceException(httpStatus, LRD_ERROR, LRD_ERROR);
+        }
+
     }
 
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(

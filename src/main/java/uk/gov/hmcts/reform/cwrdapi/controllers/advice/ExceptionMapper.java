@@ -91,7 +91,10 @@ public class ExceptionMapper {
 
     @ExceptionHandler(StaffReferenceException.class)
     public ResponseEntity<Object> handleJsonFeignResponseException(StaffReferenceException ex) {
-        return errorDetailsResponseEntity(ex, ex.getStatus(), ex.getMessage());
+        ErrorResponse errorDetails = new ErrorResponse(ex.getStatus().value(),ex.getStatus().getReasonPhrase(),
+                ex.getErrorMessage(), ex.getErrorDescription(), getTimeStamp());
+
+        return new ResponseEntity<>(errorDetails, ex.getStatus());
     }
 
     @ExceptionHandler(Exception.class)

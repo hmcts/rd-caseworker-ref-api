@@ -141,10 +141,13 @@ public final class CaseWorkerConstants {
     public static final String PAGE_NUMBER = "Page Number";
     public static final String PAGE_SIZE = "Page Size";
     public static final String SORT_DIRECTION = "Sort Direction";
+    public static final String SORT_COLUMN = "Sort Column";
     public static final String API_IS_NOT_AVAILABLE_IN_PROD_ENV = "This API is not available in Production Environment";
     public static final String REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY =
             "The required parameter 'ccd_service_names' is empty";
 
     public static final String ERROR_IN_PARSING_THE_FEIGN_RESPONSE = "Error in parsing %s Feign Response";
+
+    public static final String LRD_ERROR = "An error occurred while retrieving data from Location Reference Data";
 
 }

@@ -8,14 +8,14 @@ public class StaffReferenceException extends RuntimeException {
 
     private final HttpStatus status;
     private final String errorMessage;
-    private final Throwable exception;
+    private final String errorDescription;
 
     public StaffReferenceException(HttpStatus status,
                                    String errorMessage,
-                                   Throwable exception) {
-        super(errorMessage, exception);
+                                   String errorDescription) {
+        super(errorMessage);
         this.status = status;
         this.errorMessage = errorMessage;
-        this.exception = exception;
+        this.errorDescription = errorDescription;
     }
 }
