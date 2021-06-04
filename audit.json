@@ -57,5 +57,10 @@
   "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/upload-file_POST" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/users/fetchUsersById_POST" : "ignore",
-  "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/users?emailPattern=emailPattern&userId=userId_DELETE" : "ignore"
+  "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/users?emailPattern=emailPattern&userId=userId_DELETE" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore"
 }
