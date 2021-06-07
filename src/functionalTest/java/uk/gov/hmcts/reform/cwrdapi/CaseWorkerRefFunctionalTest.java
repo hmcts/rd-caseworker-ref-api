@@ -386,7 +386,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
-    public void shouldFetchStaffProfileByCcdServiceNames() {
+    public void shouldFetchStaffProfileByCcdServiceNamesWithDefaultParams() {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
@@ -408,6 +408,34 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
 
         assertTrue(actualServiceNames.containsAll(expectedServiceNames));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
+    public void shouldFetchStaffProfileByCcdServiceNamesWithPaginatedParams() {
+        if (isEmpty(caseWorkerIds)) {
+            createCaseWorkerIds();
+        }
+        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
+        String ccdServiceNames = String.join(",", expectedServiceNames);
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=" + ccdServiceNames
+                        + "&page_number=0&page_size=2&sort_column=caseWorkerId&sort_direction=ASC")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+        List<StaffProfileWithServiceName> paginatedStaffProfile =
+                Arrays.asList(fetchResponse.getBody().as(StaffProfileWithServiceName[].class));
+
+        assertFalse(paginatedStaffProfile.isEmpty());
+        Set<String> actualServiceNames = new HashSet<>();
+        paginatedStaffProfile
+                .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
+
+        assertTrue(actualServiceNames.containsAll(expectedServiceNames));
+        assertEquals(2, paginatedStaffProfile.size());
     }
 
     @Test
