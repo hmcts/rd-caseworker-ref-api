@@ -44,7 +44,8 @@ public class JsonFeignResponseUtil {
             return json.readValue(response.body().asReader(Charset.defaultCharset()), type);
         } catch (Exception e) {
             throw new StaffReferenceException(INTERNAL_SERVER_ERROR,
-                    String.format(ERROR_IN_PARSING_THE_FEIGN_RESPONSE, ((Class<?>) clazz).getSimpleName()), e);
+                    String.format(ERROR_IN_PARSING_THE_FEIGN_RESPONSE, ((Class<?>) clazz).getSimpleName()),
+                    e.getLocalizedMessage());
         }
     }
 

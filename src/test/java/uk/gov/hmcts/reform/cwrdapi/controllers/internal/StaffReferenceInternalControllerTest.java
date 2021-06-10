@@ -8,6 +8,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
@@ -32,8 +33,8 @@ public class StaffReferenceInternalControllerTest {
                 .thenReturn(responseEntity);
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
-                20, "id");
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
 
         ResponseEntity<?> actual = staffReferenceInternalController
                 .fetchStaffByCcdServiceNames("cmc", 1, 0,

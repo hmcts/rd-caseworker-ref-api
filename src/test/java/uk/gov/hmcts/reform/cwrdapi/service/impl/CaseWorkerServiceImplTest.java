@@ -23,8 +23,10 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -960,8 +962,8 @@ public class CaseWorkerServiceImplTest {
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
-                20, "id");
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
 
         PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.singletonList(caseWorkerProfile));
         when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
@@ -973,12 +975,12 @@ public class CaseWorkerServiceImplTest {
 
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test(expected = StaffReferenceException.class)
     public void testRefreshRoleAllocationWhenLrdResponseIsNon200() {
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
-                20, "id");
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
         when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
                 .thenReturn(Response.builder()
                         .request(mock(Request.class)).body("body", defaultCharset()).status(400).build());
@@ -1002,8 +1004,8 @@ public class CaseWorkerServiceImplTest {
                         .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
-                20, "id");
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
 
         PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.emptyList());
         when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
@@ -1012,7 +1014,7 @@ public class CaseWorkerServiceImplTest {
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test(expected = StaffReferenceException.class)
     public void testRefreshRoleAllocationWhenLrdResponseIsEmpty() throws JsonProcessingException {
 
         String body = mapper.writeValueAsString(Collections.emptyList());
@@ -1025,8 +1027,32 @@ public class CaseWorkerServiceImplTest {
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC", "test",
-                20, "id");
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
+
+        caseWorkerServiceImpl
+                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+    }
+
+    @Test(expected = StaffReferenceException.class)
+    public void testRefreshRoleAllocationWhenLrdResponseReturns400() throws JsonProcessingException {
+        ErrorResponse errorResponse = ErrorResponse
+                .builder()
+                .errorCode(400)
+                .errorDescription("testErrorDesc")
+                .errorMessage("testErrorMsg")
+                .build()
+                ;
+        String body = mapper.writeValueAsString(errorResponse);
+
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class)).body(body, defaultCharset()).status(400).build());
+
+
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
 
         caseWorkerServiceImpl
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
