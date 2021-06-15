@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
+import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
@@ -96,7 +97,11 @@ public class StaffReferenceDataProviderTest {
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
-                        "preview", caseWorkerServiceImpl));
+                        "preview", caseWorkerServiceImpl),
+                new StaffReferenceInternalController(
+                        "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
+                        caseWorkerServiceImpl)
+        );
         if (context != null) {
             context.setTarget(testTarget);
         }
@@ -122,7 +127,7 @@ public class StaffReferenceDataProviderTest {
         ObjectMapper mapper = new ObjectMapper();
 
         LrdOrgInfoServiceResponse lrdOrgInfoServiceResponse = new LrdOrgInfoServiceResponse();
-        lrdOrgInfoServiceResponse.setServiceCode("BAA1");
+        lrdOrgInfoServiceResponse.setServiceCode("BFA1");
         lrdOrgInfoServiceResponse.setCcdServiceName("CMC");
         String body = mapper.writeValueAsString(List.of(lrdOrgInfoServiceResponse));
 
@@ -133,10 +138,10 @@ public class StaffReferenceDataProviderTest {
         CaseWorkerProfile caseWorkerProfile = getCaseWorkerProfile(USER_ID);
         CaseWorkerWorkArea caseWorkerWorkArea  = new CaseWorkerWorkArea();
         caseWorkerWorkArea.setCaseWorkerId("cwId");
-        caseWorkerWorkArea.setServiceCode("BAA1");
+        caseWorkerWorkArea.setServiceCode("BFA1");
         caseWorkerWorkArea.setCaseWorkerProfile(caseWorkerProfile);
-
-        PageImpl<CaseWorkerWorkArea> page = new PageImpl<>(List.of(caseWorkerWorkArea));
+        caseWorkerProfile.setCaseWorkerWorkAreas(List.of(caseWorkerWorkArea));
+        PageImpl<CaseWorkerProfile> page = new PageImpl<>(List.of(caseWorkerProfile));
         doReturn(page).when(caseWorkerProfileRepo).findByServiceCodeIn(anySet(), any());
     }
 
