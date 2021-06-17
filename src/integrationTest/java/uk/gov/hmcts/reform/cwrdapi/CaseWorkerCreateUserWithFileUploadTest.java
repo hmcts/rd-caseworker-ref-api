@@ -29,7 +29,7 @@ import static java.lang.String.format;
 import static java.time.ZoneId.of;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Map.entry;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.Assert.assertEquals;

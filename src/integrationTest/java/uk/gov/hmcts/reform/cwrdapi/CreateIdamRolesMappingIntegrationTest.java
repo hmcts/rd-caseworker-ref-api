@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledIntegrationTest {
