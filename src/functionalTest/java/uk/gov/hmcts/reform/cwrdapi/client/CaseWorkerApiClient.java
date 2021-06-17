@@ -82,6 +82,16 @@ public class CaseWorkerApiClient {
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
+    public RequestSpecification getMultipleAuthHeadersWithoutContentType(String role) {
+        String userToken = idamOpenIdClient.getOpenIdTokenByRole(role);
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(caseWorkerApiUrl)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
+    }
+
 
     public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String... email) {
         List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest
@@ -93,9 +103,20 @@ public class CaseWorkerApiClient {
                 .caseWorkerRoleRequest()
                 .role("Tribunal Caseworker").isPrimaryFlag(true).build());
 
-        List<CaseWorkerWorkAreaRequest> areaRequests = ImmutableList.of(CaseWorkerWorkAreaRequest
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest = CaseWorkerWorkAreaRequest
                 .caseWorkerWorkAreaRequest()
-                .serviceCode("BAA1").areaOfWork("Non-Money Claims").build());
+                .serviceCode("BAA1").areaOfWork("Non-Money Claims").build();
+
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("AAA6").areaOfWork("Specified Money Claims").build();
+
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("ABA2").areaOfWork("Financial Remedy").build();
+
+        List<CaseWorkerWorkAreaRequest> areaRequests =
+                ImmutableList.of(workerWorkAreaRequest, workerWorkAreaRequest1, workerWorkAreaRequest2);
 
         Set<String> idamRoles = new HashSet<>();
 

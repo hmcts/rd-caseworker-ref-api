@@ -6,12 +6,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -36,12 +38,14 @@ import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
 public class CaseWorkerReferenceDataClient {
 
     private static final String APP_BASE_PATH = "/refdata/case-worker";
+    private static final String APP_INTERNAL_BASE_PATH = "/refdata/internal/staff";
     private static String JWT_TOKEN = null;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private RestTemplate restTemplate;
     private String baseUrl;
+    private String baseInternalUrl;
     @Value("${oidc.issuer}")
     private String issuer;
     @Value("${oidc.expiration}")
@@ -54,6 +58,7 @@ public class CaseWorkerReferenceDataClient {
 
     public CaseWorkerReferenceDataClient(int port) {
         this.baseUrl = "http://localhost:" + port + APP_BASE_PATH;
+        this.baseInternalUrl = "http://localhost:" + port + APP_INTERNAL_BASE_PATH;
     }
 
     public Map<String, Object> createCaseWorkerProfile(CaseWorkersProfileCreationRequest request, String role) {
@@ -80,6 +85,55 @@ public class CaseWorkerReferenceDataClient {
         HttpEntity<MultiValueMap<String, Object>> request =
                 new HttpEntity<>(body, httpHeaders);
         return sendRequest(uriPath, request);
+    }
+
+    public Map<String, Object> fetchStaffProfileByCcdServiceName(String ccdServiceNames, Integer pageSize,
+                                                                 Integer pageNumber, String sortDirection,
+                                                                 String sortColumn, String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("/usersByServiceName");
+        if (StringUtils.isNotBlank(ccdServiceNames)) {
+            stringBuilder.append("?ccd_service_names=");
+            stringBuilder.append(ccdServiceNames);
+        }
+        if (pageSize != null) {
+            stringBuilder.append("&page_size=");
+            stringBuilder.append(pageSize);
+        }
+        if (pageNumber != null) {
+            stringBuilder.append("&page_number=");
+            stringBuilder.append(pageNumber);
+        }
+        if (StringUtils.isNotBlank(sortDirection)) {
+            stringBuilder.append("&sort_direction=");
+            stringBuilder.append(sortDirection);
+        }
+        if (StringUtils.isNotBlank(sortColumn)) {
+            stringBuilder.append("&sort_column=");
+            stringBuilder.append(sortColumn);
+        }
+
+        ResponseEntity<Map> responseEntity;
+        HttpEntity<String> request =
+                new HttpEntity<>(getMultipleAuthHeadersWithoutContentType(role, null));
+
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseInternalUrl  + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    Map.class
+            );
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
     }
 
 
@@ -140,8 +194,21 @@ public class CaseWorkerReferenceDataClient {
 
     private HttpHeaders getMultipleAuthHeaders(String role, String userId) {
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getMultipleAuthHeadersWithoutContentType(role, userId);
         headers.setContentType(APPLICATION_JSON);
+
+        return headers;
+    }
+
+    private HttpHeaders getMultipleAuthHeaders(String role) {
+
+        return getMultipleAuthHeaders(role, null);
+    }
+
+
+    @NotNull
+    private HttpHeaders getMultipleAuthHeadersWithoutContentType(String role, String userId) {
+        HttpHeaders headers = new HttpHeaders();
         if (StringUtils.isBlank(JWT_TOKEN)) {
 
             JWT_TOKEN = generateS2SToken(serviceName);
@@ -154,13 +221,7 @@ public class CaseWorkerReferenceDataClient {
                     : userId, role));
         }
         headers.add("Authorization", bearerToken);
-
         return headers;
-    }
-
-    private HttpHeaders getMultipleAuthHeaders(String role) {
-
-        return getMultipleAuthHeaders(role, null);
     }
 
     private Map getResponse(ResponseEntity<Map> responseEntity) {

@@ -10,7 +10,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
@@ -20,8 +23,11 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
@@ -29,10 +35,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
@@ -45,10 +53,12 @@ import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,6 +70,7 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -88,6 +99,8 @@ public class CaseWorkerServiceImplTest {
     @Mock
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
+    private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
+    @Mock
     private IdamRoleMappingService idamRoleMappingService;
     @Mock
     private TopicPublisher topicPublisher;
@@ -95,7 +108,6 @@ public class CaseWorkerServiceImplTest {
     private CwrdCommonRepository cwrdCommonRepository;
     @Mock
     private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
-
     @Mock
     IValidationService validationServiceFacade;
 
@@ -933,6 +945,117 @@ public class CaseWorkerServiceImplTest {
                 .isEqualTo("User was not present in UP or CRD with userId: " + userId);
 
         verify(userProfile, times(1)).isPresent();
+    }
+
+    @Test
+    public void testRefreshRoleAllocationReturns200() throws JsonProcessingException {
+        LrdOrgInfoServiceResponse lrdOrgInfoServiceResponse = new LrdOrgInfoServiceResponse();
+        lrdOrgInfoServiceResponse.setServiceCode("BAA1");
+        lrdOrgInfoServiceResponse.setCcdServiceName("cmc");
+        String body = mapper.writeValueAsString(List.of(lrdOrgInfoServiceResponse));
+
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
+                .thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
+
+
+        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
+
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
+
+        PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.singletonList(caseWorkerProfile));
+        when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
+                .thenReturn(page);
+        ResponseEntity<Object> responseEntity = caseWorkerServiceImpl
+                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+
+        assertEquals(200, responseEntity.getStatusCodeValue());
+
+    }
+
+    @Test(expected = StaffReferenceException.class)
+    public void testRefreshRoleAllocationWhenLrdResponseIsNon200() {
+
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class)).body("body", defaultCharset()).status(400).build());
+
+        caseWorkerServiceImpl
+                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+
+    }
+
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void testRefreshRoleAllocationWhenCrdResponseIsEmpty() throws JsonProcessingException {
+
+        LrdOrgInfoServiceResponse lrdOrgInfoServiceResponse = new LrdOrgInfoServiceResponse();
+        lrdOrgInfoServiceResponse.setServiceCode("BAA1");
+        lrdOrgInfoServiceResponse.setCcdServiceName("cmc");
+        String body = mapper.writeValueAsString(List.of(lrdOrgInfoServiceResponse));
+
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
+
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
+
+        PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.emptyList());
+        when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
+                .thenReturn(page);
+        caseWorkerServiceImpl
+                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+    }
+
+    @Test(expected = StaffReferenceException.class)
+    public void testRefreshRoleAllocationWhenLrdResponseIsEmpty() throws JsonProcessingException {
+
+        String body = mapper.writeValueAsString(Collections.emptyList());
+
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
+
+
+        List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
+
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
+
+        caseWorkerServiceImpl
+                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+    }
+
+    @Test(expected = StaffReferenceException.class)
+    public void testRefreshRoleAllocationWhenLrdResponseReturns400() throws JsonProcessingException {
+        ErrorResponse errorResponse = ErrorResponse
+                .builder()
+                .errorCode(400)
+                .errorDescription("testErrorDesc")
+                .errorMessage("testErrorMsg")
+                .build()
+                ;
+        String body = mapper.writeValueAsString(errorResponse);
+
+        when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
+                .thenReturn(Response.builder()
+                        .request(mock(Request.class)).body(body, defaultCharset()).status(400).build());
+
+
+        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
+                "caseWorkerId", "ASC",
+                20, "id", CaseWorkerProfile.class);
+
+        caseWorkerServiceImpl
+                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
     }
 
 }

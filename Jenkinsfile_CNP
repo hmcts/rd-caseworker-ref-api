@@ -91,12 +91,14 @@ withPipeline(type, product, component) {
 
     onMaster() {
         enablePactAs([
-            AppPipelineDsl.PactRoles.PROVIDER
+            AppPipelineDsl.PactRoles.PROVIDER,
+            AppPipelineDsl.PactRoles.CONSUMER
         ])
     }
     onPR() {
         enablePactAs([
-                AppPipelineDsl.PactRoles.PROVIDER
+                AppPipelineDsl.PactRoles.PROVIDER,
+                AppPipelineDsl.PactRoles.CONSUMER
         ])
     }
 }

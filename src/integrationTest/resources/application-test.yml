@@ -104,6 +104,7 @@ environment_name: ${ENVIRONMENT_NAME:preview}
 
 ## user profile feign connection
 userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
+locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://127.0.0.1:8092}
 loggingComponentName: RD-Caseworker-Ref-Api
 feign:
   allow:
@@ -133,3 +134,7 @@ excel:
                           Area of Work5,Area of Work5 ID,Area of Work6,Area of Work6 ID,Area of Work7,Area of Work7 ID,Area of Work8,
                           Area of Work8 ID,IDAM Roles,Suspended}
   acceptableServiceRoleMappingHeaders: ${EXCEL_ACCEPTABLE_SERVICE_ROLE_MAPPING_HEADERS:Service ID,Role,IDAM Roles}
+
+refresh:
+  pageSize: 20
+  sortColumn: caseWorkerId
