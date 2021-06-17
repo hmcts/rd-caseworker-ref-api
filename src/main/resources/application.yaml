@@ -46,6 +46,8 @@ spring:
     cache-names: token
     caffeine:
       spec: maximumSize=50,expireAfterWrite=1m
+  config:
+    import: "optional:configtree:/mnt/secrets/rd/"
 
   ### database configuration
   datasource:
