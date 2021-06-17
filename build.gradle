@@ -449,7 +449,7 @@ dependencies {
   testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
-  testImplementation group: 'org.springframework', name: 'spring-test', version: '5.2.9.RELEASE'
+  testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 
