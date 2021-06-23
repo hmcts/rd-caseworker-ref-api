@@ -306,7 +306,7 @@ repositories {
 dependencies {
 
   implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
-  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
   implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
@@ -451,7 +451,7 @@ dependencies {
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
 
-  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
