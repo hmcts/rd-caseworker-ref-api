@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.util.Map;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
@@ -41,7 +41,8 @@ public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends Authoriza
                         "", "", "cwd-system-user");
         assertThat(response).containsEntry("http_status", "400");
         assertTrue(response.get("response_body").toString()
-                .contains("Required String parameter 'ccd_service_names' is not present"));
+                .contains("Required request parameter 'ccd_service_names'"
+                        + " for method parameter type String is not present"));
     }
 
     @Test

@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -84,8 +84,8 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;

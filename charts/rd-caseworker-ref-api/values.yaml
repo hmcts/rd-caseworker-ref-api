@@ -26,8 +26,13 @@ java:
   keyVaults:
     rd:
       secrets:
-        - caseworker-ref-api-POSTGRES-PASS
-        - ApplicationInsightsInstrumentationKey
-        - caseworker-topic-primary-send-listen-shared-access-key
-        - caseworker-ref-api-s2s-secret
-        - LD-SDK-KEY
+        - name: caseworker-ref-api-POSTGRES-PASS
+          alias: POSTGRES_PASSWORD
+        - name: ApplicationInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
+        - name: caseworker-topic-primary-send-listen-shared-access-key
+          alias: CWRD_MQ_PASSWORD
+        - name: caseworker-ref-api-s2s-secret
+          alias: S2S_SECRET
+        - name: LD-SDK-KEY
+          alias: RD_LD_SDK_KEY
