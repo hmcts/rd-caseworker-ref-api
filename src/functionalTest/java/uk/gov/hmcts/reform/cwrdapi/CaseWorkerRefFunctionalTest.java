@@ -18,6 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
@@ -33,13 +34,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -64,7 +68,10 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
     public static final String DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN =
             "CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern";
+    public static final String STAFF_BY_SERVICE_NAME_URL = "/refdata/internal/staff/usersByServiceName";
     public static List<String> caseWorkerIds = new ArrayList<>();
+    public static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
+            "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
@@ -166,24 +173,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    //this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
+    // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     public void shouldGetOnlyFewCaseWorkerDetails() {
         if (isEmpty(caseWorkerIds)) {
-            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                    caseWorkerApiClient.createCaseWorkerProfiles();
-
-            Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
-                    .body(caseWorkersProfileCreationRequests)
-                    .post("/refdata/case-worker/users")
-                    .andReturn();
-            response.then()
-                    .assertThat()
-                    .statusCode(201);
-
-            CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
-                    response.getBody().as(CaseWorkerProfileCreationResponse.class);
-            caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+            createCaseWorkerIds();
         }
         List<String> tempCwIds = new ArrayList<>(caseWorkerIds);
         tempCwIds.add("randomId");
@@ -390,6 +384,106 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 "/refdata/case-worker/users?emailPattern=ForbiddenException", FORBIDDEN);
     }
 
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
+    public void shouldFetchStaffProfileByCcdServiceNamesWithDefaultParams() {
+        if (isEmpty(caseWorkerIds)) {
+            createCaseWorkerIds();
+        }
+        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
+        String ccdServiceNames = String.join(",", expectedServiceNames);
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=" + ccdServiceNames)
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+        List<StaffProfileWithServiceName> paginatedStaffProfile =
+                Arrays.asList(fetchResponse.getBody().as(StaffProfileWithServiceName[].class));
+
+        assertFalse(paginatedStaffProfile.isEmpty());
+        Set<String> actualServiceNames = new HashSet<>();
+        paginatedStaffProfile
+                .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
+
+        assertTrue(actualServiceNames.containsAll(expectedServiceNames));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
+    public void shouldFetchStaffProfileByCcdServiceNamesWithPaginatedParams() {
+        if (isEmpty(caseWorkerIds)) {
+            createCaseWorkerIds();
+        }
+        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
+        String ccdServiceNames = String.join(",", expectedServiceNames);
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=" + ccdServiceNames
+                        + "&page_number=0&page_size=2&sort_column=caseWorkerId&sort_direction=ASC")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+        List<StaffProfileWithServiceName> paginatedStaffProfile =
+                Arrays.asList(fetchResponse.getBody().as(StaffProfileWithServiceName[].class));
+
+        assertFalse(paginatedStaffProfile.isEmpty());
+        Set<String> actualServiceNames = new HashSet<>();
+        paginatedStaffProfile
+                .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
+
+        assertTrue(actualServiceNames.containsAll(expectedServiceNames));
+        assertEquals(2, paginatedStaffProfile.size());
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
+    public void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=cmc")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(403);
+
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
+    public void shouldReturn404WhenNoCcdServiceNameFound() {
+        if (isEmpty(caseWorkerIds)) {
+            createCaseWorkerIds();
+        }
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=invalid")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(404);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = false)
+    public void shouldReturn403WhenFetchStaffProfileByCcdServiceNamesApiToggledOff() {
+
+        String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
+                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
+
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=cmc")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(403);
+
+        assertThat(fetchResponse.getBody().asString()).contains(exceptionMessage);
+    }
+
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
                                                                int statusCode,
                                                                String messageBody,
@@ -419,5 +513,22 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .header("Content-Type",
                         headerValue);
         return multiPartSpecBuilder.build();
+    }
+
+    private void createCaseWorkerIds() {
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
+                caseWorkerApiClient.createCaseWorkerProfiles();
+
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+                .body(caseWorkersProfileCreationRequests)
+                .post("/refdata/case-worker/users")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(201);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                response.getBody().as(CaseWorkerProfileCreationResponse.class);
+        caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
     }
 }

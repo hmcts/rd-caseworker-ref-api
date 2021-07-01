@@ -15,7 +15,7 @@ management:
 spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         order_updates: true
@@ -46,6 +46,8 @@ spring:
     cache-names: token
     caffeine:
       spec: maximumSize=50,expireAfterWrite=1m
+  config:
+    import: "optional:configtree:/mnt/secrets/rd/"
 
   ### database configuration
   datasource:
@@ -115,6 +117,7 @@ feign:
     headers:
       - authorization
 userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://rd-location-ref-api-aat.service.core-compute-aat.internal}
 
 crd:
   publisher:
@@ -142,3 +145,7 @@ launchdarkly:
     key: ${RD_LD_SDK_KEY:}
     environment: ${LAUNCH_DARKLY_ENV:local}
     user: rd
+
+refresh:
+  pageSize: ${REFRESH_PAGE_SIZE:20}
+  sortColumn: ${REFRESH_SORT_COLUMN:caseWorkerId}

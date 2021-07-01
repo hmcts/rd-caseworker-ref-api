@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.springframework.http.HttpStatus.OK;
 

@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,12 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -28,6 +35,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationReques
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
@@ -58,6 +66,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -75,8 +84,8 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static net.logstash.logback.encoder.org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -85,6 +94,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LRD_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FROM_UP;
@@ -93,6 +103,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntityWithListBody;
 
 @Service
 @Slf4j
@@ -134,6 +145,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     @Autowired
     private UserProfileFeignClient userProfileFeignClient;
+
+    @Autowired
+    private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
     @Autowired
     private TopicPublisher topicPublisher;
@@ -359,33 +373,107 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
     }
 
+    /**
+     * Returns the staff details for Refresh Assignments.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest) {
+        Response lrdOrgInfoServiceResponse =
+                locationReferenceDataFeignClient.getLocationRefServiceMapping(ccdServiceNames);
+        HttpStatus httpStatus = HttpStatus.valueOf(lrdOrgInfoServiceResponse.status());
+        if (httpStatus.is2xxSuccessful()) {
+            ResponseEntity<Object> responseEntity = toResponseEntityWithListBody(lrdOrgInfoServiceResponse,
+                    LrdOrgInfoServiceResponse.class);
+
+            List<LrdOrgInfoServiceResponse> listLrdServiceMapping =
+                    (List<LrdOrgInfoServiceResponse>) responseEntity.getBody();
+            if (CollectionUtils.isNotEmpty(listLrdServiceMapping)) {
+                Map<String, String> serviceNameToCodeMapping =
+                        listLrdServiceMapping
+                                .stream()
+                                .filter(r -> StringUtils.isNotBlank(r.getServiceCode())
+                                        && StringUtils.isNotBlank(r.getCcdServiceName()))
+                                .collect(Collectors.toMap(LrdOrgInfoServiceResponse::getServiceCode,
+                                        LrdOrgInfoServiceResponse::getCcdServiceName));
+
+                Page<CaseWorkerProfile> staffProfilePage = caseWorkerProfileRepo.findByServiceCodeIn(
+                        serviceNameToCodeMapping.keySet(), pageRequest);
+
+                if (staffProfilePage.isEmpty()) {
+                    log.error("{}:: No data found in CRD for the ccd service name {}",
+                            loggingComponentName, ccdServiceNames);
+                    throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+                }
+
+                List<StaffProfileWithServiceName> staffProfileList = new ArrayList<>();
+                Set<CaseWorkerWorkArea> caseWorkerWorkArea = new LinkedHashSet<>();
+
+                staffProfilePage.forEach(caseWorkerProfile -> caseWorkerProfile.getCaseWorkerWorkAreas()
+                        .stream()
+                        .filter(cw -> serviceNameToCodeMapping.containsKey(cw.getServiceCode()))
+                        .forEach(caseWorkerWorkArea::add));
+
+                caseWorkerWorkArea.forEach(workArea -> staffProfileList.add(
+                        StaffProfileWithServiceName.builder()
+                                .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
+                                .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
+                                .build()));
+                log.info("{}:: Successfully fetched the staff details to refresh role assignment "
+                        + "for ccd service names {}", loggingComponentName, ccdServiceNames);
+                return ResponseEntity
+                        .ok()
+                        .header("total_records", String.valueOf(staffProfilePage.getTotalElements()))
+                        .body(staffProfileList);
+            }
+        }
+        log.error("{}:: Error in getting the data from LRD for the ccd service name {} :: Status code {}",
+                loggingComponentName, ccdServiceNames, httpStatus);
+
+        ResponseEntity<Object> responseEntity = JsonFeignResponseUtil.toResponseEntity(lrdOrgInfoServiceResponse,
+                ErrorResponse.class);
+        Object responseBody = responseEntity.getBody();
+        if (nonNull(responseBody) && responseBody instanceof ErrorResponse) {
+            ErrorResponse errorResponse = (ErrorResponse) responseBody;
+            throw new StaffReferenceException(httpStatus, errorResponse.getErrorMessage(),
+                    errorResponse.getErrorDescription());
+        } else {
+            throw new StaffReferenceException(httpStatus, LRD_ERROR, LRD_ERROR);
+        }
+
+    }
+
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
             List<CaseWorkerProfile> caseWorkerProfileList) {
         long startTime = System.currentTimeMillis();
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfilesDto =
                 new ArrayList<>();
         for (CaseWorkerProfile profile : caseWorkerProfileList) {
-
-            caseWorkerProfilesDto.add(uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
-                    .id(profile.getCaseWorkerId())
-                    .firstName(profile.getFirstName())
-                    .lastName(profile.getLastName())
-                    .officialEmail(profile.getEmailId())
-                    .regionId(profile.getRegionId())
-                    .regionName(profile.getRegion())
-                    .userType(profile.getUserType().getDescription())
-                    .userId(profile.getUserTypeId())
-                    .suspended(profile.getSuspended().toString())
-                    .createdTime(profile.getCreatedDate())
-                    .lastUpdatedTime(profile.getLastUpdate())
-                    .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
-                    .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
-                    .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
-                    .build());
+            caseWorkerProfilesDto.add(buildCaseWorkerProfileDto(profile));
         }
         log.info("{}::Time taken By DTO for FetchCaseworkersById {}", loggingComponentName,
                 (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return caseWorkerProfilesDto;
+    }
+
+    private uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileDto(
+            CaseWorkerProfile profile) {
+        return uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
+                .id(profile.getCaseWorkerId())
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
+                .officialEmail(profile.getEmailId())
+                .regionId(profile.getRegionId())
+                .regionName(profile.getRegion())
+                .userType(profile.getUserType().getDescription())
+                .userId(profile.getUserTypeId())
+                .suspended(profile.getSuspended().toString())
+                .createdTime(profile.getCreatedDate())
+                .lastUpdatedTime(profile.getLastUpdate())
+                .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
+                .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
+                .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
+                .build();
     }
 
     private List<WorkArea> mapWorkAreasToDto(List<CaseWorkerWorkArea> caseWorkerWorkAreas) {

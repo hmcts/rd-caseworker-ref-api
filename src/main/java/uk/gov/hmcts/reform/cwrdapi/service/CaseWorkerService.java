@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface CaseWorkerService {
 
     List<CaseWorkerProfile> processCaseWorkerProfiles(List<CaseWorkersProfileCreationRequest>
-                                                          caseWorkersProfileCreationRequest);
+                                                              caseWorkersProfileCreationRequest);
 
     /**
      * Builds the idam role mappings for case worker roles.
@@ -54,5 +55,14 @@ public interface CaseWorkerService {
      * @return CaseWorkerProfilesDeletionResponse
      */
     CaseWorkerProfilesDeletionResponse deleteByEmailPattern(String emailPattern);
+
+    /**
+     * Returns the staff details for Refresh Assignments.
+     *
+     * @param ccdServiceNames ccdServiceNames
+     * @param pageRequest pageRequest
+     * @return StaffProfile
+     */
+    ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest);
 }
 

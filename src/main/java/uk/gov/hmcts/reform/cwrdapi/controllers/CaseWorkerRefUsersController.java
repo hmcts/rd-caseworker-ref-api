@@ -54,12 +54,18 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 )
 @RestController
 @Slf4j
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class CaseWorkerRefUsersController {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
+
+    @Value("${refresh.pageSize}")
+    private int configPageSize;
+
+    @Value("${refresh.sortColumn}")
+    private String configSortColumn;
 
     @Value("${environment_name}")
     private String environmentName;
@@ -258,5 +264,4 @@ public class CaseWorkerRefUsersController {
 
         return ResponseEntity.status(resource.getStatusCode()).body(resource);
     }
-
 }
