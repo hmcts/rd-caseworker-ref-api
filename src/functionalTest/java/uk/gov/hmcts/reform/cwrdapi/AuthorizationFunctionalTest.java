@@ -157,7 +157,8 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
 
     public UserProfileResponse getUserProfileFromUp(String email) {
         return funcTestRequestHandler.sendGet(OK,
-                "/v1/userprofile/roles?email=" + email, UserProfileResponse.class, baseUrlUserProfile);
+                "/v1/userprofile/roles", UserProfileResponse.class, baseUrlUserProfile,
+                Map.of("UserEmail", email));
     }
 
 }
