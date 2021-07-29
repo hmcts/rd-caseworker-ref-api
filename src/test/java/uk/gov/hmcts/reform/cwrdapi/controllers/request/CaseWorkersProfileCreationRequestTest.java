@@ -19,7 +19,8 @@ public class CaseWorkersProfileCreationRequestTest {
         CaseWorkersProfileCreationRequest request1 = new CaseWorkersProfileCreationRequest(
                 "firstName","lastName", "some@email.com",
                 1, UserTypeRequest.INTERNAL.name(), "region", false,
-                idamRoles, null, null, null, 1L);
+                idamRoles, null, null, null, 1L, false,
+                false);
 
         verify(request1);
     }

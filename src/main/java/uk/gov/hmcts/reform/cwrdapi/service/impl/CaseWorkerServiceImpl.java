@@ -641,6 +641,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         caseWorkerProfile.setUserTypeId(getUserTypeIdByDesc(cwrdProfileRequest.getUserType()));
         caseWorkerProfile.setRegionId(cwrdProfileRequest.getRegionId());
         caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());
+        caseWorkerProfile.setCaseAllocator(cwrdProfileRequest.isCaseAllocator());
+        caseWorkerProfile.setTaskSupervisor(cwrdProfileRequest.isTaskSupervisor());
+        caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());
         return caseWorkerProfile;
     }
 

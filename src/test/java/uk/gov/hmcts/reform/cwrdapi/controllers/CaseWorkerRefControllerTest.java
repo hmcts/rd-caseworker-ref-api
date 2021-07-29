@@ -86,7 +86,8 @@ public class CaseWorkerRefControllerTest {
 
         cwRequest = new CaseWorkersProfileCreationRequest("firstName",
                 "lastName","test@gmail.com",1,"userType","region",
-                false,roles,caseWorkerRoleRequests,caseWorkeLocationRequests,caseWorkeAreaRequests, 0);
+                false,roles,caseWorkerRoleRequests,caseWorkeLocationRequests,caseWorkeAreaRequests, 0,
+                false, false);
         caseWorkersProfileCreationRequest.add(cwRequest);
         cwProfileCreationResponse = CaseWorkerProfileCreationResponse
                 .builder()

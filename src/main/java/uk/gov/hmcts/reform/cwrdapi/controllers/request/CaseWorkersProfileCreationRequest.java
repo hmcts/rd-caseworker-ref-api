@@ -34,20 +34,24 @@ public class CaseWorkersProfileCreationRequest {
 
     private List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests;
     private long rowId;
+    private boolean caseAllocator;
+    private boolean taskSupervisor;
 
     @JsonCreator
     public CaseWorkersProfileCreationRequest(@JsonProperty("first_name") String firstName,
-            @JsonProperty("last_name") String lastName,
-            @JsonProperty("email_id") String emailId,
-            @JsonProperty("region_id") Integer regionId,
-            @JsonProperty("user_type") String userType,
-            @JsonProperty("region") String region,
-            @JsonProperty("suspended") boolean suspended,
-            @JsonProperty("idam_roles") Set<String> idamRoles,
-            @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
-            @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
-            @JsonProperty("work_area") List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests,
-            @JsonProperty("rowId") long rowId) {
+                                             @JsonProperty("last_name") String lastName,
+                                             @JsonProperty("email_id") String emailId,
+                                             @JsonProperty("region_id") Integer regionId,
+                                             @JsonProperty("user_type") String userType,
+                                             @JsonProperty("region") String region,
+                                             @JsonProperty("suspended") boolean suspended,
+                                             @JsonProperty("idam_roles") Set<String> idamRoles,
+                                             @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
+                                             @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
+                                             @JsonProperty("work_area") List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests,
+                                             @JsonProperty("rowId") long rowId,
+                                             @JsonProperty("case_allocator") boolean caseAllocator,
+                                             @JsonProperty("task_supervisor") boolean taskSupervisor) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -61,7 +65,7 @@ public class CaseWorkersProfileCreationRequest {
         this.workerWorkAreaRequests = workerWorkAreaRequests;
         this.region = region;
         this.rowId = rowId;
+        this.caseAllocator = caseAllocator;
+        this.taskSupervisor = taskSupervisor;
     }
-
-
 }

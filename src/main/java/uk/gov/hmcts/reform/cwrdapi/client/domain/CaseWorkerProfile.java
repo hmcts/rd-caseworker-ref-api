@@ -93,6 +93,12 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @MappingField(columnName = "Suspended")
     private String suspended;
 
+    @MappingField(columnName = "Case Allocator")
+    private String caseAllocator;
+
+    @MappingField(columnName = "Task Supervisor")
+    private String taskSupervisor;
+
     private LocalDateTime createdTime;
     private LocalDateTime lastUpdatedTime;
 }
