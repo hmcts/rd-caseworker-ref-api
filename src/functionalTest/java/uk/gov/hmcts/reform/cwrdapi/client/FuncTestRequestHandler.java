@@ -47,11 +47,11 @@ public class FuncTestRequestHandler {
                 .baseUri(baseUrl)
                 .header("ServiceAuthorization", getS2sToken())
                 .header("Authorization", BEARER + crdAdminToken);
-        if(!additionalHeaders.isEmpty()) {
+        if (!additionalHeaders.isEmpty()) {
             additionalHeaders
                     .forEach(requestSpecification::header);
         }
-        Response response = requestSpecification .when()
+        Response response = requestSpecification.when()
                 .get(urlPath);
         log.info("UP get user response status code: {}", response.getStatusCode());
         return response.then()
