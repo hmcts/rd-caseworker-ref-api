@@ -47,8 +47,10 @@ public class CaseWorkersProfileCreationRequest {
                                              @JsonProperty("suspended") boolean suspended,
                                              @JsonProperty("idam_roles") Set<String> idamRoles,
                                              @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
-                                             @JsonProperty("base_location") List<CaseWorkerLocationRequest> baseLocations,
-                                             @JsonProperty("work_area") List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests,
+                                             @JsonProperty("base_location")
+                                                         List<CaseWorkerLocationRequest> baseLocations,
+                                             @JsonProperty("work_area")
+                                                         List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests,
                                              @JsonProperty("rowId") long rowId,
                                              @JsonProperty("case_allocator") boolean caseAllocator,
                                              @JsonProperty("task_supervisor") boolean taskSupervisor) {
