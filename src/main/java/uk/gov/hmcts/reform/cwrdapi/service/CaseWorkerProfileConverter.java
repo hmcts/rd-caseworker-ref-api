@@ -39,6 +39,7 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
      */
     public List<CaseWorkersProfileCreationRequest> convert(List<CaseWorkerDomain> caseWorkerProfiles) {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
+
         suspendedRowIds = new ArrayList<>();
         caseWorkerProfiles
             .stream()
