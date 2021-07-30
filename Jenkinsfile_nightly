@@ -13,7 +13,7 @@ properties([
 
 def type = "java"
 def product = "rd"
-def component = "caseworker-ref-api.jar"
+def component = "caseworker-ref-api"
 
 def secrets = [
   's2s-${env}': [
@@ -21,7 +21,6 @@ def secrets = [
   ],
   'rd-${env}': [
     secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
-    secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
     secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID'),
     secret('LD-SDK-KEY', 'RD_LD_SDK_KEY')
   ]
