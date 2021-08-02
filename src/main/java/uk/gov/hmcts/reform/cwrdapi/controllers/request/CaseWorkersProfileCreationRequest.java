@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.request;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
@@ -16,58 +15,37 @@ import java.util.Set;
 @Builder(builderMethodName = "caseWorkersProfileCreationRequest")
 public class CaseWorkersProfileCreationRequest {
 
+    @JsonProperty("first_name")
     @JsonDeserialize(using = TrimStringFields.class)
     private String firstName;
+    @JsonProperty("last_name")
     @JsonDeserialize(using = TrimStringFields.class)
     private String lastName;
+    @JsonProperty("email_id")
     @JsonDeserialize(using = TrimStringFields.class)
     private String emailId;
+    @JsonProperty("region_id")
     private Integer regionId;
+    @JsonProperty("user_type")
     @JsonDeserialize(using = TrimStringFields.class)
     private String userType;
+    @JsonProperty("region")
     @JsonDeserialize(using = TrimStringFields.class)
     private String region;
+    @JsonProperty("suspended")
     private boolean suspended;
+    @JsonProperty("idam_roles")
     private Set<String> idamRoles;
+    @JsonProperty("roles")
     private List<CaseWorkerRoleRequest> roles;
+    @JsonProperty("base_location")
     private List<CaseWorkerLocationRequest> baseLocations;
-
+    @JsonProperty("work_area")
     private List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests;
+    @JsonProperty("rowId")
     private long rowId;
+    @JsonProperty("case_allocator")
     private boolean caseAllocator;
+    @JsonProperty("task_supervisor")
     private boolean taskSupervisor;
-
-    @JsonCreator
-    public CaseWorkersProfileCreationRequest(@JsonProperty("first_name") String firstName,
-                                             @JsonProperty("last_name") String lastName,
-                                             @JsonProperty("email_id") String emailId,
-                                             @JsonProperty("region_id") Integer regionId,
-                                             @JsonProperty("user_type") String userType,
-                                             @JsonProperty("region") String region,
-                                             @JsonProperty("suspended") boolean suspended,
-                                             @JsonProperty("idam_roles") Set<String> idamRoles,
-                                             @JsonProperty("roles") List<CaseWorkerRoleRequest> roles,
-                                             @JsonProperty("base_location")
-                                                         List<CaseWorkerLocationRequest> baseLocations,
-                                             @JsonProperty("work_area")
-                                                         List<CaseWorkerWorkAreaRequest> workerWorkAreaRequests,
-                                             @JsonProperty("rowId") long rowId,
-                                             @JsonProperty("case_allocator") boolean caseAllocator,
-                                             @JsonProperty("task_supervisor") boolean taskSupervisor) {
-
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailId = emailId;
-        this.regionId = regionId;
-        this.userType = userType;
-        this.suspended = suspended;
-        this.idamRoles = idamRoles;
-        this.roles = roles;
-        this.baseLocations = baseLocations;
-        this.workerWorkAreaRequests = workerWorkAreaRequests;
-        this.region = region;
-        this.rowId = rowId;
-        this.caseAllocator = caseAllocator;
-        this.taskSupervisor = taskSupervisor;
-    }
 }

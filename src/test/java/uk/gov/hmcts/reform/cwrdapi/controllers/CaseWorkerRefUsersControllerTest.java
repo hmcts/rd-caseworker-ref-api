@@ -76,10 +76,23 @@ public class CaseWorkerRefUsersControllerTest {
                 "serviceCode");
         caseWorkeAreaRequests.add(cwAreaRequest);
 
-        cwRequest = new CaseWorkersProfileCreationRequest("firstName",
-                "lastName", "test@gmail.com", 1, "userType",
-                "region", false, roles, caseWorkerRoleRequests,
-                caseWorkeLocationRequests, caseWorkeAreaRequests, 0, false, false);
+        cwRequest = CaseWorkersProfileCreationRequest
+                .caseWorkersProfileCreationRequest()
+                .firstName("firstName")
+                .lastName("lastName")
+                .emailId("test@gmail.com")
+                .regionId(1)
+                .userType("userType")
+                .region("region")
+                .suspended(false)
+                .idamRoles(roles)
+                .roles(caseWorkerRoleRequests)
+                .workerWorkAreaRequests(caseWorkeAreaRequests)
+                .baseLocations(caseWorkeLocationRequests)
+                .rowId(0)
+                .caseAllocator(false)
+                .taskSupervisor(false)
+                .build();
 
         caseWorkersProfileCreationRequest.add(cwRequest);
 
