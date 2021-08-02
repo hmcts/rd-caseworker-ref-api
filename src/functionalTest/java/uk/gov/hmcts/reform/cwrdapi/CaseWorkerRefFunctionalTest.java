@@ -435,7 +435,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
 
         assertTrue(actualServiceNames.containsAll(expectedServiceNames));
-        assertEquals(2, paginatedStaffProfile.size());
     }
 
     @Test
