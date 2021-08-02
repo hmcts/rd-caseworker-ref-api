@@ -56,7 +56,6 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
                         .suspended(isSuspended(obj))
                         .caseAllocator(BooleanUtils.toBoolean(obj.getCaseAllocator()))
                         .taskSupervisor(BooleanUtils.toBoolean(obj.getTaskSupervisor()))
-                        .suspended(isSuspended(obj))
                         .userType(obj.getUserType())
                         .idamRoles(Objects.isNull(obj.getIdamRoles()) ? null :
                             generateIdamRoles(obj.getIdamRoles()))
