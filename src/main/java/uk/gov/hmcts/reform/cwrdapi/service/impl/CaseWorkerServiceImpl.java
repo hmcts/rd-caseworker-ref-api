@@ -643,7 +643,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());
         caseWorkerProfile.setCaseAllocator(cwrdProfileRequest.isCaseAllocator());
         caseWorkerProfile.setTaskSupervisor(cwrdProfileRequest.isTaskSupervisor());
-        caseWorkerProfile.setRegion(cwrdProfileRequest.getRegion());
         return caseWorkerProfile;
     }
 
