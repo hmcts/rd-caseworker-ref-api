@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -53,6 +54,8 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
                         .region(obj.getRegionName())
                         .regionId(obj.getRegionId())
                         .suspended(isSuspended(obj))
+                        .caseAllocator(BooleanUtils.toBoolean(obj.getCaseAllocator()))
+                        .taskSupervisor(BooleanUtils.toBoolean(obj.getTaskSupervisor()))
                         .userType(obj.getUserType())
                         .idamRoles(Objects.isNull(obj.getIdamRoles()) ? null :
                             generateIdamRoles(obj.getIdamRoles()))
