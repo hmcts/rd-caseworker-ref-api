@@ -168,6 +168,8 @@ public class StaffReferenceDataProviderTest {
                 "National",
                 1,
                 false,
+                false,
+                false,
                 timeNow,
                 timeNow,
                 caseWorkerLocations,
