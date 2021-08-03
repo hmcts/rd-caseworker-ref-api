@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
