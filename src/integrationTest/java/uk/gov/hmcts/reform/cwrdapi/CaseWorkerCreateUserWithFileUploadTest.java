@@ -77,19 +77,43 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
-        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findAll().get(0);
+        var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         TimeZone systemZone = TimeZone.getDefault();
-        int totalZoneSecondsFromUtc = caseWorkerProfile.getCreatedDate().atZone(of(systemZone.getID())).getOffset()
-            .getTotalSeconds();
+        int totalZoneSecondsFromUtc =
+                caseWorkerProfile.get(0).getCreatedDate().atZone(of(systemZone.getID())).getOffset().getTotalSeconds();
         //to check UTC time is persisted in db
-        assertThat(caseWorkerProfile.getCreatedDate())
+        assertThat(caseWorkerProfile.get(0).getCreatedDate())
             .isCloseToUtcNow(within(totalZoneSecondsFromUtc + 10, SECONDS));
+
+        long caseAllocatorCount = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getCaseAllocator)
+                .count();
+        assertEquals(0, caseAllocatorCount);
+
+        long taskSupervisor = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getTaskSupervisor)
+                .count();
+
+        assertEquals(0, taskSupervisor);
+
     }
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xls.xls",
             TYPE_XLSX, "200 OK", cwdAdmin);
+
+        var caseWorkerProfile = caseWorkerProfileRepository.findAll();
+        long caseAllocatorCount = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getCaseAllocator)
+                .count();
+        assertEquals(0, caseAllocatorCount);
+
+        long taskSupervisor = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getTaskSupervisor)
+                .count();
+
+        assertEquals(0, taskSupervisor);
     }
 
     @Test
@@ -475,6 +499,44 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isZero();
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+    }
+
+    @Test
+    public void shouldUploadCaseWorkerUsersXlsxFileWithNonIdamRolesSuccessfully() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload with non idam roles.xlsx",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        var caseWorkerProfile = caseWorkerProfileRepository.findAll();
+        long caseAllocatorCount = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getCaseAllocator)
+                .count();
+        assertEquals(2L, caseAllocatorCount);
+
+        long taskSupervisor = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getTaskSupervisor)
+                .count();
+
+        assertEquals(2L, taskSupervisor);
+
+    }
+
+    @Test
+    public void shouldUploadCaseWorkerUsersXlsFileWithNonIdamRolesSuccessfully() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload with non idam roles.xls",
+                TYPE_XLSX, "200 OK", cwdAdmin);
+
+        var caseWorkerProfile = caseWorkerProfileRepository.findAll();
+
+        long caseAllocatorCount = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getCaseAllocator)
+                .count();
+        assertEquals(1L, caseAllocatorCount);
+
+        long taskSupervisor = caseWorkerProfile.stream()
+                .filter(CaseWorkerProfile::getTaskSupervisor)
+                .count();
+
+        assertEquals(1L, taskSupervisor);
     }
 
 }
