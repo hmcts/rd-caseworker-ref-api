@@ -67,6 +67,12 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     @Column(name = "suspended")
     private Boolean suspended;
 
+    @Column(name = "case_allocator")
+    private Boolean caseAllocator;
+
+    @Column(name = "task_supervisor")
+    private Boolean taskSupervisor;
+
     @CreationTimestamp
     @Column(name = "created_date")
     private LocalDateTime createdDate;

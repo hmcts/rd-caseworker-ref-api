@@ -435,7 +435,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
 
         assertTrue(actualServiceNames.containsAll(expectedServiceNames));
-        assertEquals(2, paginatedStaffProfile.size());
     }
 
     @Test
@@ -482,6 +481,35 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .statusCode(403);
 
         assertThat(fetchResponse.getBody().asString()).contains(exceptionMessage);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    public void shouldUploadXlsxFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload with non idam roles.xlsx",
+                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLSX, ROLE_CWD_ADMIN);
+
+        CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerFileCreationResponse.class);
+        assertTrue(caseWorkerFileCreationResponse.getMessage().contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage().contains(format(RECORDS_UPLOADED, 4)));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    public void shouldUploadXlsFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload with non idam roles.xls",
+                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
+                        ROLE_CWD_ADMIN);
+
+        CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerFileCreationResponse.class);
+        assertTrue(caseWorkerFileCreationResponse.getMessage()
+                .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
+                .contains(format(RECORDS_UPLOADED, 3)));
     }
 
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
