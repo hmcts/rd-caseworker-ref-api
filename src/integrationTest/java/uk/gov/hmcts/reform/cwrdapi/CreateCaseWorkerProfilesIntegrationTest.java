@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -64,11 +66,20 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
             .build());
 
         caseWorkersProfileCreationRequests = ImmutableList.of(CaseWorkersProfileCreationRequest
-            .caseWorkersProfileCreationRequest()
-            .firstName(" firstName ").lastName(" lastName ").emailId("test.inttest@hmcts.gov.uk")
+                .caseWorkersProfileCreationRequest()
+                .firstName(" firstName ")
+                .lastName(" lastName ")
+                .emailId("test.inttest@hmcts.gov.uk")
                 .regionId(1).userType("CTSC")
-            .region("region").suspended(false).roles(caseWorkerRoleRequests).idamRoles(roles)
-            .baseLocations(caseWorkerLocationRequests).workerWorkAreaRequests(caseWorkerAreaRequests).build());
+                .region("region")
+                .suspended(false)
+                .taskSupervisor(true)
+                .caseAllocator(false)
+                .roles(caseWorkerRoleRequests)
+                .idamRoles(roles)
+                .baseLocations(caseWorkerLocationRequests)
+                .workerWorkAreaRequests(caseWorkerAreaRequests)
+                .build());
         caseWorkerProfileRepository.deleteAll();
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
@@ -99,6 +110,8 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         assertThat(profile.getLastName()).isEqualTo("lastName");
         assertThat(profile.getEmailId()).isEqualTo("test.inttest@hmcts.gov.uk");
         assertThat(profile.getRegion()).isEqualTo("region");
+        assertFalse(profile.getCaseAllocator());
+        assertTrue(profile.getTaskSupervisor());
 
         List<CaseWorkerLocation> caseWorkerLocations = caseWorkerLocationRepository.findAll();
         CaseWorkerLocation caseWorkerLocation = caseWorkerLocations.get(0);
