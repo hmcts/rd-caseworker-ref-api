@@ -87,8 +87,7 @@ public class CaseWorkerRefController {
             consumes = "multipart/form-data")
     @Secured("cwd-admin")
     public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam(FILE)  MultipartFile file) {
-        ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(file);
-        return responseEntity;
+        return caseWorkerServiceFacade.processFile(file);
     }
 
     @ApiOperation(

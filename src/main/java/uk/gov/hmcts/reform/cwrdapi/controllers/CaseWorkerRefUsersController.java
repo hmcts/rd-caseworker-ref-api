@@ -190,10 +190,8 @@ public class CaseWorkerRefUsersController {
         if (CollectionUtils.isEmpty(userRequest.getUserIds())) {
             throw new InvalidRequestException("Caseworker request is empty");
         }
-        ResponseEntity<Object> responseEntity =
-                caseWorkerService.fetchCaseworkersById(userRequest.getUserIds());
 
-        return responseEntity;
+        return caseWorkerService.fetchCaseworkersById(userRequest.getUserIds());
 
     }
 
