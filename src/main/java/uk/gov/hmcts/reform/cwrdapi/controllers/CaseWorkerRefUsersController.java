@@ -122,16 +122,14 @@ public class CaseWorkerRefUsersController {
                 CaseWorkerProfileCreationResponse
                         .builder();
         trimIdamRoles(caseWorkersProfileCreationRequest);
-        long time1 = System.currentTimeMillis();
+
         List<CaseWorkerProfile> processedCwProfiles =
                 caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-        log.info("{}:: Time taken to process the given file is {}", loggingComponentName,
-                (System.currentTimeMillis() - time1));
+
         if (isNotEmpty(processedCwProfiles)) {
-            long time2 = System.currentTimeMillis();
+
             caseWorkerService.publishCaseWorkerDataToTopic(processedCwProfiles);
-            log.info("{}:: Time taken to publish the message is {}", loggingComponentName,
-                    (System.currentTimeMillis() - time2));
+
             List<String> caseWorkerIds = processedCwProfiles.stream()
                     .map(CaseWorkerProfile::getCaseWorkerId)
                     .collect(Collectors.toUnmodifiableList());
@@ -188,15 +186,13 @@ public class CaseWorkerRefUsersController {
     @Secured({"cwd-system-user"})
     public ResponseEntity<Object> fetchCaseworkersById(@RequestBody UserRequest userRequest) {
         log.info("Fetching the details of {} users", userRequest.getUserIds().size());
-        long startTime = System.currentTimeMillis();
+
         if (CollectionUtils.isEmpty(userRequest.getUserIds())) {
             throw new InvalidRequestException("Caseworker request is empty");
         }
         ResponseEntity<Object> responseEntity =
                 caseWorkerService.fetchCaseworkersById(userRequest.getUserIds());
-        log.info("{}::Time taken to fetch {} users is {}",loggingComponentName,
-                userRequest.getUserIds().size(),
-                (Math.subtractExact(System.currentTimeMillis(), startTime)));
+
         return responseEntity;
 
     }
