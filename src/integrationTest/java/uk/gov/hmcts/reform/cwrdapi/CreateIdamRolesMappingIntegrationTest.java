@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
@@ -14,6 +17,15 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledIntegrationTest {
+    @Autowired
+    CaseWorkerIdamRoleAssociationRepository cwIdamRoleAssocRepository;
+
+    @Before
+    public void setUpClient() {
+
+        super.setUpClient();
+        cwIdamRoleAssocRepository.deleteAll();
+    }
 
     @Test
     public void returns_200_when_idam_roles_mapping_created_successfully() {
