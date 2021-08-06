@@ -87,11 +87,7 @@ public class CaseWorkerRefController {
             consumes = "multipart/form-data")
     @Secured("cwd-admin")
     public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam(FILE)  MultipartFile file) {
-        long time1 = System.currentTimeMillis();
-        ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(file);
-        log.info("{}::Total Time taken to upload the given file is {}", loggingComponentName,
-                (System.currentTimeMillis() - time1));
-        return responseEntity;
+        return caseWorkerServiceFacade.processFile(file);
     }
 
     @ApiOperation(
