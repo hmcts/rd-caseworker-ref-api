@@ -24,7 +24,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
     public void setUpClient() {
 
         super.setUpClient();
-       // cwIdamRoleAssocRepository.deleteAll();
     }
 
     @Test
