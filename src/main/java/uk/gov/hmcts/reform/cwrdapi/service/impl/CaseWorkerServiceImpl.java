@@ -77,7 +77,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -261,12 +260,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
 
         if (isNotEmpty(profilesToBePersisted)) {
-            long time1 = currentTimeMillis();
             processedCwProfiles = caseWorkerProfileRepo.saveAll(profilesToBePersisted);
             log.info("{}:: {} case worker profiles inserted :: Job Id {}", loggingComponentName,
                     processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
-            log.info("{}::Time taken to save caseworker data in CRD is {}", loggingComponentName,
-                    (currentTimeMillis() - time1));
         }
         return processedCwProfiles;
     }
@@ -364,13 +360,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
      */
     @Override
     public ResponseEntity<Object> fetchCaseworkersById(List<String> caseWorkerIds) {
-        long startTime = System.currentTimeMillis();
         List<CaseWorkerProfile> caseWorkerProfileList = caseWorkerProfileRepo.findByCaseWorkerIdIn(caseWorkerIds);
         if (isEmpty(caseWorkerProfileList)) {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
         }
-        log.info("{}::Time taken for fetching the records from DB for FetchCaseworkersById {}",
-                loggingComponentName, (Math.subtractExact(System.currentTimeMillis(), startTime)));
         return ResponseEntity.ok().body(mapCaseWorkerProfileToDto(caseWorkerProfileList));
     }
 
@@ -446,14 +439,12 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
             List<CaseWorkerProfile> caseWorkerProfileList) {
-        long startTime = System.currentTimeMillis();
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfilesDto =
                 new ArrayList<>();
         for (CaseWorkerProfile profile : caseWorkerProfileList) {
             caseWorkerProfilesDto.add(buildCaseWorkerProfileDto(profile));
         }
-        log.info("{}::Time taken By DTO for FetchCaseworkersById {}", loggingComponentName,
-                (Math.subtractExact(System.currentTimeMillis(), startTime)));
+
         return caseWorkerProfilesDto;
     }
 
@@ -684,9 +675,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Response response = null;
         Object clazz;
         try {
-            long time1 = currentTimeMillis();
             response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
-            log.info("{}:: Time taken to call UP is {}", loggingComponentName, (System.currentTimeMillis() - time1));
 
             clazz = (response.status() == 201 || response.status() == 409)
                     ? UserProfileCreationResponse.class : ErrorResponse.class;

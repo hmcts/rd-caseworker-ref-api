@@ -292,8 +292,6 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
                 return null;
         }
     }
-    //This method has been added for functional test purpose.
-    //It should be removed before deploying to production
 
     private Object getValueFromFormula(Cell cell) {
         switch (evaluator.evaluateFormulaCell(cell)) {
