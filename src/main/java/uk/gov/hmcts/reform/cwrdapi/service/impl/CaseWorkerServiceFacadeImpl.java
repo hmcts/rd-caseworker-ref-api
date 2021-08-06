@@ -86,11 +86,8 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
         try {
             long jobId = validationServiceFacadeImpl.getAuditJobId();
-            long time1 = System.currentTimeMillis();
             Workbook workbook = excelValidatorService.validateExcelFile(file);
             String fileName = file.getOriginalFilename();
-            log.info("{}::Time taken to validate the given file {} is {}",
-                loggingComponentName, fileName, (System.currentTimeMillis() - time1));
 
             boolean isCaseWorker = nonNull(fileName)
                 && fileName.toLowerCase().startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME);
@@ -98,17 +95,10 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             Class<? extends CaseWorkerDomain> ob = isCaseWorker
                 ? CaseWorkerProfile.class : ServiceRoleMapping.class;
 
-            long time2 = System.currentTimeMillis();
             List<CaseWorkerDomain> caseWorkerRequest = (List<CaseWorkerDomain>) excelAdaptorService
                 .parseExcel(workbook, ob);
 
-            log.info("{}::Time taken to parse the given file {} is {}",
-                loggingComponentName, fileName, (System.currentTimeMillis() - time2));
-
-            long time3 = System.currentTimeMillis();
             List<CaseWorkerDomain> invalidRecords = validationServiceFacadeImpl.getInvalidRecords(caseWorkerRequest);
-            log.info("{}::Time taken to validate the records is {}", loggingComponentName,
-                (System.currentTimeMillis() - time3));
 
             int totalRecords = isNotEmpty(caseWorkerRequest) ? caseWorkerRequest.size() : 0;
 
