@@ -102,15 +102,12 @@ withPipeline(type, product, component) {
                 def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
                 def subscription = env.SUBSCRIPTION_NAME
                 def aksServiceName = dockerImage.getAksServiceName().toLowerCase()
-                def serviceBusSecret = "servicebus-secret-topic-${aksServiceName}-servicebus-jrd-aks-topic"
-                def blobSecret = "storage-secret-${aksServiceName}"
+                def serviceBusSecret = "servicebus-secret-topic-${aksServiceName}-servicebus-crd-aks-topic"
 
                 def namespace = new TeamConfig(this).getNameSpace(product)
                 def kubectl = new Kubectl(this, subscription, namespace)
                 kubectl.login()
                 env.serviceBusSecretString = kubectl.getSecret(serviceBusSecret, namespace, "{.data.connectionString}")
-                env.BLOB_ACCOUNT_NAME = kubectl.getSecret(blobSecret, namespace, "{.data.storageAccountName}")
-                env.BLOB_ACCOUNT_KEY = kubectl.getSecret(blobSecret, namespace, "{.data.accessKey}")
             }
         }
     }
