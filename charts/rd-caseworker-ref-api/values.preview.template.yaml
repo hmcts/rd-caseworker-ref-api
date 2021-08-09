@@ -20,16 +20,6 @@ java:
     postgresqlPassword: dbrdcaseworker
     postgresqlDatabase: dbrdcaseworker
     postgresqlPort: 5432
-  servicebus:
-    resourceGroup: rd-aks-pr-test
-    teamName: "RD"
-    location: ukwest
-    serviceplan: standard
-    setup:
-      topics:
-        - name: crd-aks-topic
-          subscriptionNeeded: yes
-    enabled: true
   keyVaults:
     rd:
       secrets:
@@ -45,3 +35,14 @@ java:
     SB_TOPIC_CONN_STRING:
       secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-crd-aks-topic
       key: connectionString
+
+servicebus:
+  resourceGroup: rd-aks-pr-test
+  teamName: "RD"
+  location: ukwest
+  serviceplan: standard
+  setup:
+    topics:
+      - name: crd-aks-topic
+        subscriptionNeeded: yes
+  enabled: true
