@@ -5,7 +5,6 @@ import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -465,8 +464,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
                 .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
                 .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
-                .taskSupervisor(BooleanUtils.toString(profile.getTaskSupervisor(), "Y", "N"))
-                .caseAllocator(BooleanUtils.toString(profile.getCaseAllocator(), "Y", "N"))
+                .taskSupervisor(Boolean.TRUE.equals(profile.getTaskSupervisor()) ? "Y" : "N")
+                .caseAllocator(Boolean.TRUE.equals(profile.getCaseAllocator()) ? "Y" : "N")
                 .build();
     }
 
