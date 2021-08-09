@@ -210,21 +210,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                 .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
 
-    //removed UUID mock here and put in Test config,hence use this only for insert integration testing
-    //for update use insert response UUID in test or other mock methods
-    @Before
-    public void userProfilePostUserWireMock() {
-        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
-            .inScenario("")
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withStatus(201)
-                .withBody("{"
-                    + "  \"idamRegistrationResponse\":\"201\""
-                    + "}")));
-    }
-
     @After
     public void cleanupTestData() {
     }
