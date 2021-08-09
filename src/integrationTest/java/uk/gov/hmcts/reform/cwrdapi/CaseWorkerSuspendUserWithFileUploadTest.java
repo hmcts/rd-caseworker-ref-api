@@ -43,20 +43,6 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldCreateCaseWorkerUpdateAuditFailureWithWrongStatus() throws Exception {
-        validateAuditCaseWorkerCreate();
-        modifyUserStatus(400);
-        response = uploadCaseWorkerFile("Staff Data Upload Suspended.xlsx",
-            CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
-        String json = getJsonResponse(response);
-        assertThat(objectMapper.readValue(json, CaseWorkerFileCreationResponse.class))
-            .isEqualTo(objectMapper.readValue(format(expectedSuspendFailureResponse, 1, 2),
-                CaseWorkerFileCreationResponse.class));
-        List<CaseWorkerAudit> caseWorkerAuditsUpdate = caseWorkerAuditRepository.findAll();
-        assertThat(caseWorkerAuditsUpdate.size()).isEqualTo(2);
-    }
-
-    @Test
     public void shouldCreateCaseWorkerUpdateAuditExceptionFailure() throws Exception {
         validateAuditCaseWorkerCreate();
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
