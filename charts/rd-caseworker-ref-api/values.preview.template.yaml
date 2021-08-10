@@ -16,9 +16,7 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     POSTGRES_PORT: "{{ .Values.postgresql.postgresqlPort}}"
-    CWRD_MQ_HOST: "$(CWRD_MQ_HOST)"
-    CWRD_MQ_PASSWORD: "$(CWRD_MQ_PASSWORD)"
-    CWRD_MQ_USERNAME: SendAndListenSharedAccessKey
+    CWRD_MQ_USERNAME: RootManageSharedAccessKey
     CWRD_MQ_TOPIC_NAME: crd-aks-topic
     CWRD_MQ_TRUST_ALL_CERTS: false
     CWRD_DATA_PER_MESSAGE: 50
