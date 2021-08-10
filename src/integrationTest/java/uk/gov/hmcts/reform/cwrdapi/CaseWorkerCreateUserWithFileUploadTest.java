@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.gson.Gson;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,6 +72,11 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
         + "\"message_details\":\"4 record(s) uploaded\"}";
 
+    @Before
+    public void setUp() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+    }
+
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
@@ -99,6 +105,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
         uploadCaseWorkerFile("Staff Data Upload Xls.xls",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
