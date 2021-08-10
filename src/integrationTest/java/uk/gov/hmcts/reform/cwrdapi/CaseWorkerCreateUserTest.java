@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -41,7 +41,7 @@ public class CaseWorkerCreateUserTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
                 CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
@@ -56,7 +56,7 @@ public class CaseWorkerCreateUserTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailure() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
                 TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
