@@ -3,9 +3,6 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
-import uk.gov.hmcts.contino.DockerImage
-import uk.gov.hmcts.contino.Kubectl
-import uk.gov.hmcts.pipeline.TeamConfig
 
 def type = "java"
 def product = "rd"
@@ -90,26 +87,6 @@ withPipeline(type, product, component) {
 
     after('pact-consumer-tests') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
-    }
-
-    after('akschartsinstall') {
-
-        def sleepTime = (env.BRANCH_NAME.startsWith("PR")) ? '210s' : '120s'
-        sh "sleep ${sleepTime}"
-        if (env.BRANCH_NAME.startsWith("PR")) {
-            withAksClient('nonprod', product) {
-
-                def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
-                def subscription = env.SUBSCRIPTION_NAME
-                def aksServiceName = dockerImage.getAksServiceName().toLowerCase()
-                def serviceBusSecret = "servicebus-secret-topic-${aksServiceName}-servicebus-crd-aks-topic"
-
-                def namespace = new TeamConfig(this).getNameSpace(product)
-                def kubectl = new Kubectl(this, subscription, namespace)
-                kubectl.login()
-                env.serviceBusSecretString = kubectl.getSecret(serviceBusSecret, namespace, "{.data.connectionString}")
-            }
-        }
     }
 
     onMaster() {

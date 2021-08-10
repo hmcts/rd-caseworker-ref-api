@@ -1,15 +1,25 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+
+  secrets:
+    CWRD_MQ_PASSWORD:
+      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
+      key: primaryKey
+    CWRD_MQ_HOST:
+      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
+      key: namespaceName
+
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
     POSTGRES_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
     POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     POSTGRES_PORT: "{{ .Values.postgresql.postgresqlPort}}"
-    CWRD_MQ_HOST: rd-servicebus-aat.servicebus.windows.net
+    CWRD_MQ_HOST: "$(CWRD_MQ_HOST)"
+    CWRD_MQ_PASSWORD: "$(CWRD_MQ_PASSWORD)"
     CWRD_MQ_USERNAME: SendAndListenSharedAccessKey
-    CWRD_MQ_TOPIC_NAME: rd-caseworker-topic-aat
+    CWRD_MQ_TOPIC_NAME: crd-aks-topic
     CWRD_MQ_TRUST_ALL_CERTS: false
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
@@ -31,18 +41,13 @@ java:
           alias: S2S_SECRET
         - name: LD-SDK-KEY
           alias: RD_LD_SDK_KEY
-  secrets:
-    SB_TOPIC_CONN_STRING:
-      secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-crd-aks-topic
-      key: connectionString
 
 servicebus:
-  resourceGroup: rd-aks-pr-test
-  teamName: "RD"
-  location: ukwest
+  enabled: true
+  teamName: RD
+  resourceGroup: rd-aks
   serviceplan: standard
   setup:
     topics:
       - name: crd-aks-topic
         subscriptionNeeded: yes
-  enabled: true
