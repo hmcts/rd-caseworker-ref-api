@@ -421,7 +421,7 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: versions.restAssured
 
     testImplementation group: 'com.h2database', name: 'h2'
-    testImplementation "com.github.tomakehurst:wiremock:2.21.0"
+    testImplementation "com.github.tomakehurst:wiremock:2.30.0"
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
