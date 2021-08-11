@@ -41,6 +41,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
@@ -117,7 +118,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Before
     public void setupIdamStubs() throws Exception {
 
-        s2sService.stubFor(get(urlPathMatching("/details"))
+        s2sService.stubFor(get(urlEqualTo("/details"))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")

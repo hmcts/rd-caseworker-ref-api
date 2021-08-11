@@ -25,7 +25,7 @@ import java.util.TimeZone;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static java.lang.String.format;
 import static java.time.ZoneId.of;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -309,7 +309,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             .errorDescription(errorMessageFromIdam).build();
 
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
             .willReturn(aResponse().withStatus(404)
                 .withBody(new Gson().toJson(errorResponse).getBytes())));
 
