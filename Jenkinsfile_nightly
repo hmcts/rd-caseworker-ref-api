@@ -13,7 +13,7 @@ properties([
 
 def type = "java"
 def product = "rd"
-def component = "caseworker-ref-api"
+def component = "caseworker-ref-api.jar"
 
 def secrets = [
   's2s-${env}': [
