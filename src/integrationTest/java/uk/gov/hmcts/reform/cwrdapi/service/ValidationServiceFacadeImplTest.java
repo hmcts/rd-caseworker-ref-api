@@ -5,6 +5,7 @@ import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -34,6 +35,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -55,6 +57,9 @@ public class ValidationServiceFacadeImplTest {
 
     @MockBean
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
+
+    @Mock
+    private CaseWorkerAudit caseWorkerAudit;
 
 
     @Test
@@ -96,8 +101,9 @@ public class ValidationServiceFacadeImplTest {
 
     @Test
     public void testStartAuditJob() {
-        assertTrue(validationServiceFacadeImpl.startCaseworkerAuditing(AuditStatus.IN_PROGRESS, "test")
-            > 0);
+        when(caseWorkerAudit.getJobId()).thenReturn(1L);
+        long auditJobId = validationServiceFacadeImpl.startCaseworkerAuditing(AuditStatus.IN_PROGRESS, "test");
+        assertTrue(auditJobId > 0);
     }
 }
 

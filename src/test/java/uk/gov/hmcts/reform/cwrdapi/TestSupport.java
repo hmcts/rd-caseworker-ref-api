@@ -32,7 +32,9 @@ public class TestSupport {
 
         ImmutableList<Role> roles = ImmutableList.of(
                 Role.builder().isPrimary(true)
-                        .roleName("rl1").build());
+                        .roleName("rl1").build(),
+                Role.builder().isPrimary(true)
+                        .build());
 
         return CaseWorkerProfile.builder()
                 .firstName("test").lastName("test")
@@ -44,6 +46,7 @@ public class TestSupport {
                 .locations(locations)
                 .roles(roles)
                 .idamRoles("role1, role2")
+                .suspended("Y")
                 .build();
     }
 
