@@ -400,10 +400,6 @@ dependencies {
   }
   //Fix for CVE-2021-29425
   implementation 'commons-io:commons-io:2.8.0'
-
-  //Fix for CVE-2021-28170
-  implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
-
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
