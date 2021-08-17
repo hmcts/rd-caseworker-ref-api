@@ -132,6 +132,8 @@ public class CaseWorkerApiClient {
                         .region("National")
                         .userType("CTSC")
                         .suspended(false)
+                        .caseAllocator(true)
+                        .taskSupervisor(false)
                         .idamRoles(idamRoles)
                         .baseLocations(locationRequestList)
                         .roles(roleRequests)
