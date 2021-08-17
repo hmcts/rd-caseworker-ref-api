@@ -148,6 +148,8 @@ public class CaseWorkerServiceImplTest {
         cwProfileCreationRequest = CaseWorkersProfileCreationRequest
                 .caseWorkersProfileCreationRequest()
                 .suspended(false)
+                .caseAllocator(false)
+                .taskSupervisor(true)
                 .emailId("test@test.com")
                 .idamRoles(idamRoles)
                 .firstName("testFN")
@@ -383,6 +385,8 @@ public class CaseWorkerServiceImplTest {
         caseWorkerProfile.setUserTypeId(112L);
         caseWorkerProfile.setUserType(userType);
         caseWorkerProfile.setSuspended(true);
+        caseWorkerProfile.setTaskSupervisor(true);
+        caseWorkerProfile.setCaseAllocator(false);
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
