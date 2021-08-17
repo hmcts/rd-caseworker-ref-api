@@ -464,6 +464,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
                 .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
                 .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
+                .taskSupervisor(Boolean.TRUE.equals(profile.getTaskSupervisor()) ? "Y" : "N")
+                .caseAllocator(Boolean.TRUE.equals(profile.getCaseAllocator()) ? "Y" : "N")
                 .build();
     }
 
