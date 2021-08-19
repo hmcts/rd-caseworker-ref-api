@@ -46,7 +46,7 @@ public class TestSupport {
                 .locations(locations)
                 .roles(roles)
                 .idamRoles("role1, role2")
-                .suspended("Y")
+                .suspended("N")
                 .build();
     }
 
@@ -76,7 +76,6 @@ public class TestSupport {
                 .workAreas(workAreas)
                 .locations(locations)
                 .roles(roles)
-                .idamRoles("role1, role2")
                 .build());
     }
 }
