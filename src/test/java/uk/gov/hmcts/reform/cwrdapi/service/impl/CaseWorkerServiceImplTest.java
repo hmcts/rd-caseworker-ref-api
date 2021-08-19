@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
@@ -64,13 +63,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -78,9 +77,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 
@@ -771,184 +767,8 @@ public class CaseWorkerServiceImplTest {
         assertThat(caseWorkerProfile.getUserTypeId()).isZero();
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(cwProfileCreationRequest.getRegionId());
         assertThat(caseWorkerProfile.getRegion()).isEqualTo(cwProfileCreationRequest.getRegion());
-    }
-
-    @Test
-    public void testDeleteUserProfileByUserId() {
-        Response responseMock = mock(Response.class);
-
-        CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
-        deletionResponse.setMessage("Case Worker Profiles successfully deleted");
-        deletionResponse.setStatusCode(NO_CONTENT.value());
-
-        when(userProfileFeignClient.deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null))
-                .thenReturn(responseMock);
-        when(responseMock.status()).thenReturn(NO_CONTENT.value());
-        when(caseWorkerProfileRepository.findByCaseWorkerId(any(String.class)))
-                .thenReturn(Optional.ofNullable(caseWorkerProfile));
-
-        CaseWorkerProfilesDeletionResponse deletionResp =
-                caseWorkerServiceImpl.deleteByUserId(caseWorkerProfile.getCaseWorkerId());
-
-        assertThat(deletionResp.getStatusCode()).isEqualTo(deletionResponse.getStatusCode());
-        assertThat(deletionResp.getMessage()).isEqualTo(deletionResponse.getMessage());
-
-        verify(caseWorkerProfileRepository, times(1)).findByCaseWorkerId(any(String.class));
-        verify(caseWorkerProfileRepository, times(1)).deleteAll(any());
-        verify(responseMock, times(2)).status();
-        verify(userProfileFeignClient, times(1))
-                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
-    }
-
-    @Test
-    public void testDeleteUserProfileByUserId_WhenUpReturns404() {
-        Response responseMock = mock(Response.class);
-
-        CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
-        deletionResponse.setMessage("Case Worker Profiles successfully deleted");
-        deletionResponse.setStatusCode(NO_CONTENT.value());
-
-        when(userProfileFeignClient.deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null))
-                .thenReturn(responseMock);
-        when(responseMock.status()).thenReturn(NOT_FOUND.value());
-        when(caseWorkerProfileRepository.findByCaseWorkerId(any(String.class)))
-                .thenReturn(Optional.ofNullable(caseWorkerProfile));
-
-        CaseWorkerProfilesDeletionResponse deletionResp =
-                caseWorkerServiceImpl.deleteByUserId(caseWorkerProfile.getCaseWorkerId());
-
-        assertThat(deletionResp.getStatusCode()).isEqualTo(deletionResponse.getStatusCode());
-        assertThat(deletionResp.getMessage()).isEqualTo(deletionResponse.getMessage());
-
-        verify(caseWorkerProfileRepository, times(1)).findByCaseWorkerId(any(String.class));
-        verify(caseWorkerProfileRepository, times(1)).deleteAll(any());
-        verify(responseMock, times(3)).status();
-        verify(userProfileFeignClient, times(1))
-                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
-    }
-
-    @Test
-    public void testDeleteUserProfileByUserId_WhenUpReturnsError() {
-        CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
-        deletionResponse.setMessage("UP Delete request failed for userId: " + caseWorkerProfile.getCaseWorkerId()
-                + ". With the following UP message: INTERNAL SERVER ERROR");
-        deletionResponse.setStatusCode(BAD_REQUEST.value());
-
-        Response responseMock = mock(Response.class);
-
-        when(userProfileFeignClient.deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null))
-                .thenReturn(responseMock);
-        when(responseMock.status()).thenReturn(BAD_REQUEST.value());
-
-        CaseWorkerProfilesDeletionResponse deletionResp =
-                caseWorkerServiceImpl.deleteByUserId(caseWorkerProfile.getCaseWorkerId());
-
-        assertThat(deletionResp.getStatusCode()).isEqualTo(deletionResponse.getStatusCode());
-        assertThat(deletionResp.getMessage()).contains("UP Delete request failed for userId");
-
-        verify(responseMock, times(3)).status();
-        verify(userProfileFeignClient, times(1))
-                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
-        verify(userProfileFeignClient, times(1))
-                .deleteUserProfile(caseWorkerProfile.getCaseWorkerId(), null);
-    }
-
-    @Test
-    public void testDeleteUserProfileByEmailPattern() {
-        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        caseWorkerProfiles.add(caseWorkerProfile);
-
-        Response responseMock = mock(Response.class);
-
-        CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
-        deletionResponse.setMessage("Case Worker Profiles successfully deleted");
-        deletionResponse.setStatusCode(NO_CONTENT.value());
-
-        when(userProfileFeignClient.deleteUserProfile(null, COMMON_EMAIL_PATTERN))
-                .thenReturn(responseMock);
-        when(responseMock.status()).thenReturn(NO_CONTENT.value());
-        when(caseWorkerProfileRepository
-                .findByEmailIdIgnoreCaseContaining(COMMON_EMAIL_PATTERN)).thenReturn(caseWorkerProfiles);
-
-        CaseWorkerProfilesDeletionResponse deletionResp =
-                caseWorkerServiceImpl.deleteByEmailPattern(COMMON_EMAIL_PATTERN);
-
-        assertThat(deletionResp.getStatusCode()).isEqualTo(deletionResponse.getStatusCode());
-        assertThat(deletionResp.getMessage()).isEqualTo(deletionResponse.getMessage());
-
-        verify(userProfileFeignClient, times(1))
-                .deleteUserProfile(null, COMMON_EMAIL_PATTERN);
-        verify(responseMock, times(1)).status();
-        verify(caseWorkerProfileRepository, times(1))
-                .findByEmailIdIgnoreCaseContaining(any(String.class));
-        verify(caseWorkerProfileRepository, times(1)).deleteAll(any());
-    }
-
-    @Test
-    public void testDeleteUserProfileByEmailPattern_WhenUpReturns404() {
-        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        caseWorkerProfiles.add(caseWorkerProfile);
-
-        Response responseMock = mock(Response.class);
-
-        CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
-        deletionResponse.setMessage("Case Worker Profiles successfully deleted");
-        deletionResponse.setStatusCode(NO_CONTENT.value());
-
-        when(userProfileFeignClient.deleteUserProfile(null, COMMON_EMAIL_PATTERN))
-                .thenReturn(responseMock);
-        when(responseMock.status()).thenReturn(NOT_FOUND.value());
-        when(caseWorkerProfileRepository
-                .findByEmailIdIgnoreCaseContaining(COMMON_EMAIL_PATTERN)).thenReturn(caseWorkerProfiles);
-
-        CaseWorkerProfilesDeletionResponse deletionResp =
-                caseWorkerServiceImpl.deleteByEmailPattern(COMMON_EMAIL_PATTERN);
-
-        assertThat(deletionResp.getStatusCode()).isEqualTo(deletionResponse.getStatusCode());
-        assertThat(deletionResp.getMessage()).isEqualTo(deletionResponse.getMessage());
-
-        verify(userProfileFeignClient, times(1))
-                .deleteUserProfile(null, COMMON_EMAIL_PATTERN);
-        verify(responseMock, times(2)).status();
-        verify(caseWorkerProfileRepository, times(1))
-                .findByEmailIdIgnoreCaseContaining(any(String.class));
-        verify(caseWorkerProfileRepository, times(1)).deleteAll(any());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testValidateUserAfterUpDeleteWhenStatusIs204() {
-        Optional<CaseWorkerProfile> userProfile = mock(Optional.class);
-        String userId = UUID.randomUUID().toString();
-
-        when(userProfile.isPresent()).thenReturn(false);
-
-        CaseWorkerProfilesDeletionResponse deletionResponse =
-                caseWorkerServiceImpl.validateUserAfterUpDelete(userProfile, userId, 204);
-
-        assertThat(deletionResponse.getStatusCode()).isEqualTo(204);
-        assertThat(deletionResponse.getMessage())
-                .isEqualTo("User deleted in UP but was not present in CRD with userId: " + userId);
-
-        verify(userProfile, times(1)).isPresent();
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testValidateUserAfterUpDeleteWhenStatusIsNot204() {
-        Optional<CaseWorkerProfile> userProfile = mock(Optional.class);
-        String userId = UUID.randomUUID().toString();
-
-        when(userProfile.isPresent()).thenReturn(false);
-
-        CaseWorkerProfilesDeletionResponse deletionResponse =
-                caseWorkerServiceImpl.validateUserAfterUpDelete(userProfile, userId, 404);
-
-        assertThat(deletionResponse.getStatusCode()).isEqualTo(404);
-        assertThat(deletionResponse.getMessage())
-                .isEqualTo("User was not present in UP or CRD with userId: " + userId);
-
-        verify(userProfile, times(1)).isPresent();
+        assertThat(caseWorkerProfile.getCaseAllocator()).isEqualTo(cwProfileCreationRequest.isCaseAllocator());
+        assertThat(caseWorkerProfile.getTaskSupervisor()).isEqualTo(cwProfileCreationRequest.isTaskSupervisor());
     }
 
     @Test
@@ -1060,6 +880,29 @@ public class CaseWorkerServiceImplTest {
 
         caseWorkerServiceImpl
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+    }
+
+    @Test
+    public void testUpdateUserProfile() {
+        List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
+        caseWorkerRoles.add(new CaseWorkerRole());
+        List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
+        caseWorkerWorkAreas.add(new CaseWorkerWorkArea());
+        List<CaseWorkerLocation> caseWorkerLocations = new ArrayList<>();
+        caseWorkerLocations.add(new CaseWorkerLocation());
+
+        caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
+        caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
+        caseWorkerProfile.setCaseWorkerLocations(caseWorkerLocations);
+
+        CaseWorkerProfile actualUpdatedUser = caseWorkerServiceImpl
+                .updateUserProfile(cwProfileCreationRequest, caseWorkerProfile);
+
+        assertEquals(cwProfileCreationRequest
+                .getWorkerWorkAreaRequests().size(), actualUpdatedUser.getCaseWorkerWorkAreas().size());
+        assertEquals(cwProfileCreationRequest.getBaseLocations().size(),
+                actualUpdatedUser.getCaseWorkerLocations().size());
+        assertNotEquals(cwProfileCreationRequest.getRoles().size(), actualUpdatedUser.getCaseWorkerRoles().size());
     }
 
 }
