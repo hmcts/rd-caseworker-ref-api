@@ -14,11 +14,11 @@
     <packageUrl regex="true">^pkg:maven/org\.glassfish/jakarta\.el@.*$</packageUrl>
     <cve>CVE-2021-28170</cve>
   </suppress>
-  <suppress until="2021-09-25">
-    <notes>A vulnerability in all versions of Nim-lang allows unauthenticated attackers to write files to
-      arbitrary directories via a crafted zip file with dot-slash characters included in the name of the
-      crafted file
-    </notes>
+  <suppress until="2021-11-16">
+    <notes><![CDATA[
+   file name: lang-tag-1.4.4.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
     <cve>CVE-2020-23171</cve>
   </suppress>
 </suppressions>
