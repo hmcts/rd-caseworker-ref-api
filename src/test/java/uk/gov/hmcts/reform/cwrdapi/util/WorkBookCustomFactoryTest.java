@@ -27,16 +27,16 @@ public class WorkBookCustomFactoryTest {
 
     @Test
     public void sendXlsxParseMultipartFileTest() throws IOException {
-        Workbook workbook = WorkBookCustomFactory.
-                validateAndGetWorkBook(getMultipartFile("src/test/resources/Staff Data Upload.xlsx",
+        Workbook workbook = WorkBookCustomFactory
+                .validateAndGetWorkBook(getMultipartFile("src/test/resources/Staff Data Upload.xlsx",
                         TYPE_XLSX));
         assertThat(workbook).isNotNull();
     }
 
     @Test
     public void sendXlsParseMultipartFileTest() throws IOException {
-        Workbook workbook = WorkBookCustomFactory.
-                validateAndGetWorkBook(getMultipartFile("src/test/resources/Test-file.xls",
+        Workbook workbook = WorkBookCustomFactory
+                .validateAndGetWorkBook(getMultipartFile("src/test/resources/Test-file.xls",
                         TYPE_XLS));
         assertThat(workbook).isNotNull();
     }
@@ -50,7 +50,7 @@ public class WorkBookCustomFactoryTest {
                 .hasMessage(INVALID_EXCEL_FILE_ERROR_MESSAGE);
     }
 
-    public MultipartFile getMultipartFile (String filePath, String fileType) throws IOException{
+    public MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
         return new MockMultipartFile("file",
