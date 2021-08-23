@@ -262,7 +262,8 @@ pitest {
   excludedClasses = [
     'uk.gov.hmcts.reform.cwrdapi.config.*',
     'uk.gov.hmcts.reform.cwrdapi.controllers.*',
-    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
+    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
+    'uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl'
   ]
   threads = 10
   enableDefaultIncrementalAnalysis = true
@@ -270,7 +271,7 @@ pitest {
   historyOutputLocation = 'build/reports/pitest/fastermutationtestingoutput'
   outputFormats = ['XML', 'HTML']
   timestampedReports = true
-  mutationThreshold = 80
+  mutationThreshold = 90
 }
 
 
