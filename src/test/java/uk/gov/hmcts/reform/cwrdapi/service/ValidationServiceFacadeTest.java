@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
@@ -28,6 +30,7 @@ import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ValidationServiceFacadeTest {
 
     ValidationServiceFacadeImpl validationServiceFacadeImpl = spy(new ValidationServiceFacadeImpl());
@@ -99,7 +102,7 @@ public class ValidationServiceFacadeTest {
 
     @Test
     public void testUpdateAudit() {
-        setField(validationServiceFacadeImpl, "caseWorkerAudit", CaseWorkerAudit.builder().build());
+        setField(validationServiceFacadeImpl, "caseWorkerAudit", CaseWorkerAudit.builder().jobId(1L).build());
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
         long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
         verify(validationServiceFacadeImpl, times(1))
@@ -116,5 +119,15 @@ public class ValidationServiceFacadeTest {
         validationServiceFacadeImpl.createException(1L, "testFailure", 0L);
         verify(validationServiceFacadeImpl)
             .createException(1L, "testFailure", 0L);
+    }
+
+    @Test
+    public void testStartAuditing() {
+        setField(validationServiceFacadeImpl, "caseWorkerAudit", CaseWorkerAudit.builder().build());
+        when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
+        long jobId = validationServiceFacadeImpl.startCaseworkerAuditing(AuditStatus.PARTIAL_SUCCESS, "CWR-Start");
+        verify(validationServiceFacadeImpl, times(1))
+                .startCaseworkerAuditing(AuditStatus.PARTIAL_SUCCESS, "CWR-Start");
+        assertEquals(1, jobId);
     }
 }
