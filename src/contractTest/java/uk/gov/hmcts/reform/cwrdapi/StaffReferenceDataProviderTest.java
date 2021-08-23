@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 
 import java.time.LocalDateTime;
@@ -64,6 +65,9 @@ public class StaffReferenceDataProviderTest {
 
     @Autowired
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
+
+    @Autowired
+    private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
 
     @Autowired
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
@@ -97,7 +101,7 @@ public class StaffReferenceDataProviderTest {
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
-                        "preview", caseWorkerServiceImpl),
+                        "preview", caseWorkerServiceImpl, caseWorkerDeleteServiceImpl),
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl)

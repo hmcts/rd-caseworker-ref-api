@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CaseWorkerProfileTest {
 
@@ -33,6 +34,9 @@ public class CaseWorkerProfileTest {
         caseWorkerProfile.setSuspended(true);
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setTaskSupervisor(false);
+        caseWorkerProfile.setNew(true);
 
         UserType userType = new UserType();
         userType.setUserTypeId(1L);
@@ -43,6 +47,7 @@ public class CaseWorkerProfileTest {
 
         assertNotNull(caseWorkerProfile);
         assertThat(caseWorkerProfile.getCaseWorkerId(), is("CWID1"));
+        assertThat(caseWorkerProfile.getId(), is("CWID1"));
         assertThat(caseWorkerProfile.getFirstName(), is("CWFirstName"));
         assertThat(caseWorkerProfile.getLastName(), is("CWLastName"));
         assertThat(caseWorkerProfile.getEmailId(), is("CWtest@test.com"));
@@ -52,6 +57,9 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getSuspended(), is(true));
         assertNotNull(caseWorkerProfile.getCreatedDate());
         assertNotNull(caseWorkerProfile.getLastUpdate());
+        assertFalse(caseWorkerProfile.getCaseAllocator());
+        assertFalse(caseWorkerProfile.getTaskSupervisor());
+        assertTrue(caseWorkerProfile.isNew());
 
         assertNotNull(caseWorkerProfile.getUserType());
         assertThat(caseWorkerProfile.getUserType().getUserTypeId(), is(1L));
@@ -156,5 +164,16 @@ public class CaseWorkerProfileTest {
                 .validate(caseWorkerProfile);
 
         Assertions.assertThat(violations.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testCaseWorkerProfileContainingIsNew() {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseAllocator(true);
+        caseWorkerProfile.setTaskSupervisor(true);
+
+        assertTrue(caseWorkerProfile.getCaseAllocator());
+        assertTrue(caseWorkerProfile.getTaskSupervisor());
+        assertFalse(caseWorkerProfile.isNew());
     }
 }
