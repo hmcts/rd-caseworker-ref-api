@@ -73,7 +73,7 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
         return caseWorkersProfileCreationRequests;
     }
 
-    private boolean isSuspended(CaseWorkerProfile obj) {
+    public boolean isSuspended(CaseWorkerProfile obj) {
         return "Y".equals(obj.getSuspended());
     }
 
