@@ -75,6 +75,17 @@ public class CaseWorkerServiceFacadeImplTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    @Test
+    public void shouldProcessCaseWorkerFileWithoutInvalidRecords() throws IOException {
+        MultipartFile multipartFile = createCaseWorkerFileWithoutInvalidRecords("Staff Data Upload.xlsx");
+
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(new ArrayList<>());
+
+        ResponseEntity<Object> responseEntity =
+                caseWorkerServiceFacade.processFile(multipartFile);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
 
     @Test
     public void shouldProcessCaseWorkerFileWithPartialSuccess() throws IOException {
@@ -172,6 +183,16 @@ public class CaseWorkerServiceFacadeImplTest {
             getMultipartFile("src/test/resources/" + fileName, TYPE_XLS);
         when(excelValidatorService.validateExcelFile(multipartFile))
             .thenReturn(workbook);
+        return multipartFile;
+    }
+
+    @NotNull
+    private MultipartFile createCaseWorkerFileWithoutInvalidRecords(String fileName) throws IOException {
+        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
+        MultipartFile multipartFile =
+                getMultipartFile("src/test/resources/" + fileName, TYPE_XLS);
+        when(excelValidatorService.validateExcelFile(multipartFile))
+                .thenReturn(workbook);
         return multipartFile;
     }
 
