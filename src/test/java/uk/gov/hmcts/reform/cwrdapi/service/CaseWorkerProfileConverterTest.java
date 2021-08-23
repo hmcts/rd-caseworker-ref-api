@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.service;
 import org.junit.Test;
 import uk.gov.hmcts.reform.cwrdapi.TestSupport;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 
 import java.util.ArrayList;
@@ -10,7 +11,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -56,7 +59,7 @@ public class CaseWorkerProfileConverterTest {
         assertNotNull(convert);
         CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest = convert.get(0);
         assertNotNull(caseWorkersProfileCreationRequest.getBaseLocations());
-        assertNotNull(caseWorkersProfileCreationRequest.getIdamRoles());
+        assertNull(caseWorkersProfileCreationRequest.getIdamRoles());
         assertEquals("test@justice.gov.uk", caseWorkersProfileCreationRequest.getEmailId());
         assertEquals("test", caseWorkersProfileCreationRequest.getFirstName());
         assertEquals("test", caseWorkersProfileCreationRequest.getLastName());
@@ -96,6 +99,36 @@ public class CaseWorkerProfileConverterTest {
         assertThat(suspendedRowIds).isNotEmpty();
         assertThat(suspendedRowIds.size()).isNotZero();
         assertThat(suspendedRowIds.get(0)).isEqualTo(1L);
+    }
+
+    @Test
+    public void testIsNotSuspended() {
+        CaseWorkerProfile caseWorkerProfile = CaseWorkerProfile.builder()
+                .firstName("test").lastName("test")
+                .officialEmail("email@gov.justice.uk")
+                .regionId(1)
+                .regionName("test")
+                .userType("testUser")
+                .idamRoles("role1, role2")
+                .suspended("N")
+                .build();
+
+        assertFalse(caseWorkerProfileConverter.isSuspended(caseWorkerProfile));
+    }
+
+    @Test
+    public void testIsSuspended() {
+        CaseWorkerProfile caseWorkerProfile = CaseWorkerProfile.builder()
+                .firstName("test").lastName("test")
+                .officialEmail("email@gov.justice.uk")
+                .regionId(1)
+                .regionName("test")
+                .userType("testUser")
+                .idamRoles("role1, role2")
+                .suspended("Y")
+                .build();
+
+        assertTrue(caseWorkerProfileConverter.isSuspended(caseWorkerProfile));
     }
 
 }
