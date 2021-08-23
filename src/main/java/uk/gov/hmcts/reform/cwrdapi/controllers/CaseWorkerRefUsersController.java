@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerDeleteService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.List;
@@ -72,6 +73,9 @@ public class CaseWorkerRefUsersController {
 
     @Autowired
     CaseWorkerService caseWorkerService;
+
+    @Autowired
+    CaseWorkerDeleteService caseWorkerDeleteService;
 
     @ApiOperation(
             hidden = true,
@@ -247,10 +251,10 @@ public class CaseWorkerRefUsersController {
         CaseWorkerProfilesDeletionResponse resource;
 
         if (isNotBlank(userId)) {
-            resource = caseWorkerService.deleteByUserId(userId);
+            resource = caseWorkerDeleteService.deleteByUserId(userId);
 
         } else if (isNotBlank(emailPattern)) {
-            resource = caseWorkerService.deleteByEmailPattern(emailPattern);
+            resource = caseWorkerDeleteService.deleteByEmailPattern(emailPattern);
 
         } else {
             throw new InvalidRequestException(NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE.getErrorMessage());
