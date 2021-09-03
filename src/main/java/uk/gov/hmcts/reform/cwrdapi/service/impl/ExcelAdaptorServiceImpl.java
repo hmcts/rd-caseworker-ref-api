@@ -151,6 +151,7 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         } catch (Exception ex) {
             validationServiceFacade.logFailures(format(ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE, ex.getMessage()),
                 row.getRowNum());
+
             return empty();
         }
         return ofNullable(bean);
