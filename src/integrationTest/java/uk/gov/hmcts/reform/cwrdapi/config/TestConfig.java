@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.config;
 
+import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import java.net.SocketException;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static org.mockito.Mockito.mock;
 
 @Configuration
 @Lazy
@@ -65,6 +67,11 @@ public class TestConfig {
             }
             return exception instanceof org.apache.http.NoHttpResponseException || exception instanceof SocketException;
         }).build();
+    }
+
+    @Bean
+    public ServiceBusSenderClient getServiceBusSenderClient() {
+        return mock(ServiceBusSenderClient.class);
     }
 
 }
