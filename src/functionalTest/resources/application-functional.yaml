@@ -8,6 +8,6 @@ idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
 oauth2.client.secret: ${CA_REF_OAUTH2_CLIENT_SECRET:}
 idam.auth.clientId: ${CA_REF_OAUTH2_CLIENT_ID:}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/oauth2redirect}
-s2s-secret: ${S2S_SECRET:}
+s2s-secret: ${SRD_API_S2S_SECRET:}
 userProfUrl: http://rd-user-profile-api-aat.service.core-compute-aat.internal
 locationRefDataUrl: http://rd-location-ref-api-aat.service.core-compute-aat.internal

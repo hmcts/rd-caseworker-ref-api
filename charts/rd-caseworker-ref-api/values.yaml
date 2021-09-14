@@ -33,6 +33,6 @@ java:
         - name: caseworker-topic-primary-send-listen-shared-access-key
           alias: CWRD_MQ_PASSWORD
         - name: caseworker-ref-api-s2s-secret
-          alias: S2S_SECRET
+          alias: SRD_API_S2S_SECRET
         - name: LD-SDK-KEY
           alias: RD_LD_SDK_KEY

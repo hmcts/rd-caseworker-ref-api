@@ -17,7 +17,7 @@ def component = "caseworker-ref-api.jar"
 
 def secrets = [
   's2s-${env}': [
-    secret('microservicekey-rd-caseworker-ref-api', 'S2S_SECRET')
+    secret('microservicekey-rd-caseworker-ref-api', 'SRD_API_S2S_SECRET')
   ],
   'rd-${env}': [
     secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
