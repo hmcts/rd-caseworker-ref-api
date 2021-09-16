@@ -135,7 +135,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully_with_extra_spaces() throws IOException {
-        uploadCaseWorkerFile("ServicetoIDAMRoleMapping_newRoles.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+        uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
         CaseWorkerIdamRoleAssociation association = associations.get(0);
@@ -145,7 +145,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfullyWithExtraRoles() throws IOException {
-        uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+        uploadCaseWorkerFile("ServiceToIDAMRoleMapping_newRoles.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
         CaseWorkerIdamRoleAssociation association = associations.get(0);
