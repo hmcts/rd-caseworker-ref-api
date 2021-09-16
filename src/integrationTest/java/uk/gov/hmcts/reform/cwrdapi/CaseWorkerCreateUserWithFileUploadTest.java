@@ -148,9 +148,9 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         uploadCaseWorkerFile("ServiceToIDAMRoleMapping_newRoles.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
-        CaseWorkerIdamRoleAssociation association = associations.get(0);
+        CaseWorkerIdamRoleAssociation association = associations.get(12);
         assertThat(association.getIdamRole()).isEqualTo("caseworker-iac");
-        assertThat(association.getServiceCode()).isEqualTo("BBA9");
+        assertThat(association.getServiceCode()).isEqualTo("BFA1");
     }
 
 
