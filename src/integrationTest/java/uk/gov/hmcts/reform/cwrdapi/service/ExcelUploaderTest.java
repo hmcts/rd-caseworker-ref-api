@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PROTECTED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_CW_SHEET_NAME;
 
 @RunWith(SpringIntegrationSerenityRunner.class)
@@ -53,7 +53,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
                 TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorService.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                .hasMessage(FILE_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
                 TYPE_XLSX);
         Assertions.assertThatThrownBy(() -> excelValidatorService.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                .hasMessage(FILE_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
