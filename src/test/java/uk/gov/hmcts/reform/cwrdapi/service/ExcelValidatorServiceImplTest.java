@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_EXCEL_TYPE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PRESENT_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PASSWORD_PROTECTED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PROTECTED_ERROR_MESSAGE;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExcelValidatorServiceImplTest {
@@ -56,7 +56,7 @@ public class ExcelValidatorServiceImplTest {
         MultipartFile file = getMultipartFile("src/test/resources/Staff Data UploadWithPassword.xlsx", TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                .hasMessage(FILE_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class ExcelValidatorServiceImplTest {
         MultipartFile file = getMultipartFile("src/test/resources/Staff Data UploadWithPassword.xlsx", TYPE_XLSX);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_PASSWORD_PROTECTED_ERROR_MESSAGE);
+                .hasMessage(FILE_PROTECTED_ERROR_MESSAGE);
     }
 
     @Test
