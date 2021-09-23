@@ -201,6 +201,12 @@ task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test 
   systemProperty 'pact.rootDir', "pacts"
 }
 
+task fortifyScan(type: JavaExec)  {
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 project.ext {
@@ -456,6 +462,7 @@ dependencies {
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
+  testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
