@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -29,6 +30,9 @@ public class CaseWorkerProviderTestConfiguration {
 
     @MockBean
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
+
+    @MockBean
+    public ServiceBusSenderClient serviceBusSenderClient;
 
     @TestConfiguration
     static class Configuration {
