@@ -26,8 +26,8 @@ java:
         - name: ApplicationInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
         - name: caseworker-topic-primary-send-listen-shared-access-key
-          alias: CWRD_MQ_PASSWORD
+          alias: CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY
         - name: caseworker-ref-api-s2s-secret
-          alias: S2S_SECRET
+          alias: CASEWORKER_REF_API_S2S_SECRET
         - name: LD-SDK-KEY
-          alias: RD_LD_SDK_KEY
+          alias: LD_SDK_KEY
