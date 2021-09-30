@@ -54,7 +54,7 @@ spring:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5457}/${POSTGRES_DB_NAME:dbrdcaseworker}${POSTGRES_CONNECTION_OPTIONS:}
     username: ${POSTGRES_USERNAME:dbrdcaseworker}
-    password: ${POSTGRES_PASSWORD:}
+    password: ${POSTGRES_PASSWORD:dbrdcaseworker}
     min-idle: 1
     properties:
       charSet: UTF-8
