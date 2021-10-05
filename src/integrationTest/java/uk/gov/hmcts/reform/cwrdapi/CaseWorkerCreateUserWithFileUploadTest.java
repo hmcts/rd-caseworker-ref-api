@@ -150,6 +150,17 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
+    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfullyWithExtraRoles() throws IOException {
+        uploadCaseWorkerFile("ServiceToIDAMRoleMapping_newRoles.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
+
+        List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
+        CaseWorkerIdamRoleAssociation association = associations.get(12);
+        assertThat(association.getIdamRole()).isEqualTo("caseworker-iac");
+        assertThat(association.getServiceCode()).isEqualTo("BFA1");
+    }
+
+
+    @Test
     public void shouldReturn200PartialSuccessWhenNameIsLongerThan128AndNameHasInvalidCharacter() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile(
             "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
