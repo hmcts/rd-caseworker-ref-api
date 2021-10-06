@@ -500,7 +500,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     public void shouldUploadXlsFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload with non idam roles.xls",
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff_Data_Upload_with_non_idam_roles.xls",
                         200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
                         ROLE_CWD_ADMIN);
 
