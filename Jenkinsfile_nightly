@@ -44,7 +44,7 @@ withNightlyPipeline(type, product, component) {
 
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-  env.TEST_URL = "http://rd-caseworker-ref-api-pr-365.service.core-compute-preview.internal"
+  env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
   env.Rules = params.SecurityRules
   env.execution_environment = "aat"
 
@@ -53,7 +53,7 @@ withNightlyPipeline(type, product, component) {
 
   enableMutationTest()
   enableFullFunctionalTest()
-  //enableSecurityScan()
+  enableSecurityScan()
   enableFortifyScan()
 
   after('fullFunctionalTest') {
