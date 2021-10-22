@@ -21,7 +21,7 @@ public final class CaseWorkerConstants {
             + " Check it’s saved in the correct format and try again.";
     public static final String FILE_NOT_PRESENT_ERROR_MESSAGE = "You can only upload xlsx or xls files."
             + " Check it’s saved in the correct format and try again.";
-    public static final String FILE_PASSWORD_PROTECTED_ERROR_MESSAGE =
+    public static final String FILE_PROTECTED_ERROR_MESSAGE =
             "The file is password protected. Please provide a file without password.";
     public static final String FILE_NO_VALID_SHEET_ERROR_MESSAGE = "The uploaded file does not "
             + "contain the ‘Staff data’ worksheet.";
@@ -60,7 +60,7 @@ public final class CaseWorkerConstants {
     public static final String REQUIRED_CW_SHEET_NAME = "Case Worker Data";
     public static final String REQUIRED_ROLE_MAPPING_SHEET_NAME = "Service to CW Roles Mapping";
 
-    public static final String CASE_WORKER_FILE_NAME = "staff data";
+    public static final String CASE_WORKER_FILE_NAME = "staff";
 
     public static final String RECORDS_UPLOADED = "%s record(s) uploaded";
 

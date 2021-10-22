@@ -38,7 +38,7 @@ spring:
         registration:
           oidc:
             client-id: microservicekey-rd-caseworker-ref-api
-            client-secret: ${S2S_SECRET:AAAAAAAAAAAAAAAA}
+            client-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/testmigration
@@ -88,7 +88,7 @@ security:
 ### dependency configuration
 idam:
   s2s-auth:
-    totp_secret: ${S2S_SECRET:}
+    totp_secret: ${CASEWORKER_REF_API_S2S_SECRET:}
     microservice: rd_caseworker_ref_api
     url: ${S2S_URL:http://127.0.0.1:8990}
   s2s-authorised:
@@ -119,7 +119,7 @@ crd:
         bus:
           host: ${CWRD_MQ_HOST:rd-servicebus-sandbox.servicebus.windows.net}
           username: ${CWRD_MQ_USERNAME:SendAndListenSharedAccessKey}
-          password: ${CWRD_MQ_PASSWORD:AAAAAAAAA}
+          password: ${CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY:}
           topic: ${CWRD_MQ_TOPIC_NAME:rd-caseworker-topic-sandbox}
           trustAllCerts: false
     caseWorkerDataPerMessage: 3
