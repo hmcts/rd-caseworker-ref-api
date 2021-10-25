@@ -17,7 +17,7 @@ java:
     POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     POSTGRES_PORT: "{{ .Values.postgresql.postgresqlPort}}"
     CWRD_MQ_HOST: "$(CWRD_MQ_HOST).servicebus.windows.net"
-    CWRD_MQ_PASSWORD: "$(CWRD_MQ_PASSWORD)"
+    CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY: "$(CWRD_MQ_PASSWORD)"
     CWRD_MQ_USERNAME: RootManageSharedAccessKey
     CWRD_MQ_TOPIC_NAME: crd-aks-topic
     CWRD_MQ_TRUST_ALL_CERTS: false
@@ -35,8 +35,6 @@ java:
       secrets:
         - name: ApplicationInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
-        - name: caseworker-topic-primary-send-listen-shared-access-key
-          alias: CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY
         - name: caseworker-ref-api-s2s-secret
           alias: CASEWORKER_REF_API_S2S_SECRET
         - name: LD-SDK-KEY
