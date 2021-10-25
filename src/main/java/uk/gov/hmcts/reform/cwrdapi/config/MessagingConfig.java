@@ -28,10 +28,7 @@ public class MessagingConfig {
     public ServiceBusSenderClient getServiceBusSenderClient() {
         String connectionString = "Endpoint=sb://"
                 + host + ";SharedAccessKeyName=" + sharedAccessKeyName + ";SharedAccessKey=" + sharedAccessKeyValue;
-        log.info(sharedAccessKeyValue.substring(0, 5) + " "
-                + sharedAccessKeyValue.length() + " "
-                + sharedAccessKeyValue.substring(sharedAccessKeyValue.length() - 6));
-        log.info(host.substring(host.length() - 5));
+
         return new ServiceBusClientBuilder()
                 .connectionString(connectionString)
                 .retryOptions(new AmqpRetryOptions())
