@@ -36,3 +36,5 @@ java:
           alias: CASEWORKER_REF_API_S2S_SECRET
         - name: LD-SDK-KEY
           alias: LD_SDK_KEY
+servicebus:
+  enabled: false
