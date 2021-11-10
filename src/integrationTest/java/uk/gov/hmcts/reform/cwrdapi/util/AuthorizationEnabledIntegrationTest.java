@@ -7,9 +7,12 @@ import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
 import com.launchdarkly.sdk.server.LDClient;
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.cwrdapi.config.WireMockExtension;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import java.util.LinkedList;
 import java.util.UUID;
@@ -49,6 +53,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.getUserIdAndRoleFrom
 import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse;
 
 @Configuration
+@SerenityTest
+@WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
     "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})

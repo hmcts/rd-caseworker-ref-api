@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import net.thucydides.core.annotations.WithTag;
+import net.thucydides.core.annotations.WithTags;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +34,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
 
+@SerenityTest
+@WithTags({@WithTag("testType:Integration")})
 @DataJpaTest
 @TestPropertySource(properties = {"spring.config.location=classpath:application-test.yml"})
 @ContextConfiguration(classes = {CaseWorkerRefApiApplication.class, TestConfig.class, RepositoryConfig.class})

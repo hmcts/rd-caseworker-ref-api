@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelValidatorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PROTECTED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_CW_SHEET_NAME;
 
+@SerenityTest
 public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
 
     public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
