@@ -6,7 +6,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.MultiPartSpecification;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.junit5.SerenityTest;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.collections.CollectionUtils;
@@ -28,6 +27,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import java.io.File;
 import java.io.FileInputStream;

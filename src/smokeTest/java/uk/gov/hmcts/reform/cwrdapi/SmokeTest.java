@@ -2,22 +2,17 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.response.Response;
 
-import net.serenitybdd.junit5.SerenityTest;
-import net.serenitybdd.junit5.extension.SerenityExtension;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@SerenityTest
-@ExtendWith(SerenityExtension.class)
 @WithTags({@WithTag("testType:Smoke")})
 public class SmokeTest {
 

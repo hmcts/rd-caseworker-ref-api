@@ -436,7 +436,6 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
-    implementation group: 'io.github.fabianlinz', name: 'serenity-junit5', version: '1.6.0'
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 

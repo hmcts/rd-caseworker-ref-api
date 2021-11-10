@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.response.Response;
-import net.serenitybdd.junit5.SerenityTest;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
@@ -9,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
