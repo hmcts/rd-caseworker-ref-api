@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.advice;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;

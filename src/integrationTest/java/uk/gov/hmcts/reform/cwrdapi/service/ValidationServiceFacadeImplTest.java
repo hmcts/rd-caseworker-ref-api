@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -33,11 +29,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
-@WithTags({@WithTag("testType:Integration")})
 @DataJpaTest
 @TestPropertySource(properties = {"spring.config.location=classpath:application-test.yml"})
 @ContextConfiguration(classes = {CaseWorkerRefApiApplication.class, TestConfig.class, RepositoryConfig.class})
@@ -85,7 +78,6 @@ public class ValidationServiceFacadeImplTest {
             .map(field -> field.getErrorDescription())
             .collect(Collectors.toList()).get(0);
         assertEquals(CaseWorkerConstants.FIRST_NAME_MISSING, error);
-        verify(validationServiceFacadeImplSpy).saveJsrExceptionsForCaseworkerJob(jobId);
     }
 
     @Test

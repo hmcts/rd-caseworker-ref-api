@@ -1,21 +1,23 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
+
+import net.serenitybdd.junit5.SerenityTest;
+import net.serenitybdd.junit5.extension.SerenityExtension;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@SerenityTest
+@ExtendWith(SerenityExtension.class)
 @WithTags({@WithTag("testType:Smoke")})
 public class SmokeTest {
 
@@ -32,22 +34,23 @@ public class SmokeTest {
         /*SerenityRest.proxy("proxyout.reform.hmcts.net", 8080);
         RestAssured.proxy("proxyout.reform.hmcts.net", 8080);*/
 
-        RestAssured.baseURI = targetInstance;
-        RestAssured.useRelaxedHTTPSValidation();
+        SerenityRest.useRelaxedHTTPSValidation();
+
 
         Response response = SerenityRest
-            .given()
-            .relaxedHTTPSValidation()
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .get("/")
-            .andReturn();
+                .given().log().all()
+                .baseUri(targetInstance)
+                .relaxedHTTPSValidation()
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .get("/")
+                .andReturn();
+
         if (null != response && response.statusCode() == 200) {
             assertThat(response.body().asString())
                 .contains("Message for the Caseworker Ref Data API");
 
         } else {
-
-            Assert.fail();
+            Assertions.fail();
         }
     }
 }

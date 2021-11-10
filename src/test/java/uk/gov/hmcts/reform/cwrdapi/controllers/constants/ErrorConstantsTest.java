@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.constants;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.EMPTY_RESULT_DATA_ACCESS;
