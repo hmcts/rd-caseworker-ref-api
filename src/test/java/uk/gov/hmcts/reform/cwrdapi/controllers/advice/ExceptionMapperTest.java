@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +56,7 @@ public class ExceptionMapperTest {
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertEquals(excelValidationException.getMessage(), ((ErrorResponse) responseEntity.getBody())
                 .getErrorDescription());
+        assertFalse(excelValidationException.getErrorMessage().isEmpty());
 
     }
 

@@ -221,6 +221,7 @@ public class CaseWorkerServiceImplTest {
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
 
         when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(mapper.writeValueAsString(userProfileCreationResponse),
@@ -249,6 +250,7 @@ public class CaseWorkerServiceImplTest {
         List<CaseWorkerProfile> savedProfiles = caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
         assertThat(savedProfiles).isNotEmpty();
+        Assertions.assertFalse(roleAdditionResponse.getIdamMessage().isEmpty());
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
 
         //Todo update error
