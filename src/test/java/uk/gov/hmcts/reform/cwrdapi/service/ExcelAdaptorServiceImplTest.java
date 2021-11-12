@@ -39,10 +39,10 @@ public class ExcelAdaptorServiceImplTest {
     public void initialize() {
         List<String> acceptableCaseWorkerHeaders = List.of("First Name","Last Name","Email","Region","Region ID",
                 "Primary Base Location Name","Primary Base Location ID","Secondary Location","Secondary Location ID",
-                "User type","Primary Role","Secondary Role","Area of Work1","Area of Work1 ID","Area of Work2",
-                "Area of Work2 ID","Area of Work2","Area of Work2 ID","Area of Work4","Area of Work4 ID",
-                "Area of Work5","Area of Work5 ID","Area of Work6","Area of Work6 ID","Area of Work7",
-                "Area of Work7 ID","Area of Work8","Area of Work8 ID","IDAM Roles","Suspended");
+                "User type","Primary Role","Secondary Role","Service1","Service1 ID","Service2",
+                "Service2 ID","Service2","Service2 ID","Service4","Service4 ID",
+                "Service5","Service5 ID","Service6","Service6 ID","Service7",
+                "Service7 ID","Service8","Service8 ID","IDAM Roles","Suspended");
         List<String> acceptableServiceRoleMappingHeaders = List.of("Service ID","Role","IDAM Roles");
         ReflectionTestUtils.setField(excelAdaptorServiceImpl, "acceptableCaseWorkerHeaders",
             acceptableCaseWorkerHeaders);
