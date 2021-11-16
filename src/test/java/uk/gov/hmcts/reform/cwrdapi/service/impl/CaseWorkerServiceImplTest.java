@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -80,7 +81,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CaseWorkerServiceImplTest {
     @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepository;
@@ -119,7 +120,7 @@ public class CaseWorkerServiceImplTest {
     @InjectMocks
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Set<String> idamRoles = new HashSet<>();
         idamRoles.add("IdamRole1");
@@ -220,6 +221,7 @@ public class CaseWorkerServiceImplTest {
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
 
         when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(mapper.writeValueAsString(userProfileCreationResponse),
@@ -248,6 +250,7 @@ public class CaseWorkerServiceImplTest {
         List<CaseWorkerProfile> savedProfiles = caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
         assertThat(savedProfiles).isNotEmpty();
+        Assertions.assertFalse(roleAdditionResponse.getIdamMessage().isEmpty());
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
 
         //Todo update error
@@ -308,12 +311,14 @@ public class CaseWorkerServiceImplTest {
                 .isEqualTo(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCode.toString());
     }
 
-    @Test(expected = IdamRolesMappingException.class)
+    @Test
     public void test_buildIdamRoleMappings_exception() {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder().roleId(1).build();
         doThrow(new RuntimeException("Exception message"))
                 .when(idamRoleMappingService).buildIdamRoleAssociation(any());
-        caseWorkerServiceImpl.buildIdamRoleMappings(singletonList(serviceRoleMapping));
+        Assertions.assertThrows(IdamRolesMappingException.class, () -> {
+            caseWorkerServiceImpl.buildIdamRoleMappings(singletonList(serviceRoleMapping));
+        });
     }
 
     @Test
@@ -333,11 +338,13 @@ public class CaseWorkerServiceImplTest {
     }
 
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     public void test_shouldThrow404WhenCaseworker_profile_not_found() {
         doReturn(emptyList())
                 .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(any());
-        caseWorkerServiceImpl.fetchCaseworkersById(singletonList(""));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            caseWorkerServiceImpl.fetchCaseworkersById(singletonList(""));
+        });
     }
 
     @Test
@@ -780,7 +787,7 @@ public class CaseWorkerServiceImplTest {
 
         when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
                 .thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
+                        .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
 
 
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
@@ -799,7 +806,7 @@ public class CaseWorkerServiceImplTest {
 
     }
 
-    @Test(expected = StaffReferenceException.class)
+    @Test
     public void testRefreshRoleAllocationWhenLrdResponseIsNon200() {
 
         PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
@@ -809,13 +816,15 @@ public class CaseWorkerServiceImplTest {
                 .thenReturn(Response.builder()
                         .request(mock(Request.class)).body("body", defaultCharset()).status(400).build());
 
-        caseWorkerServiceImpl
-                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        Assertions.assertThrows(StaffReferenceException.class, () -> {
+            caseWorkerServiceImpl
+                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        });
 
     }
 
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     public void testRefreshRoleAllocationWhenCrdResponseIsEmpty() throws JsonProcessingException {
 
         LrdOrgInfoServiceResponse lrdOrgInfoServiceResponse = new LrdOrgInfoServiceResponse();
@@ -834,11 +843,13 @@ public class CaseWorkerServiceImplTest {
         PageImpl<CaseWorkerProfile> page = new PageImpl<>(Collections.emptyList());
         when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
                 .thenReturn(page);
-        caseWorkerServiceImpl
-                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            caseWorkerServiceImpl
+                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        });
     }
 
-    @Test(expected = StaffReferenceException.class)
+    @Test
     public void testRefreshRoleAllocationWhenLrdResponseIsEmpty() throws JsonProcessingException {
 
         String body = mapper.writeValueAsString(Collections.emptyList());
@@ -854,19 +865,20 @@ public class CaseWorkerServiceImplTest {
                 "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
 
-        caseWorkerServiceImpl
-                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        Assertions.assertThrows(StaffReferenceException.class, () -> {
+            caseWorkerServiceImpl
+                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        });
     }
 
-    @Test(expected = StaffReferenceException.class)
+    @Test
     public void testRefreshRoleAllocationWhenLrdResponseReturns400() throws JsonProcessingException {
         ErrorResponse errorResponse = ErrorResponse
                 .builder()
                 .errorCode(400)
                 .errorDescription("testErrorDesc")
                 .errorMessage("testErrorMsg")
-                .build()
-                ;
+                .build();
         String body = mapper.writeValueAsString(errorResponse);
 
         when(locationReferenceDataFeignClient.getLocationRefServiceMapping("cmc"))
@@ -878,8 +890,10 @@ public class CaseWorkerServiceImplTest {
                 "caseWorkerId", "ASC",
                 20, "id", CaseWorkerProfile.class);
 
-        caseWorkerServiceImpl
-                .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        Assertions.assertThrows(StaffReferenceException.class, () -> {
+            caseWorkerServiceImpl
+                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
+        });
     }
 
     @Test
