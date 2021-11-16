@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -28,6 +28,8 @@ public class CaseWorkerProfileTest {
         caseWorkerProfile.setSuspended("true");
         caseWorkerProfile.setCreatedTime(LocalDateTime.now());
         caseWorkerProfile.setLastUpdatedTime(LocalDateTime.now());
+        caseWorkerProfile.setCaseAllocator("caseAllocator");
+        caseWorkerProfile.setTaskSupervisor("taskSupervisor");
 
         assertNotNull(caseWorkerProfile);
         assertThat(caseWorkerProfile.getId(), is("CWID1"));
@@ -41,6 +43,8 @@ public class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getSuspended(), is("true"));
         assertNotNull(caseWorkerProfile.getCreatedTime());
         assertNotNull(caseWorkerProfile.getLastUpdatedTime());
+        assertFalse(caseWorkerProfile.getCaseAllocator().isEmpty());
+        assertFalse(caseWorkerProfile.getTaskSupervisor().isEmpty());
     }
 
     @Test

@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import feign.Request;
 import feign.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
@@ -144,7 +145,7 @@ public class JsonFeignResponseUtilTest {
         assertFalse(listLrdServiceMapping.isEmpty());
     }
 
-    @Test(expected = StaffReferenceException.class)
+    @Test
     public void test_mapObjectToEmptyList() {
         Map<String, Collection<String>> header = new HashMap<>();
         Collection<String> list = new ArrayList<>();
@@ -152,8 +153,10 @@ public class JsonFeignResponseUtilTest {
         String responseBody = "";
         Response response = Response.builder().status(200).reason("OK").headers(header)
                 .body(responseBody, UTF_8).request(mock(Request.class)).build();
-        JsonFeignResponseUtil.toResponseEntityWithListBody(
-                        response,
-                        LrdOrgInfoServiceResponse.class);
+        Assertions.assertThrows(StaffReferenceException.class, () -> {
+            JsonFeignResponseUtil.toResponseEntityWithListBody(
+                    response,
+                    LrdOrgInfoServiceResponse.class);
+        });
     }
 }
