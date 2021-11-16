@@ -5,11 +5,12 @@ import com.google.common.collect.ImmutableList;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
@@ -43,7 +44,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CaseWorkerServiceFacadeImplTest {
     @Mock
     ExcelAdaptorService excelAdaptorService;
@@ -100,12 +101,14 @@ public class CaseWorkerServiceFacadeImplTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void shouldProcessCaseWorkerFileFailure() throws IOException {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
         when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenThrow(new RuntimeException("Failure test"));
-        caseWorkerServiceFacade.processFile(multipartFile);
-        verify(caseWorkerServiceFacade).processFile(multipartFile);
+        Assertions.assertThrows(Exception.class, () -> {
+            caseWorkerServiceFacade.processFile(multipartFile);
+            verify(caseWorkerServiceFacade).processFile(multipartFile);
+        });
 
     }
 
@@ -140,7 +143,7 @@ public class CaseWorkerServiceFacadeImplTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void shouldProcessServiceRoleMappingFileFailure() throws IOException {
 
         List<ServiceRoleMapping> serviceRoleMappings = new ArrayList<>();
@@ -153,9 +156,11 @@ public class CaseWorkerServiceFacadeImplTest {
         when(excelValidatorService.validateExcelFile(multipartFile))
             .thenReturn(workbook);
         when(excelAdaptorService
-            .parseExcel(workbook, ServiceRoleMapping.class))
-            .thenReturn(serviceRoleMappings);
-        caseWorkerServiceFacade.processFile(multipartFile);
+                .parseExcel(workbook, ServiceRoleMapping.class))
+                .thenReturn(serviceRoleMappings);
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            caseWorkerServiceFacade.processFile(multipartFile);
+        });
     }
 
     private MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {

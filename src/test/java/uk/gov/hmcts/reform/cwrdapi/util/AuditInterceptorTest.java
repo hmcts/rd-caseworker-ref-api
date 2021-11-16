@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AuditInterceptorTest {
 
     @InjectMocks
@@ -47,11 +48,13 @@ public class AuditInterceptorTest {
     @Mock
     JwtGrantedAuthoritiesConverter converter;
 
-    @Test(expected = ExcelValidationException.class)
+    @Test
     public void testPreHandleWithNobody() {
         when(request.getFile(FILE)).thenReturn(null);
-        interceptor.preHandle(request, response, new Object());
-        verify(interceptor, times(1)).preHandle(eq(request), eq(response), any());
+        Assertions.assertThrows(ExcelValidationException.class, () -> {
+            interceptor.preHandle(request, response, new Object());
+            verify(interceptor, times(1)).preHandle(eq(request), eq(response), any());
+        });
     }
 
     @Test

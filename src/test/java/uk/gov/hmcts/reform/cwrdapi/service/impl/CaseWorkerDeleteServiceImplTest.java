@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import feign.Response;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
@@ -28,7 +28,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImplTest.COMMON_EMAIL_PATTERN;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CaseWorkerDeleteServiceImplTest {
 
     @InjectMocks
@@ -41,7 +41,7 @@ public class CaseWorkerDeleteServiceImplTest {
 
     private CaseWorkerProfile caseWorkerProfile;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");

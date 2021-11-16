@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,7 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
     @Autowired
     CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
 
-    @Before
+    @BeforeEach
     public void setUpClient() {
 
         super.setUpClient();

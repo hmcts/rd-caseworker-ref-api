@@ -12,21 +12,22 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.util.CustomSerenityRunner;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
+import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,13 +54,14 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOA
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
+import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
-@RunWith(CustomSerenityRunner.class)
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
+@SerenityTest
+@SpringBootTest
 @Slf4j
-@TestPropertySource(properties = {"spring.config.location=classpath:application-functional.yml"})
 @SuppressWarnings("unchecked")
 public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
@@ -89,6 +91,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = false)
     //this test verifies new User profile is created is prohibited when api is toggled off
     public void createCwWhenUserNotExistsInCwrAndSidamAndUp_Ac1_LD_disabled() {
@@ -100,8 +103,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .post("/refdata/case-worker/users")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
-        assertThat(response.getBody().asString()).contains(CustomSerenityRunner.getFeatureFlagName().concat(" ")
-                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD));
+        assertThat(response.getBody().asString()).contains(getToggledOffMessage());
+
     }
 
     @Test
@@ -157,19 +160,19 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     @Test
     // this test verifies User profile are not fetched from CWR when toggled off
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = false)
     public void should_retrieve_403_when_Api_toggled_off() {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(
                 caseWorkerApiClient.createCaseWorkerProfiles());
-        String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
-                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
                 .body(caseWorkersProfileCreationRequests)
                 .post("/refdata/case-worker/users/fetchUsersById")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
-        assertThat(response.getBody().asString()).contains(exceptionMessage);
+        assertThat(response.getBody().asString()).contains(getToggledOffMessage());
+
     }
 
     @Test
@@ -304,10 +307,10 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     public void shouldReturn403WhenUploadFileApiToggledOff() throws IOException {
 
-        String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
-                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
+        String exceptionMessage = FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
         uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
                 403, exceptionMessage,
@@ -379,6 +382,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     public void deleteCaseworkerReturns403WhenToggledOff() {
         caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
                 "/refdata/case-worker/users?emailPattern=ForbiddenException", FORBIDDEN);
@@ -466,11 +470,9 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = false)
     public void shouldReturn403WhenFetchStaffProfileByCcdServiceNamesApiToggledOff() {
-
-        String exceptionMessage = CustomSerenityRunner.getFeatureFlagName().concat(" ")
-                .concat(FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD);
 
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
                 .get(STAFF_BY_SERVICE_NAME_URL
@@ -480,7 +482,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .assertThat()
                 .statusCode(403);
 
-        assertThat(fetchResponse.getBody().asString()).contains(exceptionMessage);
+        assertThat(fetchResponse.getBody().asString()).contains(getToggledOffMessage());
+
     }
 
     @Test

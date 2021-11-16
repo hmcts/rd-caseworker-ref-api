@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.oidc;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import uk.gov.hmcts.reform.cwrdapi.repository.IdamRepository;
@@ -26,7 +26,7 @@ public class JwtGrantedAuthoritiesConverterTest {
     UserInfo userInfoMock;
     Jwt jwtMock;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         idamRepositoryMock = mock(IdamRepository.class);
         userInfoMock = mock(UserInfo.class);

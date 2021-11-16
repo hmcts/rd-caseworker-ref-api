@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 

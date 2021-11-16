@@ -6,12 +6,13 @@ import com.azure.messaging.servicebus.ServiceBusMessageBatch;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.azure.messaging.servicebus.ServiceBusTransactionContext;
 import com.google.gson.Gson;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.PublishCaseWorkerData;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.CaseworkerMessageFailedException;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TopicPublisherTest {
 
     @Mock
@@ -45,7 +46,7 @@ public class TopicPublisherTest {
     List<String> userIdList;
     List<ServiceBusMessage> serviceBusMessageList = new ArrayList<>();
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         publishCaseWorkerData = new PublishCaseWorkerData();
         userIdList = new ArrayList<>();
@@ -73,14 +74,15 @@ public class TopicPublisherTest {
         verify(serviceBusSenderClient, times(1)).commitTransaction(any());
     }
 
-    @Test(expected = CaseworkerMessageFailedException.class)
+    @Test
     public void shouldThrowExceptionForConnectionIssues() {
 
         doReturn(1L).when(validationService).getAuditJobId();
         doReturn(transactionContext).when(serviceBusSenderClient).createTransaction();
         doThrow(new RuntimeException("Some Exception")).when(serviceBusSenderClient).createMessageBatch();
-
-        topicPublisher.sendMessage(userIdList);
+        Assertions.assertThrows(CaseworkerMessageFailedException.class, () -> {
+            topicPublisher.sendMessage(userIdList);
+        });
         verify(serviceBusSenderClient, times(1)).rollbackTransaction(any());
     }
 
