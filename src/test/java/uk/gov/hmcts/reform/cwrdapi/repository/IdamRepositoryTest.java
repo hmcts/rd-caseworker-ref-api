@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -31,7 +31,7 @@ public class IdamRepositoryTest {
     @InjectMocks
     private IdamRepository idamRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }

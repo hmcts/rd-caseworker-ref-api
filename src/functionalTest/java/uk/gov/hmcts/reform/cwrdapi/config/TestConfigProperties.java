@@ -34,6 +34,18 @@ public class TestConfigProperties {
     @Value("${idam.auth.clientId:xuiwebapp}")
     public String clientId;
 
+    @Value("${targetInstance}")
+    protected String targetInstance;
+
+    @Value("${s2s-url}")
+    protected String s2sUrl;
+
+    @Value("${s2s-name}")
+    protected String s2sName;
+
+    @Value("${s2s-secret}")
+    protected String s2sSecret;
+
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return new ObjectMapper()

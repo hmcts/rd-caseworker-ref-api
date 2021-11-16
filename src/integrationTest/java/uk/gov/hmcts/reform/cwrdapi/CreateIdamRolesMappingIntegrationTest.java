@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
@@ -40,7 +40,7 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
     }
 
     @Test
-    public void returns_400_when_request_invalid() {
+    void returns_400_when_request_invalid() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, Object> response = caseworkerReferenceDataClient
             .createIdamRolesAssoc(Collections.emptyList(), cwdAdmin);

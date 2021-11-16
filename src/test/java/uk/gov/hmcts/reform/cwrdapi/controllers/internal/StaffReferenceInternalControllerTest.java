@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.internal;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class StaffReferenceInternalControllerTest {
     @InjectMocks
     private StaffReferenceInternalController staffReferenceInternalController;
@@ -45,10 +46,12 @@ public class StaffReferenceInternalControllerTest {
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void shouldThrowInvalidRequestExceptionForEmptyServiceName() {
-        staffReferenceInternalController
-                .fetchStaffByCcdServiceNames("", 1, 0,
-                        "ASC", "caseWorkerId");
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            staffReferenceInternalController
+                    .fetchStaffByCcdServiceNames("", 1, 0,
+                            "ASC", "caseWorkerId");
+        });
     }
 }

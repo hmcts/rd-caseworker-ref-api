@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 
 import java.util.ArrayList;

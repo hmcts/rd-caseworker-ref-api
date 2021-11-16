@@ -6,16 +6,13 @@ import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.Response;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.launchdarkly.sdk.server.LDClient;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.flywaydb.core.Flyway;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,9 +26,11 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.RestTemplateConfiguration;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
+import uk.gov.hmcts.reform.cwrdapi.config.WireMockExtension;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import java.util.LinkedList;
 import java.util.UUID;
@@ -43,7 +42,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,7 +52,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.getUserIdAndRoleFrom
 import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse;
 
 @Configuration
-@RunWith(SpringIntegrationSerenityRunner.class)
+@SerenityTest
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
     "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
@@ -73,18 +71,18 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     protected CaseWorkerReferenceDataClient caseworkerReferenceDataClient;
 
-    @ClassRule
-    public static WireMockRule s2sService = new WireMockRule(wireMockConfig().port(8990));
+    @RegisterExtension
+    public static WireMockExtension s2sService = new WireMockExtension(8990);
 
-    @ClassRule
-    public static WireMockRule userProfileService = new WireMockRule(wireMockConfig().port(8091));
 
-    @ClassRule
-    public static WireMockRule sidamService = new WireMockRule(wireMockConfig().port(5000)
-        .extensions(new CaseWorkerTransformer()));
+    @RegisterExtension
+    public static WireMockExtension userProfileService = new WireMockExtension(8091);
 
-    @ClassRule
-    public static WireMockRule mockHttpServerForOidc = new WireMockRule(wireMockConfig().port(7000));
+    @RegisterExtension
+    public static WireMockExtension sidamService = new WireMockExtension(5000,new CaseWorkerTransformer());
+
+    @RegisterExtension
+    public static WireMockExtension mockHttpServerForOidc = new WireMockExtension(7000);
 
     @Value("${crd.security.roles.cwd-admin}")
     public String cwdAdmin;
@@ -107,7 +105,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     Flyway flyway;
 
-    @Before
+    @BeforeEach
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
         doNothing().when(topicPublisher).sendMessage(any());
@@ -115,7 +113,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         flyway.migrate();
     }
 
-    @Before
+    @BeforeEach
     public void setupIdamStubs() throws Exception {
 
         s2sService.stubFor(get(urlEqualTo("/details"))
@@ -212,7 +210,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
     //for update use insert response UUID in test or other mock methods
-    @Before
+    @BeforeEach
     public void userProfilePostUserWireMock() {
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
             .inScenario("")
@@ -225,7 +223,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "}")));
     }
 
-    @After
+    @AfterEach
     public void cleanupTestData() {
     }
 
