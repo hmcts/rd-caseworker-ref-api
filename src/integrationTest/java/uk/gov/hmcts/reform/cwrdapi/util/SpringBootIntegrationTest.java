@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = CaseWorkerRefApiApplication.class, webEnvironment =
         SpringBootTest.WebEnvironment.DEFINED_PORT)
 public abstract class SpringBootIntegrationTest {

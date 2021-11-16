@@ -1,19 +1,14 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import io.restassured.RestAssured;
-import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.AfterClass;
+import net.serenitybdd.rest.SerenityRest;
+import org.junit.jupiter.api.AfterAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestContext;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.AbstractTestExecutionListener;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import uk.gov.hmcts.reform.cwrdapi.client.CaseWorkerApiClient;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
 import uk.gov.hmcts.reform.cwrdapi.client.S2sClient;
@@ -28,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.isNull;
+import javax.annotation.PostConstruct;
+
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 import static org.springframework.http.HttpStatus.OK;
@@ -37,10 +33,7 @@ import static org.springframework.http.HttpStatus.OK;
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
-@TestExecutionListeners(listeners = {
-        AuthorizationFunctionalTest.class,
-        DependencyInjectionTestExecutionListener.class})
-public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
+public class AuthorizationFunctionalTest {
 
     @Value("${s2s-url}")
     protected String s2sUrl;
@@ -82,23 +75,26 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     @Value("${userProfUrl}")
     protected String baseUrlUserProfile;
 
-    @Override
-    public void beforeTestClass(TestContext testContext) {
-        testContext.getApplicationContext()
-                .getAutowireCapableBeanFactory()
-                .autowireBean(this);
+    @Autowired
+    protected TestConfigProperties testConfigProperties;
 
-        RestAssured.useRelaxedHTTPSValidation();
-        RestAssured.defaultParser = Parser.JSON;
+    @PostConstruct
+    public void beforeTestClass() {
 
-        log.info("Configured S2S secret: " + s2sSecret.substring(0, 2) + "************" + s2sSecret.substring(14));
-        log.info("Configured S2S microservice: " + s2sName);
-        log.info("Configured S2S URL: " + s2sUrl);
+        SerenityRest.useRelaxedHTTPSValidation();
 
-        idamOpenIdClient = new IdamOpenIdClient(configProperties);
+        if (null == s2sToken) {
+            log.info(":::: Generating S2S Token");
+            s2sToken = new S2sClient(
+                    testConfigProperties.getS2sUrl(),
+                    testConfigProperties.getS2sName(),
+                    testConfigProperties.getS2sSecret())
+                    .signIntoS2S();
+        }
 
-        //Single S2S & Sidam call
-        s2sToken = isNull(s2sToken) ? new S2sClient(s2sUrl, s2sName, s2sSecret).signIntoS2S() : s2sToken;
+        if (null == idamOpenIdClient) {
+            idamOpenIdClient = new IdamOpenIdClient(testConfigProperties);
+        }
 
         caseWorkerApiClient = new CaseWorkerApiClient(
                 caseWorkerApiUrl,
@@ -110,7 +106,7 @@ public class AuthorizationFunctionalTest extends AbstractTestExecutionListener {
     }
 
 
-    @AfterClass
+    @AfterAll
     public static void destroy() {
         emailsTobeDeleted.forEach(email -> idamOpenIdClient.deleteSidamUser(email));
         log.info("delete idam user called");

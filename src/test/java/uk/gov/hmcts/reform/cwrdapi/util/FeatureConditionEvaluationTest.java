@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -41,7 +41,7 @@ public class FeatureConditionEvaluationTest {
     Method method = mock(Method.class);
 
 
-    @Before
+    @BeforeEach
     public void before() {
         MockitoAnnotations.openMocks(this);
         when(method.getName()).thenReturn("test");
