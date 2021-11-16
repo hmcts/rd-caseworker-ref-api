@@ -13,7 +13,7 @@ plugins {
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.33.0'
-    id "info.solidsoft.pitest" version '1.5.2'
+    id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'org.sonarqube' version '3.1.1'
     id 'org.springframework.boot' version '2.4.9'
@@ -28,8 +28,8 @@ apply plugin: 'idea'
 
 def versions = [
   lombok             : '1.18.20',
-  gradlePitest       : '1.3.0',
-  pitest             : '1.5.1',
+  gradlePitest       : '1.5.1',
+  pitest             : '1.7.0',
   reformHealthStarter: '0.0.5',
   reformLogging      : '5.1.7',
   reformS2sClient    : '4.0.0',
@@ -263,13 +263,15 @@ jacocoTestReport {
 }
 
 pitest {
+  junit5PluginVersion = '0.15'
   targetClasses = ['uk.gov.hmcts.reform.*']
   testSourceSets = [sourceSets.test]
   excludedClasses = [
     'uk.gov.hmcts.reform.cwrdapi.config.*',
     'uk.gov.hmcts.reform.cwrdapi.controllers.*',
+    'uk.gov.hmcts.reform.cwrdapi.service.impl.*',
     'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
-    'uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl'
+    'uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher'
   ]
   threads = 10
   enableDefaultIncrementalAnalysis = true
@@ -431,7 +433,9 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: versions.restAssured
 
     testImplementation group: 'com.h2database', name: 'h2'
-    testImplementation "com.github.tomakehurst:wiremock:2.21.0"
+    testImplementation ("com.github.tomakehurst:wiremock-jre8:2.31.0") {
+      exclude group: 'com.github.jknack'
+    }
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
@@ -443,13 +447,12 @@ dependencies {
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
   testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-  testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.6'
+  testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.7.0'
   testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: '3.0.2'
   testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.0.2'
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
@@ -528,6 +531,14 @@ bootJar {
   archiveFileName = jarName
   manifest {
     attributes('Implementation-Version': project.version.toString())
+  }
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+
+  testLogging {
+    exceptionFormat = 'full'
   }
 }
 

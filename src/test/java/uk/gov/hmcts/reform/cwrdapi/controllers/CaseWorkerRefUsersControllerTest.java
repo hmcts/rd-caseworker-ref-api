@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -32,21 +33,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CaseWorkerRefUsersControllerTest {
 
-    @InjectMocks
-    private CaseWorkerRefUsersController caseWorkerRefUsersController;
-
     CaseWorkerService caseWorkerServiceMock;
-
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequest = new ArrayList<>();
     CaseWorkersProfileCreationRequest cwRequest;
     CaseWorkerProfileCreationResponse cwProfileCreationResponse;
     CaseWorkerProfileCreationResponse cwResponse;
     ResponseEntity<Object> responseEntity;
+    @InjectMocks
+    private CaseWorkerRefUsersController caseWorkerRefUsersController;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
 
@@ -149,16 +148,21 @@ public class CaseWorkerRefUsersControllerTest {
                 .publishCaseWorkerDataToTopic(any());
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void createCaseWorkerProfilesShouldThrow400() {
         caseWorkersProfileCreationRequest = null;
-        caseWorkerRefUsersController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            caseWorkerRefUsersController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        });
+
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void fetchCaseworkersByIdShouldThrow400() {
-        caseWorkerRefUsersController.fetchCaseworkersById(
-                UserRequest.builder().userIds(Collections.emptyList()).build());
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            caseWorkerRefUsersController.fetchCaseworkersById(
+                    UserRequest.builder().userIds(Collections.emptyList()).build());
+        });
     }
 
     @Test
