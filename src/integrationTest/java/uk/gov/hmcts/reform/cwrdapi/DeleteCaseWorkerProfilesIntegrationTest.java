@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -28,7 +28,7 @@ public class DeleteCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
     @Autowired
     CaseWorkerProfileRepository caseWorkerProfileRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         super.setUpClient();

@@ -1,22 +1,20 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@SerenityTest
 @WithTags({@WithTag("testType:Functional")})
 @ActiveProfiles("functional")
 public class WelcomeFuncTest {
@@ -31,16 +29,15 @@ public class WelcomeFuncTest {
     @Test
     public void test_should_prove_app_is_running_and_healthy() {
         // local test
-
-        RestAssured.baseURI = targetInstance;
-        RestAssured.useRelaxedHTTPSValidation();
+        SerenityRest.useRelaxedHTTPSValidation();
 
         Response response = SerenityRest
-            .given()
-            .relaxedHTTPSValidation()
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .get("/")
-            .andReturn();
+                .given().log().all()
+                .baseUri(targetInstance)
+                .relaxedHTTPSValidation()
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .get("/")
+                .andReturn();
         if (null != response && response.statusCode() == 200) {
             assertThat(response.body().asString()).isNotNull();
 

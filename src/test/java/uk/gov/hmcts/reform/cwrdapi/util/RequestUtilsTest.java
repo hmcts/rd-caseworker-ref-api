@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -39,25 +40,31 @@ public class RequestUtilsTest {
         assertEquals(1, pageRequest.first().getPageSize());
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void testInvalidRequestExceptionForInvalidPageNumber() {
-        validateAndBuildPaginationObject(-1, 1,
-                "caseWorkerId", "ASC",
-                20, "id", CaseWorkerProfile.class);
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            validateAndBuildPaginationObject(-1, 1,
+                    "caseWorkerId", "ASC",
+                    20, "id", CaseWorkerProfile.class);
+        });
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void testInvalidRequestExceptionForInvalidPageSize() {
-        validateAndBuildPaginationObject(0, -1,
-                "caseWorkerId", "ASC",
-                20, "id", CaseWorkerProfile.class);
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            validateAndBuildPaginationObject(0, -1,
+                    "caseWorkerId", "ASC",
+                    20, "id", CaseWorkerProfile.class);
+        });
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void testInvalidRequestExceptionForInvalidSortDirection() {
-        validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "Invalid",
-                20, "id", CaseWorkerProfile.class);
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            validateAndBuildPaginationObject(0, 1,
+                    "caseWorkerId", "Invalid",
+                    20, "id", CaseWorkerProfile.class);
+        });
     }
 
     @Test
@@ -72,10 +79,12 @@ public class RequestUtilsTest {
         assertTrue(pageRequest.getSort().get().anyMatch(i -> i.getProperty().equals("caseWorkerId")));
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void testInvalidRequestExceptionForInvalidSortColumn() {
-        validateAndBuildPaginationObject(0, 1,
-                "invalid", "ASC",
-                20, "invalid", CaseWorkerProfile.class);
+        Assertions.assertThrows(Exception.class, () -> {
+            validateAndBuildPaginationObject(0, 1,
+                    "invalid", "ASC",
+                    20, "invalid", CaseWorkerProfile.class);
+        });
     }
 }

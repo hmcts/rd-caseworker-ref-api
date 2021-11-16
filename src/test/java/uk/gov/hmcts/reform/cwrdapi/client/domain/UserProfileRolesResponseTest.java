@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class UserProfileRolesResponseTest {
@@ -23,6 +24,7 @@ public class UserProfileRolesResponseTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
 
         assertNotNull(userProfileRolesResponse);
+        assertFalse(attributeResponse.getIdamMessage().isEmpty());
         assertThat(userProfileRolesResponse.getAttributeResponse(), is(attributeResponse));
         assertThat(userProfileRolesResponse.getRoleAdditionResponse(), is(roleAdditionResponse));
     }
