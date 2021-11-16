@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 
 import java.util.Collections;
@@ -14,14 +14,14 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CaseWorkerIdamRoleAssociationRepositoryTest {
     @Mock
     private CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
 
     private CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
         caseWorkerIdamRoleAssociation.setCwIdamRoleAssociationId(2L);
