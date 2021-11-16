@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import net.serenitybdd.junit.spring.integration.SpringIntegrationSerenityRunner;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +12,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelValidatorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +26,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PROTECTED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_CW_SHEET_NAME;
 
-@RunWith(SpringIntegrationSerenityRunner.class)
+@SerenityTest
 public class ExcelUploaderTest extends AuthorizationEnabledIntegrationTest {
 
     public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";

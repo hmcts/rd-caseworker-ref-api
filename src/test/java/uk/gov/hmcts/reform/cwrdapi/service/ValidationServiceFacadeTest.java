@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
@@ -30,7 +31,7 @@ import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ValidationServiceFacadeTest {
 
     ValidationServiceFacadeImpl validationServiceFacadeImpl = spy(new ValidationServiceFacadeImpl());
@@ -44,7 +45,7 @@ public class ValidationServiceFacadeTest {
     AuditRepository caseWorkerAuditRepository = mock(AuditRepository.class);
 
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         setField(validationServiceFacadeImpl, "exceptionCaseWorkerRepository",
             exceptionCaseWorkerRepository);
@@ -80,12 +81,14 @@ public class ValidationServiceFacadeTest {
         verify(validationServiceFacadeImpl).saveJsrExceptionsForCaseworkerJob(1);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testAuditJsrWithException() {
         CaseWorkerDomain domain = CaseWorkerProfile.builder().build();
-        Field field = invokeMethod(validationServiceFacadeImpl, "getKeyFiled", domain);
-        Object[] objects = {field, domain};
-        invokeMethod(validationServiceFacadeImpl, "getKeyFieldValue", objects);
+        Assertions.assertThrows(Exception.class, () -> {
+            Field field = invokeMethod(validationServiceFacadeImpl, "getKeyFiled", domain);
+            Object[] objects = {field, domain};
+            invokeMethod(validationServiceFacadeImpl, "getKeyFieldValue", objects);
+        });
     }
 
     @Test
