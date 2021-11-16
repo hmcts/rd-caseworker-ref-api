@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CaseWorkerRefControllerTest {
 
     @InjectMocks
@@ -53,7 +54,7 @@ public class CaseWorkerRefControllerTest {
     CaseWorkerProfileCreationResponse cwResponse;
     ResponseEntity<Object> responseEntity;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
         cwResponse = CaseWorkerProfileCreationResponse
@@ -131,12 +132,12 @@ public class CaseWorkerRefControllerTest {
                 .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
     }
 
-    @Test(expected = InvalidRequestException.class)
+    @Test
     public void should_throw_exception_for_invalid_request() {
-
-        caseWorkerRefController
-                .buildIdamRoleMappings(Collections.emptyList());
-
+        Assertions.assertThrows(InvalidRequestException.class, () -> {
+            caseWorkerRefController
+                    .buildIdamRoleMappings(Collections.emptyList());
+        });
         verify(caseWorkerServiceMock,times(0))
                 .buildIdamRoleMappings(anyList());
     }

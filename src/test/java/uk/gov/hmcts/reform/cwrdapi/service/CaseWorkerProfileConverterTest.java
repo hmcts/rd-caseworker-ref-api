@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.TestSupport;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
@@ -56,6 +56,8 @@ public class CaseWorkerProfileConverterTest {
         List<CaseWorkerDomain> caseWorkerDomains = TestSupport.buildSuspendedCaseWorkerProfileData();
         List<CaseWorkersProfileCreationRequest> convert =
                 caseWorkerProfileConverter.convert(caseWorkerDomains);
+        caseWorkerDomains.get(0).setRowId(10);
+        assertFalse(caseWorkerDomains.get(0).getRowId() == 0);
         assertNotNull(convert);
         CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest = convert.get(0);
         assertNotNull(caseWorkersProfileCreationRequest.getBaseLocations());
