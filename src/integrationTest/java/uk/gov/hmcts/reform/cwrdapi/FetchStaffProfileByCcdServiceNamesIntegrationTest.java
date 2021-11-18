@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
@@ -19,17 +19,17 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTIO
 
 public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
-    @Before
+    @BeforeEach
     public void setUpClient() {
         super.setUpClient();
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }

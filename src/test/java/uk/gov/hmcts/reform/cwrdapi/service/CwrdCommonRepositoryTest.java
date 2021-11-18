@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -19,7 +19,7 @@ public class CwrdCommonRepositoryTest {
     @InjectMocks
     private CwrdCommonRepository cwrdCommonRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }

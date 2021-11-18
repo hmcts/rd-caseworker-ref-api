@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
@@ -22,7 +22,7 @@ public class JsrValidatorInitializerTest {
     @InjectMocks
     JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
-    @Before
+    @BeforeEach
     public void init() {
         openMocks(this);
         jsrValidatorInitializer.initializeFactory();
