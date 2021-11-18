@@ -62,5 +62,14 @@
   "100000_A Client Error response code was returned by the server_http://****-pr-373.service.core-compute-preview.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
   "90033_Loosely Scoped Cookie_http://****-pr-373.service.core-compute-preview.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
   "10010_Cookie No HttpOnly Flag_http://****-pr-373.service.core-compute-preview.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://****-pr-373.service.core-compute-preview.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://****-pr-373.service.core-compute-preview.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
+  "90022_Application Error Disclosure_http://****-pr-373.service.core-compute-preview.internal/v2/api-docs_GET" : "ignore",
+"10023_Information Disclosure - Debug Error Messages_http://****-pr-373.service.core-compute-preview.internal/v2/api-docs_GET" : "ignore",
+"10021_X-Content-Type-Options Header Missing_http://****-pr-373.service.core-compute-preview.internal/_GET" : "ignore",
+"10021_X-Content-Type-Options Header Missing_http://****-pr-373.service.core-compute-preview.internal/v2/api-docs_GET" : "ignore",
+"100000_A Client Error response code was returned by the server_http://****-pr-373.service.core-compute-preview.internal/refdata/case-worker/users?emailPattern=emailPattern&userId=userId_DELETE" : "ignore",
+"100000_A Client Error response code was returned by the server_http://****-pr-373.service.core-compute-preview.internal/refdata/internal/staff/usersByServiceName?ccd_service_names=ccd_service_names&page_number=10&page_size=10&sort_column=sort_column&sort_direction=sort_direction_GET" : "ignore",
+"100000_A Client Error response code was returned by the server_http://****-pr-373.service.core-compute-preview.internal/refdata/case-worker/upload-file_POST" : "ignore",
+"100000_A Client Error response code was returned by the server_http://****-pr-373.service.core-compute-preview.internal/refdata/case-worker/users/fetchUsersById_POST" : "ignore",
+"10024_Information Disclosure - Sensitive Information in URL_http://****-pr-373.service.core-compute-preview.internal/refdata/case-worker/users?emailPattern=emailPattern&userId=userId_DELETE" : "ignore"
 }
