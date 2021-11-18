@@ -132,7 +132,7 @@ excel:
     Primary Base Location ID,Secondary Location,Secondary Location ID,User type,Primary Role,Secondary Role,Service1,
     Service1 ID,Service2,Service2 ID,Service3,Service3 ID,Service4,Service4 ID,
     Service5,Service5 ID,Service6,Service6 ID,Service7,Service7 ID,Service8,
-    Service8 ID,IDAM Roles,Suspended, Case Allocator, Task Supervisor}
+    Service8 ID,IDAM Roles,Suspended}
   acceptableServiceRoleMappingHeaders: ${EXCEL_ACCEPTABLE_SERVICE_ROLE_MAPPING_HEADERS:Service ID,Role,IDAM Roles}
 
 refresh:
