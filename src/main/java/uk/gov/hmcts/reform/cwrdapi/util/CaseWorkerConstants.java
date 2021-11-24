@@ -57,7 +57,7 @@ public final class CaseWorkerConstants {
 
     public static final String REQUEST_COMPLETED_SUCCESSFULLY = "Request Completed Successfully";
 
-    public static final String REQUIRED_CW_SHEET_NAME = "Case Worker Data";
+    public static final String REQUIRED_CW_SHEET_NAME = "Staff Data";
     public static final String REQUIRED_ROLE_MAPPING_SHEET_NAME = "Service to CW Roles Mapping";
 
     public static final String CASE_WORKER_FILE_NAME = "staff";
@@ -105,7 +105,7 @@ public final class CaseWorkerConstants {
     public static final String NO_PRIMARY_LOCATION_PRESENT = "You must add Primary Base Location Name"
             + " and upload the file again";
     public static final String NO_ROLE_PRESENT = "You must add role details and upload the file again";
-    public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one area of work"
+    public static final String NO_WORK_AREA_PRESENT = "You must add details of at least one Service"
             + " and upload the file again";
     public static final String NO_USER_TYPE_PRESENT = "You must add a user type and upload the file again";
 
@@ -126,10 +126,10 @@ public final class CaseWorkerConstants {
             + "not be same.";
     public static final String DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS = "Primary and Secondary Locations Should not "
             + "be same";
-    public static final String DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK = "Duplicate Service Codes in Area of Work";
+    public static final String DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK = "Duplicate Service Codes in Service";
     public static final String ROLE_FIELD = "Role";
     public static final String LOCATION_FIELD = "Location";
-    public static final String AREA_OF_WORK_FIELD = "Area Of Work";
+    public static final String AREA_OF_WORK_FIELD = "Service";
     public static final String FILE = "file";
     public static final String AND = "and";
 
