@@ -22,12 +22,12 @@ public class WorkArea implements Serializable {
 
     private static final long serialVersionUID = 2021L;
 
-    @MappingField(columnName = "Area of Work1 ID,Area of Work2 ID,Area of Work3 ID,Area of Work4 ID,"
-        + "Area of Work5 ID, Area of Work6 ID,Area of Work7 ID,Area of Work8 ID")
+    @MappingField(columnName = "Service1 ID,Service2 ID,Service3 ID,Service4 ID,"
+        + "Service5 ID, Service6 ID,Service7 ID,Service8 ID")
     String serviceCode;
 
-    @MappingField(columnName = "Area of Work1,Area of Work2,Area of Work3,Area of Work4,Area of Work5,Area of Work6,"
-        + "Area of Work7,Area of Work8")
+    @MappingField(columnName = "Service1,Service2,Service3,Service4,Service5,Service6,"
+        + "Service7,Service8")
     String areaOfWork;
 
     private LocalDateTime createdTime;
