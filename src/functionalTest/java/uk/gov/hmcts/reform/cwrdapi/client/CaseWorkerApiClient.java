@@ -185,7 +185,7 @@ public class CaseWorkerApiClient {
                         .emailId(emailToUsed)
                         .regionId(2)
                         .region("County")
-                        .userType("CTRT")
+                        .userType("Future Operations")
                         .suspended(false)
                         .idamRoles(idamRoles)
                         .baseLocations(locationRequestList)
