@@ -56,12 +56,27 @@ withNightlyPipeline(type, product, component) {
   enableSecurityScan()
   enableFortifyScan()
 
+  after('mutationTest') {
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/pitest",
+            reportFiles          : "index.html",
+            reportName           : "Mutation Test Report"
+    ]
+  }
+
   after('fullFunctionalTest') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/**/*'
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "target/site/serenity/",
+            reportFiles          : "index.html",
+            reportName           : "Functional Tests Report"
+    ]
   }
-
-  after('fortify-scan') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-  }
-
 }
