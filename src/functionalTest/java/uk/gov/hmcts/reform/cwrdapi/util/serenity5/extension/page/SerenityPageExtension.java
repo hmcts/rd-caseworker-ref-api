@@ -18,7 +18,6 @@ import java.util.function.Consumer;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static net.thucydides.core.webdriver.ThucydidesWebDriverSupport.getPages;
 import static net.thucydides.core.webdriver.ThucydidesWebDriverSupport.initializeFieldsIn;
 
 public class SerenityPageExtension implements BeforeEachCallback {
@@ -101,7 +100,7 @@ public class SerenityPageExtension implements BeforeEachCallback {
     }
 
     private void injectPageObjectIntoTest(final Object testClass) {
-        new PageObjectDependencyInjector(getPages()).injectDependenciesInto(testClass);
+        new PageObjectDependencyInjector().injectDependenciesInto(testClass);
     }
 
     public static class ExplicitWebDriverConfiguration {
