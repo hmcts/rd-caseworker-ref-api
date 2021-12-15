@@ -41,7 +41,7 @@ def versions = [
   launchDarklySdk    : "5.2.2",
   restAssured        : '4.3.3',
   jackson            : '2.12.1',
-  log4j              : '2.15.0'
+  log4j              : '2.16.0'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
