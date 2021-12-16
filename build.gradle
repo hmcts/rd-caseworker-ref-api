@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.5'
+    id 'uk.gov.hmcts.java' version '0.12.12'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.33.0'
@@ -445,9 +445,9 @@ dependencies {
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
+  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
   contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
   testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
   testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.7.0'
