@@ -515,7 +515,8 @@ configurations.all {
   resolutionStrategy.eachDependency { details ->
     if (details.requested.group == 'io.netty'
             && details.requested.name != 'netty-tcnative-boringssl-static'
-            && details.requested.name != 'netty-tcnative') {
+            && details.requested.name != 'netty-tcnative'
+            && details.requested.name != 'netty-tcnative-classes') {
       details.useVersion "4.1.72.Final"
     }
   }
