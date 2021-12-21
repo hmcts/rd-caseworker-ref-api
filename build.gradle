@@ -42,6 +42,7 @@ def versions = [
   restAssured        : '4.3.3',
   jackson            : '2.12.1',
   log4j              : '2.16.0'
+  
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
