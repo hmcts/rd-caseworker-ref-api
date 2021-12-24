@@ -21,8 +21,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class FeatureConditionEvaluationTest {
+class FeatureConditionEvaluationTest {
 
     FeatureToggleServiceImpl featureToggleService = mock(FeatureToggleServiceImpl.class);
     @Spy
@@ -42,7 +43,7 @@ public class FeatureConditionEvaluationTest {
 
 
     @BeforeEach
-    public void before() {
+    void before() {
         MockitoAnnotations.openMocks(this);
         when(method.getName()).thenReturn("test");
         doReturn(WelcomeController.class).when(method).getDeclaringClass();
@@ -50,7 +51,7 @@ public class FeatureConditionEvaluationTest {
     }
 
     @Test
-    public void testPreHandleValidFlag() throws Exception {
+    void testPreHandleValidFlag() throws Exception {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("WelcomeController.test", "test-flag");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
@@ -65,7 +66,7 @@ public class FeatureConditionEvaluationTest {
     }
 
     @Test
-    public void testPreHandleInvalidFlag() throws Exception {
+    void testPreHandleInvalidFlag() throws Exception {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("WelcomeController.test", "test-flag");
         when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
@@ -81,7 +82,7 @@ public class FeatureConditionEvaluationTest {
     }
 
     @Test
-    public void testPreHandleInvalidServletRequestAttributes() throws Exception {
+    void testPreHandleInvalidServletRequestAttributes() throws Exception {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("WelcomeController.test", "test-flag");
         when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
@@ -92,14 +93,15 @@ public class FeatureConditionEvaluationTest {
     }
 
     @Test
-    public void testPreHandleNoFlag() throws Exception {
-        assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));
+    void testPreHandleNoFlag() throws Exception {
+        boolean response = featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod);
+        assertThat(response).isTrue();
         verify(featureConditionEvaluation, times(1))
                 .preHandle(httpRequest, httpServletResponse, handlerMethod);
     }
 
     @Test
-    public void testPreHandleNonConfiguredValues() throws Exception {
+    void testPreHandleNonConfiguredValues() throws Exception {
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("DummyController.test", "test-flag");
         when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
@@ -108,7 +110,22 @@ public class FeatureConditionEvaluationTest {
                 .preHandle(httpRequest, httpServletResponse, handlerMethod);
     }
 
-    public static String generateDummyS2SToken(String serviceName) {
+    @Test
+    void testGetServiceName() {
+        Map<String, String> launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("WelcomeController.test", "test-flag");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        String token = generateDummyS2SToken("rd_caseworker_ref_api");
+        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION))
+                .thenReturn(token);
+        when(featureToggleService.isFlagEnabled(anyString(),anyString())).thenReturn(true);
+
+        String serviceName = featureConditionEvaluation.getServiceName("test-flag");
+        assertThat(serviceName).isNotEmpty().isEqualTo("rd_caseworker_ref_api");
+    }
+
+    static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
                 .setSubject(serviceName)
                 .setIssuedAt(new Date())
