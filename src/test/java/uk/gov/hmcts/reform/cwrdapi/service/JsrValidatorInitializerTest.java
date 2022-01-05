@@ -8,28 +8,31 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 
+import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
 
-public class JsrValidatorInitializerTest {
+class JsrValidatorInitializerTest {
 
     @Spy
     @InjectMocks
     JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
 
     @BeforeEach
-    public void init() {
+    void init() {
         openMocks(this);
         jsrValidatorInitializer.initializeFactory();
     }
 
     @Test
-    public void testGetNoInvalidJsrRecords() {
+    void testGetNoInvalidJsrRecords() {
         List<CaseWorkerDomain> caseWorkerProfiles = buildCaseWorkerProfileData();
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         assertEquals(0, records.size());
@@ -37,7 +40,7 @@ public class JsrValidatorInitializerTest {
     }
 
     @Test
-    public void testGetInvalidJsrRecords() {
+    void testGetInvalidJsrRecords() {
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         profile.setOfficialEmail("abc.com");
@@ -45,10 +48,15 @@ public class JsrValidatorInitializerTest {
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         assertEquals(1, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
+
+        Set<ConstraintViolation<CaseWorkerDomain>> constraintViolationSet =
+                jsrValidatorInitializer.getConstraintViolations();
+
+        assertThat(constraintViolationSet).isNotEmpty();
     }
 
     @Test
-    public void testGetInvalidJsrRecords_withDifferentEmails() {
+    void testGetInvalidJsrRecords_withDifferentEmails() {
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerDomain profile1 = buildCaseWorkerProfileData("tEst123-CRD3@JUSTICE.GOV.UK");
         CaseWorkerDomain profile2 = buildCaseWorkerProfileData("$%^&@justice.gov.uk");
