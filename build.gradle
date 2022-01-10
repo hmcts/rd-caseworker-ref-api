@@ -462,7 +462,7 @@ dependencies {
   testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.0.2'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
-  testImplementation('com.opentable.components:otj-pg-embedded:0.13.3')
+  testImplementation('com.opentable.components:otj-pg-embedded:0.13.4')
   testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
