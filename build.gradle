@@ -414,7 +414,7 @@ dependencies {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   //Fix for CVE-2021-29425
-  implementation 'commons-io:commons-io:2.8.0'
+  implementation 'commons-io:commons-io:2.11.0'
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
