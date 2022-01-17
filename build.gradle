@@ -407,7 +407,7 @@ dependencies {
   implementation('io.netty:netty-codec-http2:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-socks:4.1.69.Final') {
+  implementation('io.netty:netty-codec-socks:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   implementation('io.netty:netty-handler-proxy:4.1.69.Final') {
