@@ -79,9 +79,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
-
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
+
 @ExtendWith(MockitoExtension.class)
 public class CaseWorkerServiceImplTest {
     @Mock
@@ -919,6 +919,7 @@ public class CaseWorkerServiceImplTest {
                 actualUpdatedUser.getCaseWorkerLocations().size());
         assertNotEquals(cwProfileCreationRequest.getRoles().size(), actualUpdatedUser.getCaseWorkerRoles().size());
     }
+
     @Test
     public void testNamesMismatch_Sc1() throws JsonProcessingException {
 
@@ -954,6 +955,7 @@ public class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
+
     @Test
     public void testNamesMismatch_Sc2() throws JsonProcessingException {
 
@@ -985,6 +987,7 @@ public class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(0)).modifyUserRoles(any(), any(), any());
 
     }
+
     @Test
     public void testNamesMismatch_Sc3() throws JsonProcessingException {
 
