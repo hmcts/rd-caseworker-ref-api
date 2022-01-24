@@ -62,7 +62,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOA
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 
 public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
@@ -310,7 +309,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailure() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin="+SRD)));
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
@@ -330,7 +329,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             .errorDescription(errorMessageFromIdam).build();
 
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin="+SRD))
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD"))
             .willReturn(aResponse().withStatus(404)
                 .withBody(new Gson().toJson(errorResponse).getBytes())));
 
@@ -349,7 +348,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin="+SRD)));
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
