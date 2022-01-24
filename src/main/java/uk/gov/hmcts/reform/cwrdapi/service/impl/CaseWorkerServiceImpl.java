@@ -96,6 +96,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntityWithListBody;
 
@@ -589,24 +590,38 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
                 return false;
             }
-
-            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
+
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
                     new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
-            if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
-                Set<RoleName> mergedRoles = idamRolesCwr.stream()
-                        .filter(s -> !(userProfileRoles.contains(s)))
-                        .map(RoleName::new)
-                        .collect(toSet());
-                if (isNotEmpty(mergedRoles)) {
-                    UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-                            .rolesAdd(mergedRoles).build();
-                    return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
-                            cwrProfileRequest.getRowId());
+            if ((!userProfileRoles.equals(idamRolesCwr) && isNotEmpty(idamRolesCwr))
+                    || (!(cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName()))
+                    || !(cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName())))) {
+
+                UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
+                Set<RoleName> mergedRoles = null;
+                if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
+                    mergedRoles = idamRolesCwr.stream()
+                            .filter(s -> !(userProfileRoles.contains(s)))
+                            .map(RoleName::new)
+                            .collect(toSet());
                 }
+                if (isNotEmpty(mergedRoles)) {
+                    builder
+                            .rolesAdd(mergedRoles).firstName(cwrProfileRequest.getFirstName())
+                            .lastName(cwrProfileRequest.getLastName()).build();
+                } else  {
+
+                    builder
+                            .firstName(cwrProfileRequest.getFirstName())
+                            .lastName(cwrProfileRequest.getLastName()).build();
+                }
+                return isEachRoleUpdated(builder.build(), idamId, "EXUI",
+                        cwrProfileRequest.getRowId());
+
             }
         } catch (Exception exception) {
             log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
@@ -668,7 +683,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Response response = null;
         Object clazz;
         try {
-            response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
+            response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest), SRD);
 
             clazz = (response.status() == 201 || response.status() == 409)
                     ? UserProfileCreationResponse.class : ErrorResponse.class;

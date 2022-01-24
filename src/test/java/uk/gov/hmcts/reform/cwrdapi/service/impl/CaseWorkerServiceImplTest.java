@@ -81,7 +81,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
-
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 @ExtendWith(MockitoExtension.class)
 public class CaseWorkerServiceImplTest {
     @Mock
@@ -194,7 +194,7 @@ public class CaseWorkerServiceImplTest {
         when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
                 .thenReturn(new ArrayList<>());
 
-        when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
+        when(userProfileFeignClient.createUserProfile(any(),SRD)).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
 
         List<CaseWorkersProfileCreationRequest> requests = new ArrayList<>();
@@ -224,7 +224,7 @@ public class CaseWorkerServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
-        when(userProfileFeignClient.createUserProfile(any())).thenReturn(Response.builder()
+        when(userProfileFeignClient.createUserProfile(any(),SRD)).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(mapper.writeValueAsString(userProfileCreationResponse),
                         defaultCharset())
                 .status(409).build());
