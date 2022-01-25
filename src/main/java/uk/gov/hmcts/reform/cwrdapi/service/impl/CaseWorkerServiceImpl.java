@@ -597,30 +597,18 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
                     new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
-            if ((!userProfileRoles.equals(idamRolesCwr) && isNotEmpty(idamRolesCwr))
+            Set<RoleName> mergedRoles = null;
+            if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
+                mergedRoles = idamRolesCwr.stream()
+                        .filter(s -> !(userProfileRoles.contains(s)))
+                        .map(RoleName::new)
+                        .collect(toSet());
+            }
+            if (isNotEmpty(mergedRoles)
                     || (!(cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName()))
                     || !(cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName())))) {
 
-                UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
-                Set<RoleName> mergedRoles = null;
-                if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
-                    mergedRoles = idamRolesCwr.stream()
-                            .filter(s -> !(userProfileRoles.contains(s)))
-                            .map(RoleName::new)
-                            .collect(toSet());
-                }
-                if (isNotEmpty(mergedRoles)) {
-                    builder
-                            .rolesAdd(mergedRoles).firstName(cwrProfileRequest.getFirstName())
-                            .lastName(cwrProfileRequest.getLastName()).build();
-                } else  {
-
-                    builder
-                            .firstName(cwrProfileRequest.getFirstName())
-                            .lastName(cwrProfileRequest.getLastName()).build();
-                }
-                return isEachRoleUpdated(builder.build(), idamId, "EXUI",
-                        cwrProfileRequest.getRowId());
+                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles);
 
             }
         } catch (Exception exception) {
@@ -632,6 +620,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
         return true;
     }
+
+
 
     public CaseWorkerProfile mapCaseWorkerProfileRequest(String idamId,
                                                          CaseWorkersProfileCreationRequest cwrdProfileRequest,
@@ -852,6 +842,24 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             return Optional.ofNullable(responseEntity.getBody());
         }
         return Optional.empty();
+    }
+
+    private boolean updateMismatchedDatatoUP(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId,
+                                             Set<RoleName> mergedRoles) {
+        UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
+
+        if (isNotEmpty(mergedRoles)) {
+            builder
+                    .rolesAdd(mergedRoles).firstName(cwrProfileRequest.getFirstName())
+                    .lastName(cwrProfileRequest.getLastName()).build();
+        } else  {
+
+            builder
+                    .firstName(cwrProfileRequest.getFirstName())
+                    .lastName(cwrProfileRequest.getLastName()).build();
+        }
+        return isEachRoleUpdated(builder.build(), idamId, "EXUI",
+                cwrProfileRequest.getRowId());
     }
 }
 
