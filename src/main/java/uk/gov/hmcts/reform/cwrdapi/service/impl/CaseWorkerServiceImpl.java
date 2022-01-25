@@ -607,8 +607,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             }
             BiPredicate<String,String> biPredicate = (s1,s2) -> s1.equals(s2);
             if (isNotEmpty(mergedRoles)
-                    || !(biPredicate.test(cwrProfileRequest.getFirstName(),userProfileResponse.getFirstName()))
-                    || !(biPredicate.test(cwrProfileRequest.getLastName(),userProfileResponse.getLastName()))) {
+                    || (biPredicate.negate().test(cwrProfileRequest.getFirstName(), userProfileResponse.getFirstName()))
+                    || (biPredicate.negate().test(cwrProfileRequest.getLastName(),userProfileResponse.getLastName()))) {
 
                 return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles);
 
