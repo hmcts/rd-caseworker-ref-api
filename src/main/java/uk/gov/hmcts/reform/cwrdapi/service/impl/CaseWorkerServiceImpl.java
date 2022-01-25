@@ -70,6 +70,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -604,9 +605,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .map(RoleName::new)
                         .collect(toSet());
             }
+            BiPredicate<String,String> biPredicate = (s1,s2) -> s1.equals(s2);
             if (isNotEmpty(mergedRoles)
-                    || (!(cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName()))
-                    || !(cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName())))) {
+                    || !(biPredicate.test(cwrProfileRequest.getFirstName(),userProfileResponse.getFirstName()))
+                    || !(biPredicate.test(cwrProfileRequest.getLastName(),userProfileResponse.getLastName()))) {
 
                 return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles);
 
