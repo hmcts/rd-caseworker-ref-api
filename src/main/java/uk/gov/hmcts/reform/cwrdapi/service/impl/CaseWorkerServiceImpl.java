@@ -733,20 +733,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
                                      String origin, long rowId) {
-        boolean isEachRoleUpdated = true;
+        boolean isEachRoleUpdated;
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
                 UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
-                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())) {
-                    if (isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
-                            .equals(valueOf(HttpStatus.CREATED.value())))) {
+                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
+                        || nonNull(userProfileRolesResponse.getAttributeResponse())) {
+                    isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse,rowId);
 
-                        validationServiceFacade.logFailures(
-                                userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage(), rowId);
-                        isEachRoleUpdated = false;
-                    }
                 } else {
                     validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
                     isEachRoleUpdated = false;
@@ -764,7 +760,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
         return isEachRoleUpdated;
     }
-
 
     private Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
                                                           String userId, String origin) {
@@ -858,10 +853,34 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             builder
                     .firstName(cwrProfileRequest.getFirstName())
-                    .lastName(cwrProfileRequest.getLastName()).build();
+                    .lastName(cwrProfileRequest.getLastName())
+                    .idamStatus(STATUS_ACTIVE);
+
         }
         return isEachRoleUpdated(builder.build(), idamId, "EXUI",
                 cwrProfileRequest.getRowId());
+    }
+
+    private boolean isRecordupdatedinUP(UserProfileRolesResponse userProfileRolesResponse,long rowId) {
+
+        boolean isRecordUpdate = true;
+        if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
+                && isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                .equals(valueOf(HttpStatus.CREATED.value())))) {
+
+            validationServiceFacade.logFailures(
+                    userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage(), rowId);
+            isRecordUpdate = false;
+        }
+        if (nonNull(userProfileRolesResponse.getAttributeResponse())
+                && !(userProfileRolesResponse.getAttributeResponse().getIdamStatusCode()
+                .equals(Integer.valueOf(HttpStatus.OK.value())))) {
+
+            validationServiceFacade.logFailures(
+                    userProfileRolesResponse.getAttributeResponse().getIdamMessage(), rowId);
+            isRecordUpdate = false;
+        }
+        return isRecordUpdate;
     }
 }
 
