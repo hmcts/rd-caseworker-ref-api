@@ -920,7 +920,7 @@ public class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void testNamesMismatch_Sc1() throws JsonProcessingException {
+     void testNamesMismatch_Sc1() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -956,7 +956,7 @@ public class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void testNamesMismatch_Sc2() throws JsonProcessingException {
+     void testNamesMismatch_Sc2() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -988,7 +988,7 @@ public class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void testNamesMismatch_Sc3() throws JsonProcessingException {
+     void testNamesMismatch_Sc3() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -1024,7 +1024,7 @@ public class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void testNamesMismatch_Sc4() throws JsonProcessingException {
+     void testNamesMismatch_Sc4() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -1060,7 +1060,7 @@ public class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void testNamesMismatch_Sc5() throws JsonProcessingException {
+     void testNamesMismatch_Sc5() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         AttributeResponse attributeResponse = new AttributeResponse();
@@ -1096,7 +1096,7 @@ public class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void testNamesMismatch_Sc6() throws JsonProcessingException {
+     void testNamesMismatch_Sc6() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         AttributeResponse attributeResponse = new AttributeResponse();
