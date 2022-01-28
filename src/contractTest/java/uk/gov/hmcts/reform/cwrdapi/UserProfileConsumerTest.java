@@ -133,7 +133,7 @@ public class UserProfileConsumerTest {
                 .stringType("email", "james.bond@justice.gov.uk")
                 .stringType("firstName", "james")
                 .stringType("lastName", "bond")
-                .stringType("idamStatus", "status")
+                .stringType("idamStatus", "ACTIVE")
                 .minArrayLike("rolesAdd", 1, obj -> obj.stringType("name", "tribunal-caseworker"))
                 .minArrayLike("rolesDelete", 1, obj -> obj.stringType("name", "caseworker"))
         ).build();
