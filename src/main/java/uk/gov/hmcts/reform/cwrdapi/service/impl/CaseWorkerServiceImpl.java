@@ -70,7 +70,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -605,13 +604,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .map(RoleName::new)
                         .collect(toSet());
             }
-            BiPredicate<String,String> biPredicate = (s1,s2) -> s1.equals(s2);
-            if (isNotEmpty(mergedRoles)
-                    || (biPredicate.negate().test(cwrProfileRequest.getFirstName(), userProfileResponse.getFirstName()))
-                    || (biPredicate.negate().test(cwrProfileRequest.getLastName(),userProfileResponse.getLastName()))) {
-
-                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles);
-
+            var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
+                    || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
+            if (isNotEmpty(mergedRoles) || hasNameChanged) {
+                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
             }
         } catch (Exception exception) {
             log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
@@ -842,14 +838,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     private boolean updateMismatchedDatatoUP(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId,
-                                             Set<RoleName> mergedRoles) {
+                                             Set<RoleName> mergedRoles,
+                                             boolean hasNameChanged) {
         UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
 
         if (isNotEmpty(mergedRoles)) {
             builder
-                    .rolesAdd(mergedRoles).firstName(cwrProfileRequest.getFirstName())
-                    .lastName(cwrProfileRequest.getLastName()).build();
-        } else  {
+                    .rolesAdd(mergedRoles);
+        }
+
+        if (hasNameChanged) {
 
             builder
                     .firstName(cwrProfileRequest.getFirstName())
