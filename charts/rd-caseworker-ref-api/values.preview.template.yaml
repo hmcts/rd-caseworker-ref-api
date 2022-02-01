@@ -24,6 +24,7 @@ java:
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
     ENVIRONMENT_NAME: "preview"
+    USER_PROFILE_URL: "http://rd-user-profile-api-pr-769.service.core-compute-preview.internal"
   postgresql:
     enabled: true
     postgresqlUsername: dbrdcaseworker
