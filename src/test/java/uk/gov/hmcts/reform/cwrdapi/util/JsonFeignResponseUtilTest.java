@@ -10,10 +10,8 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 public class JsonFeignResponseUtilTest {
 
@@ -57,12 +54,12 @@ public class JsonFeignResponseUtilTest {
         Response response = Response.builder().status(200).reason("OK").headers(header).body(bodyMock)
                 .request(mock(Request.class)).build();
 
-        try {
+        /*try {
             when(bodyMock.asInputStream()).thenThrow(new IOException());
             when(bodyMock.asReader(Charset.defaultCharset())).thenThrow(new IOException());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response,
                 UserProfileCreationResponse.class);

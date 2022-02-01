@@ -50,8 +50,8 @@ def jarName = 'rd-caseworker-ref-api.jar'
 group = 'uk.gov.hmcts.reform.rdcaseworker'
 version = '0.0.1'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 17
+targetCompatibility = 17
 
 jacocoTestCoverageVerification {
   violationRules {
@@ -156,6 +156,13 @@ pmd {
     'category/java/bestpractices.xml'
   ]
 }
+tasks.named("processIntegrationTestResources") {
+  duplicatesStrategy = 'include'
+}
+
+tasks.named("processFunctionalTestResources") {
+  duplicatesStrategy = 'include'
+}
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -251,7 +258,7 @@ runProviderPactVerification.dependsOn contractTest
 runProviderPactVerification.finalizedBy pactVerify
 
 jacoco {
-  toolVersion = "0.8.5"
+  toolVersion = "0.8.7"
 }
 
 jacocoTestReport {
@@ -439,8 +446,16 @@ dependencies {
     testImplementation ("com.github.tomakehurst:wiremock-jre8:2.31.0") {
       exclude group: 'com.github.jknack'
     }
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
+    testImplementation ("org.mockito:mockito-core:4.3.1") {
+      exclude group: "net.bytebuddy", module: "byte-buddy"
+      exclude group: "net.bytebuddy", module: "byte-buddy-agent"
+    }
+    testImplementation ("org.mockito:mockito-inline:4.3.1") {
+      exclude group: "net.bytebuddy", module: "byte-buddy"
+      exclude group: "net.bytebuddy", module: "byte-buddy-agent"
+    }
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.7'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
