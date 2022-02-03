@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
