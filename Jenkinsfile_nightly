@@ -54,7 +54,7 @@ withNightlyPipeline(type, product, component) {
   enableMutationTest()
   enableFullFunctionalTest()
   enableSecurityScan()
-  //enableFortifyScan()
+  enableFortifyScan()
 
   after('mutationTest') {
     publishHTML target: [
