@@ -372,6 +372,7 @@ dependencies {
   implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.73.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.73.Final'
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.73.Final'
+  implementation group: 'io.netty.incubator', name: 'netty-incubator-codec-quic', version: '0.0.20.Final'
   
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
