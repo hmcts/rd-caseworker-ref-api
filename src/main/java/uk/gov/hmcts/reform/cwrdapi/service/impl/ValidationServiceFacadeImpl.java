@@ -106,7 +106,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     }
 
 
-    private String getKeyFieldValue(Field field, CaseWorkerDomain domain) {
+    public String getKeyFieldValue(Field field, CaseWorkerDomain domain) {
         try {
             return (String) field.get(domain);
         } catch (Exception ex) {

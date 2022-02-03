@@ -5,22 +5,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
+import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.repository.AuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -30,6 +38,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
 
 @ExtendWith(MockitoExtension.class)
 public class ValidationServiceFacadeTest {
@@ -43,6 +52,8 @@ public class ValidationServiceFacadeTest {
 
     @SuppressWarnings("unchecked")
     AuditRepository caseWorkerAuditRepository = mock(AuditRepository.class);
+
+    CaseWorkerAudit caseWorkerAudit = mock(CaseWorkerAudit.class);
 
 
     @BeforeEach
@@ -115,6 +126,10 @@ public class ValidationServiceFacadeTest {
 
     @Test
     public void testCreateException() {
+        when(validationServiceFacadeImpl.createException(1L, "test", 1L))
+                .thenReturn(ExceptionCaseWorker.builder().jobId(1L).build());
+        assertNotNull(validationServiceFacadeImpl.createException(1L, "test", 1L));
+
         validationServiceFacadeImpl.createException(1L, "testFailure", 1L);
         verify(validationServiceFacadeImpl)
             .createException(1L, "testFailure", 1L);
@@ -133,4 +148,42 @@ public class ValidationServiceFacadeTest {
                 .startCaseworkerAuditing(AuditStatus.PARTIAL_SUCCESS, "CWR-Start");
         assertEquals(1, jobId);
     }
+
+    @Test
+    public void testCaseWorkerAudit() {
+
+        AuditStatus auditStatus = AuditStatus.PARTIAL_SUCCESS;
+
+        when(caseWorkerAudit.getJobId()).thenReturn(1L);
+        when(caseWorkerAudit.getStatus()).thenReturn("Partial Success");
+        when(caseWorkerAudit.getJobEndTime()).thenCallRealMethod();
+        CaseWorkerAudit caseWorkerAudit2 = CaseWorkerAudit.builder()
+                .fileName("test.xlsx")
+                .jobStartTime(LocalDateTime.now())
+                .jobId(1L)
+                .status(auditStatus.getStatus()).build();
+
+        ReflectionTestUtils.setField(validationServiceFacadeImpl, "caseWorkerAudit", caseWorkerAudit2);
+        long jobId = caseWorkerAudit.getJobId();
+
+        CaseWorkerAudit caseWorkerAudit1 = validationServiceFacadeImpl.createOrUpdateCaseworkerAudit(auditStatus, "");
+        List<ExceptionCaseWorker> exceptionCaseWorkers = exceptionCaseWorkerRepository.findByJobId(jobId);
+
+        assertNotNull(caseWorkerAudit);
+        assertEquals(caseWorkerAudit1.getStatus(), "Partial Success");
+        assertEquals(caseWorkerAudit1.getJobId(), Long.valueOf(0));
+        assertNotNull(caseWorkerAudit1.getJobEndTime());
+        assertNotNull(caseWorkerAudit1.getStatus());
+
+        verify(caseWorkerAudit, times(1)).getJobId();
+
+    }
+
+    @Test
+    public void testGetAuditJobId() {
+        when(validationServiceFacadeImpl.getAuditJobId()).thenReturn(1L);
+        assertEquals(validationServiceFacadeImpl.getAuditJobId(), 1L);
+        assertNotEquals(validationServiceFacadeImpl.getAuditJobId(), 0L);
+    }
+
 }
