@@ -4,12 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
+import org.apache.poi.ss.formula.functions.T;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +40,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -122,6 +126,8 @@ public class CaseWorkerServiceImplTest {
 
     @BeforeEach
     public void setUp() {
+        MockitoAnnotations.openMocks(this);
+
         Set<String> idamRoles = new HashSet<>();
         idamRoles.add("IdamRole1");
         idamRoles.add("IdamRole2");
@@ -151,6 +157,7 @@ public class CaseWorkerServiceImplTest {
                 .idamRoles(idamRoles)
                 .firstName("testFN")
                 .lastName("testLN")
+                .regionId(1)
                 .region("testRegion")
                 .userType("testUser1")
                 .workerWorkAreaRequests(singletonList(caseWorkerWorkAreaRequest))
@@ -202,6 +209,17 @@ public class CaseWorkerServiceImplTest {
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
         verify(caseWorkerIdamRoleAssociationRepository, times(1)).findByRoleTypeInAndServiceCodeIn(any(), any());
+    }
+
+    @Test
+    public void test_setNewCaseWorkerProfileFlag() {
+        CaseWorkerProfile caseWorkerProfileMock = mock(CaseWorkerProfile.class);
+        caseWorkerProfileMock.setCaseWorkerId("CWID1");
+        caseWorkerServiceImpl.setNewCaseWorkerProfileFlag(caseWorkerProfileMock);
+        assertThat(caseWorkerProfileMock).isNotNull();
+
+        verify(caseWorkerProfileMock, times(1)).setNew(true);
+
     }
 
     @Test
@@ -299,7 +317,16 @@ public class CaseWorkerServiceImplTest {
                 .idamRoles("role1")
                 .roleId(1)
                 .build();
-        List<ServiceRoleMapping> serviceRoleMappingList = singletonList(serviceRoleMapping);
+        ServiceRoleMapping serviceRoleMapping1 = ServiceRoleMapping.builder()
+                .serviceId("BA12")
+                .idamRoles("role2")
+                .roleId(2)
+                .build();
+
+        List<ServiceRoleMapping> serviceRoleMappingList = new ArrayList<>();
+        serviceRoleMappingList.add(serviceRoleMapping);
+        serviceRoleMappingList.add(serviceRoleMapping1);
+
         IdamRolesMappingResponse idamRolesMappingResponse = caseWorkerServiceImpl
                 .buildIdamRoleMappings(serviceRoleMappingList);
 
@@ -440,6 +467,8 @@ public class CaseWorkerServiceImplTest {
                         .roles(singletonList(role))
                         .locations(singletonList(location))
                         .workAreas(singletonList(workArea))
+                        .taskSupervisor("Y")
+                        .caseAllocator("N")
                         .build();
 
         return caseWorkerProfile;

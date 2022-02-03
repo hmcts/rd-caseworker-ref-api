@@ -191,7 +191,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         return processedCwProfiles;
     }
 
-    private void setNewCaseWorkerProfileFlag(CaseWorkerProfile caseWorkerProfile) {
+    public void setNewCaseWorkerProfileFlag(CaseWorkerProfile caseWorkerProfile) {
         if (nonNull(caseWorkerProfile)) {
             caseWorkerProfile.setNew(true);
         }
