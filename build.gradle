@@ -419,7 +419,14 @@ dependencies {
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  // https://mvnrepository.com/artifact/io.netty/netty-tcnative
+  implementation group: 'io.netty', name: 'netty-tcnative', version: '2.0.48.Final'
+  // https://mvnrepository.com/artifact/io.netty.incubator/netty-incubator-codec-quic
+  implementation group: 'io.netty.incubator', name: 'netty-incubator-codec-quic', version: '0.0.20.Final'
+
+
+
+  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
