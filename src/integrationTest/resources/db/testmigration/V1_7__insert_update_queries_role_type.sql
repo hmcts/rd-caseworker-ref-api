@@ -15,6 +15,11 @@ SET description = 'National Business Centre Payments Team',
 last_update =  CURRENT_TIMESTAMP
 WHERE role_id = 8;
 
+UPDATE role_type
+SET description = 'CTSC Team Leader',
+last_update =  CURRENT_TIMESTAMP
+WHERE role_id = 9;
+
 INSERT INTO
     role_type (role_id, description, created_date)
 VALUES
