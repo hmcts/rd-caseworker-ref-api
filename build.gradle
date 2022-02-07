@@ -378,40 +378,43 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
-  implementation('io.netty:netty-codec:4.1.72.Final') {
+  // https://mvnrepository.com/artifact/io.netty/netty-codec-http2
+  implementation group: 'io.netty', name: 'netty-codec-http2', version: '4.1.73.Final'
+
+  implementation('io.netty:netty-codec:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-http:4.1.72.Final') {
+  implementation('io.netty:netty-codec-http:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-common:4.1.72.Final') {
+  implementation('io.netty:netty-common:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-handler:4.1.72.Final') {
+  implementation('io.netty:netty-handler:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-resolver:4.1.72.Final') {
+  implementation('io.netty:netty-resolver:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport:4.1.72.Final') {
+  implementation('io.netty:netty-transport:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-epoll:4.1.72.Final') {
+  implementation('io.netty:netty-transport-native-epoll:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-kqueue:4.1.72.Final') {
+  implementation('io.netty:netty-transport-native-kqueue:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-unix-common:4.1.72.Final') {
+  implementation('io.netty:netty-transport-native-unix-common:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-http2:4.1.72.Final') {
+  implementation('io.netty:netty-codec-http2:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-socks:4.1.72.Final') {
+  implementation('io.netty:netty-codec-socks:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-handler-proxy:4.1.72.Final') {
+  implementation('io.netty:netty-handler-proxy:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   //Fix for CVE-2021-29425
@@ -419,12 +422,38 @@ dependencies {
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
+  // https://mvnrepository.com/artifact/io.netty/netty
+  implementation group: 'io.netty', name: 'netty', version: '3.10.6.Final'
+
   // https://mvnrepository.com/artifact/io.netty/netty-tcnative
   implementation group: 'io.netty', name: 'netty-tcnative', version: '2.0.48.Final'
   // https://mvnrepository.com/artifact/io.netty.incubator/netty-incubator-codec-quic
-  implementation group: 'io.netty.incubator', name: 'netty-incubator-codec-quic', version: '0.0.20.Final'
+  implementation group: 'io.netty.incubator', name: 'netty-incubator-codec-quic', version: '0.0.13.Final'
+// https://mvnrepository.com/artifact/io.netty/netty-transport-classes-epoll
+  implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.73.Final'
+// https://mvnrepository.com/artifact/io.netty/netty-transport-native-kqueue
+  implementation group: 'io.netty', name: 'netty-transport-native-kqueue', version: '4.1.72.Final'
+  // https://mvnrepository.com/artifact/io.netty/netty-resolver-dns-classes-macos
+  implementation group: 'io.netty', name: 'netty-resolver-dns-classes-macos', version: '4.1.73.Final'
+
+  // https://mvnrepository.com/artifact/io.netty/netty-transport-native-kqueue
+  implementation group: 'io.netty', name: 'netty-transport-native-kqueue', version: '4.1.72.Final'
+  implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.72.Final'
+  // https://mvnrepository.com/artifact/io.netty/netty-tcnative-classes
+  implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.48.Final'
 
 
+  // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+  // https://mvnrepository.com/artifact/ch.qos.logback/logback-core
+  implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+
+
+
+
+
+
+  implementation group: 'org.springframework', name: 'spring-core', version: '5.3.14'
 
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
