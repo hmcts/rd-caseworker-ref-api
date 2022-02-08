@@ -16,16 +16,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE;
 
 @ExtendWith(MockitoExtension.class)
-public class AuditInterceptorTest {
+class AuditInterceptorTest {
 
     @InjectMocks
     AuditInterceptor interceptor;
@@ -49,16 +45,18 @@ public class AuditInterceptorTest {
     JwtGrantedAuthoritiesConverter converter;
 
     @Test
-    public void testPreHandleWithNobody() {
+    void testPreHandleWithNobody() {
         when(request.getFile(FILE)).thenReturn(null);
-        Assertions.assertThrows(ExcelValidationException.class, () -> {
-            interceptor.preHandle(request, response, new Object());
-            verify(interceptor, times(1)).preHandle(eq(request), eq(response), any());
-        });
+
+        ExcelValidationException exception = Assertions.assertThrows(ExcelValidationException.class, () ->
+                interceptor.preHandle(request, response, new Object()));
+
+        Assertions.assertTrue(exception.getLocalizedMessage().contains(
+                "There is no data in the file uploaded. Upload a valid file in xlsx or xls format"));
     }
 
     @Test
-    public void testPreHandleWithBody() {
+    void testPreHandleWithBody() {
         when(request.getFile(FILE)).thenReturn(multipartFile);
         UserInfo userInfo = UserInfo.builder().uid("122323").build();
         when(converter.getUserInfo()).thenReturn(userInfo);

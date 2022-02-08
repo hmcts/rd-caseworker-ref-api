@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StaffReferenceExceptionTest {
+class StaffReferenceExceptionTest {
     @Test
-    public void test_handle_json_feign_response_parsing_exception() {
+    void test_handle_json_feign_response_parsing_exception() {
         StaffReferenceException staffReferenceException =
                 new StaffReferenceException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "Parsing exception", "Parsing exception");
