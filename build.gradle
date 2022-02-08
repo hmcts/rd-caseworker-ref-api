@@ -35,7 +35,7 @@ def versions = [
   reformS2sClient    : '4.0.0',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
-  springBoot         : '2.4.9',
+  springBoot         : '2.4.12',
   springfoxSwagger   : '2.9.2',
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.2.2",
@@ -467,7 +467,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.3')
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
