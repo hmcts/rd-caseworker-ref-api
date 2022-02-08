@@ -47,9 +47,9 @@ class AuditInterceptorTest {
     @Test
     void testPreHandleWithNobody() {
         when(request.getFile(FILE)).thenReturn(null);
-
+        Object object = new Object();
         ExcelValidationException exception = Assertions.assertThrows(ExcelValidationException.class, () ->
-                interceptor.preHandle(request, response, new Object()));
+                interceptor.preHandle(request, response,object));
 
         Assertions.assertTrue(exception.getLocalizedMessage().contains(
                 "There is no data in the file uploaded. Upload a valid file in xlsx or xls format"));
