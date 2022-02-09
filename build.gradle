@@ -12,11 +12,11 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.33.0'
+    id 'com.github.ben-manes.versions' version '0.36.0'
     id "info.solidsoft.pitest" version '1.7.0'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.4.11'
+    id 'org.springframework.boot' version '2.4.9'
     id "org.flywaydb.flyway" version '8.3.0'
     id 'au.com.dius.pact' version '4.1.7'
 }
@@ -35,7 +35,7 @@ def versions = [
   reformS2sClient    : '4.0.0',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
-  springBoot         : '2.4.11',
+  springBoot         : '2.4.9',
   springfoxSwagger   : '2.9.2',
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.2.2",
