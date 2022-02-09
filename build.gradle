@@ -16,7 +16,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.4.9'
+    id 'org.springframework.boot' version '2.4.12'
     id "org.flywaydb.flyway" version '8.3.0'
     id 'au.com.dius.pact' version '4.1.7'
 }
@@ -371,8 +371,6 @@ dependencies {
   implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.69.Final'
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
-
-
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
