@@ -16,7 +16,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.4.12'
+    id 'org.springframework.boot' version '2.4.10'
     id "org.flywaydb.flyway" version '8.3.0'
     id 'au.com.dius.pact' version '4.1.7'
 }
@@ -35,7 +35,7 @@ def versions = [
   reformS2sClient    : '4.0.0',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
-  springBoot         : '2.4.12',
+  springBoot         : '2.4.10',
   springfoxSwagger   : '2.9.2',
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.2.2",
@@ -458,8 +458,7 @@ dependencies {
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-  testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '3.1.0'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-verifier', version: '3.1.0'
+  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.3')
