@@ -12,11 +12,11 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.36.0'
+    id 'com.github.ben-manes.versions' version '0.33.0'
     id "info.solidsoft.pitest" version '1.7.0'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.4.12'
+    id 'org.springframework.boot' version '2.4.9'
     id "org.flywaydb.flyway" version '8.3.0'
     id 'au.com.dius.pact' version '4.1.7'
 }
@@ -35,13 +35,13 @@ def versions = [
   reformS2sClient    : '4.0.0',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
-  springBoot         : '2.4.12',
+  springBoot         : '2.4.9',
   springfoxSwagger   : '2.9.2',
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.2.2",
   restAssured        : '4.3.3',
   jackson            : '2.12.1',
-  log4j              : '2.17.1'
+  log4j              : '2.17.0'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -369,8 +369,8 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-core', version: '5.3.12'
   implementation group: 'io.netty', name: 'netty-codec-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.72.Final'
-  implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.72.Final'
-  implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.72.Final'
+  implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.69.Final'
+  implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
 
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
@@ -378,43 +378,40 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
-  //cve fix for cve-2021-42550
-  implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
-
-  implementation('io.netty:netty-codec:4.1.72.Final') {
+  implementation('io.netty:netty-codec:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-http:4.1.72.Final') {
+  implementation('io.netty:netty-codec-http:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-common:4.1.72.Final') {
+  implementation('io.netty:netty-common:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-handler:4.1.72.Final') {
+  implementation('io.netty:netty-handler:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-resolver:4.1.72.Final') {
+  implementation('io.netty:netty-resolver:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport:4.1.72.Final') {
+  implementation('io.netty:netty-transport:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-epoll:4.1.72.Final') {
+  implementation('io.netty:netty-transport-native-epoll:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-kqueue:4.1.72.Final') {
+  implementation('io.netty:netty-transport-native-kqueue:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-unix-common:4.1.72.Final') {
+  implementation('io.netty:netty-transport-native-unix-common:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-http2:4.1.72.Final') {
+  implementation('io.netty:netty-codec-http2:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-socks:4.1.72.Final') {
+  implementation('io.netty:netty-codec-socks:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-handler-proxy:4.1.72.Final') {
+  implementation('io.netty:netty-handler-proxy:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   //Fix for CVE-2021-29425
@@ -467,9 +464,9 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.3')
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.9'
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '3.0.9'
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '3.0.9'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
@@ -507,7 +504,7 @@ dependencyManagement {
 
   dependencies {
     // CVE-2021-42340
-    dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.0-M10') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
