@@ -6,17 +6,17 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RoleTypeRepositoryTest {
+class RoleTypeRepositoryTest {
 
     RoleTypeRepository roleTypeRepository = mock(RoleTypeRepository.class);
     List<RoleType> roleTypes = new ArrayList<>();
 
     @Test
-    public void findByServiceCodeTest() {
+    void findByServiceCodeTest() {
         when(roleTypeRepository.findAll()).thenReturn(roleTypes);
         assertNotNull(roleTypeRepository.findAll());
     }
