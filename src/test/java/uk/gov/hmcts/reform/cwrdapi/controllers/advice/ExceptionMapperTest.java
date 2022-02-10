@@ -11,18 +11,18 @@ import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
-public class ExceptionMapperTest {
+class ExceptionMapperTest {
 
     @InjectMocks
     private ExceptionMapper exceptionMapper;
 
     @Test
-    public void test_handle_empty_result_exception() {
+    void test_handle_empty_result_exception() {
         EmptyResultDataAccessException emptyResultDataAccessException = new EmptyResultDataAccessException(1);
 
         ResponseEntity<Object> responseEntity
@@ -34,7 +34,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_invalid_request_exception() {
+    void test_handle_invalid_request_exception() {
         InvalidRequestException invalidRequestException = new InvalidRequestException("Invalid Request");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.customValidationError(invalidRequestException);
@@ -46,7 +46,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_excel_validation_exception() {
+    void test_handle_excel_validation_exception() {
         ExcelValidationException excelValidationException = new ExcelValidationException(HttpStatus.BAD_REQUEST,
                 "Excel exception");
 
@@ -61,7 +61,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_idam_role_mapping_exception() {
+    void test_handle_idam_role_mapping_exception() {
         IdamRolesMappingException idamRolesMappingException =
                 new IdamRolesMappingException("Idam Roles Mapping Exception");
 
@@ -74,7 +74,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_case_worker_publish_message_exception() {
+    void test_handle_case_worker_publish_message_exception() {
         CaseworkerMessageFailedException caseworkerMessageFailedException =
                 new CaseworkerMessageFailedException(CaseWorkerConstants.ASB_PUBLISH_ERROR);
 
@@ -87,7 +87,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_launchDarkly_exception() {
+    void test_handle_launchDarkly_exception() {
         ForbiddenException forbiddenException = new ForbiddenException("LD Forbidden Exception");
         ResponseEntity<Object> responseEntity = exceptionMapper.handleLaunchDarklyException(forbiddenException);
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
@@ -96,7 +96,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_general_exception() {
+    void test_handle_general_exception() {
         Exception exception = new Exception("General Exception");
         ResponseEntity<Object> responseEntity = exceptionMapper.handleException(exception);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
@@ -107,7 +107,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_forbidden_error_exception() {
+    void test_handle_forbidden_error_exception() {
         AccessDeniedException exception = new AccessDeniedException("Access Denied");
 
         ResponseEntity<Object> responseEntity = exceptionMapper.handleForbiddenException(exception);
@@ -118,7 +118,7 @@ public class ExceptionMapperTest {
     }
 
     @Test
-    public void test_handle_json_feign_response_parsing_exception() {
+    void test_handle_json_feign_response_parsing_exception() {
         StaffReferenceException exception = new StaffReferenceException(HttpStatus.INTERNAL_SERVER_ERROR,
                 "Parsing exception", "Parsing exception");
 

@@ -8,13 +8,12 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings("unchecked")
-public class UserProfileCreationRequestTest {
+class UserProfileCreationRequestTest {
 
-    Set<String> roles = new HashSet(Arrays.asList("caseworker"));
+    Set<String> roles = new HashSet<>(Arrays.asList("caseworker"));
 
     @Test
-    public void testUserProfileCreationRequestWithBuilder() {
+    void testUserProfileCreationRequestWithBuilder() {
         UserProfileCreationRequest request = UserProfileCreationRequest.anUserProfileCreationRequest()
                 .email("abc@temp.com")
                 .firstName("first")
@@ -29,7 +28,7 @@ public class UserProfileCreationRequestTest {
     }
 
     @Test
-    public void testUserProfileCreationRequestWithConstrictor() {
+    void testUserProfileCreationRequestWithConstrictor() {
 
         UserProfileCreationRequest request1 = new UserProfileCreationRequest(
                 "abc@temp.com","first",
@@ -39,7 +38,7 @@ public class UserProfileCreationRequestTest {
         verify(request1);
     }
 
-    public void verify(UserProfileCreationRequest request) {
+    void verify(UserProfileCreationRequest request) {
         assertThat(request.getEmail()).isEqualTo("abc@temp.com");
         assertThat(request.getFirstName()).isEqualTo("first");
         assertThat(request.getLastName()).isEqualTo("last");
