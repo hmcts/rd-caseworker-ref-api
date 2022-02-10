@@ -10,26 +10,26 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseWorkerIdamRoleAssociationRepositoryTest {
+class CaseWorkerIdamRoleAssociationRepositoryTest {
     @Mock
     private CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
 
     private CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
         caseWorkerIdamRoleAssociation.setCwIdamRoleAssociationId(2L);
         caseWorkerIdamRoleAssociation.setIdamRole("testIdamRole");
     }
 
     @Test
-    public void test_findAll() {
+    void test_findAll() {
         when(caseWorkerIdamRoleAssociationRepository.findAll())
                 .thenReturn(Collections.singletonList(caseWorkerIdamRoleAssociation));
 
@@ -39,7 +39,7 @@ public class CaseWorkerIdamRoleAssociationRepositoryTest {
     }
 
     @Test
-    public void test_findByRoleType() {
+    void test_findByRoleType() {
         when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
                 .thenReturn(Collections.singletonList(caseWorkerIdamRoleAssociation));
 

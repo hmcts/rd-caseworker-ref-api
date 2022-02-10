@@ -7,12 +7,12 @@ import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RoleTypeTest {
+class RoleTypeTest {
     @Test
-    public void testRoleType() {
+    void testRoleType() {
         RoleType roleType = new RoleType();
         roleType.setRoleId(1L);
         roleType.setDescription("Test Description");
@@ -36,7 +36,7 @@ public class RoleTypeTest {
     }
 
     @Test
-    public void testRoleTypeContainingCaseWorkerRoles() {
+    void testRoleTypeContainingCaseWorkerRoles() {
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
         caseWorkerRole.setRoleId(1L);
 
@@ -48,7 +48,7 @@ public class RoleTypeTest {
     }
 
     @Test
-    public void testRoleTypeContainingCaseWorkerIdamRoleAssoc() {
+    void testRoleTypeContainingCaseWorkerIdamRoleAssoc() {
         CaseWorkerIdamRoleAssociation caseWorkerIdamRoleAssociation = new CaseWorkerIdamRoleAssociation();
         caseWorkerIdamRoleAssociation.setRoleId(1L);
 

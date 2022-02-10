@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IdamRolesMappingResponseTest {
+class IdamRolesMappingResponseTest {
 
     @Test
-    public void test_no_args_constructor() {
+    void test_no_args_constructor() {
         IdamRolesMappingResponse idamRolesMappingResponse = new IdamRolesMappingResponse();
         idamRolesMappingResponse.setMessage("testMessage");
         idamRolesMappingResponse.setStatusCode(200);
@@ -19,7 +19,7 @@ public class IdamRolesMappingResponseTest {
 
 
     @Test
-    public void test_all_args_constructor() {
+    void test_all_args_constructor() {
         IdamRolesMappingResponse idamRolesMappingResponse = new IdamRolesMappingResponse(200, "testMessage");
 
         assertThat(idamRolesMappingResponse.getMessage()).isEqualTo("testMessage");
