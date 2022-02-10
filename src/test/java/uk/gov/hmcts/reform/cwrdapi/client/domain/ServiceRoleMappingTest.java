@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ServiceRoleMappingTest {
+class ServiceRoleMappingTest {
 
     @Test
-    public void testServiceRoleMapping() {
+    void testServiceRoleMapping() {
         ServiceRoleMapping serviceRoleMapping = new ServiceRoleMapping();
         serviceRoleMapping.setServiceId("1");
         serviceRoleMapping.setRoleId(1);
@@ -23,7 +23,7 @@ public class ServiceRoleMappingTest {
     }
 
     @Test
-    public void testServiceRoleMappingBuilder() {
+    void testServiceRoleMappingBuilder() {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
                 .serviceId("1")
                 .roleId(1)

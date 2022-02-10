@@ -6,13 +6,13 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UserProfileCreationResponseTest {
+class UserProfileCreationResponseTest {
 
-    private UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-    private String testUuid = UUID.randomUUID().toString();
+    private final UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+    private final String testUuid = UUID.randomUUID().toString();
 
     @Test
-    public void test_has_mandatory_fields_specified_not_null() {
+    void test_has_mandatory_fields_specified_not_null() {
         userProfileCreationResponse.setIdamId(testUuid);
         userProfileCreationResponse.setIdamRegistrationResponse(201);
 

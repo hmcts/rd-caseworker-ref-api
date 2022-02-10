@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE_MAPPING_SHEET_NAME;
 
 @ExtendWith(MockitoExtension.class)
-public class ExcelAdaptorServiceImplTest {
+class ExcelAdaptorServiceImplTest {
 
     @Mock
     IValidationService validationService;
@@ -36,7 +36,7 @@ public class ExcelAdaptorServiceImplTest {
     ExcelAdaptorServiceImpl excelAdaptorServiceImpl;
 
     @BeforeEach
-    public void initialize() {
+    void initialize() {
         List<String> acceptableCaseWorkerHeaders = List.of("First Name","Last Name","Email","Region","Region ID",
                 "Primary Base Location Name","Primary Base Location ID","Secondary Location","Secondary Location ID",
                 "User type","Primary Role","Secondary Role","Service1","Service1 ID","Service2",
@@ -51,7 +51,7 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void parseXlsxShouldThrowExceptionWhenOnlyHeaderPresentTest() throws IOException {
+    void parseXlsxShouldThrowExceptionWhenOnlyHeaderPresentTest() throws IOException {
         Workbook workbook = WorkbookFactory
             .create(new File("src/test/resources/Staff Data Upload_WithXlsxOnlyHeader.xlsx"),
                 "1234");
@@ -62,7 +62,7 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void parseXlsxShouldThrowExceptionWhenNoValidSheetNamePresentTest() throws IOException {
+    void parseXlsxShouldThrowExceptionWhenNoValidSheetNamePresentTest() throws IOException {
         Workbook workbook = WorkbookFactory
             .create(new File("src/test/resources/Staff Data Upload_WithNoValidSheetName.xlsx"),
                 "1234");
@@ -73,14 +73,14 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void parseXlsxWhichHasFormula() throws IOException {
+    void parseXlsxWhichHasFormula() throws IOException {
         Workbook workbook = WorkbookFactory
             .create(new File("src/test/resources/Staff Data Upload With Formula.xlsx"));
 
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
             .getPhysicalNumberOfRows() - 49);
-        CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
+        CaseWorkerProfile caseWorkerProfile = profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
         assertThat(caseWorkerProfile.getOfficialEmail()).isNotBlank();
@@ -94,13 +94,13 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void parseXlsxWhichHasFormulaWithEmptyRows() throws IOException {
+    void parseXlsxWhichHasFormulaWithEmptyRows() throws IOException {
         Workbook workbook = WorkbookFactory
             .create(new File("src/test/resources/Staff Data Upload.xlsx"));
         List<CaseWorkerProfile> profiles = excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class);
         assertThat(profiles).hasSize(workbook.getSheet(CaseWorkerConstants.REQUIRED_CW_SHEET_NAME)
             .getPhysicalNumberOfRows() - 49);
-        CaseWorkerProfile caseWorkerProfile = (CaseWorkerProfile) profiles.get(0);
+        CaseWorkerProfile caseWorkerProfile = profiles.get(0);
         assertThat(caseWorkerProfile.getFirstName()).isNotBlank();
         assertThat(caseWorkerProfile.getLastName()).isNotBlank();
         assertThat(caseWorkerProfile.getOfficialEmail()).isNotBlank();
@@ -114,7 +114,7 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void parseServiceRoleMappingXlsx() throws IOException {
+    void parseServiceRoleMappingXlsx() throws IOException {
         Workbook workbook = WorkbookFactory
             .create(new File("src/test/resources/ServiceRoleMapping_BBA9.xlsx"));
 
@@ -127,7 +127,7 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void sendCwXlsxWithIncorrectHeaders() throws IOException {
+    void sendCwXlsxWithIncorrectHeaders() throws IOException {
         Workbook workbook = WorkbookFactory
             .create(new File("src/test/resources/Staff Data UploadWithInvalidHeaders.xls"));
         when(validationService.getAuditJobId()).thenReturn(1L);
@@ -138,7 +138,7 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void sendServiceRoleMappingXlsxWithIncorrectHeaders() throws IOException {
+    void sendServiceRoleMappingXlsxWithIncorrectHeaders() throws IOException {
         Workbook workbook = WorkbookFactory
                 .create(new File("src/test/resources/ServiceRoleMapping_InvalidHeaders.xlsx"));
         when(validationService.getAuditJobId()).thenReturn(1L);
@@ -148,7 +148,7 @@ public class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void parseXlsxShouldThrowExceptionWhenBlankRowsPresentTest() throws IOException {
+    void parseXlsxShouldThrowExceptionWhenBlankRowsPresentTest() throws IOException {
         Workbook workbook = WorkbookFactory
                 .create(new File("src/test/resources/Staff Data Upload With Empty Rows.xlsx"));
 

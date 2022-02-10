@@ -11,7 +11,7 @@ import javax.persistence.EntityManager;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class CwrdCommonRepositoryTest {
+class CwrdCommonRepositoryTest {
 
     @Mock
     private EntityManager entityManager;
@@ -20,12 +20,12 @@ public class CwrdCommonRepositoryTest {
     private CwrdCommonRepository cwrdCommonRepository;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testFlush() {
+    void testFlush() {
         cwrdCommonRepository.flush();
 
         verify(entityManager, times(1)).flush();

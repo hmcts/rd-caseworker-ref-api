@@ -19,14 +19,14 @@ import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EXCEL_FILE_ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
-public class WorkBookCustomFactoryTest {
+class WorkBookCustomFactoryTest {
 
-    public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static String TYPE_XLS = "application/vnd.ms-excel";
+    static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    static String TYPE_XLS = "application/vnd.ms-excel";
 
 
     @Test
-    public void sendXlsxParseMultipartFileTest() throws IOException {
+    void sendXlsxParseMultipartFileTest() throws IOException {
         Workbook workbook = WorkBookCustomFactory
                 .validateAndGetWorkBook(getMultipartFile("src/test/resources/Staff Data Upload.xlsx",
                         TYPE_XLSX));
@@ -34,7 +34,7 @@ public class WorkBookCustomFactoryTest {
     }
 
     @Test
-    public void sendXlsParseMultipartFileTest() throws IOException {
+    void sendXlsParseMultipartFileTest() throws IOException {
         Workbook workbook = WorkBookCustomFactory
                 .validateAndGetWorkBook(getMultipartFile("src/test/resources/Test-file.xls",
                         TYPE_XLS));
@@ -42,7 +42,7 @@ public class WorkBookCustomFactoryTest {
     }
 
     @Test
-    public void sendTextFileTest() throws IOException {
+    void sendTextFileTest() throws IOException {
         MultipartFile multipartFile = getMultipartFile("src/integrationTest/resources/test.txt",
                 "text/plain");
         Assertions.assertThatThrownBy(() -> WorkBookCustomFactory.validateAndGetWorkBook(multipartFile))
@@ -50,7 +50,7 @@ public class WorkBookCustomFactoryTest {
                 .hasMessage(INVALID_EXCEL_FILE_ERROR_MESSAGE);
     }
 
-    public MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
+    MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
         return new MockMultipartFile("file",
