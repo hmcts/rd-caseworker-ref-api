@@ -7,13 +7,13 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class UserProfileResponseTest {
+class UserProfileResponseTest {
 
     @Test
-    public void testUserProfileResponse() {
+    void testUserProfileResponse() {
         List<String> roles = new ArrayList<>();
         roles.add("role1");
         roles.add("role2");

@@ -7,10 +7,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CaseWorkerProfileCreationResponseTest {
+class CaseWorkerProfileCreationResponseTest {
 
     @Test
-    public void test_has_mandatory_fields_specified_not_null() {
+    void test_has_mandatory_fields_specified_not_null() {
         List<String> ids = new ArrayList<>();
         ids.add("1234");
         CaseWorkerProfileCreationResponse response = new CaseWorkerProfileCreationResponse();

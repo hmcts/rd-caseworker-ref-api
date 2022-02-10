@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -45,7 +45,7 @@ import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseWorkerServiceFacadeImplTest {
+class CaseWorkerServiceFacadeImplTest {
     @Mock
     ExcelAdaptorService excelAdaptorService;
     @Mock
@@ -66,7 +66,7 @@ public class CaseWorkerServiceFacadeImplTest {
     ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
 
     @Test
-    public void shouldProcessCaseWorkerFile() throws IOException {
+    void shouldProcessCaseWorkerFile() throws IOException {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
 
         when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(new ArrayList<>());
@@ -77,7 +77,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessCaseWorkerFileWithoutInvalidRecords() throws IOException {
+    void shouldProcessCaseWorkerFileWithoutInvalidRecords() throws IOException {
         MultipartFile multipartFile = createCaseWorkerFileWithoutInvalidRecords("Staff Data Upload.xlsx");
 
         when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(new ArrayList<>());
@@ -89,7 +89,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
 
     @Test
-    public void shouldProcessCaseWorkerFileWithPartialSuccess() throws IOException {
+    void shouldProcessCaseWorkerFileWithPartialSuccess() throws IOException {
 
 
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload With Jsr.xlsx");
@@ -102,7 +102,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessCaseWorkerFileFailure() throws IOException {
+    void shouldProcessCaseWorkerFileFailure() throws IOException {
         MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xlsx");
         when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenThrow(new RuntimeException("Failure test"));
         Assertions.assertThrows(Exception.class, () -> {
@@ -114,7 +114,7 @@ public class CaseWorkerServiceFacadeImplTest {
 
 
     @Test
-    public void shouldProcessServiceRoleMappingFile() throws IOException {
+    void shouldProcessServiceRoleMappingFile() throws IOException {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping
             .builder()
             .roleId(1)
@@ -144,7 +144,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessServiceRoleMappingFileFailure() throws IOException {
+    void shouldProcessServiceRoleMappingFileFailure() throws IOException {
 
         List<ServiceRoleMapping> serviceRoleMappings = new ArrayList<>();
 
@@ -158,9 +158,9 @@ public class CaseWorkerServiceFacadeImplTest {
         when(excelAdaptorService
                 .parseExcel(workbook, ServiceRoleMapping.class))
                 .thenReturn(serviceRoleMappings);
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
-            caseWorkerServiceFacade.processFile(multipartFile);
-        });
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+            caseWorkerServiceFacade.processFile(multipartFile));
+
     }
 
     private MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
@@ -202,7 +202,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessCaseWorkerFileWithSuspendedRowFailed() throws IOException {
+    void shouldProcessCaseWorkerFileWithSuspendedRowFailed() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
             .firstName("test").lastName("test")
             .officialEmail("test@justice.gov.uk")
@@ -240,7 +240,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessCaseWorkerFileWithUploadedAndSuspendedMessage() throws IOException {
+    void shouldProcessCaseWorkerFileWithUploadedAndSuspendedMessage() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
             .firstName("test").lastName("test")
             .officialEmail("test@justice.gov.uk")
@@ -275,7 +275,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessCaseWorkerFileWithSuspendedFailedMessage() throws IOException {
+    void shouldProcessCaseWorkerFileWithSuspendedFailedMessage() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
             .firstName("test").lastName("test")
             .officialEmail("test@justice.gov.uk")
@@ -313,7 +313,7 @@ public class CaseWorkerServiceFacadeImplTest {
     }
 
     @Test
-    public void shouldProcessCaseWorkerFileWithUploadedFailedSuspendedMessage() throws IOException {
+    void shouldProcessCaseWorkerFileWithUploadedFailedSuspendedMessage() throws IOException {
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
             .firstName("test").lastName("test")
             .officialEmail("test@justice.gov.uk")
