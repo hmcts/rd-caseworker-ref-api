@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class UserProfileRolesResponseTest {
+class UserProfileRolesResponseTest {
 
     @Test
-    public void testLocation() {
+    void testLocation() {
         AttributeResponse attributeResponse = new AttributeResponse();
         attributeResponse.setIdamMessage("OK");
         attributeResponse.setIdamStatusCode(200);

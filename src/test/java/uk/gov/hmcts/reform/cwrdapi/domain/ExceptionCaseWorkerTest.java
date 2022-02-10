@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ExceptionCaseWorkerTest {
+class ExceptionCaseWorkerTest {
 
     @Test
-    public void testCaseWorkerException() {
+    void testCaseWorkerException() {
         ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
         exceptionCaseWorker.setId(1L);
         exceptionCaseWorker.setJobId(1L);
@@ -33,7 +33,7 @@ public class ExceptionCaseWorkerTest {
     }
 
     @Test
-    public void testCaseWorkerContainingAudit() {
+    void testCaseWorkerContainingAudit() {
         CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder().jobId(1L).build();
         ExceptionCaseWorker exceptionCaseWorker = new ExceptionCaseWorker();
         exceptionCaseWorker.setCaseWorkerAudit(caseWorkerAudit);
@@ -41,7 +41,7 @@ public class ExceptionCaseWorkerTest {
     }
 
     @Test
-    public void testExceptionCaseWorkerBuilder() {
+    void testExceptionCaseWorkerBuilder() {
         ExceptionCaseWorker exceptionCaseWorker = ExceptionCaseWorker.builder()
                 .id(1L)
                 .jobId(1L)
