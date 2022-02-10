@@ -29,7 +29,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImplTest.COMMON_EMAIL_PATTERN;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseWorkerDeleteServiceImplTest {
+class CaseWorkerDeleteServiceImplTest {
 
     @InjectMocks
     private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
@@ -42,7 +42,7 @@ public class CaseWorkerDeleteServiceImplTest {
     private CaseWorkerProfile caseWorkerProfile;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName("CWFirstName");
@@ -51,7 +51,7 @@ public class CaseWorkerDeleteServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserProfileByUserId() {
+    void testDeleteUserProfileByUserId() {
         Response responseMock = mock(Response.class);
 
         CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
@@ -78,7 +78,7 @@ public class CaseWorkerDeleteServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserProfileByUserId_WhenUpReturns404() {
+    void testDeleteUserProfileByUserId_WhenUpReturns404() {
         Response responseMock = mock(Response.class);
 
         CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
@@ -105,7 +105,7 @@ public class CaseWorkerDeleteServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserProfileByUserId_WhenUpReturnsError() {
+    void testDeleteUserProfileByUserId_WhenUpReturnsError() {
         CaseWorkerProfilesDeletionResponse deletionResponse = new CaseWorkerProfilesDeletionResponse();
         deletionResponse.setMessage("UP Delete request failed for userId: " + caseWorkerProfile.getCaseWorkerId()
                 + ". With the following UP message: INTERNAL SERVER ERROR");
@@ -131,7 +131,7 @@ public class CaseWorkerDeleteServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserProfileByEmailPattern() {
+    void testDeleteUserProfileByEmailPattern() {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         caseWorkerProfiles.add(caseWorkerProfile);
 
@@ -162,7 +162,7 @@ public class CaseWorkerDeleteServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserProfileByEmailPattern_WhenUpReturns404() {
+    void testDeleteUserProfileByEmailPattern_WhenUpReturns404() {
         List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         caseWorkerProfiles.add(caseWorkerProfile);
 
@@ -194,7 +194,7 @@ public class CaseWorkerDeleteServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testValidateUserAfterUpDeleteWhenStatusIs204() {
+    void testValidateUserAfterUpDeleteWhenStatusIs204() {
         Optional<CaseWorkerProfile> userProfile = mock(Optional.class);
         String userId = UUID.randomUUID().toString();
 
@@ -212,7 +212,7 @@ public class CaseWorkerDeleteServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testValidateUserAfterUpDeleteWhenStatusIsNot204() {
+    void testValidateUserAfterUpDeleteWhenStatusIsNot204() {
         Optional<CaseWorkerProfile> userProfile = mock(Optional.class);
         String userId = UUID.randomUUID().toString();
 
