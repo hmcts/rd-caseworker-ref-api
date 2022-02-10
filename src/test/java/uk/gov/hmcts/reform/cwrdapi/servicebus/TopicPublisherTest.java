@@ -30,7 +30,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TopicPublisherTest {
+class TopicPublisherTest {
 
     @Mock
     IValidationService validationService;
@@ -47,7 +47,7 @@ public class TopicPublisherTest {
     List<ServiceBusMessage> serviceBusMessageList = new ArrayList<>();
 
     @BeforeEach
-    public void beforeTest() {
+    void beforeTest() {
         publishCaseWorkerData = new PublishCaseWorkerData();
         userIdList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -62,7 +62,7 @@ public class TopicPublisherTest {
     }
 
     @Test
-    public void sendMessageCallsAzureSendMessage() {
+    void sendMessageCallsAzureSendMessage() {
 
         doReturn(1L).when(validationService).getAuditJobId();
         doReturn(true).when(messageBatch).tryAddMessage(any());
@@ -75,19 +75,18 @@ public class TopicPublisherTest {
     }
 
     @Test
-    public void shouldThrowExceptionForConnectionIssues() {
+    void shouldThrowExceptionForConnectionIssues() {
 
         doReturn(1L).when(validationService).getAuditJobId();
         doReturn(transactionContext).when(serviceBusSenderClient).createTransaction();
         doThrow(new RuntimeException("Some Exception")).when(serviceBusSenderClient).createMessageBatch();
-        Assertions.assertThrows(CaseworkerMessageFailedException.class, () -> {
-            topicPublisher.sendMessage(userIdList);
-        });
+        Assertions.assertThrows(CaseworkerMessageFailedException.class, () ->
+            topicPublisher.sendMessage(userIdList));
         verify(serviceBusSenderClient, times(1)).rollbackTransaction(any());
     }
 
     @Test
-    public void sendLargeMessageCallsAzureSendMessage() {
+    void sendLargeMessageCallsAzureSendMessage() {
 
         doReturn(1L).when(validationService).getAuditJobId();
         doReturn(1).when(messageBatch).getCount();

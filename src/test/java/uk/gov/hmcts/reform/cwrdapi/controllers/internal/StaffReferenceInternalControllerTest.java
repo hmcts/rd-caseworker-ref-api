@@ -13,14 +13,14 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class StaffReferenceInternalControllerTest {
+class StaffReferenceInternalControllerTest {
     @InjectMocks
     private StaffReferenceInternalController staffReferenceInternalController;
     @Mock
@@ -28,7 +28,7 @@ public class StaffReferenceInternalControllerTest {
     ResponseEntity<Object> responseEntity;
 
     @Test
-    public void shouldFetchStaffByCcdServiceNames() {
+    void shouldFetchStaffByCcdServiceNames() {
         responseEntity = ResponseEntity.ok().body(null);
         when(caseWorkerServiceMock.fetchStaffProfilesForRoleRefresh(any(), any()))
                 .thenReturn(responseEntity);
@@ -47,11 +47,10 @@ public class StaffReferenceInternalControllerTest {
     }
 
     @Test
-    public void shouldThrowInvalidRequestExceptionForEmptyServiceName() {
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
+    void shouldThrowInvalidRequestExceptionForEmptyServiceName() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
             staffReferenceInternalController
                     .fetchStaffByCcdServiceNames("", 1, 0,
-                            "ASC", "caseWorkerId");
-        });
+                            "ASC", "caseWorkerId"));
     }
 }

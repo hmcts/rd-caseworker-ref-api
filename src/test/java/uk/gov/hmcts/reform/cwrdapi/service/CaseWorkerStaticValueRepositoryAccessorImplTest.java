@@ -12,13 +12,13 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerStaticValueRepositoryA
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseWorkerStaticValueRepositoryAccessorImplTest {
+class CaseWorkerStaticValueRepositoryAccessorImplTest {
     @Mock
     private SimpleJpaRepository<RoleType,Long> roleTypeRepository;
 
@@ -29,7 +29,7 @@ public class CaseWorkerStaticValueRepositoryAccessorImplTest {
     private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
 
     @Test
-    public void shouldGetRolesFromRoleTypeRepo() {
+    void shouldGetRolesFromRoleTypeRepo() {
         RoleType roleType = new RoleType();
         roleType.setDescription("testRole");
         roleType.setRoleId(1L);
@@ -41,7 +41,7 @@ public class CaseWorkerStaticValueRepositoryAccessorImplTest {
     }
 
     @Test
-    public void shouldGetUserTypeFromUserTypeRepo() {
+    void shouldGetUserTypeFromUserTypeRepo() {
         UserType roleType = new UserType();
         roleType.setDescription("testUser");
         roleType.setUserTypeId(1L);

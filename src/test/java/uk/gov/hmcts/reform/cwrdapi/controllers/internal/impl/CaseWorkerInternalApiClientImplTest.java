@@ -14,19 +14,19 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseWorkerInternalApiClientImplTest {
+class CaseWorkerInternalApiClientImplTest {
     @Mock
     RestTemplate restTemplate;
     @InjectMocks
     CaseWorkerInternalApiClientImpl caseWorkerInternalApiClient;
 
     @Test
-    public void shouldReturnResponseEntityWhenAuthHeadersProvided() {
+    void shouldReturnResponseEntityWhenAuthHeadersProvided() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         when(restTemplate.postForEntity(any(), any(), any()))
@@ -37,7 +37,7 @@ public class CaseWorkerInternalApiClientImplTest {
     }
 
     @Test
-    public void shouldReturnResponseEntityWhenNoAuthHeadersProvided() {
+    void shouldReturnResponseEntityWhenNoAuthHeadersProvided() {
         when(restTemplate.postForEntity(any(), any(), any()))
                 .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
         ResponseEntity<Object> responseEntity = caseWorkerInternalApiClient
