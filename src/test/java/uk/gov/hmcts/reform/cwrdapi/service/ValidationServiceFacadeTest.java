@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -32,7 +32,7 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildCaseWorkerProfileData;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidationServiceFacadeTest {
+class ValidationServiceFacadeTest {
 
     ValidationServiceFacadeImpl validationServiceFacadeImpl = spy(new ValidationServiceFacadeImpl());
 
@@ -46,7 +46,7 @@ public class ValidationServiceFacadeTest {
 
 
     @BeforeEach
-    public void init() throws Exception {
+    void init() throws Exception {
         setField(validationServiceFacadeImpl, "exceptionCaseWorkerRepository",
             exceptionCaseWorkerRepository);
         setField(validationServiceFacadeImpl, "caseWorkerAuditRepository",
@@ -56,7 +56,7 @@ public class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testGetInvalidRecords() throws Exception {
+    void testGetInvalidRecords() throws Exception {
         JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer = new JsrValidatorInitializer<>();
         jsrValidatorInitializer.initializeFactory();
         setField(validationServiceFacadeImpl, "jsrValidatorInitializer", jsrValidatorInitializer);
@@ -68,7 +68,7 @@ public class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testAuditJsr() {
+    void testAuditJsr() {
         JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer = new JsrValidatorInitializer<>();
         jsrValidatorInitializer.initializeFactory();
         setField(validationServiceFacadeImpl, "jsrValidatorInitializer", jsrValidatorInitializer);
@@ -82,7 +82,7 @@ public class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testAuditJsrWithException() {
+    void testAuditJsrWithException() {
         CaseWorkerDomain domain = CaseWorkerProfile.builder().build();
         Assertions.assertThrows(Exception.class, () -> {
             Field field = invokeMethod(validationServiceFacadeImpl, "getKeyFiled", domain);
@@ -92,7 +92,7 @@ public class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testInsertAudit() {
+    void testInsertAudit() {
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
         validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Insert");
 
@@ -104,7 +104,7 @@ public class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testUpdateAudit() {
+    void testUpdateAudit() {
         setField(validationServiceFacadeImpl, "caseWorkerAudit", CaseWorkerAudit.builder().jobId(1L).build());
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
         long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.PARTIAL_SUCCESS, "CWR-Update");
@@ -114,7 +114,7 @@ public class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testCreateException() {
+    void testCreateException() {
         validationServiceFacadeImpl.createException(1L, "testFailure", 1L);
         verify(validationServiceFacadeImpl)
             .createException(1L, "testFailure", 1L);
@@ -125,7 +125,7 @@ public class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testStartAuditing() {
+    void testStartAuditing() {
         setField(validationServiceFacadeImpl, "caseWorkerAudit", CaseWorkerAudit.builder().build());
         when(caseWorkerAuditRepository.save(any())).thenReturn(CaseWorkerAudit.builder().jobId(1L).build());
         long jobId = validationServiceFacadeImpl.startCaseworkerAuditing(AuditStatus.PARTIAL_SUCCESS, "CWR-Start");

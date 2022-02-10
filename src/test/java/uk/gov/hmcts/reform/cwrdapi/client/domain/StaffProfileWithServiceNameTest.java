@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class StaffProfileWithServiceNameTest {
+class StaffProfileWithServiceNameTest {
 
     @Test
-    public void testStaffProfileWithServiceName() {
+    void testStaffProfileWithServiceName() {
         StaffProfileWithServiceName staffProfileWithServiceName = new StaffProfileWithServiceName();
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         staffProfileWithServiceName.setCcdServiceName("cmc");
@@ -21,7 +21,7 @@ public class StaffProfileWithServiceNameTest {
     }
 
     @Test
-    public void testStaffProfileWithServiceNameBuilder() {
+    void testStaffProfileWithServiceNameBuilder() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         StaffProfileWithServiceName staffProfileWithServiceName = StaffProfileWithServiceName.builder()
                 .ccdServiceName("cmc")
