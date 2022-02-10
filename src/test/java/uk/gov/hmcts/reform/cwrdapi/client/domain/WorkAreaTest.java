@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class WorkAreaTest {
+class WorkAreaTest {
 
     @Test
-    public void testWorkArea() {
+    void testWorkArea() {
         WorkArea workArea = new WorkArea();
         workArea.setServiceCode("service code");
         workArea.setAreaOfWork("area of work");
@@ -27,7 +27,7 @@ public class WorkAreaTest {
     }
 
     @Test
-    public void testWorkAreaBuilder() {
+    void testWorkAreaBuilder() {
         WorkArea workArea = WorkArea.builder()
                 .serviceCode("service code")
                 .areaOfWork("area of work")
