@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RoleNameTest {
+class RoleNameTest {
 
     @Test
-    public void testRoleName() {
+    void testRoleName() {
 
         RoleName roleName = new RoleName("Role Name");
         roleName.setName("New Role Name");

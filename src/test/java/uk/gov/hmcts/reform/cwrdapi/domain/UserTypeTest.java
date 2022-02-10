@@ -7,13 +7,13 @@ import java.util.Collections;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class UserTypeTest {
+class UserTypeTest {
 
     @Test
-    public void testUserType() {
+    void testUserType() {
         UserType userType = new UserType();
         userType.setUserTypeId(1L);
         userType.setDescription("Test Description");
@@ -29,7 +29,7 @@ public class UserTypeTest {
     }
 
     @Test
-    public void testUserTypeContainingCwProfile() {
+    void testUserTypeContainingCwProfile() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
 
