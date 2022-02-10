@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class CaseWorkerWorkAreaTest {
+class CaseWorkerWorkAreaTest {
 
     @Test
-    public void testCaseWorkerWorkArea() {
+    void testCaseWorkerWorkArea() {
         CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
         caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
         caseWorkerWorkArea.setCaseWorkerId("CWID1");
