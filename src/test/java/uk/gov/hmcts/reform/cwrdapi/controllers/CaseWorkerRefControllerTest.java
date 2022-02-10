@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseWorkerRefControllerTest {
+class CaseWorkerRefControllerTest {
 
     @InjectMocks
     private CaseWorkerRefController caseWorkerRefController;
@@ -55,7 +55,7 @@ public class CaseWorkerRefControllerTest {
     ResponseEntity<Object> responseEntity;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
         cwResponse = CaseWorkerProfileCreationResponse
                 .builder()
@@ -113,7 +113,7 @@ public class CaseWorkerRefControllerTest {
     }
 
     @Test
-    public void test_buildIdamRoleMappings_success() {
+    void test_buildIdamRoleMappings_success() {
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
                 .serviceId("BA11")
                 .idamRoles("role1")
@@ -133,17 +133,19 @@ public class CaseWorkerRefControllerTest {
     }
 
     @Test
-    public void should_throw_exception_for_invalid_request() {
+    void should_throw_exception_for_invalid_request() {
+
         Assertions.assertThrows(InvalidRequestException.class, () -> {
+            List<ServiceRoleMapping> serviceRoleMappingList = Collections.emptyList();
             caseWorkerRefController
-                    .buildIdamRoleMappings(Collections.emptyList());
+                    .buildIdamRoleMappings(serviceRoleMappingList);
         });
         verify(caseWorkerServiceMock,times(0))
                 .buildIdamRoleMappings(anyList());
     }
 
     @Test
-    public void test_upload_caseworker_file_success() {
+    void test_upload_caseworker_file_success() {
         when(caseWorkerServiceFacade.processFile(multipartFile))
                 .thenReturn(new ResponseEntity<>(HttpStatus.CREATED));
 
