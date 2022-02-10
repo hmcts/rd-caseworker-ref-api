@@ -8,14 +8,14 @@ import java.util.Collections;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CaseWorkerProfileTest {
+class CaseWorkerProfileTest {
 
     @Test
-    public void testCaseWorkerProfile() {
+    void testCaseWorkerProfile() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setId("CWID1");
         caseWorkerProfile.setUserId(1L);
@@ -48,7 +48,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileBuilder() {
+    void testCaseWorkerProfileBuilder() {
         Role caseWorkerRole = new Role();
         caseWorkerRole.setRoleId("id");
         caseWorkerRole.setRoleName("role name");
@@ -95,7 +95,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingCaseWorkerWorkAreas() {
+    void testCaseWorkerProfileContainingCaseWorkerWorkAreas() {
         WorkArea caseWorkerWorkArea = new WorkArea();
         caseWorkerWorkArea.setAreaOfWork("TestArea");
         caseWorkerWorkArea.setServiceCode("SvcCode1");
@@ -112,7 +112,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingCaseWorkerRoles() {
+    void testCaseWorkerProfileContainingCaseWorkerRoles() {
         Role caseWorkerRole = new Role();
         caseWorkerRole.setRoleId("id");
         caseWorkerRole.setRoleName("role name");
@@ -128,7 +128,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingCaseWorkerLocations() {
+    void testCaseWorkerProfileContainingCaseWorkerLocations() {
         Location caseWorkerLocation = new Location();
         caseWorkerLocation.setBaseLocationId(1);
         caseWorkerLocation.setLocationName("TestLocation");
@@ -146,7 +146,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingSuspended() {
+    void testCaseWorkerProfileContainingSuspended() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setSuspended("false");
         assertThat(caseWorkerProfile.getSuspended(), is("false"));
