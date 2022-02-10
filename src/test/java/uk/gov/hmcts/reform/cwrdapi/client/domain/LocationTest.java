@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LocationTest {
+class LocationTest {
 
     @Test
-    public void testLocation() {
+    void testLocation() {
         Location location = new Location();
         location.setLocationName("location name");
         location.setPrimary(true);
@@ -29,7 +29,7 @@ public class LocationTest {
     }
 
     @Test
-    public void testLocationBuilder() {
+    void testLocationBuilder() {
         Location location = Location.builder()
                 .baseLocationId(1)
                 .locationName("location name")

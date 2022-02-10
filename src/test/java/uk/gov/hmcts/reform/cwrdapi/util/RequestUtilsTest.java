@@ -13,15 +13,15 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPaginationObject;
 
-public class RequestUtilsTest {
+class RequestUtilsTest {
 
     @Test
-    public void testTrimIdamRoles() {
+    void testTrimIdamRoles() {
         Set<String> roles = ImmutableSet.of(" tribunal_case_worker ", " caseworker ", " ");
         List<CaseWorkersProfileCreationRequest> requests = ImmutableList.of(CaseWorkersProfileCreationRequest
                 .caseWorkersProfileCreationRequest().idamRoles(roles).build());
@@ -31,7 +31,7 @@ public class RequestUtilsTest {
     }
 
     @Test
-    public void testValidateAndBuildPaginationObject() {
+    void testValidateAndBuildPaginationObject() {
         PageRequest pageRequest =
                 validateAndBuildPaginationObject(0, 1,
                         "caseWorkerId", "ASC",
@@ -41,34 +41,31 @@ public class RequestUtilsTest {
     }
 
     @Test
-    public void testInvalidRequestExceptionForInvalidPageNumber() {
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
+    void testInvalidRequestExceptionForInvalidPageNumber() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
             validateAndBuildPaginationObject(-1, 1,
                     "caseWorkerId", "ASC",
-                    20, "id", CaseWorkerProfile.class);
-        });
+                    20, "id", CaseWorkerProfile.class));
     }
 
     @Test
-    public void testInvalidRequestExceptionForInvalidPageSize() {
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
+    void testInvalidRequestExceptionForInvalidPageSize() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
             validateAndBuildPaginationObject(0, -1,
                     "caseWorkerId", "ASC",
-                    20, "id", CaseWorkerProfile.class);
-        });
+                    20, "id", CaseWorkerProfile.class));
     }
 
     @Test
-    public void testInvalidRequestExceptionForInvalidSortDirection() {
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
+    void testInvalidRequestExceptionForInvalidSortDirection() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
             validateAndBuildPaginationObject(0, 1,
                     "caseWorkerId", "Invalid",
-                    20, "id", CaseWorkerProfile.class);
-        });
+                    20, "id", CaseWorkerProfile.class));
     }
 
     @Test
-    public void testConfigValueWhenPaginationParametersNotProvided() {
+    void testConfigValueWhenPaginationParametersNotProvided() {
         PageRequest pageRequest =
                 validateAndBuildPaginationObject(null, null,
                         null, null,
@@ -80,11 +77,10 @@ public class RequestUtilsTest {
     }
 
     @Test
-    public void testInvalidRequestExceptionForInvalidSortColumn() {
-        Assertions.assertThrows(Exception.class, () -> {
+    void testInvalidRequestExceptionForInvalidSortColumn() {
+        Assertions.assertThrows(Exception.class, () ->
             validateAndBuildPaginationObject(0, 1,
                     "invalid", "ASC",
-                    20, "invalid", CaseWorkerProfile.class);
-        });
+                    20, "invalid", CaseWorkerProfile.class));
     }
 }

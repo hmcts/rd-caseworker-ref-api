@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CaseWorkerRoleTest {
+class CaseWorkerRoleTest {
     @Test
-    public void testCaseWorkerRole() {
+    void testCaseWorkerRole() {
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
         caseWorkerRole.setCaseWorkerRoleId(1L);
         caseWorkerRole.setCaseWorkerId("CWID1");
@@ -51,7 +51,7 @@ public class CaseWorkerRoleTest {
     }
 
     @Test
-    public void testCaseWorkerRoleWithPrimaryFlagSetToTrue() {
+    void testCaseWorkerRoleWithPrimaryFlagSetToTrue() {
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
         caseWorkerRole.setPrimaryFlag(true);
 
