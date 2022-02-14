@@ -135,11 +135,10 @@ class CaseWorkerRefControllerTest {
     @Test
     void should_throw_exception_for_invalid_request() {
 
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
-            List<ServiceRoleMapping> serviceRoleMappingList = Collections.emptyList();
+        List<ServiceRoleMapping> serviceRoleMappingList = Collections.emptyList();
+        Assertions.assertThrows(InvalidRequestException.class, () ->
             caseWorkerRefController
-                    .buildIdamRoleMappings(serviceRoleMappingList);
-        });
+                    .buildIdamRoleMappings(serviceRoleMappingList));
         verify(caseWorkerServiceMock,times(0))
                 .buildIdamRoleMappings(anyList());
     }
