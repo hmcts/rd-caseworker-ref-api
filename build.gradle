@@ -369,9 +369,8 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-core', version: '5.3.15'
   implementation group: 'io.netty', name: 'netty-codec-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.72.Final'
-  implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.71.Final'
-  implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.71.Final'
-  implementation group: 'io.netty', name: 'netty-tcnative', version: '2.0.48.Final'
+  implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.69.Final'
+  implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
@@ -379,40 +378,40 @@ dependencies {
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
 
-  implementation('io.netty:netty-codec:4.1.71.Final') {
+  implementation('io.netty:netty-codec:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   implementation('io.netty:netty-codec-http:4.1.72.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-common:4.1.71.Final') {
+  implementation('io.netty:netty-common:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-handler:4.1.71.Final') {
+  implementation('io.netty:netty-handler:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-resolver:4.1.71.Final') {
+  implementation('io.netty:netty-resolver:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport:4.1.71.Final') {
+  implementation('io.netty:netty-transport:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-epoll:4.1.71.Final') {
+  implementation('io.netty:netty-transport-native-epoll:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-kqueue:4.1.71.Final') {
+  implementation('io.netty:netty-transport-native-kqueue:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-unix-common:4.1.71.Final') {
+  implementation('io.netty:netty-transport-native-unix-common:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-http2:4.1.71.Final') {
+  implementation('io.netty:netty-codec-http2:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-socks:4.1.71.Final') {
+  implementation('io.netty:netty-codec-socks:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-handler-proxy:4.1.71.Final') {
+  implementation('io.netty:netty-handler-proxy:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   //Fix for CVE-2021-29425
