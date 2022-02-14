@@ -13,16 +13,16 @@ import javax.validation.Validator;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CaseWorkerProfileTest {
+class CaseWorkerProfileTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void testCaseWorkerProfile() {
+    void testCaseWorkerProfile() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName("CWFirstName");
@@ -68,7 +68,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingCaseWorkerWorkAreas() {
+    void testCaseWorkerProfileContainingCaseWorkerWorkAreas() {
         CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
         caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
         caseWorkerWorkArea.setCaseWorkerId("CWID1");
@@ -89,7 +89,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingCaseWorkerRoles() {
+    void testCaseWorkerProfileContainingCaseWorkerRoles() {
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
         caseWorkerRole.setCaseWorkerRoleId(1L);
         caseWorkerRole.setCaseWorkerId("CWID1");
@@ -110,7 +110,7 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingCaseWorkerLocations() {
+    void testCaseWorkerProfileContainingCaseWorkerLocations() {
         CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
         caseWorkerLocation.setCaseWorkerLocationId(1L);
         caseWorkerLocation.setCaseWorkerId("CWID1");
@@ -133,14 +133,14 @@ public class CaseWorkerProfileTest {
     }
 
     @Test
-    public void testCaseWorkerProfileContainingSuspended() {
+    void testCaseWorkerProfileContainingSuspended() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setSuspended(false);
         assertFalse(caseWorkerProfile.getSuspended());
     }
 
     @Test
-    public void testCaseWorkerProfileWithNameLongerThan128CharactersIsConstraintViolation() {
+    void testCaseWorkerProfileWithNameLongerThan128CharactersIsConstraintViolation() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName(RandomStringUtils.randomAlphabetic(129));
@@ -163,11 +163,11 @@ public class CaseWorkerProfileTest {
         Set<ConstraintViolation<CaseWorkerProfile>> violations = validator
                 .validate(caseWorkerProfile);
 
-        Assertions.assertThat(violations.size()).isEqualTo(1);
+        Assertions.assertThat(violations).hasSize(1);
     }
 
     @Test
-    public void testCaseWorkerProfileContainingIsNew() {
+    void testCaseWorkerProfileContainingIsNew() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseAllocator(true);
         caseWorkerProfile.setTaskSupervisor(true);

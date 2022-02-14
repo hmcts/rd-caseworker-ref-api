@@ -24,19 +24,19 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NOT_PRES
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_PROTECTED_ERROR_MESSAGE;
 
 @ExtendWith(MockitoExtension.class)
-public class ExcelValidatorServiceImplTest {
+class ExcelValidatorServiceImplTest {
 
-    public static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    public static String TYPE_XLS = "application/vnd.ms-excel";
+    static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    static String TYPE_XLS = "application/vnd.ms-excel";
 
     @InjectMocks
     ExcelValidatorServiceImpl excelValidatorServiceImpl;
 
     @BeforeEach
-    public void setUpField() {
+    void setUpField() {
     }
 
-    public MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
+    MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
         return new MockMultipartFile("file",
@@ -44,7 +44,7 @@ public class ExcelValidatorServiceImplTest {
     }
 
     @Test
-    public void sendXlsTest() throws IOException {
+    void sendXlsTest() throws IOException {
         Workbook workbook = excelValidatorServiceImpl
                 .validateExcelFile(
                         getMultipartFile("src/test/resources/Staff Data Upload.xls", TYPE_XLS));
@@ -52,7 +52,7 @@ public class ExcelValidatorServiceImplTest {
     }
 
     @Test
-    public void sendXlsWithPasswordTest() throws IOException {
+    void sendXlsWithPasswordTest() throws IOException {
         MultipartFile file = getMultipartFile("src/test/resources/Staff Data UploadWithPassword.xlsx", TYPE_XLS);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
@@ -60,14 +60,14 @@ public class ExcelValidatorServiceImplTest {
     }
 
     @Test
-    public void sendXlsxTest() throws IOException {
+    void sendXlsxTest() throws IOException {
         MultipartFile file = getMultipartFile("src/test/resources/Staff Data Upload.xlsx", TYPE_XLSX);
         Workbook workbook = excelValidatorServiceImpl.validateExcelFile(file);
         assertThat(workbook).isNotNull();
     }
 
     @Test
-    public void sendXlsxWithPasswordTest() throws IOException {
+    void sendXlsxWithPasswordTest() throws IOException {
         MultipartFile file = getMultipartFile("src/test/resources/Staff Data UploadWithPassword.xlsx", TYPE_XLSX);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
@@ -75,7 +75,7 @@ public class ExcelValidatorServiceImplTest {
     }
 
     @Test
-    public void sendTextFileTest() throws IOException {
+    void sendTextFileTest() throws IOException {
         MultipartFile file = getMultipartFile("src/test/resources/test.txt", "text/plain");
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)
@@ -83,14 +83,14 @@ public class ExcelValidatorServiceImplTest {
     }
 
     @Test
-    public void sendNoFileTest() {
+    void sendNoFileTest() {
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(null))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NOT_PRESENT_ERROR_MESSAGE);
     }
 
     @Test
-    public void sendNoFileContentNullTest() throws IOException {
+    void sendNoFileContentNullTest() throws IOException {
         MultipartFile file = getMultipartFile("src/test/resources/test.txt", null);
         Assertions.assertThatThrownBy(() -> excelValidatorServiceImpl.validateExcelFile(file))
                 .isExactlyInstanceOf(ExcelValidationException.class)

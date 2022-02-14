@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class IdamRoleMappingServiceImplTest {
+class IdamRoleMappingServiceImplTest {
     @Mock
     CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
 
@@ -22,7 +22,7 @@ public class IdamRoleMappingServiceImplTest {
     IdamRoleMappingServiceImpl idamRoleMappingService;
 
     @Test
-    public void test_saveAll() {
+    void test_saveAll() {
 
         idamRoleMappingService.buildIdamRoleAssociation(anyList());
 
@@ -31,7 +31,7 @@ public class IdamRoleMappingServiceImplTest {
     }
 
     @Test
-    public void test_delete_record_for_service_code() {
+    void test_delete_record_for_service_code() {
         idamRoleMappingService.deleteExistingRecordForServiceCode(anySet());
 
         verify(caseWorkerIdamRoleAssociationRepository, times(1))

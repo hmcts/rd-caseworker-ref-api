@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ErrorResponseTest {
+class ErrorResponseTest {
 
     @Test
-    public void test_ErrorResponse() {
+    void test_ErrorResponse() {
 
         int code = 1;
         String status = "status";
@@ -32,13 +32,13 @@ public class ErrorResponseTest {
     }
 
     @Test
-    public void test_NoArgsConstructor() {
+    void test_NoArgsConstructor() {
         ErrorResponse errorResponse = new ErrorResponse();
         assertThat(errorResponse).isNotNull();
     }
 
     @Test
-    public void test_ErrorResponseWithConstructor() {
+    void test_ErrorResponseWithConstructor() {
 
         int code = 1;
         String status = "status";
