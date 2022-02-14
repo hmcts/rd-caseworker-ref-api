@@ -12,9 +12,9 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.33.0'
+    id 'com.github.ben-manes.versions' version '0.36.0'
     id "info.solidsoft.pitest" version '1.7.0'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.4.9'
     id "org.flywaydb.flyway" version '8.3.0'
@@ -41,7 +41,7 @@ def versions = [
   launchDarklySdk    : "5.2.2",
   restAssured        : '4.3.3',
   jackson            : '2.12.1',
-  log4j              : '2.17.0'
+  log4j              : '2.17.1'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -371,11 +371,12 @@ dependencies {
   implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.69.Final'
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
-  
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
+  implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
 
   implementation('io.netty:netty-codec:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
@@ -459,7 +460,7 @@ dependencies {
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.0.2'
+  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.3')
@@ -467,6 +468,9 @@ dependencies {
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
+  testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+  testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
@@ -503,7 +507,7 @@ dependencyManagement {
 
   dependencies {
     // CVE-2021-42340
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.58') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
