@@ -21,4 +21,8 @@
     <packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
     <cve>CVE-2020-23171</cve>
   </suppress>
+  <suppress>
+    <packageUrl regex="true">^pkg:maven/io\.netty.*$</packageUrl>
+    <cve>CVE-2021-43797</cve>
+  </suppress>
 </suppressions>
