@@ -304,7 +304,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         response.then()
                 .assertThat()
                 .statusCode(401);
-        assertThat(response.getHeader("UnAuthorized-Token-Error").contains("Authentication Exception"));
     }
 
     @Test
