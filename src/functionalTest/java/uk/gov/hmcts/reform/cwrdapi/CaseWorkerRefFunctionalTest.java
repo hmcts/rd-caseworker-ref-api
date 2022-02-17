@@ -118,6 +118,19 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void updateNamesMismatchinUpCwandSidam() {
+        var profileCreateRequests = createNewActiveCaseWorkerProfile();
+        var upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        var caseWorkersProfileCreationRequests = caseWorkerApiClient
+                .createCaseWorkerProfiles(upResponse.getEmail());
+        caseWorkersProfileCreationRequests.get(0).setFirstName("cwr-test-one");
+        caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+        UserProfileResponse upResponseUpdated =
+                getUserProfileFromUp(caseWorkersProfileCreationRequests.get(0).getEmailId());
+        assertEquals("cwr-test-one",upResponseUpdated.getFirstName());
+    }
+
+    @Test
     // this test verifies User profile are fetched from CWR
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
