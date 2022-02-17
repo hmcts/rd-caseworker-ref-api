@@ -309,7 +309,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailure() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
@@ -329,7 +329,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             .errorDescription(errorMessageFromIdam).build();
 
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile"))
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD"))
             .willReturn(aResponse().withStatus(404)
                 .withBody(new Gson().toJson(errorResponse).getBytes())));
 
@@ -348,7 +348,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
-        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile")));
+        userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "500", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
