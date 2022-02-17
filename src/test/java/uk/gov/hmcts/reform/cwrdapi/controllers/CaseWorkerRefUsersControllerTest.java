@@ -178,4 +178,22 @@ class CaseWorkerRefUsersControllerTest {
                 .fetchCaseworkersById(Arrays.asList(
                         "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
     }
+
+    @Test
+    void createCaseWorkerProfileWithNewRole() {
+        List<CaseWorkerRoleRequest> caseWorkerRoleRequests = new ArrayList<>();
+        CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
+        CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
+        caseWorkerRoleRequests.add(cwRoleRequest);
+        caseWorkerRoleRequests.add(cwRoleRequest1);
+        caseWorkersProfileCreationRequest.get(0).setRoles(caseWorkerRoleRequests);
+        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
+                .thenReturn(Collections.emptyList());
+        ResponseEntity<?> actual =
+                caseWorkerRefUsersController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+
+        assertNotNull(actual);
+        verify(caseWorkerServiceMock, times(1))
+                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+    }
 }
