@@ -149,5 +149,5 @@ public final class CaseWorkerConstants {
     public static final String ERROR_IN_PARSING_THE_FEIGN_RESPONSE = "Error in parsing %s Feign Response";
 
     public static final String LRD_ERROR = "An error occurred while retrieving data from Location Reference Data";
-
+    public static final String SRD = "SRD";
 }

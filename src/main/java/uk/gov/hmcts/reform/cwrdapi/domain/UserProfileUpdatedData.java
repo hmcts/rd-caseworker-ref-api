@@ -14,4 +14,6 @@ public class UserProfileUpdatedData {
     private String idamStatus;
 
     private Set<RoleName> rolesAdd;
+    private String firstName;
+    private String lastName;
 }
