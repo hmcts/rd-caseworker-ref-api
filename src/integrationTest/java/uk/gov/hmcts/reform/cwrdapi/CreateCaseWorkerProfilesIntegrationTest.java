@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -139,4 +140,23 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         assertThat(caseWorkerRoleRepository.count()).isZero();
         assertThat(caseWorkerWorkAreaRepository.count()).isZero();
     }
+
+    @Test
+    void shouldCreateCaseworkerWithNewRoles() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
+        CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
+        List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList.of(cwRoleRequest,cwRoleRequest1);
+        caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+            .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+        assertThat(response).containsEntry("http_status", "201 CREATED");
+        List<CaseWorkerRole> caseWorkerRoles = caseWorkerRoleRepository.findAll();
+        CaseWorkerRole caseWorkerRole = caseWorkerRoles.get(0);
+        assertThat(caseWorkerRole.getRoleId()).isEqualTo(13);
+
+    }
+
+
 }
