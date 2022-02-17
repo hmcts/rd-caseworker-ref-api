@@ -22,7 +22,8 @@ public interface UserProfileFeignClient {
     @RequestLine("POST /v1/userprofile")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
             "Content-Type: application/json"})
-    Response createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest);
+    Response createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest,
+                               @RequestParam(value = "origin") String origin);
 
     @PutMapping(value = "/v1/userprofile/{userId}")
     @RequestLine("PUT /v1/userprofile/{userId}")
