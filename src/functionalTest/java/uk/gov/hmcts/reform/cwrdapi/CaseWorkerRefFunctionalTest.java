@@ -167,7 +167,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldGetCaseWorkerDetails(String str) {
+    public void shouldGetCaseWorkerDetails() {
         if (isEmpty(caseWorkerIds)) {
             //Create 2 Caseworker Users
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
