@@ -597,7 +597,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
                     new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
-            Set<RoleName> mergedRoles = null;
+            Set<RoleName> mergedRoles = new HashSet<>();
             if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
                 mergedRoles = idamRolesCwr.stream()
                         .filter(s -> !(userProfileRoles.contains(s)))
