@@ -156,4 +156,7 @@ public class AuthorizationFunctionalTest {
                 Map.of("UserEmail", email));
     }
 
+    public static Map getIdamResponse(String idamId) {
+        return idamOpenIdClient.getUser(idamId);
+    }
 }

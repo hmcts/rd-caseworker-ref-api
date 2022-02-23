@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -20,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -38,14 +41,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.util.ResourceUtils.getFile;
@@ -82,12 +86,29 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
-
+        List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
+        roleRequests.add(new CaseWorkerRoleRequest("Senior Tribunal Caseworker",true));
+        roleRequests.add(new CaseWorkerRoleRequest("Tribunal Caseworker",false));
+        caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
         Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         List<String> caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+            .body(UserRequest.builder().userIds(caseWorkerIds).build())
+            .post("/refdata/case-worker/users/fetchUsersById/")
+            .andReturn();
+        fetchResponse.then()
+            .assertThat()
+            .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+            Arrays.asList(fetchResponse.getBody().as(
+                uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        assertEquals("Tribunal Caseworker", fetchedList.get(0).getRoles().get(1).getRoleName());
+        assertEquals(fetchedList.get(0).getFirstName(), caseWorkersProfileCreationRequests.get(0).getFirstName());
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
 
@@ -131,10 +152,22 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    public void updateCwWhenNamesMismatchExistsInCwrAndUpAndSidam_Ac3() {
+        var profileCreateRequests = createNewActiveCaseWorkerProfile();
+        var upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
+        var caseWorkersProfileCreationRequests = caseWorkerApiClient
+            .createCaseWorkerProfiles(upResponse.getEmail());
+        caseWorkersProfileCreationRequests.get(0).setFirstName("cwr-test-one");
+        caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+        var idamResponse = getIdamResponse(upResponse.getIdamId());
+        assertEquals(idamResponse.get("forename"),caseWorkersProfileCreationRequests.get(0).getFirstName());
+    }
+
+    @Test
     // this test verifies User profile are fetched from CWR
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldGetCaseWorkerDetails() {
+    public void shouldGetCaseWorkerDetails(String str) {
         if (isEmpty(caseWorkerIds)) {
             //Create 2 Caseworker Users
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
@@ -466,6 +499,78 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .forEach(p -> actualServiceNames.add(p.getCcdServiceName().toLowerCase()));
 
         assertTrue(actualServiceNames.containsAll(expectedServiceNames));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    public void shouldFetchStaffProfileByCcdServiceNamesInDesc() {
+        if (isEmpty(caseWorkerIds)) {
+            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
+
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                .createCaseWorkerProfiles());
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                .createCaseWorkerProfiles());
+            caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+        }
+        String ccdServiceNames = "all";
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+            .get(STAFF_BY_SERVICE_NAME_URL
+                + "?ccd_service_names=" + ccdServiceNames
+                + "&page_number=0&page_size=40&sort_column=caseWorkerId&sort_direction=DESC")
+            .andReturn();
+        fetchResponse.then()
+            .assertThat()
+            .statusCode(200);
+        List<StaffProfileWithServiceName> paginatedStaffProfile =
+            Arrays.asList(fetchResponse.getBody().as(StaffProfileWithServiceName[].class));
+
+        List<String> caseWorkerIds = paginatedStaffProfile.stream()
+             .map(ps -> ps.getStaffProfile().getId())
+            .distinct().collect(Collectors.toList());
+        assertTrue(Ordering.natural().reverse().isOrdered(caseWorkerIds));
+
+    }
+
+
+    @Test
+    @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    public void shouldThrowRecordNotFoundError() {
+        if (isEmpty(caseWorkerIds)) {
+            List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
+
+            CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("ABA4").areaOfWork("Adoption").build();
+
+            CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("BHA3").areaOfWork("Specified Money Claims").build();
+
+            List<CaseWorkerWorkAreaRequest> areaRequests =
+                ImmutableList.of(workerWorkAreaRequest1, workerWorkAreaRequest2);
+
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                .createCaseWorkerProfiles());
+            caseWorkersProfileCreationRequests.get(0).setWorkerWorkAreaRequests(areaRequests);
+            caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
+                .createCaseWorkerProfiles());
+            caseWorkersProfileCreationRequests.get(1).setWorkerWorkAreaRequests(areaRequests);
+            caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+        }
+        String ccdServiceNames = "Adoption";
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+            .get(STAFF_BY_SERVICE_NAME_URL
+                + "?ccd_service_names=" + ccdServiceNames
+                + "&page_number=1&page_size=100&sort_column=caseWorkerId&sort_direction=DESC")
+            .andReturn();
+        fetchResponse.then()
+            .assertThat()
+            .statusCode(404);
+
+
     }
 
     @Test
