@@ -45,5 +45,9 @@ public class UserType implements Serializable {
     @OneToMany(targetEntity = CaseWorkerProfile.class, mappedBy = "userType")
     private List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
 
+    public UserType(Long userTypeId, String description) {
+        this.userTypeId = userTypeId;
+        this.description = description;
+    }
 
 }

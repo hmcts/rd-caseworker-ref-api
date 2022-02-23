@@ -26,11 +26,11 @@ import javax.validation.constraints.Size;
 
 import static javax.persistence.CascadeType.ALL;
 
-
 @Entity(name = "case_worker_profile")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CaseWorkerProfile implements Persistable<String>, Serializable {
 
     @Id

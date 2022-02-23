@@ -48,4 +48,7 @@ public class RoleType implements Serializable {
     @OneToMany(targetEntity = CaseWorkerIdamRoleAssociation.class, mappedBy = "roleType")
     private List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
 
+    public RoleType(String description) {
+        this.description = description;
+    }
 }
