@@ -537,7 +537,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldThrowRecordNotFoundError() {
+    public void shouldThrowRecordNotFoundErrorOnInvalidPageSize() {
         if (isEmpty(caseWorkerIds)) {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
