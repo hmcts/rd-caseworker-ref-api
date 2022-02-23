@@ -25,7 +25,6 @@ import javax.persistence.UniqueConstraint;
 @Entity(name = "case_worker_role")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @SequenceGenerator(name = "case_worker_role_id_seq", sequenceName = "case_worker_role_id_seq", allocationSize = 1)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "role_id"}))
