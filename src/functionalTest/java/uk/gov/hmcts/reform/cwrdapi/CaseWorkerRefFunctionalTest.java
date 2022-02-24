@@ -20,6 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -87,8 +88,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
         List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
-        roleRequests.add(new CaseWorkerRoleRequest("Senior Tribunal Caseworker",true));
-        roleRequests.add(new CaseWorkerRoleRequest("Tribunal Caseworker",false));
+        roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
+        roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
         Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
@@ -107,7 +108,15 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             Arrays.asList(fetchResponse.getBody().as(
                 uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
-        assertEquals("Tribunal Caseworker", fetchedList.get(0).getRoles().get(1).getRoleName());
+        assertEquals("Regional Centre Team Leader", fetchedList.get(0).getRoles().get(1).getRoleName());
+        List<String> workAreas = fetchedList.stream().flatMap(fw -> fw.getWorkAreas().stream().map(
+            WorkArea::getAreaOfWork)).collect(
+            Collectors.toList());
+        assertTrue(workAreas.contains(caseWorkersProfileCreationRequests.get(0)
+            .getWorkerWorkAreaRequests().get(0).getAreaOfWork()));
+        caseWorkersProfileCreationRequests.get(0)
+            .getWorkerWorkAreaRequests().forEach(workerWorkAreaRequest ->
+                assertTrue(workAreas.contains(workerWorkAreaRequest.getAreaOfWork())));
         assertEquals(fetchedList.get(0).getFirstName(), caseWorkersProfileCreationRequests.get(0).getFirstName());
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
