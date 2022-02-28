@@ -107,6 +107,20 @@ public class IdamOpenIdClient {
         return crdAdminToken;
     }
 
+    public Map getUser(String idamId) {
+        log.info(":::: Get a User");
+
+        Response generatedUserResponse = RestAssured.given().relaxedHTTPSValidation()
+            .baseUri(testConfig.getIdamApiUrl())
+            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .get("/testing-support/accounts/" + idamId)
+            .andReturn();
+        if (generatedUserResponse.getStatusCode() == 404) {
+            log.info("SIDAM getUser response 404");
+        }
+        return generatedUserResponse.getBody().as(Map.class);
+    }
+
     public String getCwdSystemUserOpenIdToken() {
         if (isNull(cwdSystemUserToken)) {
             cwdSystemUserToken = getToken(ROLE_CWD_SYSTEM_USER);
