@@ -26,7 +26,6 @@ import javax.validation.constraints.Size;
 
 import static javax.persistence.CascadeType.ALL;
 
-
 @Entity(name = "case_worker_profile")
 @Getter
 @Setter
