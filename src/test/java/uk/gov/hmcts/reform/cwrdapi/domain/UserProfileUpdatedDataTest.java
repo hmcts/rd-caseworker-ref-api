@@ -24,10 +24,14 @@ class UserProfileUpdatedDataTest {
 
         UserProfileUpdatedData userProfileUpdatedData = UserProfileUpdatedData.builder()
                 .idamStatus("ACTIVE")
+                .firstName("firstName")
+                .lastName("lastName")
                 .rolesAdd(rolesAdd)
                 .build();
 
         assertThat(userProfileUpdatedData.getIdamStatus()).isEqualTo("ACTIVE");
+        assertThat(userProfileUpdatedData.getFirstName()).isEqualTo("firstName");
+        assertThat(userProfileUpdatedData.getLastName()).isEqualTo("lastName");
         assertThat(userProfileUpdatedData.getRolesAdd()).isNotEmpty();
 
         String userProfileUpdatedDataString = UserProfileUpdatedData.builder().idamStatus("ACTIVE").toString();
