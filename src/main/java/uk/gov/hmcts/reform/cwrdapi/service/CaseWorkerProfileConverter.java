@@ -127,6 +127,10 @@ public class CaseWorkerProfileConverter implements Converter<List<CaseWorkerDoma
             : Set.of(idamRoles);
     }
 
+    /**
+     * To get list of suspended CaseWorkerProfile Ids.
+     * @return List
+     */
     public List<Long> getSuspendedRowIds() {
         return suspendedRowIds;
     }
