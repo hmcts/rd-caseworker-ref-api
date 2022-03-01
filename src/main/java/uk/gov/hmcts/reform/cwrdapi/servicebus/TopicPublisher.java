@@ -98,7 +98,8 @@ public class TopicPublisher {
 
         if (messageBatch.getCount() > 0) {
             serviceBusSenderClient.sendMessages(messageBatch, transactionContext);
-            log.info("{}:: Sent a batch of messages to the topic: {} ::Job id::{}", loggingComponentName, topic,
+            log.info("{}:: Sent a batch of messages count: {} to the topic: {} ::Job id::{}", loggingComponentName,
+                    messageBatch.getCount(),topic,
                     validationService.getAuditJobId());
         }
     }
