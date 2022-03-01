@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,10 +21,10 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+
 @Entity(name = "case_worker_role")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @SequenceGenerator(name = "case_worker_role_id_seq", sequenceName = "case_worker_role_id_seq", allocationSize = 1)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "role_id"}))
