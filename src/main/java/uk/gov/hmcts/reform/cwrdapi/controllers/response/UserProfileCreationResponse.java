@@ -12,7 +12,4 @@ public class UserProfileCreationResponse {
     private String idamId;
     private Integer idamRegistrationResponse;
 
-    public void setIdamRegistrationResponse(Integer idamRegistrationResponse) {
-        this.idamRegistrationResponse = idamRegistrationResponse;
-    }
 }
