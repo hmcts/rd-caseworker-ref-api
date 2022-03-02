@@ -55,12 +55,12 @@ class JsonFeignResponseUtilTest {
         Response response = Response.builder().status(200).reason("OK").headers(header).body(bodyMock)
                 .request(mock(Request.class)).build();
 
-        try {
-            when(bodyMock.asInputStream()).thenThrow(new IOException());
-            when(bodyMock.asReader(Charset.defaultCharset())).thenThrow(new IOException());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            when(bodyMock.asInputStream()).thenThrow(new IOException());
+//            when(bodyMock.asReader(Charset.defaultCharset())).thenThrow(new IOException());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response,
                 UserProfileCreationResponse.class);
