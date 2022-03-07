@@ -1,6 +1,8 @@
 buildscript {
   repositories {
-    jcenter()
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
   }
   dependencies {
     classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.4")
@@ -16,7 +18,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.4.12'
+    id 'org.springframework.boot' version '2.4.9'
     id "org.flywaydb.flyway" version '8.3.0'
     id 'au.com.dius.pact' version '4.1.7'
 }
@@ -31,8 +33,7 @@ def versions = [
   gradlePitest       : '1.5.1',
   pitest             : '1.7.0',
   reformHealthStarter: '0.0.5',
-  reformLogging      : '5.1.7',
-  reformS2sClient    : '4.0.0',
+  reformLogging      : '5.1.9',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
   springBoot         : '2.4.9',
@@ -41,7 +42,7 @@ def versions = [
   launchDarklySdk    : "5.2.2",
   restAssured        : '4.3.3',
   jackson            : '2.12.1',
-  log4j              : '2.17.0'
+  log4j              : '2.17.1'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -306,12 +307,9 @@ project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 project.tasks['sonarqube'].group = "Verification"
 
 repositories {
-
-  maven {
-    url "https://jitpack.io/"
-  }
-
-  jcenter()
+  mavenLocal()
+  mavenCentral()
+  maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -327,6 +325,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.5'
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -339,16 +338,16 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: versions.reformS2sClient
+  implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
+  implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
+  implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.1.0'
+  implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
 
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-  implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
+  implementation 'com.github.hmcts:idam-java-client:2.0.1'
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
@@ -366,16 +365,17 @@ dependencies {
   implementation group: 'com.azure', name: 'azure-core', version: '1.13.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.0.2'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
-  implementation group: 'org.springframework', name: 'spring-core', version: '5.3.12'
+  implementation group: 'org.springframework', name: 'spring-core', version: '5.3.15'
   implementation group: 'io.netty', name: 'netty-codec-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.69.Final'
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
-  
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
+  implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
 
   implementation('io.netty:netty-codec:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
@@ -459,7 +459,7 @@ dependencies {
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.0.2'
+  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.3')
@@ -467,11 +467,14 @@ dependencies {
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
+  testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+  testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
-  testCompile 'com.github.hmcts:fortify-client:1.2.0:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -503,7 +506,7 @@ dependencyManagement {
 
   dependencies {
     // CVE-2021-42340
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.58') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'

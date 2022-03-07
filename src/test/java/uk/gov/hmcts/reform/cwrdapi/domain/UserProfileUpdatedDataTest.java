@@ -6,28 +6,32 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserProfileUpdatedDataTest {
+class UserProfileUpdatedDataTest {
 
     @Test
-    public void test_should_add_roles_add_when_modified() {
+    void test_should_add_roles_add_when_modified() {
 
         UserProfileUpdatedData userProfileUpdatedData =  UserProfileUpdatedData.builder().idamStatus("ACTIVE").build();
         assertThat(userProfileUpdatedData.getIdamStatus()).isEqualTo("ACTIVE");
     }
 
     @Test
-    public void testUserProfileUpdatedDataBuilder() {
+    void testUserProfileUpdatedDataBuilder() {
         Set<RoleName> rolesAdd = new HashSet<>();
         rolesAdd.add(new RoleName("Role Name"));
 
         UserProfileUpdatedData userProfileUpdatedData = UserProfileUpdatedData.builder()
                 .idamStatus("ACTIVE")
+                .firstName("firstName")
+                .lastName("lastName")
                 .rolesAdd(rolesAdd)
                 .build();
 
         assertThat(userProfileUpdatedData.getIdamStatus()).isEqualTo("ACTIVE");
+        assertThat(userProfileUpdatedData.getFirstName()).isEqualTo("firstName");
+        assertThat(userProfileUpdatedData.getLastName()).isEqualTo("lastName");
         assertThat(userProfileUpdatedData.getRolesAdd()).isNotEmpty();
 
         String userProfileUpdatedDataString = UserProfileUpdatedData.builder().idamStatus("ACTIVE").toString();

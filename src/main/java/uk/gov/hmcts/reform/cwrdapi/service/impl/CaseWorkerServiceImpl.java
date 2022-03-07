@@ -93,6 +93,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SU
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RESPONSE_BODY_MISSING_FROM_UP;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_CREATION_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
@@ -589,24 +590,24 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
                 return false;
             }
-
-            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
+
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
                     new HashSet<>();
             idamRolesCwr.addAll(mappedRoles);
-            if (isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr)) {
-                Set<RoleName> mergedRoles = idamRolesCwr.stream()
+            Set<RoleName> mergedRoles = new HashSet<>();
+            if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
+                mergedRoles = idamRolesCwr.stream()
                         .filter(s -> !(userProfileRoles.contains(s)))
                         .map(RoleName::new)
                         .collect(toSet());
-                if (isNotEmpty(mergedRoles)) {
-                    UserProfileUpdatedData usrProfileStatusUpdate = UserProfileUpdatedData.builder()
-                            .rolesAdd(mergedRoles).build();
-                    return isEachRoleUpdated(usrProfileStatusUpdate, idamId, "EXUI",
-                            cwrProfileRequest.getRowId());
-                }
+            }
+            var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
+                    || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
+            if (isNotEmpty(mergedRoles) || hasNameChanged) {
+                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
             }
         } catch (Exception exception) {
             log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
@@ -617,6 +618,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
         return true;
     }
+
+
 
     public CaseWorkerProfile mapCaseWorkerProfileRequest(String idamId,
                                                          CaseWorkersProfileCreationRequest cwrdProfileRequest,
@@ -668,7 +671,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         Response response = null;
         Object clazz;
         try {
-            response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest));
+            response = userProfileFeignClient.createUserProfile(createUserProfileRequest(cwrdProfileRequest), SRD);
 
             clazz = (response.status() == 201 || response.status() == 409)
                     ? UserProfileCreationResponse.class : ErrorResponse.class;
@@ -726,20 +729,16 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
                                      String origin, long rowId) {
-        boolean isEachRoleUpdated = true;
+        boolean isEachRoleUpdated;
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
                 UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
-                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())) {
-                    if (isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
-                            .equals(valueOf(HttpStatus.CREATED.value())))) {
+                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
+                        || nonNull(userProfileRolesResponse.getAttributeResponse())) {
+                    isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse,rowId);
 
-                        validationServiceFacade.logFailures(
-                                userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage(), rowId);
-                        isEachRoleUpdated = false;
-                    }
                 } else {
                     validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
                     isEachRoleUpdated = false;
@@ -757,7 +756,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         }
         return isEachRoleUpdated;
     }
-
 
     private Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
                                                           String userId, String origin) {
@@ -837,6 +835,50 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             return Optional.ofNullable(responseEntity.getBody());
         }
         return Optional.empty();
+    }
+
+    private boolean updateMismatchedDatatoUP(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId,
+                                             Set<RoleName> mergedRoles,
+                                             boolean hasNameChanged) {
+        UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
+
+        if (isNotEmpty(mergedRoles)) {
+            builder
+                    .rolesAdd(mergedRoles);
+        }
+
+        if (hasNameChanged) {
+
+            builder
+                    .firstName(cwrProfileRequest.getFirstName())
+                    .lastName(cwrProfileRequest.getLastName())
+                    .idamStatus(STATUS_ACTIVE);
+
+        }
+        return isEachRoleUpdated(builder.build(), idamId, "EXUI",
+                cwrProfileRequest.getRowId());
+    }
+
+    private boolean isRecordupdatedinUP(UserProfileRolesResponse userProfileRolesResponse,long rowId) {
+
+        boolean isRecordUpdate = true;
+        if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
+                && isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                .equals(valueOf(HttpStatus.CREATED.value())))) {
+
+            validationServiceFacade.logFailures(
+                    userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage(), rowId);
+            isRecordUpdate = false;
+        }
+        if (nonNull(userProfileRolesResponse.getAttributeResponse())
+                && !(userProfileRolesResponse.getAttributeResponse().getIdamStatusCode()
+                .equals(Integer.valueOf(HttpStatus.OK.value())))) {
+
+            validationServiceFacade.logFailures(
+                    userProfileRolesResponse.getAttributeResponse().getIdamMessage(), rowId);
+            isRecordUpdate = false;
+        }
+        return isRecordUpdate;
     }
 }
 

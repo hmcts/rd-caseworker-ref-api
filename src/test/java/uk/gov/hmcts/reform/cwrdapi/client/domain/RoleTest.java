@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RoleTest {
+class RoleTest {
 
     @Test
-    public void testRole() {
+    void testRole() {
         Role role = new Role();
         role.setRoleId("1");
         role.setRoleName("role name");
@@ -29,7 +29,7 @@ public class RoleTest {
     }
 
     @Test
-    public void testRoleBuilder() {
+    void testRoleBuilder() {
         Role role = Role.builder()
                 .roleId("1")
                 .roleName("role name")

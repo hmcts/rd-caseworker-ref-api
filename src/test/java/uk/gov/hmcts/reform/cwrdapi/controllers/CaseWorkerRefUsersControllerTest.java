@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseWorkerRefUsersControllerTest {
+class CaseWorkerRefUsersControllerTest {
 
     CaseWorkerService caseWorkerServiceMock;
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequest = new ArrayList<>();
@@ -46,7 +46,7 @@ public class CaseWorkerRefUsersControllerTest {
     private CaseWorkerRefUsersController caseWorkerRefUsersController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
 
         cwResponse = CaseWorkerProfileCreationResponse
@@ -105,7 +105,7 @@ public class CaseWorkerRefUsersControllerTest {
     }
 
     @Test
-    public void createCaseWorkerProfilesTest() {
+    void createCaseWorkerProfilesTest() {
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
                 .thenReturn(Collections.emptyList());
         ResponseEntity<?> actual =
@@ -118,7 +118,7 @@ public class CaseWorkerRefUsersControllerTest {
     }
 
     @Test
-    public void test_sendCwDataToTopic_called_when_ids_exists() {
+    void test_sendCwDataToTopic_called_when_ids_exists() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("1234");
 
@@ -135,7 +135,7 @@ public class CaseWorkerRefUsersControllerTest {
     }
 
     @Test
-    public void test_sendCwDataToTopic_not_called_when_no_ids_exists() {
+    void test_sendCwDataToTopic_not_called_when_no_ids_exists() {
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
                 .thenReturn(Collections.emptyList());
         ResponseEntity<?> actual =
@@ -149,24 +149,22 @@ public class CaseWorkerRefUsersControllerTest {
     }
 
     @Test
-    public void createCaseWorkerProfilesShouldThrow400() {
+    void createCaseWorkerProfilesShouldThrow400() {
         caseWorkersProfileCreationRequest = null;
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
-            caseWorkerRefUsersController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
-        });
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+            caseWorkerRefUsersController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest));
 
     }
 
     @Test
-    public void fetchCaseworkersByIdShouldThrow400() {
-        Assertions.assertThrows(InvalidRequestException.class, () -> {
-            caseWorkerRefUsersController.fetchCaseworkersById(
-                    UserRequest.builder().userIds(Collections.emptyList()).build());
-        });
+    void fetchCaseworkersByIdShouldThrow400() {
+        final UserRequest userRequest = UserRequest.builder().userIds(Collections.emptyList()).build();
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+            caseWorkerRefUsersController.fetchCaseworkersById(userRequest));
     }
 
     @Test
-    public void shouldFetchCaseworkerDetails() {
+    void shouldFetchCaseworkerDetails() {
         responseEntity = ResponseEntity.ok().body(null);
         when(caseWorkerServiceMock.fetchCaseworkersById(any()))
                 .thenReturn(responseEntity);
@@ -179,5 +177,23 @@ public class CaseWorkerRefUsersControllerTest {
         verify(caseWorkerServiceMock, times(1))
                 .fetchCaseworkersById(Arrays.asList(
                         "185a0254-ff80-458b-8f62-2a759788afd2", "2dee918c-279d-40a0-a4c2-871758d78cf0"));
+    }
+
+    @Test
+    void createCaseWorkerProfileWithNewRole() {
+        List<CaseWorkerRoleRequest> caseWorkerRoleRequests = new ArrayList<>();
+        CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
+        CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
+        caseWorkerRoleRequests.add(cwRoleRequest);
+        caseWorkerRoleRequests.add(cwRoleRequest1);
+        caseWorkersProfileCreationRequest.get(0).setRoles(caseWorkerRoleRequests);
+        when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
+                .thenReturn(Collections.emptyList());
+        ResponseEntity<?> actual =
+                caseWorkerRefUsersController.createCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+
+        assertNotNull(actual);
+        verify(caseWorkerServiceMock, times(1))
+                .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
     }
 }

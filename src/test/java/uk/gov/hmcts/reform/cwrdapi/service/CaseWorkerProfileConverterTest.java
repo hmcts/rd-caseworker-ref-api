@@ -10,21 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-public class CaseWorkerProfileConverterTest {
+class CaseWorkerProfileConverterTest {
 
-    public CaseWorkerProfileConverter caseWorkerProfileConverter = new CaseWorkerProfileConverter();
-    public CaseWorkerProfileConverter caseWorkerProfileConverterMock = mock(CaseWorkerProfileConverter.class);
+    CaseWorkerProfileConverter caseWorkerProfileConverter = new CaseWorkerProfileConverter();
+    CaseWorkerProfileConverter caseWorkerProfileConverterMock = mock(CaseWorkerProfileConverter.class);
 
     @Test
-    public void shouldConvertCwProfileToRequest() {
+    void shouldConvertCwProfileToRequest() {
         List<CaseWorkerDomain> caseWorkerDomains = TestSupport.buildCaseWorkerProfileData();
         List<CaseWorkersProfileCreationRequest> convert =
                 caseWorkerProfileConverter.convert(caseWorkerDomains);
@@ -52,12 +53,12 @@ public class CaseWorkerProfileConverterTest {
     }
 
     @Test
-    public void shouldConvertSuspendedCwProfileToRequest() {
+    void shouldConvertSuspendedCwProfileToRequest() {
         List<CaseWorkerDomain> caseWorkerDomains = TestSupport.buildSuspendedCaseWorkerProfileData();
         List<CaseWorkersProfileCreationRequest> convert =
                 caseWorkerProfileConverter.convert(caseWorkerDomains);
         caseWorkerDomains.get(0).setRowId(10);
-        assertFalse(caseWorkerDomains.get(0).getRowId() == 0);
+        assertNotEquals(0,caseWorkerDomains.get(0).getRowId());
         assertNotNull(convert);
         CaseWorkersProfileCreationRequest caseWorkersProfileCreationRequest = convert.get(0);
         assertNotNull(caseWorkersProfileCreationRequest.getBaseLocations());
@@ -90,7 +91,7 @@ public class CaseWorkerProfileConverterTest {
     }
 
     @Test
-    public void testGetSuspendedRowIds() {
+    void testGetSuspendedRowIds() {
         List<Long> suspendedIds = new ArrayList<>();
         suspendedIds.add(1L);
 
@@ -104,7 +105,7 @@ public class CaseWorkerProfileConverterTest {
     }
 
     @Test
-    public void testIsNotSuspended() {
+    void testIsNotSuspended() {
         CaseWorkerProfile caseWorkerProfile = CaseWorkerProfile.builder()
                 .firstName("test").lastName("test")
                 .officialEmail("email@gov.justice.uk")
@@ -119,7 +120,7 @@ public class CaseWorkerProfileConverterTest {
     }
 
     @Test
-    public void testIsSuspended() {
+    void testIsSuspended() {
         CaseWorkerProfile caseWorkerProfile = CaseWorkerProfile.builder()
                 .firstName("test").lastName("test")
                 .officialEmail("email@gov.justice.uk")

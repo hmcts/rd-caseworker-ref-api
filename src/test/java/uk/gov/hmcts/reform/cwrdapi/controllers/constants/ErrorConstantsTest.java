@@ -8,10 +8,10 @@ import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.I
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.MALFORMED_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.UNSUPPORTED_MEDIA_TYPES;
 
-public class ErrorConstantsTest {
+class ErrorConstantsTest {
 
     @Test
-    public void test_shouldReturnMsgWhenMsgPassed() {
+    void test_shouldReturnMsgWhenMsgPassed() {
         ErrorConstants mailFormedJson = MALFORMED_JSON;
         assertThat(mailFormedJson).isNotNull();
         assertThat(mailFormedJson.getErrorMessage()).isEqualTo(MALFORMED_JSON.getErrorMessage());

@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class CaseWorkersProfileCreationRequestTest {
+class CaseWorkersProfileCreationRequestTest {
 
     Set<String> idamRoles = Set.of("caseworker");
 
     @Test
-    public void testUserProfileCreationRequestWithConstructor() {
+    void testUserProfileCreationRequestWithConstructor() {
 
         CaseWorkersProfileCreationRequest request1 = new CaseWorkersProfileCreationRequest(
                 "firstName","lastName", "some@email.com",
@@ -23,7 +23,7 @@ public class CaseWorkersProfileCreationRequestTest {
         verify(request1);
     }
 
-    public void verify(CaseWorkersProfileCreationRequest request) {
+    void verify(CaseWorkersProfileCreationRequest request) {
         assertThat(request.getEmailId()).isEqualTo("some@email.com");
         assertThat(request.getFirstName()).isEqualTo("firstName");
         assertThat(request.getLastName()).isEqualTo("lastName");
