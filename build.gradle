@@ -20,7 +20,7 @@ plugins {
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.4.9'
     id "org.flywaydb.flyway" version '8.3.0'
-    id 'au.com.dius.pact' version '4.1.7'
+    id 'au.com.dius.pact' version '4.3.4'
 }
 
 apply plugin: 'java'
@@ -400,7 +400,7 @@ dependencies {
   implementation('io.netty:netty-transport-native-epoll:4.1.74.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-transport-native-kqueue:4.1.69.Final') {
+  implementation('io.netty:netty-transport-native-kqueue:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   implementation('io.netty:netty-transport-native-unix-common:4.1.69.Final') {
@@ -409,14 +409,14 @@ dependencies {
   implementation('io.netty:netty-codec-http2:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
-  implementation('io.netty:netty-codec-socks:4.1.69.Final') {
+  implementation('io.netty:netty-codec-socks:4.1.73.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   implementation('io.netty:netty-handler-proxy:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   //Fix for CVE-2021-29425
-  implementation 'commons-io:commons-io:2.8.0'
+  implementation 'commons-io:commons-io:2.11.0'
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
@@ -447,7 +447,7 @@ dependencies {
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
-  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+  contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
   contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.7.2')
 
@@ -464,7 +464,7 @@ dependencies {
   testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.14'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
-  testImplementation('com.opentable.components:otj-pg-embedded:0.13.3')
+  testImplementation('com.opentable.components:otj-pg-embedded:0.13.4')
   testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
