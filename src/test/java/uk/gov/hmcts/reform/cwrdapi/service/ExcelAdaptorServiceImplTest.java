@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE_MAPPING_SHEET_NAME;
@@ -155,5 +156,15 @@ class ExcelAdaptorServiceImplTest {
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void testHandleRowProcessing_error() {
+        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.handleRowProcessing(
+                null,null,null,
+                null,null,null,
+                null))
+                .isExactlyInstanceOf(NullPointerException.class)
+                .hasMessage(null);
     }
 }

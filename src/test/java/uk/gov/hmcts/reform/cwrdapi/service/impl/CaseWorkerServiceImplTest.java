@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -121,7 +122,9 @@ class CaseWorkerServiceImplTest {
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+
         Set<String> idamRoles = new HashSet<>();
         idamRoles.add("IdamRole1");
         idamRoles.add("IdamRole2");
@@ -151,6 +154,7 @@ class CaseWorkerServiceImplTest {
                 .idamRoles(idamRoles)
                 .firstName("testFN")
                 .lastName("testLN")
+                .regionId(1)
                 .region("testRegion")
                 .userType("testUser1")
                 .workerWorkAreaRequests(singletonList(caseWorkerWorkAreaRequest))
@@ -185,7 +189,6 @@ class CaseWorkerServiceImplTest {
         userProfileCreationResponse.setIdamRegistrationResponse(1);
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailIdIn(any()))
@@ -205,7 +208,18 @@ class CaseWorkerServiceImplTest {
     }
 
     @Test
-    void test_409WhileCwUserProfileCreation() throws JsonProcessingException {
+    public void test_setNewCaseWorkerProfileFlag() {
+        CaseWorkerProfile caseWorkerProfileMock = mock(CaseWorkerProfile.class);
+        caseWorkerProfileMock.setCaseWorkerId("CWID1");
+        caseWorkerServiceImpl.setNewCaseWorkerProfileFlag(caseWorkerProfileMock);
+        assertThat(caseWorkerProfileMock).isNotNull();
+
+        verify(caseWorkerProfileMock, times(1)).setNew(true);
+
+    }
+
+    @Test
+    public void test_409WhileCwUserProfileCreation() throws JsonProcessingException {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("12345678");
         userProfileCreationResponse.setIdamRegistrationResponse(1);
@@ -299,16 +313,27 @@ class CaseWorkerServiceImplTest {
                 .idamRoles("role1")
                 .roleId(1)
                 .build();
-        List<ServiceRoleMapping> serviceRoleMappingList = singletonList(serviceRoleMapping);
+        ServiceRoleMapping serviceRoleMapping1 = ServiceRoleMapping.builder()
+                .serviceId("BA12")
+                .idamRoles("role2")
+                .roleId(2)
+                .build();
+
+        List<ServiceRoleMapping> serviceRoleMappingList = new ArrayList<>();
+        serviceRoleMappingList.add(serviceRoleMapping);
+        serviceRoleMappingList.add(serviceRoleMapping1);
+
         IdamRolesMappingResponse idamRolesMappingResponse = caseWorkerServiceImpl
                 .buildIdamRoleMappings(serviceRoleMappingList);
 
         Set<String> serviceCode = new HashSet<>();
         serviceCode.add(serviceRoleMapping.getServiceId());
+        serviceCode.add(serviceRoleMapping1.getServiceId());
 
         assertThat(idamRolesMappingResponse.getStatusCode()).isEqualTo(201);
         assertThat(idamRolesMappingResponse.getMessage())
                 .isEqualTo(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCode.toString());
+
     }
 
     @Test
@@ -441,6 +466,8 @@ class CaseWorkerServiceImplTest {
                         .roles(singletonList(role))
                         .locations(singletonList(location))
                         .workAreas(singletonList(workArea))
+                        .taskSupervisor("Y")
+                        .caseAllocator("N")
                         .build();
 
         return caseWorkerProfile;

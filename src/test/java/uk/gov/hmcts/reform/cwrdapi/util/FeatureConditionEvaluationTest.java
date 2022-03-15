@@ -21,7 +21,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+<<<<<<< HEAD
 import static org.junit.jupiter.api.Assertions.assertThrows;
+=======
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+>>>>>>> RDCC-3618
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -93,7 +98,12 @@ class FeatureConditionEvaluationTest {
 
     @Test
     void testPreHandleNoFlag() throws Exception {
+<<<<<<< HEAD
         assertTrue(featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod));
+=======
+        boolean response = featureConditionEvaluation.preHandle(httpRequest, httpServletResponse, handlerMethod);
+        assertThat(response).isTrue();
+>>>>>>> RDCC-3618
         verify(featureConditionEvaluation, times(1))
                 .preHandle(httpRequest, httpServletResponse, handlerMethod);
     }
@@ -108,6 +118,24 @@ class FeatureConditionEvaluationTest {
                 .preHandle(httpRequest, httpServletResponse, handlerMethod);
     }
 
+<<<<<<< HEAD
+=======
+    @Test
+    void testGetServiceName() {
+        Map<String, String> launchDarklyMap = new HashMap<>();
+        launchDarklyMap.put("WelcomeController.test", "test-flag");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(httpRequest));
+        when(featureToggleService.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
+        String token = generateDummyS2SToken("rd_caseworker_ref_api");
+        when(httpRequest.getHeader(FeatureConditionEvaluation.SERVICE_AUTHORIZATION))
+                .thenReturn(token);
+        when(featureToggleService.isFlagEnabled(anyString(),anyString())).thenReturn(true);
+
+        String serviceName = featureConditionEvaluation.getServiceName("test-flag");
+        assertThat(serviceName).isNotEmpty().isEqualTo("rd_caseworker_ref_api");
+    }
+
+>>>>>>> RDCC-3618
     static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
                 .setSubject(serviceName)
