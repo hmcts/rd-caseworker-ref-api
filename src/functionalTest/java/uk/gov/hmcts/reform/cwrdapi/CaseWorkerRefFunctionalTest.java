@@ -85,12 +85,14 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies new User profile is created
     public void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-                .createCaseWorkerProfiles();
         List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
         roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
         roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
+        roleRequests.add(new CaseWorkerRoleRequest("DWP Administrator",false));
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
+            .createCaseWorkerProfiles();
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
+        caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
         Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
@@ -109,6 +111,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
         assertEquals("Regional Centre Team Leader", fetchedList.get(0).getRoles().get(1).getRoleName());
+        assertEquals("DWP Administrator",fetchedList.get(0).getRoles().get(2).getRoleName());
         List<String> workAreas = fetchedList.stream().flatMap(fw -> fw.getWorkAreas().stream().map(
             WorkArea::getAreaOfWork)).collect(
             Collectors.toList());
@@ -118,6 +121,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             .getWorkerWorkAreaRequests().forEach(workerWorkAreaRequest ->
                 assertTrue(workAreas.contains(workerWorkAreaRequest.getAreaOfWork())));
         assertEquals(fetchedList.get(0).getFirstName(), caseWorkersProfileCreationRequests.get(0).getFirstName());
+        assertEquals(5,fetchedList.get(0).getUserId());
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
 
