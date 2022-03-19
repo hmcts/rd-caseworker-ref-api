@@ -36,7 +36,7 @@ def versions = [
   reformLogging      : '5.1.9',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
-  springBoot         : '2.6.4',
+  springBoot         : '2.4.9',
   springfoxSwagger   : '2.9.2',
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.2.2",
@@ -471,7 +471,7 @@ dependencies {
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
   testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
-
+  testRuntimeOnly "com.vladsch.flexmark:flexmark-all:0.64.0"
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
@@ -513,7 +513,7 @@ dependencyManagement {
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
     }
-    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.1') {
+    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.2') {
       entry 'jackson-databind'
       entry 'jackson-core'
       entry 'jackson-annotations'
