@@ -10,17 +10,17 @@ buildscript {
 }
 
 plugins {
-    id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.12'
-    id 'jacoco'
-    id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.36.0'
-    id "info.solidsoft.pitest" version '1.7.0'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.sonarqube' version '3.3'
-    id 'org.springframework.boot' version '2.4.9'
-    id "org.flywaydb.flyway" version '8.3.0'
-    id 'au.com.dius.pact' version '4.3.4'
+  id 'application'
+  id 'uk.gov.hmcts.java' version '0.12.12'
+  id 'jacoco'
+  id 'pmd'
+  id 'com.github.ben-manes.versions' version '0.36.0'
+  id "info.solidsoft.pitest" version '1.7.0'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'org.sonarqube' version '3.3'
+  id 'org.springframework.boot' version '2.4.9'
+  id "org.flywaydb.flyway" version '8.3.0'
+  id 'au.com.dius.pact' version '4.3.4'
 }
 
 apply plugin: 'java'
@@ -29,20 +29,20 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 def versions = [
-  lombok             : '1.18.20',
-  gradlePitest       : '1.5.1',
-  pitest             : '1.7.0',
-  reformHealthStarter: '0.0.5',
-  reformLogging      : '5.1.9',
-  serenity           : '2.0.76',
-  sonarPitest        : '0.5',
-  springBoot         : '2.4.9',
-  springfoxSwagger   : '2.9.2',
-  pact_version       : '4.1.7',
-  launchDarklySdk    : "5.2.2",
-  restAssured        : '4.3.3',
-  jackson            : '2.12.1',
-  log4j              : '2.17.1'
+        lombok             : '1.18.20',
+        gradlePitest       : '1.5.1',
+        pitest             : '1.7.0',
+        reformHealthStarter: '0.0.5',
+        reformLogging      : '5.1.9',
+        serenity           : '2.0.76',
+        sonarPitest        : '0.5',
+        springBoot         : '2.4.9',
+        springfoxSwagger   : '2.9.2',
+        pact_version       : '4.1.7',
+        launchDarklySdk    : "5.2.2",
+        restAssured        : '4.3.3',
+        jackson            : '2.13.1',
+        log4j              : '2.17.1'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -153,8 +153,8 @@ pmd {
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   ruleSets = [
-    'category/java/errorprone.xml',
-    'category/java/bestpractices.xml'
+          'category/java/errorprone.xml',
+          'category/java/bestpractices.xml'
   ]
 }
 
@@ -271,11 +271,11 @@ pitest {
   targetClasses = ['uk.gov.hmcts.reform.*']
   testSourceSets = [sourceSets.test]
   excludedClasses = [
-    'uk.gov.hmcts.reform.cwrdapi.config.*',
-    'uk.gov.hmcts.reform.cwrdapi.controllers.*',
-    'uk.gov.hmcts.reform.cwrdapi.service.impl.*',
-    'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
-    'uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher'
+          'uk.gov.hmcts.reform.cwrdapi.config.*',
+          'uk.gov.hmcts.reform.cwrdapi.controllers.*',
+          'uk.gov.hmcts.reform.cwrdapi.service.impl.*',
+          'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
+          'uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher'
   ]
   threads = 10
   enableDefaultIncrementalAnalysis = true
@@ -298,10 +298,10 @@ sonarqube {
     property "sonar.pitest.mode", "reuseReport"
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/cwrdapi/config/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/request/**," +
-                "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
+            "src/main/java/uk/gov/hmcts/reform/cwrdapi/client/domain/**," +
+            "src/main/java/uk/gov/hmcts/reform/cwrdapi/domain/**," +
+            "src/main/java/uk/gov/hmcts/reform/cwrdapi/controllers/request/**," +
+            "src/main/java/uk/gov/hmcts/reform/cwrdapi/CaseWorkerRefApiApplication.java"
   }
 }
 
@@ -348,6 +348,9 @@ dependencies {
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
+
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation 'com.github.hmcts:idam-java-client:2.0.1'
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
@@ -417,36 +420,35 @@ dependencies {
   }
   //Fix for CVE-2021-29425
   implementation 'commons-io:commons-io:2.11.0'
-  implementation 'com.vladsch.flexmark:flexmark-util:0.42.14'
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testImplementation("org.hamcrest:hamcrest-junit:2.0.0.0") {
     exclude group: "org.hamcrest", module: "hamcrest-core"
     exclude group: "org.hamcrest", module: "hamcrest-library"
   }
 
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
-    testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: versions.restAssured
+  testImplementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
+  testImplementation group: 'io.rest-assured', name: 'rest-assured-common', version: versions.restAssured
 
-    testImplementation group: 'com.h2database', name: 'h2'
-    testImplementation ("com.github.tomakehurst:wiremock-jre8:2.31.0") {
-      exclude group: 'com.github.jknack'
-    }
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
+  testImplementation group: 'com.h2database', name: 'h2'
+  testImplementation ("com.github.tomakehurst:wiremock-jre8:2.31.0") {
+    exclude group: 'com.github.jknack'
+  }
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.4.6'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
+  testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
   contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
   contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
@@ -472,6 +474,7 @@ dependencies {
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.8'
   testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
@@ -513,12 +516,6 @@ dependencyManagement {
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
     }
-    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.2') {
-      entry 'jackson-databind'
-      entry 'jackson-core'
-      entry 'jackson-annotations'
-    }
-
   }
 }
 
