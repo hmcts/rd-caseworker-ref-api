@@ -70,6 +70,7 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -322,7 +323,7 @@ class CaseWorkerServiceImplTest {
         List<ServiceRoleMapping> serviceRoleMappingList = new ArrayList<>();
         serviceRoleMappingList.add(serviceRoleMapping);
         serviceRoleMappingList.add(serviceRoleMapping1);
-
+//
         IdamRolesMappingResponse idamRolesMappingResponse = caseWorkerServiceImpl
                 .buildIdamRoleMappings(serviceRoleMappingList);
 
@@ -333,7 +334,6 @@ class CaseWorkerServiceImplTest {
         assertThat(idamRolesMappingResponse.getStatusCode()).isEqualTo(201);
         assertThat(idamRolesMappingResponse.getMessage())
                 .isEqualTo(CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS + serviceCode.toString());
-
     }
 
     @Test
