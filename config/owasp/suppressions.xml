@@ -18,4 +18,8 @@
     <packageUrl regex="true">^pkg:maven/io\.netty.*$</packageUrl>
     <cve>CVE-2021-43797</cve>
   </suppress>
+  <suppress until="2022-09-24">
+    <packageUrl regex="true">^pkg:maven/org\.apache\.poi.*$</packageUrl>
+    <cve>CVE-2022-26336</cve>
+  </suppress>
 </suppressions>
