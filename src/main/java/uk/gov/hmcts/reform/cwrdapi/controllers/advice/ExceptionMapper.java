@@ -1,16 +1,19 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.advice;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -95,6 +98,20 @@ public class ExceptionMapper {
                 ex.getErrorMessage(), ex.getErrorDescription(), getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, ex.getStatus());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> httpMessageNotReadableExceptionError(HttpMessageNotReadableException ex) {
+        String field = "";
+        if (ex.getCause() != null) {
+            JsonMappingException jme = (JsonMappingException) ex.getCause();
+            field = jme.getPath().get(0).getFieldName();
+        }
+        var errorDetails = new ErrorResponse(BAD_REQUEST.value(), BAD_REQUEST.getReasonPhrase(),
+            field + " in invalid format",
+            ErrorConstants.MALFORMED_JSON.getErrorMessage(), getTimeStamp());
+
+        return new ResponseEntity<>(errorDetails, BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
