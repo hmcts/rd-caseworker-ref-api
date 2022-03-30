@@ -88,7 +88,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
         roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
         roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
-        roleRequests.add(new CaseWorkerRoleRequest("DWP Administrator",false));
+        roleRequests.add(new CaseWorkerRoleRequest("DWP Caseworker",false));
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
             .createCaseWorkerProfiles();
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
@@ -111,7 +111,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
         assertEquals("Regional Centre Team Leader", fetchedList.get(0).getRoles().get(1).getRoleName());
-        assertEquals("DWP Administrator",fetchedList.get(0).getRoles().get(2).getRoleName());
+        assertEquals("DWP Caseworker",fetchedList.get(0).getRoles().get(2).getRoleName());
         List<String> workAreas = fetchedList.stream().flatMap(fw -> fw.getWorkAreas().stream().map(
             WorkArea::getAreaOfWork)).collect(
             Collectors.toList());

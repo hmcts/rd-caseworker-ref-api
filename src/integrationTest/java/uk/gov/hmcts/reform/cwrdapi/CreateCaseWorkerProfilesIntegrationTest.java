@@ -147,7 +147,7 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
         CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
-        CaseWorkerRoleRequest cwRoleRequest2 = new CaseWorkerRoleRequest("DWP Administrator", false);
+        CaseWorkerRoleRequest cwRoleRequest2 = new CaseWorkerRoleRequest("DWP Caseworker", false);
 
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
             .of(cwRoleRequest,cwRoleRequest1,cwRoleRequest2);
