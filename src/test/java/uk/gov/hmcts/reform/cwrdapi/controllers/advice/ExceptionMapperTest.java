@@ -1,18 +1,26 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.advice;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
+import java.util.Collections;
+import java.util.LinkedList;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.UNKNOWN_EXCEPTION;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,6 +28,9 @@ class ExceptionMapperTest {
 
     @InjectMocks
     private ExceptionMapper exceptionMapper;
+
+    @Mock
+    LinkedList<JsonMappingException.Reference> path = new LinkedList<>();
 
     @Test
     void test_handle_empty_result_exception() {
@@ -128,5 +139,21 @@ class ExceptionMapperTest {
         assertEquals(exception.getErrorMessage(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
         assertEquals(exception.getErrorDescription(), ((ErrorResponse)responseEntity.getBody()).getErrorDescription());
 
+    }
+
+    @Test
+    void test_handle_http_message_not_readable_exception() {
+        HttpMessageNotReadableException httpMessageNotReadableException = mock(HttpMessageNotReadableException.class);
+
+        JsonMappingException jm = mock(JsonMappingException.class);
+        JsonMappingException.Reference rf = mock(JsonMappingException.Reference.class);
+        when(httpMessageNotReadableException.getCause()).thenReturn(jm);
+        when(jm.getPath()).thenReturn(Collections.unmodifiableList(path));
+        when(jm.getPath().get(0)).thenReturn(rf);
+        when(jm.getPath().get(0).getFieldName()).thenReturn("field");
+        ResponseEntity<Object> responseEntity = exceptionMapper
+            .httpMessageNotReadableExceptionError(httpMessageNotReadableException);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 }
