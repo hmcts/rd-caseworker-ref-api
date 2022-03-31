@@ -323,7 +323,6 @@ class CaseWorkerServiceImplTest {
         List<ServiceRoleMapping> serviceRoleMappingList = new ArrayList<>();
         serviceRoleMappingList.add(serviceRoleMapping);
         serviceRoleMappingList.add(serviceRoleMapping1);
-//
         IdamRolesMappingResponse idamRolesMappingResponse = caseWorkerServiceImpl
                 .buildIdamRoleMappings(serviceRoleMappingList);
 
