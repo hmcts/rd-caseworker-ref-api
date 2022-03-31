@@ -380,7 +380,9 @@ class CaseWorkerServiceImplTest {
                 "27fbd198-552e-4c32-9caf-37be1545caaf"));
         caseWorkerServiceImpl.fetchCaseworkersById(
                 singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
-        verify(caseWorkerProfileRepository, times(1)).findByCaseWorkerIdIn(any());
+        assertNotNull(caseWorkerServiceImpl
+                .fetchCaseworkersById(singletonList("27fbd198-552e-4c32-9caf-37be1545caaf")));
+        verify(caseWorkerProfileRepository, times(2)).findByCaseWorkerIdIn(any());
     }
 
     CaseWorkerProfile buildCaseWorkerProfile() {
