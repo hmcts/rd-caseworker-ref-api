@@ -120,7 +120,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             .getWorkerWorkAreaRequests().forEach(workerWorkAreaRequest ->
                 assertTrue(workAreas.contains(workerWorkAreaRequest.getAreaOfWork())));
         assertEquals(fetchedList.get(0).getFirstName(), caseWorkersProfileCreationRequests.get(0).getFirstName());
-        assertEquals(5,fetchedList.get(0).getUserId());
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
 
