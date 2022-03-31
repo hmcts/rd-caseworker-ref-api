@@ -92,7 +92,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
             .createCaseWorkerProfiles();
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
-        caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
         Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
