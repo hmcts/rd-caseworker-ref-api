@@ -85,11 +85,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies new User profile is created
     public void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-                .createCaseWorkerProfiles();
         List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
         roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
         roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
+            .createCaseWorkerProfiles();
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
         Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
