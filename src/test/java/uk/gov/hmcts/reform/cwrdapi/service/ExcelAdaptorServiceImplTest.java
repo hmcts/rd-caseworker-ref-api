@@ -156,4 +156,14 @@ class ExcelAdaptorServiceImplTest {
                 .isExactlyInstanceOf(ExcelValidationException.class)
                 .hasMessage(FILE_NO_DATA_ERROR_MESSAGE);
     }
+
+    @Test
+    public void testHandleRowProcessing_error() {
+        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.handleRowProcessing(
+                null,null,null,
+                null,null,null,
+                null))
+                .isExactlyInstanceOf(NullPointerException.class)
+                .hasMessage(null);
+    }
 }
