@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class FeatureToggleServiceImplTest {
 
@@ -19,7 +20,14 @@ class FeatureToggleServiceImplTest {
     }
 
     @Test
-    void mapServiceToFlagTest() {
+    public void testIsFlagEnabled_true() {
+        flaFeatureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
+        when(flaFeatureToggleService.isFlagEnabled("test", "test")).thenReturn(true);
+        assertTrue(flaFeatureToggleService.isFlagEnabled("test", "test"));
+    }
+
+    @Test
+    public void mapServiceToFlagTest() {
         flaFeatureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
         flaFeatureToggleService.mapServiceToFlag();
         assertTrue(flaFeatureToggleService.getLaunchDarklyMap().size() >= 1);
