@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
@@ -46,14 +45,10 @@ public class ValidationServiceFacadeImplTest {
     IValidationService validationServiceFacadeImpl;
 
     @Autowired
-    JsrValidatorInitializer<CaseWorkerDomain> jsrValidatorInitializer;
-
-    @Autowired
     ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
 
     @MockBean
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
-
 
     @Test
     public void testAuditJsr() {
@@ -66,10 +61,10 @@ public class ValidationServiceFacadeImplTest {
 
         long jobId = validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.IN_PROGRESS, "test");
         CaseWorkerAudit caseWorkerAudit = CaseWorkerAudit.builder()
-            .fileName("test.xlsx")
-            .jobStartTime(LocalDateTime.now())
-            .jobId(jobId)
-            .status(PARTIAL_SUCCESS).build();
+                .fileName("test.xlsx")
+                .jobStartTime(LocalDateTime.now())
+                .jobId(jobId)
+                .status(PARTIAL_SUCCESS).build();
 
         validationServiceFacadeImpl.getInvalidRecords(caseWorkerProfiles);
 
