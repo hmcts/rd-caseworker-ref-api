@@ -106,7 +106,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     }
 
 
-    private String getKeyFieldValue(Field field, CaseWorkerDomain domain) {
+    public String getKeyFieldValue(Field field, CaseWorkerDomain domain) {
         try {
             return (String) field.get(domain);
         } catch (Exception ex) {
@@ -172,7 +172,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
      * @param fileName    String
      * @return CaseWorkerAudit CaseWorkerAudit
      */
-    private CaseWorkerAudit createOrUpdateCaseworkerAudit(AuditStatus auditStatus, String fileName) {
+    public CaseWorkerAudit createOrUpdateCaseworkerAudit(AuditStatus auditStatus, String fileName) {
         if (isNull(caseWorkerAudit) || isNull(caseWorkerAudit.getJobId())) {
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
             String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : EMPTY;
