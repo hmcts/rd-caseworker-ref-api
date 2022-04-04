@@ -10,7 +10,10 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -45,6 +48,11 @@ class JsrValidatorInitializerTest {
         List<CaseWorkerDomain> records = jsrValidatorInitializer.getInvalidJsrRecords(caseWorkerProfiles);
         assertEquals(1, records.size());
         verify(jsrValidatorInitializer).getInvalidJsrRecords(caseWorkerProfiles);
+
+        Set<ConstraintViolation<CaseWorkerDomain>> constraintViolationSet =
+                jsrValidatorInitializer.getConstraintViolations();
+
+        assertThat(constraintViolationSet).isNotEmpty();
     }
 
     @Test
