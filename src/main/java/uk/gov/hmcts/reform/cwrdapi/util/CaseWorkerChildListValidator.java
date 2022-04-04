@@ -49,7 +49,7 @@ public class CaseWorkerChildListValidator implements ConstraintValidator<Validat
         return isValidAreaOfWk;
     }
 
-    private boolean isValidLocations(CaseWorkerProfile caseWorkerProfile, ConstraintValidatorContext context) {
+    public boolean isValidLocations(CaseWorkerProfile caseWorkerProfile, ConstraintValidatorContext context) {
         boolean isValidLocations = true;
         if (isNotEmpty(caseWorkerProfile.getLocations())
             && caseWorkerProfile.getLocations().size() > 1) {
