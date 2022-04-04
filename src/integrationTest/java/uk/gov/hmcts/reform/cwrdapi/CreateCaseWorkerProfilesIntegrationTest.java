@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -146,15 +147,23 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
         CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
-        List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList.of(cwRoleRequest,cwRoleRequest1);
+        CaseWorkerRoleRequest cwRoleRequest2 = new CaseWorkerRoleRequest("DWP Caseworker", false);
+
+        List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
+            .of(cwRoleRequest,cwRoleRequest1,cwRoleRequest2);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
+        caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
 
         Map<String, Object> response = caseworkerReferenceDataClient
             .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "201 CREATED");
         List<CaseWorkerRole> caseWorkerRoles = caseWorkerRoleRepository.findAll();
-        CaseWorkerRole caseWorkerRole = caseWorkerRoles.get(0);
-        assertThat(caseWorkerRole.getRoleId()).isEqualTo(13);
+        var caseWorkerProfile = caseWorkerProfileRepository.findAll();
+        assertEquals(13, (long) caseWorkerRoles.get(0).getRoleId());
+        assertEquals(14,(long)caseWorkerRoles.get(2).getRoleId());
+        assertEquals(5,caseWorkerProfile.get(0).getUserTypeId());
+
+
 
     }
 
