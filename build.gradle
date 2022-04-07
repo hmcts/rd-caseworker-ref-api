@@ -374,7 +374,7 @@ dependencies {
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-  implementation ('com.github.hmcts:rd-commons-lib:v0.0.4'){
+  implementation ('com.github.hmcts:rd-commons-lib:v0.0.5'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
 
