@@ -35,6 +35,12 @@ resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
 
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  name          = join("-", [var.component, "POSTGRES-DATABASE"])
+  value         = module.db-rd-caseworker-ref-api.postgresql_database
+  key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+}
+
 module "db-rd-caseworker-ref-api" {
   source              = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product             = var.product
