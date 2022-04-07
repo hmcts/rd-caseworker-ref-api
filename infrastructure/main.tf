@@ -37,7 +37,7 @@ resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name          = join("-", [var.component, "POSTGRES-DATABASE"])
-  value         = module.db-caseworker-ref-data.postgresql_database
+  value         = module.db-rd-caseworker-ref-api.postgresql_database
   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
 
