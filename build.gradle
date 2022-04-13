@@ -318,9 +318,7 @@ repositories {
 
 dependencies {
 
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: '3.0.2'
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.0.2'
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
+
   implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
@@ -390,10 +388,13 @@ dependencies {
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-  implementation ('com.github.hmcts:rd-commons-lib:v0.0.5'){
+  /*implementation ('com.github.hmcts:rd-commons-lib:v0.0.6'){
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+  }*/
+
+  testImplementation ('uk.gov.hmcts.reform:rd-commons-lib:DEV-SNAPSHOT'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
-
 
   implementation('io.netty:netty-codec:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
