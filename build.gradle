@@ -19,7 +19,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.4.9'
-    id "org.flywaydb.flyway" version '8.3.0'
+    id "org.flywaydb.flyway" version '8.5.2'
     id 'au.com.dius.pact' version '4.1.7' // do not change, otherwise serenity report fails
 }
 
@@ -318,7 +318,6 @@ repositories {
 
 dependencies {
 
-
   implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
@@ -369,7 +368,7 @@ dependencies {
 
   implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '6.5.5'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
 
   implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
@@ -486,7 +485,7 @@ dependencies {
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
 
-
+  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
   testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
