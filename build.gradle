@@ -392,14 +392,9 @@ dependencies {
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-  /*implementation ('com.github.hmcts:rd-commons-lib:v0.0.6'){
-    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-  }*/
-
-  testImplementation ('uk.gov.hmcts.reform:rd-commons-lib:DEV-SNAPSHOT'){
+  testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.7'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
-
   implementation('io.netty:netty-codec:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
