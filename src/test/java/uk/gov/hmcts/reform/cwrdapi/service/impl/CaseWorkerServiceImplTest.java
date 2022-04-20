@@ -209,7 +209,7 @@ class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void test_setNewCaseWorkerProfileFlag() {
+    void test_setNewCaseWorkerProfileFlag() {
         CaseWorkerProfile caseWorkerProfileMock = mock(CaseWorkerProfile.class);
         caseWorkerProfileMock.setCaseWorkerId("CWID1");
         caseWorkerServiceImpl.setNewCaseWorkerProfileFlag(caseWorkerProfileMock);
@@ -220,7 +220,7 @@ class CaseWorkerServiceImplTest {
     }
 
     @Test
-    public void test_409WhileCwUserProfileCreation() throws JsonProcessingException {
+    void test_409WhileCwUserProfileCreation() throws JsonProcessingException {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("12345678");
         userProfileCreationResponse.setIdamRegistrationResponse(1);
