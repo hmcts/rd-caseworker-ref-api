@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.cwrdapi.config.WireMockExtension;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
-import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
+import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.LinkedList;
 import java.util.UUID;
