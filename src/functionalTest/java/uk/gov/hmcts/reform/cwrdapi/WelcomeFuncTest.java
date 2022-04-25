@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
+import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
