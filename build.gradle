@@ -403,7 +403,8 @@ dependencies {
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
-  testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.9'){
+
+   testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.11'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
   implementation('io.netty:netty-codec:4.1.69.Final') {
@@ -508,7 +509,7 @@ dependencies {
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
-  testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
+
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
