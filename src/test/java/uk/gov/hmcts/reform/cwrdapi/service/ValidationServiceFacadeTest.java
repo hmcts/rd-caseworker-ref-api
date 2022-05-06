@@ -120,7 +120,7 @@ class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testCreateException() {
+    void testCreateException() {
         when(validationServiceFacadeImpl.createException(1L, "test", 1L))
                 .thenReturn(ExceptionCaseWorker.builder().jobId(1L).build());
         assertNotNull(validationServiceFacadeImpl.createException(1L, "test", 1L));
@@ -145,7 +145,7 @@ class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testCaseWorkerAudit() {
+    void testCaseWorkerAudit() {
 
         AuditStatus auditStatus = AuditStatus.PARTIAL_SUCCESS;
 
@@ -165,7 +165,7 @@ class ValidationServiceFacadeTest {
         List<ExceptionCaseWorker> exceptionCaseWorkers = exceptionCaseWorkerRepository.findByJobId(jobId);
 
         assertNotNull(caseWorkerAudit);
-        assertEquals(caseWorkerAudit1.getStatus(), "Partial Success");
+        assertEquals("Partial Success", caseWorkerAudit1.getStatus());
         assertEquals(caseWorkerAudit1.getJobId(), Long.valueOf(0));
         assertNotNull(caseWorkerAudit1.getJobEndTime());
         assertNotNull(caseWorkerAudit1.getStatus());
@@ -175,9 +175,9 @@ class ValidationServiceFacadeTest {
     }
 
     @Test
-    public void testGetAuditJobId() {
+    void testGetAuditJobId() {
         when(validationServiceFacadeImpl.getAuditJobId()).thenReturn(1L);
-        assertEquals(validationServiceFacadeImpl.getAuditJobId(), 1L);
+        assertEquals(1L, validationServiceFacadeImpl.getAuditJobId());
         assertNotEquals(validationServiceFacadeImpl.getAuditJobId(), 0L);
     }
 

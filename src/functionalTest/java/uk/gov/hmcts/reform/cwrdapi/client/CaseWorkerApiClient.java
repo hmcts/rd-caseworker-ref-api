@@ -55,7 +55,7 @@ public class CaseWorkerApiClient {
     }
 
     public RequestSpecification getMultipleAuthHeadersInternal() {
-        return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken());
+        return getMultipleAuthHeaders(idamOpenIdClient.getcwdAdminOpenIdToken("cwd-admin"));
     }
 
     public RequestSpecification getMultipleAuthHeadersInternal(String role) {

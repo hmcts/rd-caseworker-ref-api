@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelValidatorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.cwrdapi.util.serenity5.SerenityTest;
+import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -19,7 +19,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.4.9'
-    id "org.flywaydb.flyway" version '8.3.0'
+    id "org.flywaydb.flyway" version '8.5.2'
     id 'au.com.dius.pact' version '4.1.7' // do not change, otherwise serenity report fails
 }
 
@@ -328,7 +328,6 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springBoot
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.2'
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
 
   implementation group: 'org.springframework', name: 'spring-aop', version: '5.3.18'
@@ -344,8 +343,6 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.18'
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
-  implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
-  implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
   implementation (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
     exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
     exclude group: "org.apache.sling"
@@ -354,9 +351,6 @@ dependencies {
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
-  implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
-  implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
-  implementation 'com.github.hmcts:properties-volume-spring-boot-starter:0.1.0'
   implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
 
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -365,16 +359,16 @@ dependencies {
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.1'
   implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.2.20220324', ext: 'pom'
-
+  implementation group: 'org.jetbrains', name: 'annotations', version: '13.0'
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation 'com.github.hmcts:idam-java-client:2.0.1'
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
-  implementation "io.github.openfeign:feign-httpclient:11.0"
+
   implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-  implementation group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+  implementation group: 'org.flywaydb', name: 'flyway-core', version: '6.5.5'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
 
   implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
@@ -382,22 +376,26 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
   implementation group:"org.yaml", name: "snakeyaml", version:"1.30"
 
+
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
+  implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
+
   implementation group: 'com.azure', name: 'azure-core', version: '1.13.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.0.2'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
-  implementation group: 'org.springframework', name: 'spring-core', version: '5.3.18'
+  implementation group: 'org.springframework', name: 'spring-core', version: '5.3.19'
   implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.18'
   implementation group: 'io.netty', name: 'netty-codec-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.72.Final'
   implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.69.Final'
   implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
-  implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 
+   testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.11'){
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
+  }
   implementation('io.netty:netty-codec:4.1.69.Final') {
     because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
@@ -464,7 +462,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '3.4.6'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
 
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
+
 
   contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
   contractTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
@@ -474,9 +472,7 @@ dependencies {
   testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.7.0'
   testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: '3.0.2'
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: '3.2.0'
+
   testImplementation 'io.github.openfeign:feign-jackson:10.7.0'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
@@ -494,7 +490,7 @@ dependencies {
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
-  testImplementation 'com.github.hmcts:fortify-client:1.2.0:all'
+
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

@@ -158,7 +158,7 @@ class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void testHandleRowProcessing_error() {
+    void testHandleRowProcessing_error() {
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.handleRowProcessing(
                 null,null,null,
                 null,null,null,

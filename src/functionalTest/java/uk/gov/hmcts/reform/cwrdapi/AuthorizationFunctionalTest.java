@@ -11,13 +11,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cwrdapi.client.CaseWorkerApiClient;
 import uk.gov.hmcts.reform.cwrdapi.client.FuncTestRequestHandler;
-import uk.gov.hmcts.reform.cwrdapi.client.S2sClient;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.Oauth2;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
+import uk.gov.hmcts.reform.lib.client.response.S2sClient;
 
 import java.util.ArrayList;
 import java.util.List;
