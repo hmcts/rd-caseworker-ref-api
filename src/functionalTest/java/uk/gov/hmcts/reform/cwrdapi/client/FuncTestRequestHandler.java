@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.getS2sToken;
-import static uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient.crdAdminToken;
+import static uk.gov.hmcts.reform.lib.idam.IdamOpenId.adminToken;
 
 @Slf4j
 @Service
@@ -46,10 +46,11 @@ public class FuncTestRequestHandler {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .baseUri(baseUrl)
                 .header("ServiceAuthorization", getS2sToken())
-                .header("Authorization", BEARER + crdAdminToken);
+                .header("Authorization", BEARER + adminToken);
         if (!additionalHeaders.isEmpty()) {
             additionalHeaders
                     .forEach(requestSpecification::header);
+
         }
         Response response = requestSpecification.when()
                 .get(urlPath);
