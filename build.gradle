@@ -373,7 +373,9 @@ dependencies {
 
   implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
   implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
+  implementation (group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk) {
+    exclude group: "com.google.code.gson", module: "gson"
+  }
   implementation group:"org.yaml", name: "snakeyaml", version:"1.30"
 
 
