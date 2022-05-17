@@ -164,6 +164,6 @@ class ExcelAdaptorServiceImplTest {
                 null,null,null,
                 null))
                 .isExactlyInstanceOf(NullPointerException.class)
-                .hasMessage(null);
+                .hasMessage("Cannot invoke \"org.apache.poi.ss.usermodel.Row.getRowNum()\" because \"row\" is null");
     }
 }
