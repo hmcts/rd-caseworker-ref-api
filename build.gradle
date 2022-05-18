@@ -397,51 +397,11 @@ dependencies {
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
   implementation group: 'org.springframework', name: 'spring-core', version: '5.3.19'
   implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.18'
-  implementation group: 'io.netty', name: 'netty-codec-dns', version: '4.1.72.Final'
-  implementation group: 'io.netty', name: 'netty-resolver-dns', version: '4.1.72.Final'
-  implementation group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: '4.1.69.Final'
-  implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.69.Final'
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 
    testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.11'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
-  }
-  implementation('io.netty:netty-codec:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-codec-http:4.1.72.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-common:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-handler:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-resolver:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-transport:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-transport-native-epoll:4.1.74.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-transport-native-kqueue:4.1.73.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-transport-native-unix-common:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-codec-http2:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-codec-socks:4.1.73.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
-  }
-  implementation('io.netty:netty-handler-proxy:4.1.69.Final') {
-    because 'In Netty before version 4.1.60.Final there is a vulnerability that enables request smuggling.'
   }
   //Fix for CVE-2021-29425
   implementation 'commons-io:commons-io:2.11.0'
@@ -572,6 +532,14 @@ bootJar {
   archiveFileName = jarName
   manifest {
     attributes('Implementation-Version': project.version.toString())
+  }
+}
+configurations.all {
+  resolutionStrategy.eachDependency { details ->
+    if (details.requested.group == 'io.netty'
+            && details.requested.name != 'netty-tcnative-boringssl-static' ) {
+      details.useVersion "4.1.77.Final"
+    }
   }
 }
 
