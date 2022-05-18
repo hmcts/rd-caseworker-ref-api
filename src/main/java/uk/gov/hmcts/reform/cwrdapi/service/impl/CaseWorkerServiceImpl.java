@@ -731,7 +731,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse userProfileRolesResponse) {
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse
+                    userProfileRolesResponse) {
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
                         || nonNull(userProfileRolesResponse.getAttributeResponse())) {
                     isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse,rowId);
