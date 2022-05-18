@@ -24,8 +24,9 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
 
     List<CaseWorkerProfile> findByEmailIdIgnoreCaseContaining(String emailPattern);
 
-    @Query(value = "select cw from case_worker_profile cw \n"
-            + "JOIN FETCH case_worker_work_area wa ON cw.caseWorkerId = wa.caseWorkerId \n"
-            + "where wa.serviceCode IN :serviceCode")
+    @Query(value = """
+            select cw from case_worker_profile cw 
+            JOIN FETCH case_worker_work_area wa ON cw.caseWorkerId = wa.caseWorkerId 
+            where wa.serviceCode IN :serviceCode""")
     Page<CaseWorkerProfile> findByServiceCodeIn(Set<String> serviceCode, Pageable pageable);
 }
