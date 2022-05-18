@@ -578,9 +578,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse userProfileResponse) {
-                if (isNotTrue(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
-                    validationServiceFacade.logFailures(String.format(IDAM_STATUS, userProfileResponse.getIdamStatus()),
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
+                if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+                    validationServiceFacade.logFailures(String.format(IDAM_STATUS, profileResponse.getIdamStatus()),
                             cwrProfileRequest.getRowId());
                     return false;
                 }
@@ -589,6 +589,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
                 return false;
             }
+            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
 
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
