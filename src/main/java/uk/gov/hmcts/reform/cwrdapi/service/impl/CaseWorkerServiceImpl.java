@@ -422,8 +422,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         ResponseEntity<Object> responseEntity = JsonFeignResponseUtil.toResponseEntity(lrdOrgInfoServiceResponse,
                 ErrorResponse.class);
         Object responseBody = responseEntity.getBody();
-        if (nonNull(responseBody) && responseBody instanceof ErrorResponse) {
-            ErrorResponse errorResponse = (ErrorResponse) responseBody;
+        if (nonNull(responseBody) && responseBody instanceof ErrorResponse errorResponse) {
+
             throw new StaffReferenceException(httpStatus, errorResponse.getErrorMessage(),
                     errorResponse.getErrorDescription());
         } else {
@@ -578,8 +578,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse) {
-                UserProfileResponse userProfileResponse = (UserProfileResponse) resultResponse.get();
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse userProfileResponse) {
                 if (isNotTrue(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
                     validationServiceFacade.logFailures(String.format(IDAM_STATUS, userProfileResponse.getIdamStatus()),
                             cwrProfileRequest.getRowId());
@@ -590,7 +589,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
                 return false;
             }
-            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
 
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
@@ -733,8 +731,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
-                UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse userProfileRolesResponse) {
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
                         || nonNull(userProfileRolesResponse.getAttributeResponse())) {
                     isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse,rowId);
