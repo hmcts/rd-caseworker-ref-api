@@ -342,7 +342,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
         List<String> caseWorkerIds = caseWorkerData.stream()
                 .map(CaseWorkerProfile::getCaseWorkerId)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         topicPublisher.sendMessage(caseWorkerIds);
     }
@@ -800,14 +800,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .getRoleTypes()
                         .stream()
                         .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                        .collect(toList()))
+                        .toList())
         );
 
         // get work area codes
         List<String> serviceCodes = cwProfileRequest.getWorkerWorkAreaRequests()
                 .stream()
                 .map(CaseWorkerWorkAreaRequest::getServiceCode)
-                .collect(toList());
+                .toList();
 
 
         // get all assoc records matching role id and service code, finally return idam roles associated

@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerDeleteService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -136,7 +135,7 @@ public class CaseWorkerRefUsersController {
 
             List<String> caseWorkerIds = processedCwProfiles.stream()
                     .map(CaseWorkerProfile::getCaseWorkerId)
-                    .collect(Collectors.toUnmodifiableList());
+                    .toList();
             caseWorkerProfileCreationResponse
                     .caseWorkerRegistrationResponse(REQUEST_COMPLETED_SUCCESSFULLY)
                     .messageDetails(format(RECORDS_UPLOADED, caseWorkerIds.size()))
