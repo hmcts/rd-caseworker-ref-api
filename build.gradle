@@ -29,14 +29,14 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 def versions = [
-  lombok             : '1.18.20',
+  lombok             : '1.18.22',
   gradlePitest       : '1.5.1',
   pitest             : '1.7.0',
   reformHealthStarter: '0.0.5',
   reformLogging      : '5.1.9',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
-  springBoot         : '2.4.9',
+  springBoot         : '2.6.7',
   springfoxSwagger   : '2.9.2',
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.8.1",
@@ -55,6 +55,10 @@ java {
   toolchain {
     languageVersion = JavaLanguageVersion.of(17)
   }
+}
+
+tasks.withType(JavaExec).configureEach {
+  javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
 jacocoTestCoverageVerification {
@@ -161,13 +165,6 @@ pmd {
   ]
 }
 
-tasks.named("processIntegrationTestResources") {
-  duplicatesStrategy = 'include'
-}
-
-tasks.named("processFunctionalTestResources") {
-  duplicatesStrategy = 'include'
-}
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
@@ -271,9 +268,9 @@ jacoco {
 jacocoTestReport {
   executionData(test,integration)
   reports {
-    xml.enabled = true
-    csv.enabled = false
-    xml.destination = file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+    xml.required = true
+    csv.required = false
+    xml.outputLocation = file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
   }
 }
 
@@ -440,6 +437,7 @@ dependencies {
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.12.7'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.12.7'
     testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.3.1'
 
 
 
