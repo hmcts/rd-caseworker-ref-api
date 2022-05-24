@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.UnauthorizedException;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-
+import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
 
 @Configuration
 public class SecurityEndpointFilter extends OncePerRequestFilter {
@@ -50,9 +50,7 @@ public class SecurityEndpointFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             Throwable throwable = e.getCause();
-            if (throwable instanceof FeignException.FeignClientException) {
-                FeignException.FeignClientException feignClientException =
-                        (FeignException.FeignClientException) throwable;
+            if (throwable instanceof FeignException.FeignClientException feignClientException) {
                 response.setStatus(feignClientException.status());
                 return;
             } else if (e instanceof UnauthorizedException) {
