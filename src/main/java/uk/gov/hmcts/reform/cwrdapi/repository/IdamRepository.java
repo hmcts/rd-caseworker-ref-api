@@ -45,9 +45,6 @@ public class IdamRepository {
         } catch (FeignException feignException) {
             log.error("FeignException Unauthorized: retrieve user info ", feignException);
             throw new UnauthorizedException("User is not authorized", feignException);
-        } catch (Exception e) {
-            log.error("FeignException Unauthorized: retrieve user info ", e.getMessage());
-            throw new UnauthorizedException("User is not authorized", e);
         }
     }
 
