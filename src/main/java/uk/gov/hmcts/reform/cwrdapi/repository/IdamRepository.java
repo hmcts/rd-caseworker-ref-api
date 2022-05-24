@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
 import com.github.benmanes.caffeine.cache.Cache;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +9,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.UnauthorizedException;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -37,7 +39,16 @@ public class IdamRepository {
         log.info("{}:: generating Bearer Token, current size of cache: "
                 + nativeCache.estimatedSize(), loggingComponentName);
 
-        return idamClient.getUserInfo("Bearer " + jwtToken);
+
+        try {
+            return idamClient.getUserInfo("Bearer " + jwtToken);
+        } catch (FeignException feignException) {
+            log.error("FeignException Unauthorized: retrieve user info ", feignException);
+            throw new UnauthorizedException("User is not authorized", feignException);
+        } catch (Exception e) {
+            log.error("FeignException Unauthorized: retrieve user info ", e.getMessage());
+            throw new UnauthorizedException("User is not authorized", e);
+        }
     }
 
 }
