@@ -60,8 +60,8 @@ class IdamRepositoryTest {
         verify(cache, times(1)).estimatedSize();
     }
 
-    @Test
-    public void test_getUserInfo_unAuthorizedException() {
+     @Test
+     void test_getUserInfo_unAuthorizedException() {
 
         UserInfo userInfo = mock(UserInfo.class);
         CaffeineCache caffeineCacheMock = mock(CaffeineCache.class);
