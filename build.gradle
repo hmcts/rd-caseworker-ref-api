@@ -42,7 +42,8 @@ def versions = [
   launchDarklySdk    : "5.8.1",
   restAssured        : '4.3.3',
   jackson            : '2.13.1',
-  log4j              : '2.17.1'
+  log4j              : '2.17.1',
+  springVersion      : '5.3.20'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -338,17 +339,17 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: versions.springBoot
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.1'
 
-  implementation group: 'org.springframework', name: 'spring-aop', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-aspects', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-context', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-context-support', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-expression', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-jcl', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-orm', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-web', version: '5.3.18'
-  implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.18'
+  implementation group: 'org.springframework', name: 'spring-aop', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-aspects', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-context', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-context-support', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-expression', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-jcl', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-jdbc', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-orm', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-tx', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-web', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-webmvc', version: versions.springVersion
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
   implementation (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
@@ -392,8 +393,8 @@ dependencies {
   implementation group: 'com.azure', name: 'azure-core', version: '1.13.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.0.2'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
-  implementation group: 'org.springframework', name: 'spring-core', version: '5.3.19'
-  implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.18'
+  implementation group: 'org.springframework', name: 'spring-core', version: versions.springVersion
+  implementation group: 'org.springframework', name: 'spring-beans', version: versions.springVersion
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
   implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 
