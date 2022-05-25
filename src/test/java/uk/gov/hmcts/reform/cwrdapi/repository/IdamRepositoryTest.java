@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
 import com.github.benmanes.caffeine.cache.Cache;
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,8 @@ import org.springframework.cache.caffeine.CaffeineCache;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.UnauthorizedException;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -67,8 +72,11 @@ class IdamRepositoryTest {
         CaffeineCache caffeineCacheMock = mock(CaffeineCache.class);
         Cache cache = mock(Cache.class);
 
+        Request request = Request.create(Request.HttpMethod.GET, "url",
+                new HashMap<>(), null, new RequestTemplate());
         when(idamClient.getUserInfo(anyString()))
-                .thenThrow(new UnauthorizedException("User is not authorized", new Exception()));
+                .thenThrow(new FeignException
+                        .Unauthorized("User is not authorized", request,null));
 
         when(cacheManager.getCache(anyString())).thenReturn(caffeineCacheMock);
         doReturn(cache).when(caffeineCacheMock).getNativeCache();
