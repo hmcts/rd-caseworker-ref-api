@@ -68,7 +68,7 @@ class IdamRepositoryTest {
         Cache cache = mock(Cache.class);
 
         when(idamClient.getUserInfo(anyString()))
-                .thenThrow(new UnauthorizedException("User is not authorized", new Exception()));
+              .thenThrow(new UnauthorizedException("User is not authorized", new Exception()));
 
         when(cacheManager.getCache(anyString())).thenReturn(caffeineCacheMock);
         doReturn(cache).when(caffeineCacheMock).getNativeCache();

@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.oidc;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.UnauthorizedException;
 import uk.gov.hmcts.reform.cwrdapi.repository.IdamRepository;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -114,6 +117,27 @@ class JwtGrantedAuthoritiesConverterTest {
         UserInfo userInfo = converter.getUserInfo();
 
         assertNotNull(userInfo);
+    }
+
+    @Test
+    void test_shouldReturnUnAuthorisedExceptionWhenIdamFeignException() {
+        List<String> roles = new ArrayList<>();
+        roles.add("lrd-admin");
+        when(jwtMock.containsClaim(anyString())).thenReturn(true);
+        when(jwtMock.getClaim(anyString())).thenReturn("access_token");
+        when(jwtMock.getTokenValue()).thenReturn("access_token");
+        when(userInfoMock.getRoles()).thenReturn(roles);
+        when(idamRepositoryMock.getUserInfo(anyString()))
+                .thenThrow(new UnauthorizedException("User is not authorized", new Exception()));
+
+
+
+
+        UnauthorizedException thrown = Assertions.assertThrows(UnauthorizedException.class, () -> {
+            Collection<GrantedAuthority> authorities = converter.convert(jwtMock);
+        });
+        assertThat(thrown.getMessage()).contains("User is not authorized");
+
     }
 
 }
