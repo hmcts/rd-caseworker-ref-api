@@ -396,7 +396,7 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-core', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-beans', version: versions.springVersion
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
-  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
