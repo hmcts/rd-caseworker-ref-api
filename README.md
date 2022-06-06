@@ -4,7 +4,7 @@ CaseWorker Ref API
 
 ## Purpose
 
-Provides Case worker user profile data to clients, implemented as a Java/SpringBoot application.
+Provides Caseworker user profile data to clients, implemented as a Java/SpringBoot application.
 
 ### Prerequisites
 
