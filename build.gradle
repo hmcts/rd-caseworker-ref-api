@@ -352,7 +352,7 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-webmvc', version: versions.springVersion
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
-  implementation (group: 'io.rest-assured', name: 'rest-assured', version: '5.0.0') {
+  implementation (group: 'io.rest-assured', name: 'rest-assured', version: '4.5.1') {
     exclude group: "com.sun.xml.bind", module: "jaxb-osgi"
     exclude group: "org.apache.sling"
   }
