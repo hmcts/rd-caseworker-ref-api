@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.tuple.Pair;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -342,7 +342,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
         List<String> caseWorkerIds = caseWorkerData.stream()
                 .map(CaseWorkerProfile::getCaseWorkerId)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         topicPublisher.sendMessage(caseWorkerIds);
     }
@@ -422,8 +422,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         ResponseEntity<Object> responseEntity = JsonFeignResponseUtil.toResponseEntity(lrdOrgInfoServiceResponse,
                 ErrorResponse.class);
         Object responseBody = responseEntity.getBody();
-        if (nonNull(responseBody) && responseBody instanceof ErrorResponse) {
-            ErrorResponse errorResponse = (ErrorResponse) responseBody;
+        if (nonNull(responseBody) && responseBody instanceof ErrorResponse errorResponse) {
+
             throw new StaffReferenceException(httpStatus, errorResponse.getErrorMessage(),
                     errorResponse.getErrorDescription());
         } else {
@@ -578,10 +578,9 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse) {
-                UserProfileResponse userProfileResponse = (UserProfileResponse) resultResponse.get();
-                if (isNotTrue(userProfileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
-                    validationServiceFacade.logFailures(String.format(IDAM_STATUS, userProfileResponse.getIdamStatus()),
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
+                if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+                    validationServiceFacade.logFailures(String.format(IDAM_STATUS, profileResponse.getIdamStatus()),
                             cwrProfileRequest.getRowId());
                     return false;
                 }
@@ -733,8 +732,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
 
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse) {
-                UserProfileRolesResponse userProfileRolesResponse = (UserProfileRolesResponse) resultResponse.get();
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse
+                    userProfileRolesResponse) {
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
                         || nonNull(userProfileRolesResponse.getAttributeResponse())) {
                     isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse,rowId);
@@ -800,14 +799,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                         .getRoleTypes()
                         .stream()
                         .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
-                        .collect(toList()))
+                        .toList())
         );
 
         // get work area codes
         List<String> serviceCodes = cwProfileRequest.getWorkerWorkAreaRequests()
                 .stream()
                 .map(CaseWorkerWorkAreaRequest::getServiceCode)
-                .collect(toList());
+                .toList();
 
 
         // get all assoc records matching role id and service code, finally return idam roles associated

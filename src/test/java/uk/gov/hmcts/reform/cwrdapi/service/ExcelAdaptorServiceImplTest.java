@@ -158,12 +158,12 @@ class ExcelAdaptorServiceImplTest {
     }
 
     @Test
-    public void testHandleRowProcessing_error() {
+    void testHandleRowProcessing_error() {
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.handleRowProcessing(
                 null,null,null,
                 null,null,null,
                 null))
                 .isExactlyInstanceOf(NullPointerException.class)
-                .hasMessage(null);
+                .hasMessage("Cannot invoke \"org.apache.poi.ss.usermodel.Row.getRowNum()\" because \"row\" is null");
     }
 }

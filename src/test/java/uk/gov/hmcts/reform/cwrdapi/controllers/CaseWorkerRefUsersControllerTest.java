@@ -185,9 +185,11 @@ class CaseWorkerRefUsersControllerTest {
         CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
         CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
         CaseWorkerRoleRequest cwRoleRequest2 = new CaseWorkerRoleRequest("DWP Caseworker",false);
+        CaseWorkerRoleRequest cwRoleRequest3 = new CaseWorkerRoleRequest("Registrar",false);
         caseWorkerRoleRequests.add(cwRoleRequest);
         caseWorkerRoleRequests.add(cwRoleRequest1);
         caseWorkerRoleRequests.add(cwRoleRequest2);
+        caseWorkerRoleRequests.add(cwRoleRequest3);
         caseWorkersProfileCreationRequest.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequest.get(0).setUserType("Other Government Department");
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
