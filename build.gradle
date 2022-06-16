@@ -14,12 +14,12 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.36.0'
+    id 'com.github.ben-manes.versions' version '0.42.0'
     id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.4.9'
-    id "org.flywaydb.flyway" version '8.5.2'
+    id "org.flywaydb.flyway" version '8.5.13'
     id 'au.com.dius.pact' version '4.1.7' // do not change, otherwise serenity report fails
 }
 
@@ -380,7 +380,7 @@ dependencies {
   implementation group: 'org.flywaydb', name: 'flyway-core', version: '6.5.5'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
 
-  implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+  implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
   implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: versions.launchDarklySdk
   implementation group:"org.yaml", name: "snakeyaml", version:"1.30"
@@ -396,7 +396,7 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-core', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-beans', version: versions.springVersion
   implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
-  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
@@ -464,10 +464,10 @@ dependencies {
   testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.4')
-  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '2.5.14'
+  testImplementation group: 'org.codehaus.groovy', name: 'groovy', version: '3.0.10'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '2.5.14'
   testImplementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.5.14'
-  testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.16'
+  testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.17'
   testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
