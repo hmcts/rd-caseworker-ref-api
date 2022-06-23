@@ -384,6 +384,22 @@ class CaseWorkerServiceImplTest {
         verify(caseWorkerProfileRepository, times(2)).findByCaseWorkerIdIn(any());
     }
 
+    @Test
+    void test_should_return_caseworker_profile_withCaseAllocatorFalse() {
+
+        CaseWorkerProfile caseWorkerProfile=buildCaseWorkerProfile();
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setTaskSupervisor(false);
+        doReturn(singletonList(caseWorkerProfile))
+            .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(singletonList(
+                "27fbd198-552e-4c32-9caf-37be1545caaf"));
+        caseWorkerServiceImpl.fetchCaseworkersById(
+            singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
+        assertNotNull(caseWorkerServiceImpl
+            .fetchCaseworkersById(singletonList("27fbd198-552e-4c32-9caf-37be1545caaf")));
+        verify(caseWorkerProfileRepository, times(2)).findByCaseWorkerIdIn(any());
+    }
+
     CaseWorkerProfile buildCaseWorkerProfile() {
 
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
