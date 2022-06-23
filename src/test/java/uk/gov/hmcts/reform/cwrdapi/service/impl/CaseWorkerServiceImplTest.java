@@ -387,7 +387,7 @@ class CaseWorkerServiceImplTest {
     @Test
     void test_should_return_caseworker_profile_withCaseAllocatorFalse() {
 
-        CaseWorkerProfile caseWorkerProfile=buildCaseWorkerProfile();
+        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
         caseWorkerProfile.setCaseAllocator(false);
         caseWorkerProfile.setTaskSupervisor(false);
         doReturn(singletonList(caseWorkerProfile))
