@@ -411,6 +411,16 @@ class CaseWorkerServiceImplTest {
         caseWorkerRole.setLastUpdate(LocalDateTime.now());
         caseWorkerRole.setRoleType(roleType);
 
+        CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
+        caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
+        caseWorkerWorkArea.setCaseWorkerId("CWID1");
+        caseWorkerWorkArea.setAreaOfWork("cmc");
+        caseWorkerWorkArea.setServiceCode("BAA1");
+        caseWorkerWorkArea.setCreatedDate(LocalDateTime.now());
+        caseWorkerWorkArea.setLastUpdate(LocalDateTime.now());
+        CaseWorkerProfile caseWorkerProfileObj = getCaseWorkerProfile("234873");
+        caseWorkerWorkArea.setCaseWorkerProfile(caseWorkerProfileObj);
+
         CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
         caseWorkerLocation.setCaseWorkerId("CWID1");
         caseWorkerLocation.setCaseWorkerLocationId(11111L);
@@ -439,9 +449,41 @@ class CaseWorkerServiceImplTest {
         caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
         caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
         caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
+        caseWorkerProfile.setCaseWorkerWorkAreas(singletonList(caseWorkerWorkArea));
         return caseWorkerProfile;
     }
 
+    private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
+        LocalDateTime timeNow = LocalDateTime.now();
+
+        List<CaseWorkerLocation> caseWorkerLocations =
+            Collections.singletonList(new CaseWorkerLocation(caseWorkerId, 1,
+                "National", true));
+
+        List<CaseWorkerWorkArea> caseWorkerWorkAreas =
+            Collections.singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
+
+        List<CaseWorkerRole> caseWorkerRoles =
+            Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
+        caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
+
+        return new CaseWorkerProfile(caseWorkerId,
+            "firstName",
+            "lastName",
+            "sam.test@justice.gov.uk",
+            1L,
+            "National",
+            1,
+            false,
+            false,
+            false,
+            timeNow,
+            timeNow,
+            caseWorkerLocations,
+            caseWorkerWorkAreas,
+            caseWorkerRoles,
+            new UserType(1L, "HMCTS"), false);
+    }
 
     uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
         Role
