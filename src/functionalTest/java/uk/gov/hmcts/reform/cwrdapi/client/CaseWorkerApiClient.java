@@ -101,7 +101,7 @@ public class CaseWorkerApiClient {
 
         List<CaseWorkerRoleRequest> roleRequests = ImmutableList.of(CaseWorkerRoleRequest
                 .caseWorkerRoleRequest()
-                .role("Tribunal Caseworker").isPrimaryFlag(true).build());
+                .role("Legal Caseworker").isPrimaryFlag(true).build());
 
         CaseWorkerWorkAreaRequest workerWorkAreaRequest = CaseWorkerWorkAreaRequest
                 .caseWorkerWorkAreaRequest()
@@ -155,11 +155,11 @@ public class CaseWorkerApiClient {
         List<CaseWorkerRoleRequest> roleRequests = List.of(
                 CaseWorkerRoleRequest
                         .caseWorkerRoleRequest()
-                        .role("Senior Tribunal Caseworker")
+                        .role("Senior Legal Caseworker")
                         .isPrimaryFlag(true).build(),
                 CaseWorkerRoleRequest
                         .caseWorkerRoleRequest()
-                        .role("Tribunal Caseworker")
+                        .role("Legal Caseworker")
                         .isPrimaryFlag(false).build());
 
 
