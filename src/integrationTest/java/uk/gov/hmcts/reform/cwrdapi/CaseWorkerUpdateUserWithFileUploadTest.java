@@ -25,7 +25,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
         validateAuditCaseWorkerCreate();
 
-        String roles = "[\"Senior Tribunal Caseworker\"]";
+        String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         modifyUserRoles();
         response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
@@ -43,7 +43,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateStaleUser() throws Exception {
         validateAuditCaseWorkerCreate();
-        String roles = "[\"Senior Tribunal Caseworker\"]";
+        String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("STALE", roles);
         modifyUserRoles();
         response = uploadCaseWorkerFile("Staff Data Upload Update.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
@@ -88,7 +88,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateFailedExceptionInModifyingUser() throws Exception {
         validateAuditCaseWorkerCreate();
-        String roles = "[\"Senior Tribunal Caseworker\"]";
+        String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
