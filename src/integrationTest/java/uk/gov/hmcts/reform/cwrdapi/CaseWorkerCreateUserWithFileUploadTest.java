@@ -236,7 +236,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditSuccessWitUpConflict() throws Exception {
-        String roles = "[\"Senior Tribunal Caseworker\"]";
+        String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         modifyUserRoles();
         validateAuditCaseWorkerConflict();
