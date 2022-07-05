@@ -12,10 +12,10 @@ java:
 
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-    POSTGRES_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    POSTGRES_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    POSTGRES_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-    POSTGRES_PORT: "{{ .Values.postgresql.postgresqlPort}}"
+    POSTGRES_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+    POSTGRES_PORT: "{{ .Values.postgresql.auth.port}}"
     CWRD_MQ_HOST: "$(CWRD_MQ_HOST).servicebus.windows.net"
     CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY: "$(CWRD_MQ_PASSWORD)"
     CWRD_MQ_USERNAME: RootManageSharedAccessKey
@@ -26,10 +26,17 @@ java:
     ENVIRONMENT_NAME: "preview"
   postgresql:
     enabled: true
-    postgresqlUsername: dbrdcaseworker
-    postgresqlPassword: dbrdcaseworker
-    postgresqlDatabase: dbrdcaseworker
-    postgresqlPort: 5432
+    image:
+      tag: '11.16.0'
+    auth:
+      username: dbrdcaseworker
+      password: dbrdcaseworker
+      database: dbrdcaseworker
+      port: 5432
+    ## Disable Postgres Persistence
+    primary:
+      persistence:
+        enabled: false
   keyVaults:
     rd:
       secrets:
