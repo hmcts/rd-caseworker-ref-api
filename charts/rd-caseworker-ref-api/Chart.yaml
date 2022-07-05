@@ -3,12 +3,12 @@ appVersion: "1.0"
 description: A Helm chart for rd-caseworker-ref-api
 name: rd-caseworker-ref-api
 home: https://github.com/hmcts/rd-caseworker-ref-api
-version: 0.0.25
+version: 0.0.26
 maintainers:
   - name: Reference Data Team
 dependencies:
   - name: java
-    version: 3.7.3
+    version: 4.0.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
   - name: servicebus
     version: v0.4.0
