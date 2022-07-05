@@ -26,17 +26,10 @@ java:
     ENVIRONMENT_NAME: "preview"
   postgresql:
     enabled: true
-    image:
-      tag: '11.16.0'
     auth:
       username: dbrdcaseworker
       password: dbrdcaseworker
       database: dbrdcaseworker
-      port: 5432
-    ## Disable Postgres Persistence
-    primary:
-      persistence:
-        enabled: false
   keyVaults:
     rd:
       secrets:
