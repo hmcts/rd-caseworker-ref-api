@@ -30,6 +30,7 @@ java:
       username: dbrdcaseworker
       password: dbrdcaseworker
       database: dbrdcaseworker
+      port: 5432
   keyVaults:
     rd:
       secrets:
