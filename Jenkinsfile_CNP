@@ -43,8 +43,9 @@ env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
 env.PACT_BROKER_PORT = "443"
 env.PACT_BROKER_SCHEME = "https"
 
-withPipeline(type, product, component) {
 
+withPipeline(type, product, component) {
+    env.Rules = "http://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf"
     overrideVaultEnvironments(vaultOverrides)
     loadVaultSecrets(secrets)
 
@@ -52,6 +53,7 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     enableAksStagingDeployment()
     enableSecurityScan()
+    enableFortifyScan()
     before('functionalTest:preview') {
       env.execution_environment = "preview"
     }
