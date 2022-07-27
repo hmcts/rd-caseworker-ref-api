@@ -350,6 +350,7 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-tx', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-web', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-webmvc', version: versions.springVersion
+  implementation group: 'jakarta.el', name: 'jakarta.el-api', version: '5.0.1'
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
   implementation (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
