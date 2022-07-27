@@ -462,7 +462,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
-        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
+        Set<String> expectedServiceNames = Set.of("divorce");
         String ccdServiceNames = String.join(",", expectedServiceNames);
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
                 .get(STAFF_BY_SERVICE_NAME_URL
@@ -489,7 +489,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
-        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
+        Set<String> expectedServiceNames = Set.of("divorce");
         String ccdServiceNames = String.join(",", expectedServiceNames);
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
                 .get(STAFF_BY_SERVICE_NAME_URL

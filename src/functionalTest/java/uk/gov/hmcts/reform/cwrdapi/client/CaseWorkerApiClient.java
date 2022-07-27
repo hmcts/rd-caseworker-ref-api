@@ -103,20 +103,13 @@ public class CaseWorkerApiClient {
                 .caseWorkerRoleRequest()
                 .role("Legal Caseworker").isPrimaryFlag(true).build());
 
-        CaseWorkerWorkAreaRequest workerWorkAreaRequest = CaseWorkerWorkAreaRequest
-                .caseWorkerWorkAreaRequest()
-                .serviceCode("BAA1").areaOfWork("Non-Money Claims").build();
 
         CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
                 .caseWorkerWorkAreaRequest()
                 .serviceCode("BBA9").areaOfWork("Immigration and Asylum Appeals").build();
 
-        CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
-                .caseWorkerWorkAreaRequest()
-                .serviceCode("ABA2").areaOfWork("Financial Remedy").build();
-
         List<CaseWorkerWorkAreaRequest> areaRequests =
-                ImmutableList.of(workerWorkAreaRequest, workerWorkAreaRequest1, workerWorkAreaRequest2);
+                ImmutableList.of(workerWorkAreaRequest1);
 
         Set<String> idamRoles = new HashSet<>();
 
