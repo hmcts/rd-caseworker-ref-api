@@ -109,7 +109,7 @@ public class CaseWorkerApiClient {
 
         CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
                 .caseWorkerWorkAreaRequest()
-                .serviceCode("AAA6").areaOfWork("Specified Money Claims").build();
+                .serviceCode("BFA1").areaOfWork("Immigration and Asylum Appeals").build();
 
         CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
                 .caseWorkerWorkAreaRequest()
