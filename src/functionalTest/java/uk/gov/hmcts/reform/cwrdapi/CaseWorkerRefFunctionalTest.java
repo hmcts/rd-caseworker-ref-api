@@ -143,7 +143,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
         UserProfileResponse upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         Assertions.assertThat(upResponse.getRoles())
-                .containsExactlyInAnyOrderElementsOf(ImmutableList.of(CWD_USER, CASEWORKER_IAC_BULKSCAN));
+                .containsExactlyInAnyOrderElementsOf(ImmutableList
+                        .of(CWD_USER, CASEWORKER_IAC_BULKSCAN, CASEWORKER_SENIOR_IAC));
     }
 
     @Test
@@ -351,6 +352,23 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    public void shouldUploadServiceRoleMappingAba1XlsFileSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_ABA1.xls",
+                        200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                        ROLE_CWD_ADMIN);
+
+        CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerFileCreationResponse.class);
+        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+                .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
+                .contains(format(RECORDS_UPLOADED, 4)));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     public void shouldReturn401WhenAuthenticationInvalid() {
         Response response = caseWorkerApiClient.withUnauthenticatedRequest()
                 .post("/refdata/case-worker/upload-file/")
@@ -461,7 +479,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
-        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
+        Set<String> expectedServiceNames = Set.of("divorce");
         String ccdServiceNames = String.join(",", expectedServiceNames);
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
                 .get(STAFF_BY_SERVICE_NAME_URL
@@ -488,7 +506,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
-        Set<String> expectedServiceNames = Set.of("cmc", "divorce");
+        Set<String> expectedServiceNames = Set.of("divorce");
         String ccdServiceNames = String.join(",", expectedServiceNames);
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
                 .get(STAFF_BY_SERVICE_NAME_URL
