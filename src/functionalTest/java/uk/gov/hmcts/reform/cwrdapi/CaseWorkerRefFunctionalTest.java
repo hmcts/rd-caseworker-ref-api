@@ -352,6 +352,23 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    public void shouldUploadServiceRoleMappingAba1XlsFileSuccessfully() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_ABA1.xls",
+                        200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                        ROLE_CWD_ADMIN);
+
+        CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerFileCreationResponse.class);
+        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+                .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+        assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
+                .contains(format(RECORDS_UPLOADED, 4)));
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     public void shouldReturn401WhenAuthenticationInvalid() {
         Response response = caseWorkerApiClient.withUnauthenticatedRequest()
                 .post("/refdata/case-worker/upload-file/")

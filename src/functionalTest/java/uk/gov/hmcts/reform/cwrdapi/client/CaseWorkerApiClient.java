@@ -108,8 +108,12 @@ public class CaseWorkerApiClient {
                 .caseWorkerWorkAreaRequest()
                 .serviceCode("BBA9").areaOfWork("Immigration and Asylum Appeals").build();
 
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("ABA1").areaOfWork("Divorce").build();
+
         List<CaseWorkerWorkAreaRequest> areaRequests =
-                ImmutableList.of(workerWorkAreaRequest1);
+                ImmutableList.of(workerWorkAreaRequest1, workerWorkAreaRequest2);
 
         Set<String> idamRoles = new HashSet<>();
 
