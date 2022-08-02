@@ -26,7 +26,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
@@ -67,8 +69,6 @@ import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -89,6 +89,8 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     static List<String> caseWorkerIds = new ArrayList<>();
     static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
             "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
+    static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    static String TYPE_XLS = "application/vnd.ms-excel";
 
     @Value("${fileversion.value}")
     private String fileVersionValue;
@@ -739,7 +741,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
         if (updateVersion) {
-            input = updateVersionNumber(file,input);
+            input = updateVersionNumber(file,input,headerValue);
         }
         MultiPartSpecBuilder multiPartSpecBuilder = new MultiPartSpecBuilder(IOUtils.toByteArray(input))
                 .fileName(file.getName())
@@ -765,9 +767,11 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
     }
 
-    private FileInputStream updateVersionNumber(File file, FileInputStream input) throws IOException {
+    private FileInputStream updateVersionNumber(File file, FileInputStream input,String fileType) throws IOException {
 
-        Workbook workbook = WorkBookCustomFactory.validateAndGetWorkBook(input);
+        MultipartFile multipartInput = new MockMultipartFile("file",
+                file.getName(), fileType, IOUtils.toByteArray(input));
+        Workbook workbook = WorkBookCustomFactory.validateAndGetWorkBook(multipartInput);
         Sheet sheet = workbook.getSheet("VERSION");
         if (sheet != null) {
 

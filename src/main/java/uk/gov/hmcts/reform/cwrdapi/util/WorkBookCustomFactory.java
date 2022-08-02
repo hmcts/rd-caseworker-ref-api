@@ -8,7 +8,6 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,19 +31,6 @@ public class WorkBookCustomFactory extends WorkbookFactory {
      */
     public static Workbook validateAndGetWorkBook(MultipartFile file) throws IOException {
         InputStream is = FileMagic.prepareToCheckMagic(file.getInputStream());
-        FileMagic fm = FileMagic.valueOf(is);
-        switch (fm) {
-            case OLE2:
-                return createWorkBookForOldXls(is);
-            case OOXML:
-                return createWorkBookForNewXlsx(is);
-            default:
-                throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
-        }
-    }
-
-    public static Workbook validateAndGetWorkBook(FileInputStream input) throws IOException {
-        InputStream is = FileMagic.prepareToCheckMagic(input);
         FileMagic fm = FileMagic.valueOf(is);
         switch (fm) {
             case OLE2:
