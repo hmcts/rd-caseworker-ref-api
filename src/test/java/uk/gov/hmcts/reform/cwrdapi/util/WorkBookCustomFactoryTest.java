@@ -50,6 +50,13 @@ class WorkBookCustomFactoryTest {
                 .hasMessage(INVALID_EXCEL_FILE_ERROR_MESSAGE);
     }
 
+    @Test
+    void sendXlsxParseFileTest() throws IOException {
+        Workbook workbook = WorkBookCustomFactory
+                .validateAndGetWorkBook(new FileInputStream("src/test/resources/Staff Data Upload.xlsx"));
+        assertThat(workbook).isNotNull();
+    }
+
     MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
