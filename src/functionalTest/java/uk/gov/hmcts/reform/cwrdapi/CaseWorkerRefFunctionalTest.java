@@ -700,6 +700,19 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .contains(format(RECORDS_UPLOADED, 3)));
     }
 
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void shouldUploadXlsVersionMismatchError() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload different Version.xlsx",
+                        400, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
+                        ROLE_CWD_ADMIN, Boolean.FALSE);
+
+        assertThat(uploadCaseWorkerFileResponse.statusCode()).isEqualTo(400);
+
+    }
+
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
                                                                int statusCode,
                                                                String messageBody,
