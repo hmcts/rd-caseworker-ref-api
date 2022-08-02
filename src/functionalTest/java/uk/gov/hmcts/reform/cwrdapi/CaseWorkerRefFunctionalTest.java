@@ -69,6 +69,8 @@ import static org.springframework.util.ResourceUtils.getFile;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_ROLE_MAPPINGS_SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -89,8 +91,6 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     static List<String> caseWorkerIds = new ArrayList<>();
     static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
             "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
-    static String TYPE_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String TYPE_XLS = "application/vnd.ms-excel";
 
     @Value("${fileversion.value}")
     private String fileVersionValue;
