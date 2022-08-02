@@ -11,6 +11,10 @@ import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -18,10 +22,13 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
@@ -34,10 +41,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
+import uk.gov.hmcts.reform.cwrdapi.util.WorkBookCustomFactory;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,23 +80,32 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SpringBootTest
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
+class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
-    public static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefUsersController.createCaseWorkerProfiles";
-    public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
-    public static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
-    public static final String DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN =
+    static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefUsersController.createCaseWorkerProfiles";
+    static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
+    static final String CASEWORKER_FILE_UPLOAD = "CaseWorkerRefController.caseWorkerFileUpload";
+    static final String DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN =
             "CaseWorkerRefUsersController.deleteCaseWorkerProfileByIdOrEmailPattern";
-    public static final String STAFF_BY_SERVICE_NAME_URL = "/refdata/internal/staff/usersByServiceName";
-    public static List<String> caseWorkerIds = new ArrayList<>();
-    public static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
+    static final String STAFF_BY_SERVICE_NAME_URL = "/refdata/internal/staff/usersByServiceName";
+    static List<String> caseWorkerIds = new ArrayList<>();
+    static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
             "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
+
+    @Value("${fileversion.value}")
+    private String fileVersionValue;
+
+    @Value("${fileversion.row}")
+    private int fileVersionRow;
+
+    @Value("${fileversion.coloumn}")
+    private int fileVersionColumn;
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies new User profile is created
-    public void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
+    void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
         List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
         roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
         roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
@@ -128,7 +146,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = false)
     //this test verifies new User profile is created is prohibited when api is toggled off
-    public void createCwWhenUserNotExistsInCwrAndSidamAndUp_Ac1_LD_disabled() {
+    void createCwWhenUserNotExistsInCwrAndSidamAndUp_Ac1_LD_disabled() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
 
@@ -143,7 +161,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     @Test
     //this test verifies new User profile is created when user is already present in SIDAM
-    public void createCwWhenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() {
+    void createCwWhenUserNotExistsInCwrAndUpAndExistsInSidam_Ac2() {
         List<CaseWorkersProfileCreationRequest> profileCreateRequests = createNewActiveCaseWorkerProfile();
         UserProfileResponse upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         Assertions.assertThat(upResponse.getRoles())
@@ -152,7 +170,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void updateNamesMismatchinUpCwandSidam() {
+    void updateNamesMismatchinUpCwandSidam() {
         var profileCreateRequests = createNewActiveCaseWorkerProfile();
         var upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         var caseWorkersProfileCreationRequests = caseWorkerApiClient
@@ -165,7 +183,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    public void updateCwWhenNamesMismatchExistsInCwrAndUpAndSidam_Ac3() {
+    void updateCwWhenNamesMismatchExistsInCwrAndUpAndSidam_Ac3() {
         var profileCreateRequests = createNewActiveCaseWorkerProfile();
         var upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         var caseWorkersProfileCreationRequests = caseWorkerApiClient
@@ -180,7 +198,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldGetCaseWorkerDetails() {
+    void shouldGetCaseWorkerDetails() {
         if (isEmpty(caseWorkerIds)) {
             //Create 2 Caseworker Users
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
@@ -223,7 +241,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are not fetched from CWR when toggled off
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = false)
-    public void should_retrieve_403_when_Api_toggled_off() {
+    void should_retrieve_403_when_Api_toggled_off() {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>(
                 caseWorkerApiClient.createCaseWorkerProfiles());
@@ -240,7 +258,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldGetOnlyFewCaseWorkerDetails() {
+    void shouldGetOnlyFewCaseWorkerDetails() {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
@@ -276,7 +294,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are not fetched from CWR when user is invalid
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldThrowForbiddenExceptionForNonCompliantRole() {
+    void shouldThrowForbiddenExceptionForNonCompliantRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("prd-admin")
                 .body(UserRequest.builder().userIds(Collections.singletonList("someUUID")).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
@@ -290,10 +308,10 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldUploadXlsxFileSuccessfully() throws IOException {
+    void shouldUploadXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
-                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLSX, ROLE_CWD_ADMIN);
+                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLSX, ROLE_CWD_ADMIN,Boolean.TRUE);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
@@ -304,11 +322,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldUploadXlsFileSuccessfully() throws IOException {
+    void shouldUploadXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xls",
                         200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                        ROLE_CWD_ADMIN, Boolean.TRUE);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
@@ -322,11 +340,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @Order(1)
-    public void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
+    void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
                         200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                        ROLE_CWD_ADMIN,Boolean.FALSE);
 
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
@@ -341,11 +359,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @Order(2)
-    public void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
+    void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
                         200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                        ROLE_CWD_ADMIN,Boolean.FALSE);
 
         CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
@@ -359,11 +377,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @Order(3)
-    public void shouldUploadServiceRoleMappingAba1XlsFileSuccessfully() throws IOException {
+    void shouldUploadServiceRoleMappingAba1XlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_ABA1.xls",
                         200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                        ROLE_CWD_ADMIN,Boolean.FALSE);
 
         CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
@@ -376,7 +394,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldReturn401WhenAuthenticationInvalid() {
+    void shouldReturn401WhenAuthenticationInvalid() {
         Response response = caseWorkerApiClient.withUnauthenticatedRequest()
                 .post("/refdata/case-worker/upload-file/")
                 .andReturn();
@@ -388,29 +406,29 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldReturn403WhenRoleIsInvalid() throws IOException {
+    void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
                 403, null,
-                TYPE_XLSX, "Invalid");
+                TYPE_XLSX, "Invalid",Boolean.TRUE);
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldReturn403WhenUploadFileApiToggledOff() throws IOException {
+    void shouldReturn403WhenUploadFileApiToggledOff() throws IOException {
 
         String exceptionMessage = FeatureConditionEvaluation.FORBIDDEN_EXCEPTION_LD;
 
         uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
                 403, exceptionMessage,
-                TYPE_XLSX, ROLE_CWD_ADMIN);
+                TYPE_XLSX, ROLE_CWD_ADMIN,Boolean.TRUE);
     }
 
     @Test
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by ID
-    public void deleteCaseworkerById() {
+    void deleteCaseworkerById() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                 caseWorkerApiClient.createCaseWorkerProfiles();
 
@@ -441,7 +459,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
-    public void deleteCaseworkerByEmailPattern() {
+    void deleteCaseworkerByEmailPattern() {
         String emailPattern = "deleteTest1234";
         String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
 
@@ -474,7 +492,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void deleteCaseworkerReturns403WhenToggledOff() {
+    void deleteCaseworkerReturns403WhenToggledOff() {
         caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
                 "/refdata/case-worker/users?emailPattern=ForbiddenException", FORBIDDEN);
     }
@@ -482,7 +500,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldFetchStaffProfileByCcdServiceNamesWithDefaultParams() {
+    void shouldFetchStaffProfileByCcdServiceNamesWithDefaultParams() {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
@@ -509,7 +527,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldFetchStaffProfileByCcdServiceNamesWithPaginatedParams() {
+    void shouldFetchStaffProfileByCcdServiceNamesWithPaginatedParams() {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
@@ -537,7 +555,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldFetchStaffProfileByCcdServiceNamesInDesc() {
+    void shouldFetchStaffProfileByCcdServiceNamesInDesc() {
         if (isEmpty(caseWorkerIds)) {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
@@ -570,7 +588,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldThrowRecordNotFoundErrorOnInvalidPageSize() {
+    void shouldThrowRecordNotFoundErrorOnInvalidPageSize() {
         if (isEmpty(caseWorkerIds)) {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
@@ -609,7 +627,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
+    void shouldThrowForbiddenExceptionForNonCompliantRoleWhileFetchingStaffByCcdServiceNames() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("cwd-admin")
                 .get(STAFF_BY_SERVICE_NAME_URL
                         + "?ccd_service_names=cmc")
@@ -623,7 +641,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldReturn404WhenNoCcdServiceNameFound() {
+    void shouldReturn404WhenNoCcdServiceNameFound() {
         if (isEmpty(caseWorkerIds)) {
             createCaseWorkerIds();
         }
@@ -639,7 +657,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = false)
-    public void shouldReturn403WhenFetchStaffProfileByCcdServiceNamesApiToggledOff() {
+    void shouldReturn403WhenFetchStaffProfileByCcdServiceNamesApiToggledOff() {
 
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
                 .get(STAFF_BY_SERVICE_NAME_URL
@@ -656,10 +674,10 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldUploadXlsxFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
+    void shouldUploadXlsxFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload with non idam roles.xlsx",
-                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLSX, ROLE_CWD_ADMIN);
+                        200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLSX, ROLE_CWD_ADMIN,Boolean.TRUE);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
@@ -670,11 +688,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldUploadXlsFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
+    void shouldUploadXlsFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/Staff_Data_Upload_with_non_idam_roles.xls",
                         200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                        ROLE_CWD_ADMIN,true);
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
@@ -684,12 +702,26 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .contains(format(RECORDS_UPLOADED, 3)));
     }
 
+    @Test
+    @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void shouldUploadXlsVersionMismatchError() throws IOException {
+        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload different Version.xlsx",
+                        400, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
+                        ROLE_CWD_ADMIN, Boolean.FALSE);
+
+        assertThat(uploadCaseWorkerFileResponse.statusCode()).isEqualTo(400);
+
+    }
+
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
                                                                int statusCode,
                                                                String messageBody,
                                                                String header,
-                                                               String role) throws IOException {
-        MultiPartSpecification multiPartSpec = getMultipartFile(filePath, header);
+                                                               String role,
+                                                               Boolean updateVersion) throws IOException {
+        MultiPartSpecification multiPartSpec = getMultipartFile(filePath, header, updateVersion);
 
         Response response = caseWorkerApiClient.getMultiPartWithAuthHeaders(role)
                 .multiPart(multiPartSpec)
@@ -705,9 +737,12 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
 
     private MultiPartSpecification getMultipartFile(String filePath,
-                                                    String headerValue) throws IOException {
+                                                    String headerValue, Boolean updateVersion) throws IOException {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
+        if (updateVersion) {
+            input = updateVersionNumber(file,input,headerValue);
+        }
         MultiPartSpecBuilder multiPartSpecBuilder = new MultiPartSpecBuilder(IOUtils.toByteArray(input))
                 .fileName(file.getName())
                 .header("Content-Type",
@@ -730,5 +765,29 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+    }
+
+    private FileInputStream updateVersionNumber(File file, FileInputStream input,String fileType) throws IOException {
+
+        MultipartFile multipartInput = new MockMultipartFile("file",
+                file.getName(), fileType, IOUtils.toByteArray(input));
+        Workbook workbook = WorkBookCustomFactory.validateAndGetWorkBook(multipartInput);
+        Sheet sheet = workbook.getSheet("VERSION");
+        if (sheet != null) {
+
+            Row row = sheet.getRow(fileVersionRow);
+            Cell cell = row.getCell(fileVersionColumn);
+            cell.setCellValue(fileVersionValue);
+        }
+        //Close input stream
+        input.close();
+
+        FileOutputStream os = new FileOutputStream(file);
+        workbook.write(os);
+        workbook.close();
+        os.close();
+        input = new FileInputStream(file);
+
+        return input;
     }
 }
