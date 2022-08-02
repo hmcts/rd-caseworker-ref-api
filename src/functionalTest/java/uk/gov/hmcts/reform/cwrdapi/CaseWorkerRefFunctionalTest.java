@@ -17,7 +17,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,6 +77,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SerenityTest
 @SpringBootTest
 @Slf4j
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
     static final String CREATE_CASEWORKER_PROFILE = "CaseWorkerRefUsersController.createCaseWorkerProfiles";
@@ -333,6 +337,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @Order(1)
     void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
@@ -351,6 +356,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @Order(2)
     void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
@@ -368,6 +374,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @Order(3)
     void shouldUploadServiceRoleMappingAba1XlsFileSuccessfully() throws IOException {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_ABA1.xls",
