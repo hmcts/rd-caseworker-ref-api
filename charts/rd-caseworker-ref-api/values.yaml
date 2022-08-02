@@ -23,6 +23,7 @@ java:
     OPEN_ID_API_BASE_URI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o
     REFRESH_PAGE_SIZE: 20
     REFRESH_SORT_COLUMN: caseWorkerId
+    STAFF_DATA_FILE_VERSION: v1.14
   keyVaults:
     rd:
       secrets:
