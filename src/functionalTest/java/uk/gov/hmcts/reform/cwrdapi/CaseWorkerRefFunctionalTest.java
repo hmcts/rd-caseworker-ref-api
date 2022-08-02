@@ -342,7 +342,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
                         200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN,Boolean.TRUE);
+                        ROLE_CWD_ADMIN,Boolean.FALSE);
 
 
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
@@ -361,7 +361,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
                         200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN,Boolean.TRUE);
+                        ROLE_CWD_ADMIN,Boolean.FALSE);
 
         CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
@@ -379,7 +379,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_ABA1.xls",
                         200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN,Boolean.TRUE);
+                        ROLE_CWD_ADMIN,Boolean.FALSE);
 
         CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);

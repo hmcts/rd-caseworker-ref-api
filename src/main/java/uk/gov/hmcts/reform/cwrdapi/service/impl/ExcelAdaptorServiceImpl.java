@@ -84,11 +84,10 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         List<String> validHeaders;
         Sheet sheet;
 
-        //validation for version
-        sheet = workbook.getSheet(FILE_SHEET_VERSION);
-        validateVersion(sheet);
-
         if (classType.isAssignableFrom(CaseWorkerProfile.class)) {
+            //validation for version
+            sheet = workbook.getSheet(FILE_SHEET_VERSION);
+            validateVersion(sheet);
             sheet = workbook.getSheet(REQUIRED_CW_SHEET_NAME);
             validHeaders = acceptableCaseWorkerHeaders;
         } else {
@@ -114,6 +113,8 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         Row row = sheet.getRow(fileVersionRow);
         String value = row.getCell(fileVersionColumn).getStringCellValue();
         if (!fileVersionValue.equalsIgnoreCase(value)) {
+            log.error("{}:: File Version received {}:: Environment Version {}", loggingComponentName, value,
+                    fileVersionValue);
             throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_INVALID_VERSION_SHEET_ERROR_MESSAGE);
         }
     }
