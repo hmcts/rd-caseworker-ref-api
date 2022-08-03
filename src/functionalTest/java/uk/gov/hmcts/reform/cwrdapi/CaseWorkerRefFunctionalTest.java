@@ -57,6 +57,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.lang.System.getenv;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,9 +92,6 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     static List<String> caseWorkerIds = new ArrayList<>();
     static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
             "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
-
-    @Value("${fileversion.value}")
-    private String fileVersionValue;
 
     @Value("${fileversion.row}")
     private int fileVersionRow;
@@ -773,6 +771,7 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 file.getName(), fileType, IOUtils.toByteArray(input));
         Workbook workbook = WorkBookCustomFactory.validateAndGetWorkBook(multipartInput);
         Sheet sheet = workbook.getSheet("VERSION");
+        String fileVersionValue = getenv("STAFF_DATA_FILE_VERSION");
         if (sheet != null) {
 
             Row row = sheet.getRow(fileVersionRow);
