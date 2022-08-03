@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
+import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -93,11 +94,8 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
             "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
 
-    @Value("${fileversion.row}")
-    private int fileVersionRow;
-
-    @Value("${fileversion.coloumn}")
-    private int fileVersionColumn;
+    @Autowired
+    protected TestConfigProperties configProperties;
 
     @Test
     @ToggleEnable(mapKey = CREATE_CASEWORKER_PROFILE, withFeature = true)
@@ -771,12 +769,11 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 file.getName(), fileType, IOUtils.toByteArray(input));
         Workbook workbook = WorkBookCustomFactory.validateAndGetWorkBook(multipartInput);
         Sheet sheet = workbook.getSheet("VERSION");
-        String fileVersionValue = getenv("STAFF_DATA_FILE_VERSION");
         if (sheet != null) {
 
-            Row row = sheet.getRow(fileVersionRow);
-            Cell cell = row.getCell(fileVersionColumn);
-            cell.setCellValue(fileVersionValue);
+            Row row = sheet.getRow(configProperties.getFileVersionRow());
+            Cell cell = row.getCell(configProperties.getFileVersionColumn());
+            cell.setCellValue(getenv("STAFF_DATA_FILE_VERSION"));
         }
         //Close input stream
         input.close();
