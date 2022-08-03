@@ -81,7 +81,7 @@ public class FeatureToggleConditionExtension implements ExecutionCondition {
     private static void initialize() {
         LDClient ldClient = new LDClient(getenv("LD_SDK_KEY"));
         featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
-        String executionEnvironment = getenv("execution_environment");
+        String executionEnvironment = "preview";
         ReflectionTestUtils.setField(featureToggleService, "environment", executionEnvironment);
         isInitialized = true;
     }
