@@ -49,15 +49,6 @@ public class TestConfigProperties implements TestConfig {
     @Value("${scope-name}")
     protected String scope;
 
-    @Value("${fileversion.row}")
-    private int fileVersionRow;
-
-    @Value("${fileversion.coloumn}")
-    private int fileVersionColumn;
-
-    @Value("${fileversion.value}")
-    private String fileVersionValue;
-
     @Bean
     public ObjectMapper defaultObjectMapper() {
         return new ObjectMapper()
