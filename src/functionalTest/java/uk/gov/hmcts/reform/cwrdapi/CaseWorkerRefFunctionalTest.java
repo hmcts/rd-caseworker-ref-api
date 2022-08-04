@@ -92,13 +92,13 @@ class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     static final String FETCH_STAFF_BY_CCD_SERVICE_NAMES =
             "StaffReferenceInternalController.fetchStaffByCcdServiceNames";
 
-    @Value("${fileversion.value}")
+    @Value("${fileversiontest.value}")
     private String fileVersionValue;
 
-    @Value("${fileversion.row}")
+    @Value("${fileversiontest.row}")
     private int fileVersionRow;
 
-    @Value("${fileversion.coloumn}")
+    @Value("${fileversiontest.coloumn}")
     private int fileVersionColumn;
 
     @Test
