@@ -24,7 +24,7 @@ java:
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
     ENVIRONMENT_NAME: "preview"
-    STAFF_DATA_FILE_VERSION: v1.15
+    STAFF_DATA_FILE_VERSION: v1.14
   postgresql:
     enabled: true
     auth:
