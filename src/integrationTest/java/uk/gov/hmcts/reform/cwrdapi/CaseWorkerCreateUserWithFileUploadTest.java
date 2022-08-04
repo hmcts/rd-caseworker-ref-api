@@ -32,8 +32,8 @@ import static java.util.Map.entry;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -64,7 +64,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
 
-public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
+class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Autowired
     JdbcTemplate template;
@@ -73,7 +73,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
         + "\"message_details\":\"4 record(s) uploaded\"}";
 
     @Test
-    public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
+    void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -99,7 +99,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
+    void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload Xls.xls",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -117,7 +117,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
+     void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
 
         Map<String, Object> response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
@@ -134,7 +134,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully_with_extra_spaces() throws IOException {
+    void shouldUploadServiceRoleMappingsXlsxFileSuccessfully_with_extra_spaces() throws IOException {
         uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
@@ -144,7 +144,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadServiceRoleMappingsXlsxFileSuccessfullyWithExtraRoles() throws IOException {
+    void shouldUploadServiceRoleMappingsXlsxFileSuccessfullyWithExtraRoles() throws IOException {
         uploadCaseWorkerFile("ServiceToIDAMRoleMapping_newRoles.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
@@ -155,7 +155,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
 
     @Test
-    public void shouldReturn200PartialSuccessWhenNameIsLongerThan128AndNameHasInvalidCharacter() throws IOException {
+    void shouldReturn200PartialSuccessWhenNameIsLongerThan128AndNameHasInvalidCharacter() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile(
             "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
@@ -172,70 +172,79 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
-        uploadCaseWorkerFile("test.txt",
+    void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
+        var response = uploadCaseWorkerFile("test.txt",
             TYPE_XLSX, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status", "400");
     }
 
     @Test
-    public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("Staff Data Upload With Password.xls",
+    void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
+        var response = uploadCaseWorkerFile("Staff Data Upload With Password.xls",
             CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status", "400");
     }
 
     @Test
-    public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
+    void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
+        var response = uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status", "400");
     }
 
     @Test
-    public void shouldReturn400WhenFileHasNoData() throws IOException {
-        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
+    void shouldReturn400WhenFileHasNoData() throws IOException {
+        var response = uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status", "400");
     }
 
     @Test
-    public void shouldReturn400WhenFileHasAllEmptyRows() throws IOException {
-        uploadCaseWorkerFile("Staff Data Upload With All Empty Rows.xlsx",
+    void shouldReturn400WhenFileHasAllEmptyRows() throws IOException {
+        var response = uploadCaseWorkerFile("Staff Data Upload With All Empty Rows.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status", "400");
     }
 
     @Test
-    public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
+    void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
+        var response = uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             "application/octet-stream", "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status", "400");
+
     }
 
     @Test
-    public void shouldReturn403WhenRoleIsInvalid() throws IOException {
+    void shouldReturn403WhenRoleIsInvalid() throws IOException {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
-        uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
+        var response = uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             TYPE_XLSX, "403", "invalid");
+        assertThat(response).containsEntry("http_status", "403");
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @Test
-    public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
+    void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
             "test-flag-1");
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(false);
         when(featureToggleServiceImpl.getLaunchDarklyMap()).thenReturn(launchDarklyMap);
-        uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
+        var response =  uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             TYPE_XLSX, "403", cwdAdmin);
+        assertThat(response).containsEntry("http_status", "403");
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
 
     @Test
-    public void shouldCreateCaseWorkerAuditSuccess() throws IOException {
+    void shouldCreateCaseWorkerAuditSuccess() throws IOException {
         validateAuditCaseWorkerCreate();
     }
 
     @Test
-    public void shouldCreateCaseWorkerAuditSuccessWitUpConflict() throws Exception {
+    void shouldCreateCaseWorkerAuditSuccessWitUpConflict() throws Exception {
         String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         modifyUserRoles();
@@ -243,7 +252,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
+    void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         response = uploadCaseWorkerFile("Staff Data Upload With Jsr.xlsx",
@@ -306,7 +315,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldCreateCaseWorkerAuditFailure() throws IOException {
+    void shouldCreateCaseWorkerAuditFailure() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
@@ -321,7 +330,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldCreateCaseWorkerAuditFailureForBadIdamRoles() throws IOException {
+    void shouldCreateCaseWorkerAuditFailureForBadIdamRoles() throws IOException {
         //create invalid stub of UP for Exception validation
         String errorMessageFromIdam = "The role to be assigned does not exist.";
         ErrorResponse errorResponse = ErrorResponse.builder()
@@ -345,7 +354,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
+    void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
@@ -360,7 +369,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
+    void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
         userProfileService.resetAll();
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
             + "Some records failed during validation and were ignored.\","
@@ -381,7 +390,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadServiceRoleMappingsXlsxFileWithJsr() throws IOException {
+    void shouldUploadServiceRoleMappingsXlsxFileWithJsr() throws IOException {
 
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
@@ -414,7 +423,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldFailCaseWorkerUsersXlsxFileUploadIfPreviousUploadInProgress() throws IOException {
+    void shouldFailCaseWorkerUsersXlsxFileUploadIfPreviousUploadInProgress() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -431,7 +440,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldHandlePartialSuccessWhenFileHasBadFormulaRecord() throws IOException {
+    void shouldHandlePartialSuccessWhenFileHasBadFormulaRecord() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -441,7 +450,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadStaffDataXlsxFileSuccessfully_whenEmptyRowsInBetween() throws IOException {
+    void shouldUploadStaffDataXlsxFileSuccessfully_whenEmptyRowsInBetween() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -451,7 +460,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadStaffDataXlsxFileSuccessfully_whenNoEmptyRowsInBetween() throws IOException {
+    void shouldUploadStaffDataXlsxFileSuccessfully_whenNoEmptyRowsInBetween() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -461,7 +470,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldCreateCaseWorkerAudit_when_email_in_capital_letters() throws IOException {
+    void shouldCreateCaseWorkerAudit_when_email_in_capital_letters() throws IOException {
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
             + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -476,7 +485,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldHandleDuplicateEmailProfiles() throws IOException {
+    void shouldHandleDuplicateEmailProfiles() throws IOException {
         Map<String, Object> response =
             uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
@@ -502,7 +511,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldFailToCreateAuditForInvalidRole() throws IOException {
+    void shouldFailToCreateAuditForInvalidRole() throws IOException {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
                         TYPE_XLSX, "403", "invalid");
@@ -513,7 +522,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadCaseWorkerUsersXlsxFileWithNonIdamRolesSuccessfully() throws IOException {
+    void shouldUploadCaseWorkerUsersXlsxFileWithNonIdamRolesSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload with non idam roles.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -532,7 +541,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     }
 
     @Test
-    public void shouldUploadCaseWorkerUsersXlsFileWithNonIdamRolesSuccessfully() throws IOException {
+    void shouldUploadCaseWorkerUsersXlsFileWithNonIdamRolesSuccessfully() throws IOException {
         uploadCaseWorkerFile("Staff Data Upload with non idam roles.xls",
                 TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -548,6 +557,27 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
                 .count();
 
         assertEquals(1L, taskSupervisor);
+    }
+
+    @Test
+    void shouldReturn400WhenFileHasNoVersionSheet() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload No Version Sheet.xlsx",
+                TYPE_XLSX, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status","400");
+    }
+
+    @Test
+    void shouldReturn400WhenFileHasNoVersionNumber() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload No Version.xlsx",
+                TYPE_XLSX, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status","400");
+    }
+
+    @Test
+    void shouldReturn400WhenFileHasDifferentVersion() throws IOException {
+        uploadCaseWorkerFile("Staff Data Upload different Version.xlsx",
+                TYPE_XLSX, "400", cwdAdmin);
+        assertThat(response).containsEntry("http_status","400");
     }
 
 }
