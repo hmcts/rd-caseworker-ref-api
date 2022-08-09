@@ -15,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
@@ -24,7 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE_MAPPING_SHEET_NAME;
@@ -174,7 +175,7 @@ class ExcelAdaptorServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"Staff Data Upload No Version Sheet.xlsx", "Staff Data Upload different Version.xlsx",
+    @ValueSource(strings = {"Staff Data Upload different Version.xlsx",
         "Staff Data Upload No Version.xlsx"})
     void exceptionWhenNoVersionSheetNamePresentTest(String file) throws IOException {
         Workbook workbook = WorkbookFactory
@@ -182,7 +183,7 @@ class ExcelAdaptorServiceImplTest {
                         "1234");
 
         Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
-                .isExactlyInstanceOf(ExcelValidationException.class)
-                .hasMessage(FILE_INVALID_VERSION_SHEET_ERROR_MESSAGE);
+                .isExactlyInstanceOf(StaffReferenceException.class)
+                .hasMessage(FILE_INVALID_VERSION_SHEET_MESSAGE);
     }
 }

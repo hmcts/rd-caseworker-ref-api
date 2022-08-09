@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
@@ -42,7 +43,8 @@ import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_DESCRIPTION;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADERS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
@@ -108,14 +110,15 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     private void validateVersion(Sheet sheet) {
 
         if (Objects.isNull(sheet)) {
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_INVALID_VERSION_SHEET_ERROR_MESSAGE);
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_VALID_SHEET_ERROR_MESSAGE);
         }
         Row row = sheet.getRow(fileVersionRow);
         String value = row.getCell(fileVersionColumn).getStringCellValue();
         if (!fileVersionValue.equalsIgnoreCase(value)) {
             log.error("{}:: File Version received {}:: Environment Version {}", loggingComponentName, value,
                     fileVersionValue);
-            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_INVALID_VERSION_SHEET_ERROR_MESSAGE);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, FILE_INVALID_VERSION_SHEET_MESSAGE,
+                    String.format(FILE_INVALID_VERSION_SHEET_DESCRIPTION,fileVersionValue));
         }
     }
 

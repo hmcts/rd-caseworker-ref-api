@@ -151,6 +151,7 @@ public final class CaseWorkerConstants {
     public static final String LRD_ERROR = "An error occurred while retrieving data from Location Reference Data";
     public static final String SRD = "SRD";
     public static final String FILE_SHEET_VERSION = "VERSION";
-    public static final String FILE_INVALID_VERSION_SHEET_ERROR_MESSAGE = "please download the latest template "
-            + "and upload it.";
+    public static final String FILE_INVALID_VERSION_SHEET_MESSAGE = "Invalid Staff upload file version";
+    public static final String FILE_INVALID_VERSION_SHEET_DESCRIPTION = "Please use the latest version %s"
+            + " of the Staff upload template";
 }
