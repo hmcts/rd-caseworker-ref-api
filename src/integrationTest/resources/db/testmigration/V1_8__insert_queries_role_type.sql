@@ -1,5 +1,5 @@
 -- insert queries for role_type table new business roles 3-10
-
+--Covers V1_14
 INSERT INTO
     role_type (role_id, description, created_date)
 VALUES

@@ -20,6 +20,7 @@ SET description = 'CTSC Team Leader',
 last_update =  CURRENT_TIMESTAMP
 WHERE role_id = 9;
 
+--Covers V1_13
 INSERT INTO
     role_type (role_id, description, created_date)
 VALUES
