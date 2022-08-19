@@ -43,7 +43,9 @@ def versions = [
   restAssured        : '4.3.3',
   jackson            : '2.13.1',
   log4j              : '2.17.1',
-  springVersion      : '5.3.20'
+  springVersion      : '5.3.20',
+  poi                : '4.1.2',
+  logback            : '1.2.11'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -327,8 +329,8 @@ repositories {
 
 dependencies {
 
-  implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
-  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+  implementation group: 'org.apache.poi', name: 'poi', version: versions.poi
+  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: versions.poi
   implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: versions.springBoot
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springBoot
@@ -395,8 +397,8 @@ dependencies {
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
   implementation group: 'org.springframework', name: 'spring-core', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-beans', version: versions.springVersion
-  implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
-  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
+  implementation group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
