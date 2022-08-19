@@ -12,3 +12,8 @@ idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.s
 s2s-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
 userProfUrl: http://rd-user-profile-api-aat.service.core-compute-aat.internal
 locationRefDataUrl: http://rd-location-ref-api-aat.service.core-compute-aat.internal
+
+fileversiontest:
+  row: 5
+  coloumn: 1
+  value: ${STAFF_DATA_FILE_VERSION_TEST:}
