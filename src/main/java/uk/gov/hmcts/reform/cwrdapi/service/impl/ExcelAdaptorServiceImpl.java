@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.service.ExcelAdaptorService;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
@@ -42,9 +43,12 @@ import static org.springframework.util.ReflectionUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_FILE_PARSING_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ERROR_PARSING_EXCEL_CELL_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_DESCRIPTION;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_MISSING_HEADERS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_SHEET_VERSION;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IS_PRIMARY_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_CW_SHEET_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE_MAPPING_SHEET_NAME;
@@ -67,12 +71,25 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
     @Autowired
     IValidationService validationServiceFacade;
 
+    @Value("${fileversion.row}")
+    private int fileVersionRow;
+
+    @Value("${fileversion.coloumn}")
+    private int fileVersionColumn;
+
+    @Value("${fileversion.value}")
+    private String fileVersionValue;
+
 
     public <T> List<T> parseExcel(Workbook workbook, Class<T> classType) {
         evaluator = workbook.getCreationHelper().createFormulaEvaluator();
         List<String> validHeaders;
         Sheet sheet;
+
         if (classType.isAssignableFrom(CaseWorkerProfile.class)) {
+            //validation for version
+            sheet = workbook.getSheet(FILE_SHEET_VERSION);
+            validateVersion(sheet);
             sheet = workbook.getSheet(REQUIRED_CW_SHEET_NAME);
             validHeaders = acceptableCaseWorkerHeaders;
         } else {
@@ -88,6 +105,21 @@ public class ExcelAdaptorServiceImpl implements ExcelAdaptorService {
         collectHeaderList(headers, sheet);
         validateHeaders(headers, validHeaders);
         return mapToPojo(sheet, classType, headers);
+    }
+
+    private void validateVersion(Sheet sheet) {
+
+        if (Objects.isNull(sheet)) {
+            throw new ExcelValidationException(HttpStatus.BAD_REQUEST, FILE_NO_VALID_SHEET_ERROR_MESSAGE);
+        }
+        Row row = sheet.getRow(fileVersionRow);
+        String value = row.getCell(fileVersionColumn).getStringCellValue();
+        if (!fileVersionValue.equalsIgnoreCase(value)) {
+            log.error("{}:: File Version received {}:: Environment Version {}", loggingComponentName, value,
+                    fileVersionValue);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, FILE_INVALID_VERSION_SHEET_MESSAGE,
+                    String.format(FILE_INVALID_VERSION_SHEET_DESCRIPTION,fileVersionValue));
+        }
     }
 
     private void validateHeaders(List<String> headersToBeValidated,
