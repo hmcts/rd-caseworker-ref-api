@@ -6,6 +6,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.advice.ExcelValidationException;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ExcelAdaptorServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
@@ -22,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_INVALID_VERSION_SHEET_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_DATA_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FILE_NO_VALID_SHEET_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUIRED_ROLE_MAPPING_SHEET_NAME;
@@ -48,6 +52,9 @@ class ExcelAdaptorServiceImplTest {
             acceptableCaseWorkerHeaders);
         ReflectionTestUtils.setField(excelAdaptorServiceImpl, "acceptableServiceRoleMappingHeaders",
                 acceptableServiceRoleMappingHeaders);
+        ReflectionTestUtils.setField(excelAdaptorServiceImpl, "fileVersionRow", 5);
+        ReflectionTestUtils.setField(excelAdaptorServiceImpl, "fileVersionColumn", 1);
+        ReflectionTestUtils.setField(excelAdaptorServiceImpl, "fileVersionValue", "vx.xx");
     }
 
     @Test
@@ -165,5 +172,18 @@ class ExcelAdaptorServiceImplTest {
                 null))
                 .isExactlyInstanceOf(NullPointerException.class)
                 .hasMessage("Cannot invoke \"org.apache.poi.ss.usermodel.Row.getRowNum()\" because \"row\" is null");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Staff Data Upload different Version.xlsx",
+        "Staff Data Upload No Version.xlsx"})
+    void exceptionWhenNoVersionSheetNamePresentTest(String file) throws IOException {
+        Workbook workbook = WorkbookFactory
+                .create(new File("src/test/resources/" + file),
+                        "1234");
+
+        Assertions.assertThatThrownBy(() -> excelAdaptorServiceImpl.parseExcel(workbook, CaseWorkerProfile.class))
+                .isExactlyInstanceOf(StaffReferenceException.class)
+                .hasMessage(FILE_INVALID_VERSION_SHEET_MESSAGE);
     }
 }
