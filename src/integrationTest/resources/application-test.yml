@@ -138,8 +138,3 @@ excel:
 refresh:
   pageSize: 20
   sortColumn: caseWorkerId
-
-fileversion:
-  row: 5
-  coloumn: 1
-  value: ${STAFF_DATA_FILE_VERSION:vx.xx}
