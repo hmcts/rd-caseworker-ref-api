@@ -67,7 +67,6 @@ withPipeline(type, product, component) {
     env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
     env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
-    env.STAFF_DATA_FILE_VERSION_TEST = "v1.14"
 
     after('integrationTest:preview') {
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
