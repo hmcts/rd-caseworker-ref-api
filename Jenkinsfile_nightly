@@ -47,7 +47,6 @@ withNightlyPipeline(type, product, component) {
   env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
   env.Rules = params.SecurityRules
   env.execution_environment = "aat"
-  env.STAFF_DATA_FILE_VERSION_TEST = "v1.14"
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
