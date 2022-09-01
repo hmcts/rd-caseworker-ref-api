@@ -570,7 +570,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = FETCH_STAFF_BY_CCD_SERVICE_NAMES, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldThrowRecordNotFoundErrorOnInvalidPageSize() {
+    public void shouldThrowRecordNotFoundErrorOnInvalidCcdServiceName() {
         if (isEmpty(caseWorkerIds)) {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
@@ -593,7 +593,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             caseWorkersProfileCreationRequests.get(1).setWorkerWorkAreaRequests(areaRequests);
             caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         }
-        String ccdServiceNames = "Adoption";
+        String ccdServiceNames = "Invalid";
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
             .get(STAFF_BY_SERVICE_NAME_URL
                 + "?ccd_service_names=" + ccdServiceNames
