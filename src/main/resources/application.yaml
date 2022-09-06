@@ -34,7 +34,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.demo.platform.hmcts.net/o}
+            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
         registration:
           oidc:
             client-id: ${IDAM_CLIENT_ID:microservicekey-rd-caseworker-ref-api}
@@ -102,12 +102,12 @@ idam:
   s2s-auth:
     totp_secret: ${CASEWORKER_REF_API_S2S_SECRET:}
     microservice: rd_caseworker_ref_api
-    url: ${S2S_URL:http://rpe-service-auth-provider-demo.service.core-compute-demo.internal}
+    url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
     services: ${CRD_S2S_AUTHORISED_SERVICES:rd_caseworker_ref_api,am_org_role_mapping_service,iac,xui_webapp}
-  api.url: ${idam_url:https://idam-api.demo.platform.hmcts.net}
+  api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
-oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-demo.internal:8443/openam/oauth2/hmcts}
+oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
 environment_name: ${ENVIRONMENT_NAME:prod}
 
@@ -116,8 +116,8 @@ feign:
   allow:
     headers:
       - authorization
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-demo.service.core-compute-demo.internal}
-locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://rd-location-ref-api-demo.service.core-compute-demo.internal}
+userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://rd-location-ref-api-aat.service.core-compute-aat.internal}
 
 crd:
   publisher:
