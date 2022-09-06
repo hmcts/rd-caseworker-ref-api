@@ -35,4 +35,3 @@ CREATE TABLE staff_audit (
 );
 
 COMMIT;
-
