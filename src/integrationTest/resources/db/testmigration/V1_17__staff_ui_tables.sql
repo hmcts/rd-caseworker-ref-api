@@ -30,7 +30,7 @@ CREATE TABLE staff_audit (
     error_description varchar(512),
     case_worker_id varchar(64),
     operation_type varchar(32) NOT NULL,
-    request_log varchar(32)
+    request_log jsonb,
     CONSTRAINT staff_audit_pk PRIMARY KEY (id)
 );
 
