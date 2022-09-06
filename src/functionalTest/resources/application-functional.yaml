@@ -1,6 +1,6 @@
 targetInstance: ${TEST_URL:http://localhost:8095}
 
-s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-demo.service.core-compute-aat.internal}
+s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-demo.service.core-compute-demo.internal}
 
 s2s-name: rd_caseworker_ref_api
 scope-name: openid profile roles manage-user create-user search-user
