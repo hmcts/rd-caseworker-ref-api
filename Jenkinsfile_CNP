@@ -13,8 +13,8 @@ def secrets = [
     secret('microservicekey-rd-caseworker-ref-api', 'CASEWORKER_REF_API_S2S_SECRET')
   ],
   'rd-${env}': [
-    secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
-    secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID'),
+    secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
+    secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
     secret('LD-SDK-KEY', 'LD_SDK_KEY')
 
   ]
@@ -30,7 +30,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 def vaultOverrides = [
-  'preview' : 'aat',
+  'preview' : 'demo',
   'spreview': 'saat'
 ]
 
@@ -62,8 +62,8 @@ withPipeline(type, product, component) {
     // Sync demo and perftest with master branch
     syncBranchesWithMaster(branchesToSync)
 
-    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-demo.service.core-compute-aat.internal"
+    env.IDAM_URL = "https://idam-api.demo.platform.hmcts.net"
     env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
 
     after('integrationTest:preview') {
