@@ -34,9 +34,6 @@ CREATE TABLE staff_audit (
     CONSTRAINT staff_audit_pk PRIMARY KEY (id)
 );
 
-
-
-
 --dummy data
 INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(1, '1', 'testskill1', '1', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(2, '2', 'testskill2', '2', '2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
