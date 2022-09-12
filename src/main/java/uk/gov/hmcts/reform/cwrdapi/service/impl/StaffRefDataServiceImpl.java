@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
+import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
@@ -34,11 +35,21 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<Skill> skills = null;
         List<ServiceSkill> serviceSkills = new ArrayList<>();
         try{
-
+            List<SkillDTO> skillData = new ArrayList<>();
             skills = skillRepository.findAll();
             Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
             if(skillsOptional.isPresent()){
-                serviceSkills = mapSkillToServicesSkill(skills);
+                skillData = skills.stream().map(skill -> {
+                    SkillDTO skillDTO = new SkillDTO();
+                    skillDTO.setServiceId(skill.getServiceId());
+                    skillDTO.setSkillId(skill.getSkillId());
+                    skillDTO.setSkillCode(skill.getSkillCode());
+                    skillDTO.setUserType(skill.getUserType());
+                    skillDTO.setDescription(skill.getDescription());
+                    return skillDTO;
+                }).toList();
+
+                serviceSkills = mapSkillToServicesSkill(skillData);
             }
 
               } catch (Exception exp) {
@@ -51,10 +62,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return staffWorkerSkillResponse;
     }
 
-    public  List<ServiceSkill> mapSkillToServicesSkill(List<Skill> skills){
+    public  List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData ){
         //List<Skill> skills = getSkillsData();
 
-        Map<String, List<Skill>> result = skills.stream()
+        Map<String, List<SkillDTO>> result = skillData.stream()
                 .collect(
                         Collectors.toMap(
                                 skill -> skill.getServiceId(),
@@ -63,7 +74,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                         )
                 );
 
-        //System.out.println(result);
 
         List<ServiceSkill> serviceSkills = new ArrayList<>();
 
@@ -78,8 +88,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 return serviceSkills;
 
     }
-    private  List<Skill> mergeSkillsWithDuplicateServiceIds(List<Skill> existingResults, List<Skill> newResults) {
-        List<Skill> mergedResults = new ArrayList<>();
+    private  List<SkillDTO> mergeSkillsWithDuplicateServiceIds(List<SkillDTO> existingResults, List<SkillDTO> newResults) {
+        List<SkillDTO> mergedResults = new ArrayList<>();
         mergedResults.addAll(existingResults);
         mergedResults.addAll(newResults);
         return mergedResults;

@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
+import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 
 import java.util.ArrayList;
@@ -47,12 +48,12 @@ public class StaffRefDataServiceImplTest {
 
         assertThat(serviceSkill.getId()).isEqualTo("BBA3");
 
-        Skill skill = serviceSkill.getSkills().get(0);
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
 
-        assertThat(skill.getSkillId()).isEqualTo(1l);
-        assertThat(skill.getSkillCode()).isEqualTo("A1");
-        assertThat(skill.getDescription()).isEqualTo("desc1");
-        assertThat(skill.getUserType()).isEqualTo("user_type1");
+        assertThat(skillDTO.getSkillId()).isEqualTo(1l);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
+        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
+        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
 
     }
 

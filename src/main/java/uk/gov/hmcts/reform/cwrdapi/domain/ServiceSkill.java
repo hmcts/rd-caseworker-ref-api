@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.List;
 
@@ -13,5 +10,6 @@ import java.util.List;
 @Builder
 public class ServiceSkill {
     private String id;
-    private List<Skill> skills;
+    @JsonProperty("skills")
+    private List<SkillDTO> skills;
 }
