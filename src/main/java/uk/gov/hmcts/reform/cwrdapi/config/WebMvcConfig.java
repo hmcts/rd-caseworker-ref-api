@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditInterceptor;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
+import uk.gov.hmcts.reform.cwrdapi.util.OrgRoleInterceptor;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -25,6 +26,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     AuditInterceptor auditInterceptor;
 
+    @Autowired
+    OrgRoleInterceptor orgRoleInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
@@ -39,5 +43,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         //Audit Interceptor
         registry.addInterceptor(auditInterceptor)
             .addPathPatterns("/refdata/case-worker/upload-file");
+
+        registry.addInterceptor(orgRoleInterceptor)
+                .addPathPatterns("/refdata/case-worker/profile");//similarly add other end points as well
     }
 }

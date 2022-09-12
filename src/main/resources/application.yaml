@@ -118,6 +118,7 @@ feign:
       - authorization
 userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
 locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://rd-location-ref-api-aat.service.core-compute-aat.internal}
+amRoleAssignmentUrl: ${AM_ROLE_ASSIGNMENT_SERVICE_URL:http://am-role-assignment-service-aat.service.core-compute-aat.internal}
 
 crd:
   publisher:
