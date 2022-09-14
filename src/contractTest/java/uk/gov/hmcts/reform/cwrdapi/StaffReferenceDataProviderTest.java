@@ -95,11 +95,11 @@ public class StaffReferenceDataProviderTest {
     private static final String USER_ID2 = "234879";
 
 
-    @Autowired
-    private StaffRefDataServiceImpl staffRefDataServiceImpl;
-
     @Mock
     private SkillRepository skillRepository;
+
+    @Autowired
+    private StaffRefDataServiceImpl staffRefDataServiceImpl;
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
