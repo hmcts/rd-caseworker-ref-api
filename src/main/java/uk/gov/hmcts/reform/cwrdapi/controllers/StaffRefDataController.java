@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,6 +67,7 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE,
             path = {"/skill"}
     )
+    //@Secured("cwd-admin")
     public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills() {
         log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
 
