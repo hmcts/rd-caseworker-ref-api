@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
@@ -63,20 +64,26 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @Provider("staff_referenceData_service_skills")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-        host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-        @VersionSelector(tag = "master")})
-@Import(CaseWorkerProviderTestConfiguration.class)
-@SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
+        host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:9292}"
+        , consumerVersionSelectors = {
+        @VersionSelector(tag = "Dev")})
+//@Import(CaseWorkerProviderTestConfiguration.class)
+//@SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
+@ContextConfiguration(classes = {
+        CaseWorkerServiceImpl.class, CaseWorkerDeleteServiceImpl.class,
+        StaffRefDataServiceImpl.class
+})
+
 @IgnoreNoPactsToVerify
 public class StaffReferenceDataProviderServiceSkillsTest {
 
-    @Autowired
+    @MockBean
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
 
-    @Autowired
+    @MockBean
     private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
 
-    @Autowired
+    @MockBean
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
 
     @MockBean
@@ -85,8 +92,7 @@ public class StaffReferenceDataProviderServiceSkillsTest {
     @MockBean
     private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
-    @Autowired
-    private DataSource ds;
+
 
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
@@ -95,10 +101,10 @@ public class StaffReferenceDataProviderServiceSkillsTest {
     private static final String USER_ID2 = "234879";
 
 
-    @Mock
+    @MockBean
     private SkillRepository skillRepository;
 
-    @Autowired
+    @MockBean
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
 
     @TestTemplate
@@ -112,6 +118,7 @@ public class StaffReferenceDataProviderServiceSkillsTest {
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
 
                 new StaffRefDataController("RD-Caseworker-Ref-Api",staffRefDataServiceImpl)
