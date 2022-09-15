@@ -34,7 +34,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest{
     @Test
     @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void should_return_service_skills_with_status_code_200() {
+    public void should_return_service_skills_with_status_code_200_when_flag_true() {
 
         Response fetchResponse = caseWorkerApiClient.
                 getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
@@ -52,4 +52,27 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest{
         assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isEqualTo(5);
 
     }
+
+    @Test
+    @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    public void should_return_service_skills_with_status_code_200_when_flag_false() {
+
+        Response fetchResponse = caseWorkerApiClient.
+                getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
+                .get(STAFF_REF_DATA_SKILL_URL
+                )
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        StaffWorkerSkillResponse staffWorkerSkillResponse =
+                fetchResponse.getBody().as(StaffWorkerSkillResponse.class);
+        assertThat(staffWorkerSkillResponse).isNotNull();
+        assertThat(staffWorkerSkillResponse.getServiceSkills()).isNotNull();
+        assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isEqualTo(5);
+
+    }
+
 }
