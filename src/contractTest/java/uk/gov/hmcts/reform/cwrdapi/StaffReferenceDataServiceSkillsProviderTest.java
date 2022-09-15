@@ -9,112 +9,40 @@ import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Request;
-import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
-import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
-import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
-import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
-import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
-import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
-import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.sql.DataSource;
 
-import static java.nio.charset.Charset.defaultCharset;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @Provider("staff_referenceData_service_skills")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-        host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:9292}"
-        , consumerVersionSelectors = {
-        @VersionSelector(tag = "Dev")})
-//@Import(CaseWorkerProviderTestConfiguration.class)
-//@SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
-@ContextConfiguration(classes = {
-        StaffRefDataController.class,
-        CaseWorkerServiceImpl.class, CaseWorkerDeleteServiceImpl.class,
-        StaffRefDataServiceImpl.class
-})
-@TestPropertySource(properties = {"loggingComponentName=StaffReferenceDataServiceSkillsProviderTest"})
+        host = "${PACT_BROKER_URL:localhost}",
+        port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
+        @VersionSelector(tag = "master")})
+
 @IgnoreNoPactsToVerify
 public class StaffReferenceDataServiceSkillsProviderTest {
 
     @MockBean
-    private CaseWorkerServiceImpl caseWorkerServiceImpl;
-
-    @MockBean
-    private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
-
-    @MockBean
-    private CaseWorkerProfileRepository caseWorkerProfileRepo;
-
-    @MockBean
-    private CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
-
-    @MockBean
-    private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
-
-
-
-    @Mock
-    private CaseWorkerServiceFacade caseWorkerServiceFacade;
-
-    private static final String USER_ID = "234873";
-    private static final String USER_ID2 = "234879";
-
-
-    @MockBean
-    private SkillRepository skillRepository;
-
-    @MockBean
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
-    @Autowired
-    StaffRefDataController staffRefDataController;
+
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
@@ -128,8 +56,7 @@ public class StaffReferenceDataServiceSkillsProviderTest {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
-                staffRefDataController
-                //new StaffRefDataController("RD-Caseworker-Ref-Api",staffRefDataServiceImpl)
+                new StaffRefDataController("RD-Caseworker-Ref-Api",staffRefDataServiceImpl)
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -142,9 +69,6 @@ public class StaffReferenceDataServiceSkillsProviderTest {
     public void fetchListOfServiceSkills() throws JsonProcessingException {
         StaffWorkerSkillResponse staffWorkerSkillResponse = getServiceSkills();
         when(staffRefDataServiceImpl.getServiceSkills()).thenReturn(staffWorkerSkillResponse);
-        List<Skill> skills = getSkillsData();
-        when(skillRepository.findAll()).thenReturn(skills);
-        //StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
 
     }
 
