@@ -23,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
@@ -35,7 +36,9 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
+import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
@@ -51,6 +54,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -70,10 +76,11 @@ import static org.mockito.Mockito.when;
 //@Import(CaseWorkerProviderTestConfiguration.class)
 //@SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 @ContextConfiguration(classes = {
+        StaffRefDataController.class,
         CaseWorkerServiceImpl.class, CaseWorkerDeleteServiceImpl.class,
         StaffRefDataServiceImpl.class
 })
-
+@TestPropertySource(properties = {"loggingComponentName=StaffReferenceDataServiceSkillsProviderTest"})
 @IgnoreNoPactsToVerify
 public class StaffReferenceDataServiceSkillsProviderTest {
 
@@ -101,12 +108,13 @@ public class StaffReferenceDataServiceSkillsProviderTest {
     private static final String USER_ID2 = "234879";
 
 
-    @Mock
+    @MockBean
     private SkillRepository skillRepository;
 
     @MockBean
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
-
+    @Autowired
+    StaffRefDataController staffRefDataController;
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
@@ -120,8 +128,8 @@ public class StaffReferenceDataServiceSkillsProviderTest {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
-
-                new StaffRefDataController("RD-Caseworker-Ref-Api",staffRefDataServiceImpl)
+                staffRefDataController
+                //new StaffRefDataController("RD-Caseworker-Ref-Api",staffRefDataServiceImpl)
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -132,6 +140,8 @@ public class StaffReferenceDataServiceSkillsProviderTest {
 
     @State({"A list of staff ref data Service skills"})
     public void fetchListOfServiceSkills() throws JsonProcessingException {
+        StaffWorkerSkillResponse staffWorkerSkillResponse = getServiceSkills();
+        when(staffRefDataServiceImpl.getServiceSkills()).thenReturn(staffWorkerSkillResponse);
         List<Skill> skills = getSkillsData();
         when(skillRepository.findAll()).thenReturn(skills);
         //StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
@@ -173,7 +183,65 @@ public class StaffReferenceDataServiceSkillsProviderTest {
     }
 
 
+    public StaffWorkerSkillResponse getServiceSkills() {
+        List<Skill> skills = getSkillsData();
+        List<ServiceSkill> serviceSkills = new ArrayList<>();
 
+            List<SkillDTO> skillData = new ArrayList<>();
+            //skills = skillRepository.findAll();
+            Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
+            if(skillsOptional.isPresent()){
+                skillData = skills.stream().map(skill -> {
+                    SkillDTO skillDTO = new SkillDTO();
+                    skillDTO.setServiceId(skill.getServiceId());
+                    skillDTO.setSkillId(skill.getSkillId());
+                    skillDTO.setSkillCode(skill.getSkillCode());
+                    skillDTO.setUserType(skill.getUserType());
+                    skillDTO.setDescription(skill.getDescription());
+                    return skillDTO;
+                }).toList();
+
+                serviceSkills = mapSkillToServicesSkill(skillData);
+            }
+
+
+        StaffWorkerSkillResponse staffWorkerSkillResponse = new StaffWorkerSkillResponse();
+        staffWorkerSkillResponse.setServiceSkills(serviceSkills);
+        return staffWorkerSkillResponse;
+    }
+
+    public  List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData ){
+        //List<Skill> skills = getSkillsData();
+
+        Map<String, List<SkillDTO>> result = skillData.stream()
+                .collect(
+                        Collectors.toMap(
+                                skill -> skill.getServiceId(),
+                                skill -> Collections.singletonList(skill),
+                                this::mergeSkillsWithDuplicateServiceIds
+                        )
+                );
+
+
+        List<ServiceSkill> serviceSkills = new ArrayList<>();
+
+        result.forEach(
+                (key,value)->{
+                    serviceSkills.add(
+                            ServiceSkill.builder()
+                                    .id(key)
+                                    .skills(value).build());
+                }
+        );
+        return serviceSkills;
+
+    }
+    private  List<SkillDTO> mergeSkillsWithDuplicateServiceIds(List<SkillDTO> existingResults, List<SkillDTO> newResults) {
+        List<SkillDTO> mergedResults = new ArrayList<>();
+        mergedResults.addAll(existingResults);
+        mergedResults.addAll(newResults);
+        return mergedResults;
+    }
 }
 
 
