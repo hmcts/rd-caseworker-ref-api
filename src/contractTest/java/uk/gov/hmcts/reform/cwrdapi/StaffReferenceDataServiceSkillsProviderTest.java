@@ -75,7 +75,7 @@ import static org.mockito.Mockito.when;
 })
 
 @IgnoreNoPactsToVerify
-public class StaffReferenceDataProviderServiceSkillsTest {
+public class StaffReferenceDataServiceSkillsProviderTest {
 
     @MockBean
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
@@ -101,7 +101,7 @@ public class StaffReferenceDataProviderServiceSkillsTest {
     private static final String USER_ID2 = "234879";
 
 
-    @MockBean
+    @Mock
     private SkillRepository skillRepository;
 
     @MockBean
@@ -134,7 +134,7 @@ public class StaffReferenceDataProviderServiceSkillsTest {
     public void fetchListOfServiceSkills() throws JsonProcessingException {
         List<Skill> skills = getSkillsData();
         when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
+        //StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
 
     }
 
