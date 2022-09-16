@@ -64,16 +64,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
 
-    @MockBean
+    @InjectMocks
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
 
-    @MockBean
+    @InjectMocks
     private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
 
-    @MockBean
+    @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
 
-    @MockBean
+    @Mock
     private CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
 
     @MockBean
@@ -101,7 +101,6 @@ public class StaffReferenceDataProviderTest {
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
-        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
