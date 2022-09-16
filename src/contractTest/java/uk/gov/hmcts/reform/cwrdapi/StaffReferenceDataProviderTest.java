@@ -18,12 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
@@ -50,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mockito.ArgumentMatchers.any;
@@ -65,8 +60,6 @@ import static org.mockito.Mockito.when;
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
         host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
         @VersionSelector(tag = "master")})
-//@Import(CaseWorkerProviderTestConfiguration.class)
-//@SpringBootTest(properties = {"crd.publisher.caseWorkerDataPerMessage=1"})
 @IgnoreNoPactsToVerify
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
@@ -90,8 +83,6 @@ public class StaffReferenceDataProviderTest {
     SkillRepository skillRepository;
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
-    //@Autowired
-    //private DataSource ds;
 
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
