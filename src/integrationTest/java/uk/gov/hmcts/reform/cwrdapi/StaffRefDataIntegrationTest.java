@@ -38,7 +38,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_retrieveAllServiceSkills_return_status_code_200()
             throws JsonProcessingException {
         String path = "/skill";
-        String role = "cwd-system-user";
+        String role = "cwd-admin";
 
         final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
                 .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
