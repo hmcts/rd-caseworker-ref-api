@@ -12,6 +12,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
@@ -19,6 +24,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
+import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
 
 import java.util.ArrayList;
@@ -34,15 +40,20 @@ import static org.mockito.Mockito.when;
 @Provider("staff_referenceData_service_skills")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
         host = "${PACT_BROKER_URL:localhost}",
-        port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-        @VersionSelector(tag = "master")})
+        port = "${PACT_BROKER_PORT:9292}", consumerVersionSelectors = {
+        @VersionSelector(tag = "Dev")})
 
 @IgnoreNoPactsToVerify
+@ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataServiceSkillsProviderTest {
 
-    @MockBean
+    @Mock
+    SkillRepository skillRepository;
+    @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
 
+    //@InjectMocks
+    //StaffRefDataController staffRefDataController;
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
@@ -53,9 +64,11 @@ public class StaffReferenceDataServiceSkillsProviderTest {
 
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
+        MockitoAnnotations.openMocks(this);
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
+                //staffRefDataController
                 new StaffRefDataController("RD-Caseworker-Ref-Api",staffRefDataServiceImpl)
         );
         if (context != null) {
@@ -67,8 +80,10 @@ public class StaffReferenceDataServiceSkillsProviderTest {
 
     @State({"A list of staff ref data Service skills"})
     public void fetchListOfServiceSkills() throws JsonProcessingException {
-        StaffWorkerSkillResponse staffWorkerSkillResponse = getServiceSkills();
-        when(staffRefDataServiceImpl.getServiceSkills()).thenReturn(staffWorkerSkillResponse);
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.findAll()).thenReturn(skills);
+        //StaffWorkerSkillResponse staffWorkerSkillResponse = getServiceSkills();
+        //when(staffRefDataServiceImpl.getServiceSkills()).thenReturn(staffWorkerSkillResponse);
 
     }
 
