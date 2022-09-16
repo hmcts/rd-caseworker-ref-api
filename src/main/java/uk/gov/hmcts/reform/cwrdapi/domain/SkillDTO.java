@@ -8,20 +8,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonPropertyOrder({"skillId", "skillCode", "description","userType"})
+@JsonPropertyOrder({"skillId", "skillCode", "description", "userType"})
+@SuppressWarnings("AbbreviationAsWordInName")
 public class SkillDTO {
     @JsonIgnore
     private String serviceId;

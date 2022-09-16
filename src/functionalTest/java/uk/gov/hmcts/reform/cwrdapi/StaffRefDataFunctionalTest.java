@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest{
+public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     public static final String STAFF_REF_DATA_SKILL_URL = "/refdata/case-worker/skill";
     public static final String STAFF_REF_DATA_RD_STAFF_UI_KEY =
             "StaffRefDataController.retrieveAllServiceSkills";
@@ -36,8 +36,8 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest{
     @ExtendWith(FeatureToggleConditionExtension.class)
     public void should_return_service_skills_with_status_code_200_when_flag_true() {
 
-        Response fetchResponse = caseWorkerApiClient.
-                getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
+        Response fetchResponse = caseWorkerApiClient
+                .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
                 .get(STAFF_REF_DATA_SKILL_URL
                 )
                 .andReturn();
@@ -58,8 +58,8 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest{
     @ExtendWith(FeatureToggleConditionExtension.class)
     public void should_return_service_skills_with_status_code_200_when_flag_false() {
 
-        Response fetchResponse = caseWorkerApiClient.
-                getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
+        Response fetchResponse = caseWorkerApiClient
+                .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
                 .get(STAFF_REF_DATA_SKILL_URL
                 )
                 .andReturn();

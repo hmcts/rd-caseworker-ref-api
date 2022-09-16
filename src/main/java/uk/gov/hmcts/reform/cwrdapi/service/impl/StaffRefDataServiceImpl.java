@@ -5,11 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
-import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
@@ -22,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Value("${loggingComponentName}")
@@ -34,11 +33,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public StaffWorkerSkillResponse getServiceSkills() {
         List<Skill> skills = null;
         List<ServiceSkill> serviceSkills = new ArrayList<>();
-        try{
+        try {
             List<SkillDTO> skillData = new ArrayList<>();
             skills = skillRepository.findAll();
             Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
-            if(skillsOptional.isPresent()){
+            if (skillsOptional.isPresent()) {
                 skillData = skills.stream().map(skill -> {
                     SkillDTO skillDTO = new SkillDTO();
                     skillDTO.setServiceId(skill.getServiceId());
@@ -52,17 +51,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 serviceSkills = mapSkillToServicesSkill(skillData);
             }
 
-              } catch (Exception exp) {
-        log.error("{}:: StaffRefDataService getServiceSkills failed :: {}", loggingComponentName,
-                 exp);
-        throw exp;
-    }
+        } catch (Exception exp) {
+            log.error("{}:: StaffRefDataService getServiceSkills failed :: {}", loggingComponentName,
+                    exp);
+            throw exp;
+        }
         StaffWorkerSkillResponse staffWorkerSkillResponse = new StaffWorkerSkillResponse();
         staffWorkerSkillResponse.setServiceSkills(serviceSkills);
         return staffWorkerSkillResponse;
     }
 
-    public  List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData ){
+    public List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData) {
         //List<Skill> skills = getSkillsData();
 
         Map<String, List<SkillDTO>> result = skillData.stream()
@@ -78,17 +77,19 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<ServiceSkill> serviceSkills = new ArrayList<>();
 
         result.forEach(
-                (key,value)->{
+                (key, value) -> {
                     serviceSkills.add(
                             ServiceSkill.builder()
                                     .id(key)
                                     .skills(value).build());
                 }
         );
-return serviceSkills;
+        return serviceSkills;
 
     }
-    private  List<SkillDTO> mergeSkillsWithDuplicateServiceIds(List<SkillDTO> existingResults, List<SkillDTO> newResults) {
+
+    private List<SkillDTO> mergeSkillsWithDuplicateServiceIds(List<SkillDTO> existingResults,
+                                                              List<SkillDTO> newResults) {
         List<SkillDTO> mergedResults = new ArrayList<>();
         mergedResults.addAll(existingResults);
         mergedResults.addAll(newResults);

@@ -109,8 +109,8 @@ public class StaffReferenceDataProviderTest {
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
-                new StaffRefDataController("RD-Caseworker-Ref-Api"
-                        ,staffRefDataServiceImpl)
+                new StaffRefDataController("RD-Caseworker-Ref-Api",
+                        staffRefDataServiceImpl)
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -162,17 +162,17 @@ public class StaffReferenceDataProviderTest {
 
     }
 
-    private  List<Skill> getSkillsData(){
+    private  List<Skill> getSkillsData() {
         Skill skill1 = new Skill();
         skill1.setServiceId("BBA3");
-        skill1.setSkillId(1l);
+        skill1.setSkillId(1L);
         skill1.setSkillCode("A1");
         skill1.setDescription("desc1");
         skill1.setUserType("user_type1");
 
         Skill skill2 = new Skill();
         skill2.setServiceId("BBA3");
-        skill2.setSkillId(3l);
+        skill2.setSkillId(3L);
         skill2.setSkillCode("A3");
         skill2.setDescription("desc3");
         skill2.setUserType("user_type3");
@@ -180,14 +180,14 @@ public class StaffReferenceDataProviderTest {
 
         Skill skill3 = new Skill();
         skill3.setServiceId("ABA1");
-        skill3.setSkillId(2l);
+        skill3.setSkillId(2L);
         skill3.setSkillCode("A2");
         skill3.setDescription("desc2");
         skill3.setUserType("user_type2");
 
         Skill skill4 = new Skill();
         skill4.setServiceId("ABA1");
-        skill4.setSkillId(4l);
+        skill4.setSkillId(4L);
         skill4.setSkillCode("A4");
         skill4.setDescription("desc4");
         skill4.setUserType("user_type4");

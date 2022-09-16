@@ -1,19 +1,17 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 
 @Entity(name = "skill")
 @Getter

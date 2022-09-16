@@ -91,13 +91,13 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public Object retrieveAllServiceSkills(Class<?> clazz,
-                                               String path, String role) throws JsonProcessingException {
-        ResponseEntity<Object> responseEntity = getRequest(path , clazz, role,null);
+                                           String path, String role) throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequest(path, clazz, role);
         return mapServiceSkillsIdResponse(responseEntity, clazz);
     }
 
     private Object mapServiceSkillsIdResponse(ResponseEntity<Object> responseEntity,
-                                                   Class<?> clazz) throws JsonProcessingException {
+                                              Class<?> clazz) throws JsonProcessingException {
         HttpStatus status = responseEntity.getStatusCode();
 
         if (status.is2xxSuccessful()) {
@@ -115,18 +115,11 @@ public class CaseWorkerReferenceDataClient {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private ResponseEntity<Object> getRequest(String uriPath, Class clasz, String role, Object... params) {
+    private ResponseEntity<Object> getRequest(String uriPath, Class clasz, String role) {
 
         ResponseEntity<Object> responseEntity;
         try {
             HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeadersWithoutContentType(role, null));
- /*           responseEntity = restTemplate.exchange(
-                    baseUrl + uriPath,
-                    HttpMethod.GET,
-                    request,
-                    clasz,
-                    params
-            );*/
 
             responseEntity = restTemplate.exchange(
                     baseUrl + uriPath,
