@@ -79,6 +79,7 @@ public class StaffReferenceDataProviderTest {
     @MockBean
     private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
+
     @Mock
     SkillRepository skillRepository;
     @InjectMocks
