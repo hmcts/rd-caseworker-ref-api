@@ -80,13 +80,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
         List<ServiceSkill> serviceSkills = new ArrayList<>();
-
         result.forEach(
                 (key, value) -> {
-                    serviceSkills.add(
-                            ServiceSkill.builder()
-                                    .id(key)
-                                    .skills(value).build());
+                    ServiceSkill serviceSkill = new ServiceSkill();
+                    serviceSkill.setId(key);
+                    serviceSkill.setSkills(value);
+                    serviceSkills.add(serviceSkill);
                 }
         );
         return serviceSkills;
