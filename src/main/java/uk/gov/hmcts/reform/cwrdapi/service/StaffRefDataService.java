@@ -5,5 +5,9 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse
 
 @Service
 public interface StaffRefDataService {
+    /**
+     * Get List of Service skills.
+     * @return StaffWorkerSkillResponse
+     */
     StaffWorkerSkillResponse getServiceSkills();
 }

@@ -61,6 +61,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return staffWorkerSkillResponse;
     }
 
+    /**
+     * To convert skills data to ServiceSkills.
+     * @param skillData List of skills
+     * @return List of ServiceSkill
+     */
     public List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData) {
         //List<Skill> skills = getSkillsData();
 
