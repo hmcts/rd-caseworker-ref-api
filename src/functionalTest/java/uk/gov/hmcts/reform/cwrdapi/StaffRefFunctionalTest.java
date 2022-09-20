@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.caseWorkerApiClient;
 
 import groovy.util.logging.Slf4j;
@@ -55,7 +55,7 @@ public class StaffRefFunctionalTest {
         String SEARCH_STRING = "cwr";
 
         Response fetchResponse = caseWorkerApiClient
-            .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
+            .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
             .get(CASE_WORKER_PROFILE_URL + "/search-by-name?" + SEARCH_STRING)
             .andReturn();
         fetchResponse.then()
