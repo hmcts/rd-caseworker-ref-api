@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
@@ -23,7 +22,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 @RequestMapping(
@@ -88,24 +85,16 @@ public class StaffRefDataController {
     @Validated
     @GetMapping(path = "/profile/search-by-name",
                 produces = APPLICATION_JSON_VALUE)
-//    @Secured("staff-admin")
+    @Secured("cwd-admin")
     public ResponseEntity<Object> searchStaffUserByName(
         @RequestHeader(name = "page-number", required = false) Integer pageNumber,
         @RequestHeader(name = "page-size", required = false) Integer pageSize,
         @RequestParam(value = "search") @NotEmpty @NotNull String searchString) {
 
         validateSearchString(removeEmptySpaces(searchString));
-        PageRequest pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize, configPageNumber);
+        var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize, configPageNumber);
 
-        List<SearchStaffUserResponse> searchResponse =
-            caseWorkerService.retrieveStaffUserByName(searchString, pageRequest);
-        int totalRecords = searchResponse.size();
-
-        //if no data found return 200 with empty response
-        return ResponseEntity
-            .status(200)
-            .header("total-records",String.valueOf(totalRecords))
-            .body(searchResponse);
+        return caseWorkerService.retrieveStaffUserByName(searchString, pageRequest);
     }
 
 }

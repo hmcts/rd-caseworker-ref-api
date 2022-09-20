@@ -149,3 +149,7 @@ launchdarkly:
 refresh:
   pageSize: ${REFRESH_PAGE_SIZE:20}
   sortColumn: ${REFRESH_SORT_COLUMN:caseWorkerId}
+
+search:
+  pageSize: ${REFRESH_PAGE_SIZE:20}
+  pageNumber: ${REFRESH_PAGE_NUMBER:1}

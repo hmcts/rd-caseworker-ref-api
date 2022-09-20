@@ -117,6 +117,6 @@ public class RequestUtils {
 
         return PageRequest.of((Objects.isNull(pageNumber) ? configPageNumber : pageNumber) - 1,
             Objects.isNull(pageSize) ? configPageSize : pageSize,
-            Sort.by(Sort.DEFAULT_DIRECTION, CW_FIRST_NAME, CW_LAST_NAME));
+            Sort.by(Sort.DEFAULT_DIRECTION, CW_LAST_NAME, CW_FIRST_NAME));
     }
 }

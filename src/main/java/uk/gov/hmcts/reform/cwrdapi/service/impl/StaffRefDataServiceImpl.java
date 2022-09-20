@@ -6,7 +6,9 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
@@ -31,10 +33,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     CaseWorkerProfileRepository caseWorkerProfileRepo;
 
     @Override
-    public List<SearchStaffUserResponse> retrieveStaffUserByName(String searchString, PageRequest pageRequest) {
+    public ResponseEntity<Object> retrieveStaffUserByName(String searchString, PageRequest pageRequest) {
 
-        List<CaseWorkerProfile> caseWorkerProfiles =
-            caseWorkerProfileRepo.findByFirstNameOrLastName(searchString, pageRequest).getContent();
+        Page<CaseWorkerProfile> pageable =
+            caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest);
+        long totalRecords = pageable.getTotalElements();
+
+        List<CaseWorkerProfile> caseWorkerProfiles = pageable.getContent();
 
         List<SearchStaffUserResponse> searchResponse = new ArrayList<>();
 
@@ -42,7 +47,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
            searchResponse = mapCaseWorkerProfilesToSearchResponse(caseWorkerProfiles);
         }
 
-        return searchResponse;
+        return ResponseEntity
+            .status(200)
+            .header("total-records",String.valueOf(totalRecords))
+            .body(searchResponse);
     }
 
     private List<SearchStaffUserResponse> mapCaseWorkerProfilesToSearchResponse(List<CaseWorkerProfile>
