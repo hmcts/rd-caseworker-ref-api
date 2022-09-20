@@ -72,6 +72,9 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     @Column(name = "task_supervisor")
     private Boolean taskSupervisor;
 
+    @Column(name = "user_admin")
+    private Boolean userAdmin;
+
     @CreationTimestamp
     @Column(name = "created_date")
     private LocalDateTime createdDate;
@@ -93,6 +96,10 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = CaseWorkerRole.class, mappedBy = "caseWorkerProfile", cascade = ALL, orphanRemoval = true)
     private List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
+
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = Skill.class, mappedBy = "caseWorkerProfile", cascade = ALL, orphanRemoval = true)
+    private List<Skill> caseWorkerSkills = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_type_id", referencedColumnName = "user_type_id",
