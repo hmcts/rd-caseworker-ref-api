@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileUpdateRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
@@ -768,7 +768,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     }
 
     // creating user profile request
-    public UserProfileCreationRequest createUserProfileRequest(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
+    public UserProfileUpdateRequest createUserProfileRequest(CaseWorkersProfileCreationRequest cwrdProfileRequest) {
 
         Set<String> userRoles = cwrdProfileRequest.getIdamRoles() != null ? cwrdProfileRequest.getIdamRoles() :
                 new HashSet<>();
@@ -778,7 +778,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             userRoles.addAll(idamRoles);
         }
         //Creating user profile request
-        return new UserProfileCreationRequest(
+        return new UserProfileUpdateRequest(
                 cwrdProfileRequest.getEmailId(),
                 cwrdProfileRequest.getFirstName(),
                 cwrdProfileRequest.getLastName(),

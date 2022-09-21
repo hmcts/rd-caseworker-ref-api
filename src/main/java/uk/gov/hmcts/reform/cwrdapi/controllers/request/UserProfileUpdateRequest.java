@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @Getter
 @Builder(builderMethodName = "anUserProfileCreationRequest")
-public class UserProfileCreationRequest  {
+public class UserProfileUpdateRequest {
 
     private String email;
 
@@ -38,14 +38,14 @@ public class UserProfileCreationRequest  {
     private boolean resendInvite;
 
     @JsonCreator
-    public UserProfileCreationRequest(@JsonProperty(value = "email") String email,
-                                      @JsonProperty(value = "firstName") String firstName,
-                                      @JsonProperty(value = "lastName") String lastName,
-                                      @JsonProperty(value = "languagePreference") LanguagePreference languagePreference,
-                                      @JsonProperty(value = "userCategory") UserCategory userCategory,
-                                      @JsonProperty(value = "userType") UserTypeRequest userType,
-                                      @JsonProperty(value = "roles") Set<String> roles,
-                                      @JsonProperty(value = "resendInvite") boolean resendInvite) {
+    public UserProfileUpdateRequest(@JsonProperty(value = "email") String email,
+                                    @JsonProperty(value = "firstName") String firstName,
+                                    @JsonProperty(value = "lastName") String lastName,
+                                    @JsonProperty(value = "languagePreference") LanguagePreference languagePreference,
+                                    @JsonProperty(value = "userCategory") UserCategory userCategory,
+                                    @JsonProperty(value = "userType") UserTypeRequest userType,
+                                    @JsonProperty(value = "roles") Set<String> roles,
+                                    @JsonProperty(value = "resendInvite") boolean resendInvite) {
 
         this.email = email;
         this.firstName = firstName;

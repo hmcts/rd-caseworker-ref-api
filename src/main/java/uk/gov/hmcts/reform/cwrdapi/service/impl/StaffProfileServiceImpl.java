@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileUpdateRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
@@ -172,7 +172,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         Response response = null;
         Object clazz;
         try {
-            response = userProfileFeignClient.createUserProfile(createUserProfileRequest(staffProfileRequest), SRD);
+            response = userProfileFeignClient.createUserProfile(updateUserProfileRequest(staffProfileRequest), SRD);
 
             clazz = (response.status() == 201 || response.status() == 409)
                     ? UserProfileCreationResponse.class : ErrorResponse.class;
@@ -200,8 +200,8 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         return processedCwProfiles;
     }
 
-    // creating user profile request
-    public UserProfileCreationRequest createUserProfileRequest(StaffProfileCreationRequest profileRequest) {
+    // creating user profile update request
+    public UserProfileUpdateRequest updateUserProfileRequest(StaffProfileCreationRequest profileRequest) {
 
         Set<String> userRoles = new HashSet<>();
         userRoles.add(ROLE_CWD_USER);
@@ -212,8 +212,8 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         if (isNotEmpty(idamRoles)) {
             userRoles.addAll(idamRoles);
         }
-        //Creating user profile request
-        return new UserProfileCreationRequest(
+        //Creating user profile update request
+        return new UserProfileUpdateRequest(
                 profileRequest.getEmailId(),
                 profileRequest.getFirstName(),
                 profileRequest.getLastName(),
