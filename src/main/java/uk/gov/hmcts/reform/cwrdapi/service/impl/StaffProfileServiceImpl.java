@@ -120,8 +120,8 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         StaffProfileCreationResponse response;
         try {
 
-            checkStaffProfileEmail(profileRequest.getEmailId());
-            newCaseWorkerProfiles = updateCaseWorkerProfile(profileRequest);
+            CaseWorkerProfile dbCaseWorkerProfile = checkStaffProfileEmail(profileRequest.getEmailId());
+            newCaseWorkerProfiles = updateCaseWorkerProfile(profileRequest,dbCaseWorkerProfile);
             newCaseWorkerProfiles.setNew(true);
 
             // persist in db
@@ -139,19 +139,21 @@ public class StaffProfileServiceImpl implements StaffProfileService {
 
 
 
-    private void checkStaffProfileEmail(String emailId) {
+    private CaseWorkerProfile checkStaffProfileEmail(String emailId) {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(emailId);
 
         if (caseWorkerProfile != null) {
-            //throw new StaffReferenceException(HttpStatus.BAD_REQUEST, errorResponse.getErrorMessage(),
-            //        errorResponse.getErrorDescription());
+            return caseWorkerProfile;
+        } else {
+            return null;
         }
     }
 
-    public CaseWorkerProfile updateCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
-        CaseWorkerProfile caseWorkerProfile = null;
+    public CaseWorkerProfile updateCaseWorkerProfile(StaffProfileCreationRequest profileRequest,
+                                                     CaseWorkerProfile caseWorkerProfile) {
+        // CaseWorkerProfile caseWorkerProfile = null;
         //User Profile Call
         ResponseEntity<Object> responseEntity = updateUserProfileInIdamUP(profileRequest);
         if (nonNull(responseEntity) && (responseEntity.getStatusCode().is2xxSuccessful()
