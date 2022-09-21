@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class StaffRefDataUserTypeControllerTest {
+class StaffRefDataControllerTest {
 
     StaffRefDataService staffRefDataServiceMock;
     StaffRefDataUserTypesResponse srResponse;
