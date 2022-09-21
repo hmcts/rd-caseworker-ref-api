@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -142,19 +141,6 @@ public class CaseWorkerRefController {
                 .body(idamRolesMappingResponse);
     }
 
-
-    @PutMapping(
-            path = "/refdata/case-worker/profile",
-            consumes = APPLICATION_JSON_VALUE,
-            produces = APPLICATION_JSON_VALUE
-    )
-    @Secured("cwd-admin")
-    public ResponseEntity<Object> updateStaff(@RequestBody List<ServiceRoleMapping>
-                                                                serviceRoleMappings) {
-        //TODO copy existing functionlity
-        return null;
-
-    }
 
 
 
