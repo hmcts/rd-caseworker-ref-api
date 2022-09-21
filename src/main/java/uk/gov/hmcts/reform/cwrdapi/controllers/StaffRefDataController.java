@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -73,7 +73,7 @@ public class StaffRefDataController {
                     message = INTERNAL_SERVER_ERROR
             )
     })
-    @PostMapping(
+    @PutMapping (
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE,
             path = {"/profile"}
@@ -81,9 +81,9 @@ public class StaffRefDataController {
     //@Secured("staff-admin")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<StaffProfileCreationResponse> createStaffUserProfile(@RequestBody StaffProfileCreationRequest
+    public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfile(@RequestBody StaffProfileCreationRequest
                                                                                staffProfileCreationRequest) {
-        log.debug("Inside createStaffUserProfile Controller");
+        log.debug("Inside updateStaffUserProfile Controller");
         StaffProfileCreationResponse response = null;
 
         response = staffProfileService.processStaffProfile(staffProfileCreationRequest);
