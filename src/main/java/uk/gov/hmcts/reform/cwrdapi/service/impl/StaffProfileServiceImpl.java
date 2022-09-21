@@ -113,7 +113,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
 
 
     @Override
-    public StaffProfileCreationResponse processStaffProfile(StaffProfileCreationRequest profileRequest) {
+    public StaffProfileCreationResponse processStaffProfileUpdate(StaffProfileCreationRequest profileRequest) {
 
         CaseWorkerProfile newCaseWorkerProfiles;
         CaseWorkerProfile processedCwProfiles;
@@ -121,7 +121,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         try {
 
             checkStaffProfileEmail(profileRequest.getEmailId());
-            newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
+            newCaseWorkerProfiles = updateCaseWorkerProfile(profileRequest);
             newCaseWorkerProfiles.setNew(true);
 
             // persist in db
@@ -144,16 +144,16 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(emailId);
 
-        if (caseWorkerProfile == null) {
+        if (caseWorkerProfile != null) {
             //throw new StaffReferenceException(HttpStatus.BAD_REQUEST, errorResponse.getErrorMessage(),
             //        errorResponse.getErrorDescription());
         }
     }
 
-    public CaseWorkerProfile createCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
+    public CaseWorkerProfile updateCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
         CaseWorkerProfile caseWorkerProfile = null;
         //User Profile Call
-        ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
+        ResponseEntity<Object> responseEntity = updateUserProfileInIdamUP(profileRequest);
         if (nonNull(responseEntity) && (responseEntity.getStatusCode().is2xxSuccessful()
                 || responseEntity.getStatusCode() == CONFLICT) && nonNull(responseEntity.getBody())) {
 
@@ -166,7 +166,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         return caseWorkerProfile;
     }
 
-    public ResponseEntity<Object> createUserProfileInIdamUP(StaffProfileCreationRequest staffProfileRequest) {
+    public ResponseEntity<Object> updateUserProfileInIdamUP(StaffProfileCreationRequest staffProfileRequest) {
 
         ResponseEntity<Object> responseEntity;
         Response response = null;
@@ -194,7 +194,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
 
         if (caseWorkerProfile.isNew()) {
             processedCwProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
-            log.info("{}:: {} case worker profiles inserted ::", loggingComponentName,
+            log.info("{}:: {} case worker profiles Updated ::", loggingComponentName,
                     processedCwProfiles, validationServiceFacade.getAuditJobId());
         }
         return processedCwProfiles;

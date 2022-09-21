@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface StaffProfileService {
 
-    StaffProfileCreationResponse processStaffProfile(StaffProfileCreationRequest staffProfileRequest);
+    StaffProfileCreationResponse processStaffProfileUpdate(StaffProfileCreationRequest staffProfileRequest);
 
     /**
      * Prepare caseworker data to be published as a message to topic.

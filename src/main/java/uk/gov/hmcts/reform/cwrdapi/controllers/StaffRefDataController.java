@@ -86,7 +86,7 @@ public class StaffRefDataController {
         log.debug("Inside updateStaffUserProfile Controller");
         StaffProfileCreationResponse response = null;
 
-        response = staffProfileService.processStaffProfile(staffProfileCreationRequest);
+        response = staffProfileService.processStaffProfileUpdate(staffProfileCreationRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
