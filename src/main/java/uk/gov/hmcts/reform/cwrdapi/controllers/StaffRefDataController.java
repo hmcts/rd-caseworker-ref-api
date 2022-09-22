@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.*;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 
 @RequestMapping(
         path = "/refdata/case-worker"
@@ -87,10 +89,10 @@ public class StaffRefDataController {
                     .collect(Collectors.toList());
             staffReferenceDataUserTypesResponseBuilder.userTypes(refDataUserTypes);
             log.debug("refDataUserTypes = {}", refDataUserTypes);
-            return   ResponseEntity
+            return ResponseEntity
                     .status(200)
                     .body(staffReferenceDataUserTypesResponseBuilder.build());
-        }else{
+        } else {
             log.error("Record not found ");
             return ResponseEntity.status(404).body(userTypes);
         }

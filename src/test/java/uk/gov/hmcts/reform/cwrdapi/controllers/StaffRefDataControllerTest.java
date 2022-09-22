@@ -18,7 +18,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StaffRefDataControllerTest {
@@ -29,7 +32,7 @@ class StaffRefDataControllerTest {
     @InjectMocks
     private StaffRefDataController staffRefDataController;
 
-    List<UserType> userTypes=null;
+    List<UserType> userTypes = null;
 
     @BeforeEach
     void setUp() {
@@ -43,8 +46,8 @@ class StaffRefDataControllerTest {
         responseEntity = new ResponseEntity<>(srResponse, null, HttpStatus.OK);
 
         userTypes = new ArrayList<>();
-        userTypes.add(new UserType(1L,"Test"));
-        userTypes.add(new UserType(2L,"Test 2"));
+        userTypes.add(new UserType(1L, "Test"));
+        userTypes.add(new UserType(2L, "Test 2"));
 
         srResponse = StaffRefDataUserTypesResponse
                 .builder()

@@ -14,7 +14,7 @@ import java.util.List;
 public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Autowired
-    UserTypeRepository userTypeRepository;
+    private UserTypeRepository userTypeRepository;
 
     @Override
     public List<UserType> fetchUserTypes() {

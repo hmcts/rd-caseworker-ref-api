@@ -29,9 +29,9 @@ class StaffRefDataServiceTest {
     @SuppressWarnings("unchecked")
     void testFetchUserType_All() {
         when(userTypeRepository.findAll())
-            .thenReturn(prepareUserTypeResponse());
-        var userTypes =  staffRefDataService
-            .fetchUserTypes();
+                .thenReturn(prepareUserTypeResponse());
+        var userTypes = staffRefDataService
+                .fetchUserTypes();
         verifyAllUserTypes(userTypes);
     }
 
@@ -40,7 +40,7 @@ class StaffRefDataServiceTest {
     void testFetchUserType_one() {
         when(userTypeRepository.findAll()).thenReturn(prepareUserTypeResponse());
         var staffRefDataUserTypesResponses = (List<UserType>) staffRefDataService
-            .fetchUserTypes();
+                .fetchUserTypes();
         assertFalse(verifyCurrentUserTypes(staffRefDataUserTypesResponses.get(0)));
     }
 
@@ -57,10 +57,10 @@ class StaffRefDataServiceTest {
 
     private List<UserType> prepareUserTypeResponse() {
         var userTypeArrayList = new ArrayList<UserType>();
-        userTypeArrayList.add(new UserType(1L,"User Type 1"));
-        userTypeArrayList.add(new UserType(2L,"User Type 2"));
-        userTypeArrayList.add(new UserType(3L,"User Type 3"));
-        userTypeArrayList.add(new UserType(4L,"User Type 4"));
+        userTypeArrayList.add(new UserType(1L, "User Type 1"));
+        userTypeArrayList.add(new UserType(2L, "User Type 2"));
+        userTypeArrayList.add(new UserType(3L, "User Type 3"));
+        userTypeArrayList.add(new UserType(4L, "User Type 4"));
 
         return userTypeArrayList;
     }
@@ -73,6 +73,6 @@ class StaffRefDataServiceTest {
     }
 
     private boolean verifyCurrentUserTypes(UserType userType) {
-        return userType.getUserTypeId()==null || userType.getDescription()==null;
+        return userType.getUserTypeId() == null || userType.getDescription() == null;
     }
 }

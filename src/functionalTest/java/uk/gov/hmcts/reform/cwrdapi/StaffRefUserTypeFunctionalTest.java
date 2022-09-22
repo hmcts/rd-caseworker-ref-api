@@ -71,7 +71,7 @@ class StaffRefUserTypeFunctionalTest extends AuthorizationFunctionalTest {
                 caseWorkerApiClient.fetchUserType(
                 HttpStatus.OK
             );
-        assertTrue(responses.getUserTypes().size()>0);
+        assertTrue(responses.getUserTypes().size() > 0);
     }
 
     @Test
