@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -119,16 +120,22 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return serviceResponses;
     }
 
-    private List<SkillResponse> mapSkillsToDto(List<Skill> caseWorkerSkills) {
-        List<SkillResponse> skills = new ArrayList<>();
-        for (Skill caseWorkerSkill : caseWorkerSkills) {
-            var skill = SkillResponse.builder()
-                .skillId(caseWorkerSkill.getSkillId())
-                .description(caseWorkerSkill.getDescription())
-                .build();
+    private List<SkillResponse> mapSkillsToDto(List<CaseWorkerSkill> caseWorkerSkills) {
 
-            skills.add(skill);
-        }
+        List<SkillResponse> skills = new ArrayList<>();
+        caseWorkerSkills.forEach(caseWorkerSkill -> {
+
+            for (Skill skill : caseWorkerSkill.getSkills()) {
+                var skillResponse = SkillResponse.builder()
+                        .skillId(skill.getSkillId())
+                        .description(skill.getDescription())
+                        .build();
+
+                skills.add(skillResponse);
+            }
+        });
+
+
         return skills;
     }
 }

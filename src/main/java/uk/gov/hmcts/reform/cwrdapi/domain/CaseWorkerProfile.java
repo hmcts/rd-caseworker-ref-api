@@ -98,8 +98,8 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     private List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Skill.class, mappedBy = "caseWorkerProfile", cascade = ALL, orphanRemoval = true)
-    private List<Skill> caseWorkerSkills = new ArrayList<>();
+    @OneToMany(targetEntity = CaseWorkerSkill.class, mappedBy = "caseWorkerProfile", cascade = ALL, orphanRemoval = true)
+    private List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_type_id", referencedColumnName = "user_type_id",
