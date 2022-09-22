@@ -72,7 +72,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldReturn401WhenAuthenticationInvalid() {
+    public void should_return_401_when_authentication_invalid() {
         Response response = caseWorkerApiClient.withUnauthenticatedRequest()
                 .get(STAFF_REF_DATA_SKILL_URL)
                 .andReturn();
@@ -84,7 +84,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldReturn404WhenNoSkillsFound() {
+    public void should_return_200_when_no_skills_found() {
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
                 .get(STAFF_REF_DATA_SKILL_URL)
                 .andReturn();

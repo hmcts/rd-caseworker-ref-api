@@ -67,7 +67,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
      * @return List of ServiceSkill
      */
     public List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData) {
-        //List<Skill> skills = getSkillsData();
 
         Map<String, List<SkillDTO>> result = skillData.stream()
                 .collect(

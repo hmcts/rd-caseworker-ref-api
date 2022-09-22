@@ -36,8 +36,8 @@ public class StaffRefDataController {
     StaffRefDataService staffRefDataService;
 
     @ApiOperation(
-            value = "Staff Ui API is used  to retrieve the service specific skills ",
-            notes = "This API will be invoked by user having organisational role of staff-admin",
+            value = "This API is used to retrieve the service specific skills ",
+            notes = "This API will be invoked by user having idam role of staff-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
