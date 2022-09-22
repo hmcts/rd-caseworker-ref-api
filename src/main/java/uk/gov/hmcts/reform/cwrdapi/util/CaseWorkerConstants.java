@@ -150,4 +150,12 @@ public final class CaseWorkerConstants {
 
     public static final String LRD_ERROR = "An error occurred while retrieving data from Location Reference Data";
     public static final String SRD = "SRD";
+
+
+    public static final String CW_FIRST_NAME = "firstName";
+
+    public static final String CW_LAST_NAME = "lastName";
+
+
+    public static final String SEARCH_STRING_REGEX_PATTERN = "([a-zA-Z\\-\\s']){3,}+";
 }
