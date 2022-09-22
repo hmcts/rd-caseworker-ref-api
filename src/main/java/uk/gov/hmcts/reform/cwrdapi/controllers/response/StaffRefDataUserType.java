@@ -13,8 +13,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@EqualsAndHashCode
 public class StaffRefDataUserType {
 
     @JsonProperty("id")
