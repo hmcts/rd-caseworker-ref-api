@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
@@ -30,12 +31,15 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -75,6 +79,12 @@ public class StaffReferenceDataProviderTest {
     @MockBean
     private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
+
+    @Mock
+    SkillRepository skillRepository;
+    @InjectMocks
+    private StaffRefDataServiceImpl staffRefDataServiceImpl;
+
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
 
@@ -98,7 +108,9 @@ public class StaffReferenceDataProviderTest {
                         "preview", caseWorkerServiceImpl, caseWorkerDeleteServiceImpl),
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
-                        caseWorkerServiceImpl)
+                        caseWorkerServiceImpl),
+                new StaffRefDataController("RD-Caseworker-Ref-Api",
+                        staffRefDataServiceImpl)
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -143,6 +155,46 @@ public class StaffReferenceDataProviderTest {
         doReturn(page).when(caseWorkerProfileRepo).findByServiceCodeIn(anySet(), any());
     }
 
+    @State({"A list of staff ref data Service skills"})
+    public void fetchListOfServiceSkills() throws JsonProcessingException {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.findAll()).thenReturn(skills);
+
+    }
+
+    private  List<Skill> getSkillsData() {
+        Skill skill1 = new Skill();
+        skill1.setServiceId("BBA3");
+        skill1.setSkillId(1L);
+        skill1.setSkillCode("A1");
+        skill1.setDescription("desc1");
+        skill1.setUserType("user_type1");
+
+        Skill skill2 = new Skill();
+        skill2.setServiceId("BBA3");
+        skill2.setSkillId(3L);
+        skill2.setSkillCode("A3");
+        skill2.setDescription("desc3");
+        skill2.setUserType("user_type3");
+
+
+        Skill skill3 = new Skill();
+        skill3.setServiceId("ABA1");
+        skill3.setSkillId(2L);
+        skill3.setSkillCode("A2");
+        skill3.setDescription("desc2");
+        skill3.setUserType("user_type2");
+
+        Skill skill4 = new Skill();
+        skill4.setServiceId("ABA1");
+        skill4.setSkillId(4L);
+        skill4.setSkillCode("A4");
+        skill4.setDescription("desc4");
+        skill4.setUserType("user_type4");
+
+        List<Skill> skills = List.of(skill1,skill2,skill3,skill4);
+        return  skills;
+    }
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
         LocalDateTime timeNow = LocalDateTime.now();

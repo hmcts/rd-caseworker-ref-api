@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,17 +12,21 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+
 @Entity(name = "skill")
 @Getter
 @Setter
 @NoArgsConstructor
+
 @AllArgsConstructor
+
 public class Skill implements Serializable {
 
     @Id
@@ -52,9 +57,9 @@ public class Skill implements Serializable {
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "skill_id", referencedColumnName = "skill_id",
-          //  insertable = false, updatable = false, nullable = false)
     @JoinColumn(name = "skill_id",insertable = false, updatable = false, nullable = false)
     private CaseWorkerSkill caseWorkerSkill;
+
 }
