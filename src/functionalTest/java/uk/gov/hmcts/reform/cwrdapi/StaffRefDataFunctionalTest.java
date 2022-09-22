@@ -81,17 +81,4 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
                 .statusCode(401);
     }
 
-    @Test
-    @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    public void should_return_200_when_no_skills_found() {
-        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
-                .get(STAFF_REF_DATA_SKILL_URL)
-                .andReturn();
-        fetchResponse.then()
-                .assertThat()
-                .statusCode(200);
-    }
-
-
 }
