@@ -184,6 +184,42 @@ public class CaseWorkerReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public Map<String, Object> searchStaffUserByName(String path,String searchString, Integer pageSize,
+
+                                                                 Integer pageNumber,  String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(path)
+                .append("/usersByServiceName");
+        if (StringUtils.isNotBlank(searchString)) {
+            stringBuilder.append("?search=");
+            stringBuilder.append(searchString);
+        }
+
+
+        ResponseEntity<Map> responseEntity;
+        HttpEntity<String> request =
+                new HttpEntity<>(getMultipleAuthHeadersWithoutContentType(role, null));
+
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl  + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    Map.class
+            );
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
 
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
