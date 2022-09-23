@@ -86,7 +86,7 @@ public class StaffRefDataController {
         if (ObjectUtils.isNotEmpty(userTypes)) {
             List<StaffRefDataUserType> refDataUserTypes = userTypes.stream()
                     .map(StaffRefDataUserType::new)
-                    .collect(Collectors.toList());
+                    .toList();
             staffReferenceDataUserTypesResponseBuilder.userTypes(refDataUserTypes);
             log.debug("refDataUserTypes = {}", refDataUserTypes);
             return ResponseEntity
