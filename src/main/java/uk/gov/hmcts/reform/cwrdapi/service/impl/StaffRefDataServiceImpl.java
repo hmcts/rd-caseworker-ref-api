@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,26 +7,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
-import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
-
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.ArrayList;
@@ -53,7 +46,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
     @Override
-    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffUserByName(String searchString, PageRequest pageRequest) {
+    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffUserByName(String searchString,
+                                                                                 PageRequest pageRequest) {
 
         Page<CaseWorkerProfile> pageable =
             caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest);
@@ -64,7 +58,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<SearchStaffUserResponse> searchResponse = new ArrayList<>();
 
         if (!caseWorkerProfiles.isEmpty()) {
-           searchResponse = mapCaseWorkerProfilesToSearchResponse(caseWorkerProfiles);
+            searchResponse = mapCaseWorkerProfilesToSearchResponse(caseWorkerProfiles);
         }
 
         return ResponseEntity

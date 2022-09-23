@@ -5,7 +5,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
@@ -17,7 +16,6 @@ import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 
@@ -77,7 +75,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
                 .searchStaffUserByName(path,searchString,0,20,role);
 
         assertThat(response).containsEntry("http_status", "400");
-        assertThat(response.get("response_body").toString()).contains(PAGE_SIZE +" is invalid");
+        assertThat(response.get("response_body").toString()).contains(PAGE_SIZE + " is invalid");
 
     }
 
@@ -92,7 +90,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
                 .searchStaffUserByName(path,searchString,1,0,role);
 
         assertThat(response).containsEntry("http_status", "400");
-        assertThat(response.get("response_body").toString()).contains(PAGE_NUMBER +" is invalid");
+        assertThat(response.get("response_body").toString()).contains(PAGE_NUMBER + " is invalid");
 
     }
 

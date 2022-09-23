@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
 import java.util.ArrayList;

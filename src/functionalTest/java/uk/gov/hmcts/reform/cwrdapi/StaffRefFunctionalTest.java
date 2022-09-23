@@ -1,13 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
-import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.caseWorkerApiClient;
-
 import groovy.util.logging.Slf4j;
 import io.restassured.response.Response;
 import net.thucydides.core.annotations.WithTag;
@@ -21,11 +13,18 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.caseWorkerApiClient;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @WithTags({@WithTag("testType:Functional")})
@@ -52,11 +51,11 @@ public class StaffRefFunctionalTest {
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
         caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
-        String SEARCH_STRING = "cwr";
+        String searchString = "cwr";
 
         Response fetchResponse = caseWorkerApiClient
             .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
-            .get(CASE_WORKER_PROFILE_URL + "/search-by-name?" + SEARCH_STRING)
+            .get(CASE_WORKER_PROFILE_URL + "/search-by-name?" + searchString)
             .andReturn();
         fetchResponse.then()
             .assertThat()
@@ -65,8 +64,8 @@ public class StaffRefFunctionalTest {
         List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
             fetchResponse.getBody().as(SearchStaffUserResponse[].class));
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
-        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains(SEARCH_STRING);
-        assertThat(searchStaffUserResponse.get(0).getLastName()).contains(SEARCH_STRING);
+        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains(searchString);
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains(searchString);
 
     }
 

@@ -7,10 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
@@ -31,11 +29,9 @@ import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
-import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -115,7 +111,7 @@ public class StaffRefDataServiceImplTest {
     }
 
     @Test
-    void should_return_case_worker_profile_with_status_code_200(){
+    void should_return_case_worker_profile_with_status_code_200() {
 
         var pageRequest =
                 validateAndBuildPagination(20, 1,
@@ -130,7 +126,7 @@ public class StaffRefDataServiceImplTest {
         when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
-                staffRefDataServiceImpl.retrieveStaffUserByName(searchString,pageRequest);
+                staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
         List<SearchStaffUserResponse> searchResponse =
@@ -139,7 +135,7 @@ public class StaffRefDataServiceImplTest {
         validateSearchStaffUserResponses(searchResponse);
     }
 
-    void validateSearchStaffUserResponses(List< SearchStaffUserResponse > searchResponses){
+    void validateSearchStaffUserResponses(List<SearchStaffUserResponse> searchResponses) {
         assertThat(searchResponses.size()).isEqualTo(1);
 
         SearchStaffUserResponse searchStaffUserResponse = searchResponses.get(0);
@@ -177,6 +173,7 @@ public class StaffRefDataServiceImplTest {
 
 
     }
+
     CaseWorkerProfile buildCaseWorkerProfile() {
 
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
@@ -206,8 +203,6 @@ public class StaffRefDataServiceImplTest {
         userType.setDescription("userTypeId");
 
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-       //TODO Needs to getValues "services": []
-       //TODO need to add Skills Data
         caseWorkerProfile.setFirstName("firstName");
         caseWorkerProfile.setLastName("Last`name");
         caseWorkerProfile.setEmailId("a@b.com");
@@ -240,6 +235,7 @@ public class StaffRefDataServiceImplTest {
         caseWorkerProfile.setCaseWorkerWorkAreas(singletonList(caseWorkerWorkArea));
         return caseWorkerProfile;
     }
+
     uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
         Role
                 role = Role.builder()
@@ -287,7 +283,7 @@ public class StaffRefDataServiceImplTest {
         return caseWorkerProfile;
     }
 
-    private CaseWorkerSkill getCaseWorkerSkill(){
+    private CaseWorkerSkill getCaseWorkerSkill() {
 
         CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
         caseWorkerSkill.setCaseWorkerId("423ec46f-359f-4fcc-9ecc-b1cab4d7e683");
@@ -297,6 +293,7 @@ public class StaffRefDataServiceImplTest {
         return caseWorkerSkill;
 
     }
+
     private List<Skill> getSkillsData() {
         Skill skill1 = new Skill();
         skill1.setServiceId("BBA3");
@@ -311,7 +308,6 @@ public class StaffRefDataServiceImplTest {
         skill2.setSkillCode("A3");
         skill2.setDescription("desc3");
         skill2.setUserType("user_type3");
-
 
 
         List<Skill> skills = List.of(skill1, skill2);

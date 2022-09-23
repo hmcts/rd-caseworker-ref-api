@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
@@ -24,9 +23,10 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
     Optional<CaseWorkerProfile> findByCaseWorkerId(String caseWorkerId);
 
     List<CaseWorkerProfile> findByEmailIdIgnoreCaseContaining(String emailPattern);
-    @Query(value = "select cw from case_worker_profile cw where lower(cw.firstName) like " +
-            "concat('%', :searchString, '%') " +
-            "or lower(cw.lastName) like concat('%', :searchString, '%')")
+
+    @Query(value = "select cw from case_worker_profile cw where lower(cw.firstName) like "
+            + "concat('%', :searchString, '%') "
+            + "or lower(cw.lastName) like concat('%', :searchString, '%')")
     Page<CaseWorkerProfile> findByFirstNameOrLastName(String searchString, Pageable pageable);
 
     @Query(value = """

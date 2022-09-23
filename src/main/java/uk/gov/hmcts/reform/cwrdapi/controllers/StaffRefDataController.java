@@ -1,6 +1,28 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
+
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -13,39 +35,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.removeEmptySpaces;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
-
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-
-import org.springframework.web.bind.annotation.GetMapping;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
-import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
-
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
-import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
-
-import java.util.List;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RequestMapping(
