@@ -37,10 +37,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
+
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -104,7 +107,7 @@ public class StaffRefDataController {
     @GetMapping(path = "/profile/search-by-name",
                 produces = APPLICATION_JSON_VALUE)
     @Secured("cwd-admin")
-    public ResponseEntity<Object> searchStaffUserByName(
+    public ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserByName(
         @RequestHeader(name = "page-number", required = false) Integer pageNumber,
         @RequestHeader(name = "page-size", required = false) Integer pageSize,
         @RequestParam(value = "search") @NotEmpty @NotNull String searchString) {

@@ -14,11 +14,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
@@ -30,12 +35,14 @@ import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 @ExtendWith(MockitoExtension.class)
@@ -109,9 +116,11 @@ public class StaffRefDataServiceImplTest {
 
     @Test
     void should_return_case_worker_profile_with_status_code_200(){
-        PageRequest pageRequest = RequestUtils.validateAndBuildPaginationObject(0, 1,
-                "caseWorkerId", "ASC",
-                20, "id", CaseWorkerProfile.class);
+
+        var pageRequest =
+                validateAndBuildPagination(20, 1,
+                        20, 1);
+
         String searchString = "cwr-test";
         ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
@@ -120,11 +129,54 @@ public class StaffRefDataServiceImplTest {
 
         when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
-        ResponseEntity<Object> responseEntity =
+        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString,pageRequest);
         assertEquals(200, responseEntity.getStatusCodeValue());
+
+        List<SearchStaffUserResponse> searchResponse =
+                responseEntity.getBody();
+        assertThat(responseEntity.getBody()).isNotNull();
+        validateSearchStaffUserResponses(searchResponse);
     }
 
+    void validateSearchStaffUserResponses(List< SearchStaffUserResponse > searchResponses){
+        assertThat(searchResponses.size()).isEqualTo(1);
+
+        SearchStaffUserResponse searchStaffUserResponse = searchResponses.get(0);
+        assertThat(searchStaffUserResponse.getFirstName()).isEqualTo("firstName");
+        assertThat(searchStaffUserResponse.getLastName()).isEqualTo("Last`name");
+        assertThat(searchStaffUserResponse.getEmailId()).isEqualTo("a@b.com");
+        assertThat(searchStaffUserResponse.isSuspended()).isEqualTo(true);
+        assertThat(searchStaffUserResponse.isTaskSupervisor()).isEqualTo(true);
+        assertThat(searchStaffUserResponse.isCaseAllocator()).isEqualTo(false);
+        assertThat(searchStaffUserResponse.isStaffAdmin()).isEqualTo(true);
+
+        ServiceResponse serviceResponse = searchStaffUserResponse.getServices().get(0);
+
+        assertThat(serviceResponse.getService()).isEqualTo("TestArea");
+        assertThat(serviceResponse.getServiceCode()).isEqualTo("SvcCode1");
+
+        assertThat(searchStaffUserResponse.getRegionId()).isEqualTo(111122222);
+        assertThat(searchStaffUserResponse.getRegion()).isEqualTo("region");
+
+        Role role = searchStaffUserResponse.getRoles().get(0);
+
+        assertThat(role.getRoleId()).isEqualTo("1");
+        assertThat(role.getRoleName()).isEqualTo("testRole1");
+
+        Location location = searchStaffUserResponse.getBaseLocations().get(0);
+
+        assertThat(location.getBaseLocationId()).isEqualTo(11112);
+        assertThat(location.getLocationName()).isEqualTo("test location");
+        assertThat(searchStaffUserResponse.getUserType()).isEqualTo("userTypeId");
+
+        SkillResponse skillResponse = searchStaffUserResponse.getSkills().get(0);
+
+        assertThat(skillResponse.getSkillId()).isEqualTo(1L);
+        assertThat(skillResponse.getDescription()).isEqualTo("desc1");
+
+
+    }
     CaseWorkerProfile buildCaseWorkerProfile() {
 
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
@@ -147,6 +199,7 @@ public class StaffRefDataServiceImplTest {
         caseWorkerLocation.setCreatedDate(LocalDateTime.now());
         caseWorkerLocation.setLastUpdate(LocalDateTime.now());
         caseWorkerLocation.setLocationId(11112);
+        caseWorkerLocation.setLocation("test location");
         caseWorkerLocation.setPrimaryFlag(true);
 
         UserType userType = new UserType();
@@ -165,13 +218,26 @@ public class StaffRefDataServiceImplTest {
         caseWorkerProfile.setSuspended(true);
         caseWorkerProfile.setTaskSupervisor(true);
         caseWorkerProfile.setCaseAllocator(false);
-        caseWorkerProfile.setUserAdmin(false);
+        caseWorkerProfile.setUserAdmin(true);
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
         caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
         caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
         caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
+        CaseWorkerSkill caseWorkerSkill = getCaseWorkerSkill();
+
+        caseWorkerProfile.setCaseWorkerSkills(singletonList(caseWorkerSkill));
+
+        CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
+        caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
+        caseWorkerWorkArea.setCaseWorkerId("CWID1");
+        caseWorkerWorkArea.setAreaOfWork("TestArea");
+        caseWorkerWorkArea.setServiceCode("SvcCode1");
+        caseWorkerWorkArea.setCreatedDate(LocalDateTime.now());
+        caseWorkerWorkArea.setLastUpdate(LocalDateTime.now());
+
+        caseWorkerProfile.setCaseWorkerWorkAreas(singletonList(caseWorkerWorkArea));
         return caseWorkerProfile;
     }
     uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
@@ -221,6 +287,16 @@ public class StaffRefDataServiceImplTest {
         return caseWorkerProfile;
     }
 
+    private CaseWorkerSkill getCaseWorkerSkill(){
+
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        caseWorkerSkill.setCaseWorkerId("423ec46f-359f-4fcc-9ecc-b1cab4d7e683");
+        caseWorkerSkill.setSkillId(1L);
+        caseWorkerSkill.setSkills(getSkillsData());
+
+        return caseWorkerSkill;
+
+    }
     private List<Skill> getSkillsData() {
         Skill skill1 = new Skill();
         skill1.setServiceId("BBA3");
@@ -231,27 +307,14 @@ public class StaffRefDataServiceImplTest {
 
         Skill skill2 = new Skill();
         skill2.setServiceId("BBA3");
-        skill2.setSkillId(3L);
+        skill2.setSkillId(1L);
         skill2.setSkillCode("A3");
         skill2.setDescription("desc3");
         skill2.setUserType("user_type3");
 
 
-        Skill skill3 = new Skill();
-        skill3.setServiceId("ABA1");
-        skill3.setSkillId(2L);
-        skill3.setSkillCode("A2");
-        skill3.setDescription("desc2");
-        skill3.setUserType("user_type2");
 
-        Skill skill4 = new Skill();
-        skill4.setServiceId("ABA1");
-        skill4.setSkillId(4L);
-        skill4.setSkillCode("A4");
-        skill4.setDescription("desc4");
-        skill4.setUserType("user_type4");
-
-        List<Skill> skills = List.of(skill1, skill2, skill3, skill4);
+        List<Skill> skills = List.of(skill1, skill2);
         return skills;
     }
 }

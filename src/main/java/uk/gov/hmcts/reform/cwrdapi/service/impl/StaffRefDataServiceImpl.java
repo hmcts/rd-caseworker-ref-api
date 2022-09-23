@@ -53,7 +53,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
     @Override
-    public ResponseEntity<Object> retrieveStaffUserByName(String searchString, PageRequest pageRequest) {
+    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffUserByName(String searchString, PageRequest pageRequest) {
 
         Page<CaseWorkerProfile> pageable =
             caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest);
