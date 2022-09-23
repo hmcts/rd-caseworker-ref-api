@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.repository;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
 import java.util.ArrayList;
@@ -36,5 +39,17 @@ class CaseWorkerProfileRepositoryTest {
         when(cwProfileRepository.findByCaseWorkerId(any())).thenReturn(Optional.of(new CaseWorkerProfile()));
         assertNotNull(cwProfileRepository.findByCaseWorkerId(any()));
         verify(cwProfileRepository, times(1)).findByCaseWorkerId(any());
+    }
+
+    @Test
+    void findByFirstNameOrLastName() {
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        caseWorkerProfiles.add(new CaseWorkerProfile());
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+
+        when(cwProfileRepository.findByFirstNameOrLastName(any(),any()))
+                .thenReturn(pages);
+        assertNotNull(cwProfileRepository.findByFirstNameOrLastName(any(),any()));
+        verify(cwProfileRepository, times(1)).findByFirstNameOrLastName(any(),any());
     }
 }
