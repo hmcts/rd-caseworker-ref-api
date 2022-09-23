@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
@@ -111,6 +113,8 @@ public class StaffProfileServiceImpl implements StaffProfileService {
 
     List<ExceptionCaseWorker> upExceptionCaseWorkers;
 
+    @Autowired
+    SkillRepository skillRepository;
 
     @Override
     public StaffProfileCreationResponse processStaffProfile(StaffProfileCreationRequest profileRequest) {
@@ -120,8 +124,13 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         StaffProfileCreationResponse response;
         try {
 
-            checkStaffProfileEmail(profileRequest.getEmailId());
-            newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
+            newCaseWorkerProfiles =   checkStaffProfileEmail(profileRequest.getEmailId());
+
+            newCaseWorkerProfiles.setFirstName(profileRequest.getFirstName());
+            newCaseWorkerProfiles.setLastName(profileRequest.getLastName());
+            newCaseWorkerProfiles.setSuspended(profileRequest.isSuspended());
+            newCaseWorkerProfiles.setSuspended(profileRequest.isTaskSupervisor());
+            //newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
             newCaseWorkerProfiles.setNew(true);
 
             // persist in db
@@ -139,7 +148,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
 
 
 
-    private void checkStaffProfileEmail(String emailId) {
+    private CaseWorkerProfile checkStaffProfileEmail(String emailId) {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(emailId);
@@ -148,6 +157,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
             //throw new StaffReferenceException(HttpStatus.BAD_REQUEST, errorResponse.getErrorMessage(),
             //        errorResponse.getErrorDescription());
         }
+        return caseWorkerProfile;
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
@@ -263,7 +273,10 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         caseWorkerProfile.getCaseWorkerRoles().addAll(mapCaseWorkerRoleRequestMapping(idamId, staffProfileRequest));
         //caseWorkerWorkAreas setting to case worker profile
         caseWorkerProfile.getCaseWorkerWorkAreas().addAll(mapCwAreaOfWork(staffProfileRequest, idamId));
+
+        caseWorkerProfile.getCaseWorkerSkills().addAll(mapCaseWorkerSkillRequestMapping(idamId, staffProfileRequest));
     }
+
 
     public List<CaseWorkerWorkArea> mapCwAreaOfWork(StaffProfileCreationRequest profileRequest,
                                                     String idamId) {
@@ -329,11 +342,27 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         return caseWorkerRoles;
     }
 
+
+    private List<CaseWorkerSkill> mapCaseWorkerSkillRequestMapping(String idamId,
+                                                                 StaffProfileCreationRequest staffProfileRequest) {
+        List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
+        staffProfileRequest.getSkills().forEach(skill -> caseWorkerStaticValueRepositoryAccessor
+                .getSkills()
+                .stream().filter(skills ->
+                        skill.getDescription().equalsIgnoreCase(skills.getDescription().trim()))
+                .forEach(skills -> {
+                    CaseWorkerSkill workerSkill = new CaseWorkerSkill(idamId, skills.getSkillId());
+                    caseWorkerSkills.add(workerSkill);
+                }));
+        return caseWorkerSkills;
+
+    }
     /**
      * Prepare caseworker data to be published as a message to topic.
      *
      * @param caseWorkerData list containing caseworker data
      */
+
     @Override
     public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
         List<String> caseWorkerIds = caseWorkerData.stream()
