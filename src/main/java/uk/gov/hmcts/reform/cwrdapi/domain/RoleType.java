@@ -18,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
+
+
 @Entity(name = "role_type")
 @Getter
 @Setter
@@ -49,6 +51,11 @@ public class RoleType implements Serializable {
     private List<CaseWorkerIdamRoleAssociation> caseWorkerIdamRoleAssociations = new ArrayList<>();
 
     public RoleType(String description) {
+        this.description = description;
+    }
+
+    public RoleType(Long roleId, String description) {
+        this.roleId = roleId;
         this.description = description;
     }
 }
