@@ -120,8 +120,13 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         StaffProfileCreationResponse response;
         try {
 
-            CaseWorkerProfile dbCaseWorkerProfile = checkStaffProfileEmail(profileRequest.getEmailId());
-            newCaseWorkerProfiles = updateCaseWorkerProfile(profileRequest,dbCaseWorkerProfile);
+            newCaseWorkerProfiles =   checkStaffProfileEmail(profileRequest.getEmailId());
+
+            newCaseWorkerProfiles.setFirstName(profileRequest.getFirstName());
+            newCaseWorkerProfiles.setLastName(profileRequest.getLastName());
+            newCaseWorkerProfiles.setSuspended(profileRequest.isSuspended());
+            newCaseWorkerProfiles.setSuspended(profileRequest.isTaskSupervisor());
+            //newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
             newCaseWorkerProfiles.setNew(true);
 
             // persist in db
