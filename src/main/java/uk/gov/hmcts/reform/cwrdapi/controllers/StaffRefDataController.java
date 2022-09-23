@@ -56,8 +56,6 @@ public class StaffRefDataController {
     @Value("${search.pageNumber}")
     private int configPageNumber;
 
-    @Autowired
-    StaffRefDataService caseWorkerService;
 
     @Autowired
     StaffRefDataService staffRefDataService;
@@ -104,7 +102,7 @@ public class StaffRefDataController {
         validateSearchString(removeEmptySpaces(searchString));
         var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize, configPageNumber);
 
-        return caseWorkerService.retrieveStaffUserByName(searchString, pageRequest);
+        return staffRefDataService.retrieveStaffUserByName(searchString, pageRequest);
 
     }
 

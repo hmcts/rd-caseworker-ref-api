@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceRespons
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
@@ -109,8 +110,9 @@ public class StaffReferenceDataProviderTest {
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
-                new StaffRefDataController("RD-Caseworker-Ref-Api",
+                new StaffRefDataController("RD-Caseworker-Ref-Api",20,1,
                         staffRefDataServiceImpl)
+
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -197,7 +199,26 @@ public class StaffReferenceDataProviderTest {
     }
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
+
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+
+        caseWorkerProfile.setCaseWorkerId(caseWorkerId);
+        caseWorkerProfile.setFirstName("firstName");
+        caseWorkerProfile.setLastName("lastName");
+        caseWorkerProfile.setEmailId("sam.test@justice.gov.uk");
+        caseWorkerProfile.setUserTypeId(1L);
+        caseWorkerProfile.setRegion("National");
+        caseWorkerProfile.setRegionId(1);
+        caseWorkerProfile.setSuspended(false);
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setTaskSupervisor(false);
+        caseWorkerProfile.setUserAdmin(true);
+
         LocalDateTime timeNow = LocalDateTime.now();
+
+        caseWorkerProfile.setCreatedDate(timeNow);
+        caseWorkerProfile.setLastUpdate(timeNow);
 
         List<CaseWorkerLocation> caseWorkerLocations =
                 Collections.singletonList(new CaseWorkerLocation(caseWorkerId, 1,
@@ -210,22 +231,17 @@ public class StaffReferenceDataProviderTest {
                 Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
         caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
 
-        return new CaseWorkerProfile(caseWorkerId,
-                "firstName",
-                "lastName",
-                "sam.test@justice.gov.uk",
-                1L,
-                "National",
-                1,
-                false,
-                false,
-                false,
-                timeNow,
-                timeNow,
-                caseWorkerLocations,
-                caseWorkerWorkAreas,
-                caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false);
+        caseWorkerProfile.setCaseWorkerLocations(caseWorkerLocations);
+        caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
+        caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
+
+        List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
+
+        caseWorkerProfile.setCaseWorkerSkills(caseWorkerSkills);
+        caseWorkerProfile.setUserType(new UserType(1L, "HMCTS"));
+
+        return caseWorkerProfile;
+
     }
 
 }
