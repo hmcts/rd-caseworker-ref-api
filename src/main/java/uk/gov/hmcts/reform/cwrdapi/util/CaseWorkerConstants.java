@@ -121,6 +121,7 @@ public final class CaseWorkerConstants {
     public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
             + "Please try again or check with HMCTS Support Team";
     public static final String ROLE_CWD_USER = "cwd-user";
+    public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
     public static final String DUPLICATE_PRIMARY_AND_SECONDARY_ROLES = "Primary and Secondary Roles Should "
             + "not be same.";

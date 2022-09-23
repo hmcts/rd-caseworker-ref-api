@@ -36,6 +36,7 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     @Id
     @Column(name = "case_worker_id")
     @Size(max = 64)
+    //@GeneratedValue(strategy = GenerationType.AUTO)
     private String caseWorkerId;
 
     @Column(name = "first_name")
@@ -101,6 +102,9 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
 
     @Transient
     private boolean isNew = false;
+
+    @Column(name = "user_admin")
+    private Boolean userAdmin;
 
     @Override
     public String getId() {

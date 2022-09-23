@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.cwrdapi.config.FeignInterceptorConfiguration;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileUpdateRequest;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 
 @FeignClient(name = "UserProfileClient", url = "${userProfUrl}", configuration = FeignInterceptorConfiguration.class)
@@ -22,7 +22,7 @@ public interface UserProfileFeignClient {
     @RequestLine("POST /v1/userprofile")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
             "Content-Type: application/json"})
-    Response createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest,
+    Response createUserProfile(@RequestBody UserProfileUpdateRequest userProfileCreationRequest,
                                @RequestParam(value = "origin") String origin);
 
     @PutMapping(value = "/v1/userprofile/{userId}")

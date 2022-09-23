@@ -14,7 +14,7 @@ class UserProfileCreationRequestTest {
 
     @Test
     void testUserProfileCreationRequestWithBuilder() {
-        UserProfileCreationRequest request = UserProfileCreationRequest.anUserProfileCreationRequest()
+        UserProfileUpdateRequest request = UserProfileUpdateRequest.anUserProfileCreationRequest()
                 .email("abc@temp.com")
                 .firstName("first")
                 .lastName("last")
@@ -30,7 +30,7 @@ class UserProfileCreationRequestTest {
     @Test
     void testUserProfileCreationRequestWithConstrictor() {
 
-        UserProfileCreationRequest request1 = new UserProfileCreationRequest(
+        UserProfileUpdateRequest request1 = new UserProfileUpdateRequest(
                 "abc@temp.com","first",
                 "last",LanguagePreference.EN,
                 UserCategory.CASEWORKER, UserTypeRequest.INTERNAL, roles,
@@ -38,7 +38,7 @@ class UserProfileCreationRequestTest {
         verify(request1);
     }
 
-    void verify(UserProfileCreationRequest request) {
+    void verify(UserProfileUpdateRequest request) {
         assertThat(request.getEmail()).isEqualTo("abc@temp.com");
         assertThat(request.getFirstName()).isEqualTo("first");
         assertThat(request.getLastName()).isEqualTo("last");
