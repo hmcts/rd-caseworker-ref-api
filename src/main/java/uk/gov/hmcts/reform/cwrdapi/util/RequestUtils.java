@@ -96,10 +96,11 @@ public class RequestUtils {
 
     public static void validateSearchString(String searchString) {
         if (isNotEmpty(searchString)) {
+            if (searchString.length() < 3) {
+                throw new InvalidRequestException("The search string should contain at least 3 characters.");
+            }
             if (!searchString.matches(SEARCH_STRING_REGEX_PATTERN)) {
                 throw new InvalidRequestException("Invalid search string. Please input a valid string.");
-            } else if (searchString.length() < 3) {
-                throw new InvalidRequestException("The search string should contain at least 3 characters.");
             }
         } else {
             throw new InvalidRequestException("Empty search string. Please enter a valid search string.");

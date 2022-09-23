@@ -189,17 +189,20 @@ public class CaseWorkerReferenceDataClient {
                                                                  Integer pageNumber,  String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
-                .append(path)
-                .append("/usersByServiceName");
+                .append(path);
+
         if (StringUtils.isNotBlank(searchString)) {
             stringBuilder.append("?search=");
             stringBuilder.append(searchString);
         }
 
+        HttpHeaders headers =  getMultipleAuthHeadersWithoutContentType(role, null);
+        headers.add("page-number",pageNumber.toString());
+        headers.add("page-size",pageSize.toString());
 
         ResponseEntity<Map> responseEntity;
         HttpEntity<String> request =
-                new HttpEntity<>(getMultipleAuthHeadersWithoutContentType(role, null));
+                new HttpEntity<>(headers);
 
 
         try {

@@ -18,6 +18,8 @@ import java.util.Map;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -65,30 +67,80 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     }
 
     @Test
-    void should_return_status_code_200_and_list_of_staff_users_by_name()
+    void should_return_status_code_400_when_page_size_is_zero()
             throws JsonProcessingException {
         String path = "/profile/search-by-name";
         String role = "cwd-admin";
         String searchString = "cwr-test";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
-                .searchStaffUserByName(path,searchString,20,1,role);
+                .searchStaffUserByName(path,searchString,0,20,role);
 
-        assertThat(response).containsEntry("http_status", "200");
-       /* assertTrue(response.get("response_body").toString()
-                .contains("Required request parameter 'ccd_service_names'"
-                        + " for method parameter type String is not present"));*/
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString()).contains(PAGE_SIZE +" is invalid");
 
     }
 
     @Test
-    public void shouldReturn400ForEmptyServiceName() {
-        Map<String, Object> response = caseworkerReferenceDataClient
-                .fetchStaffProfileByCcdServiceName("", null, null,
-                        "", "", "cwd-system-user");
+    void should_return_status_code_400_when_page_num_is_zero()
+            throws JsonProcessingException {
+        String path = "/profile/search-by-name";
+        String role = "cwd-admin";
+        String searchString = "cwr-test";
+
+        Map<String, Object> response =  caseworkerReferenceDataClient
+                .searchStaffUserByName(path,searchString,1,0,role);
+
         assertThat(response).containsEntry("http_status", "400");
-        assertTrue(response.get("response_body").toString()
-                .contains("Required request parameter 'ccd_service_names'"
-                        + " for method parameter type String is not present"));
+        assertThat(response.get("response_body").toString()).contains(PAGE_NUMBER +" is invalid");
+
+    }
+
+    @Test
+    void should_return_status_code_400_when_search_String_is_not_valid()
+            throws JsonProcessingException {
+        String path = "/profile/search-by-name";
+        String role = "cwd-admin";
+        String searchString = "1234";
+
+        Map<String, Object> response =  caseworkerReferenceDataClient
+                .searchStaffUserByName(path,searchString,0,20,role);
+
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("Invalid search string. Please input a valid string.");
+
+    }
+
+    @Test
+    void should_return_status_code_400_when_search_String_len_less_3()
+            throws JsonProcessingException {
+        String path = "/profile/search-by-name";
+        String role = "cwd-admin";
+        String searchString = "ab";
+
+        Map<String, Object> response =  caseworkerReferenceDataClient
+                .searchStaffUserByName(path,searchString,0,20,role);
+
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("The search string should contain at least 3 characters.");
+
+    }
+
+    @Test
+    void should_return_status_code_400_when_search_String_empty()
+            throws JsonProcessingException {
+        String path = "/profile/search-by-name";
+        String role = "cwd-admin";
+        String searchString = "";
+
+        Map<String, Object> response =  caseworkerReferenceDataClient
+                .searchStaffUserByName(path,searchString,0,20,role);
+
+        assertThat(response).containsEntry("http_status", "400");
+        assertThat(response.get("response_body").toString())
+                .contains("Required request parameter 'search' for method parameter type String is not present");
+
     }
 }
