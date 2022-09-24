@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -82,7 +81,7 @@ public class StaffRefDataController {
         if (ObjectUtils.isNotEmpty(roleType)) {
             List<StaffRefDataJobTitle> refDataJobTitles = roleType.stream()
                     .map(StaffRefDataJobTitle::new)
-                    .collect(Collectors.toList());
+                    .toList();
             staffRefJobTitleResponseBuilder.jobTitles(refDataJobTitles);
             log.debug("refDataJobTitles = {}", refDataJobTitles);
             return   ResponseEntity
