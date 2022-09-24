@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
@@ -60,6 +61,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
 
+
+    @Mock
+    private RoleTypeRepository roleTypeRepository;
     @InjectMocks
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
 
@@ -174,6 +178,16 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
                 new UserType(1L, "HMCTS"), false);
+    }
+
+    @State({"A list of all staff reference data role-type"})
+    public void retrieveJobTitles() throws JsonProcessingException {
+        List<RoleType> roleTypeList = new ArrayList<>();
+        roleTypeList.add(new RoleType(1L, "Role Description 1"));
+        roleTypeList.add(new RoleType(2L, "Role Description 2"));
+        roleTypeList.add(new RoleType(3L, "Role Description 3"));
+        when(roleTypeRepository.findAll())
+                .thenReturn(roleTypeList);
     }
 
 }
