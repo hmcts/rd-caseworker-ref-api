@@ -68,7 +68,7 @@ class StaffRefDataControllerTest {
                 .thenReturn(userTypes);
 
         ResponseEntity<?> actual = staffRefDataController.fetchUserTypes();
-        StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
+        final StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
         assertNotNull(actual);
         verify(staffRefDataServiceMock, times(1))
                 .fetchUserTypes();
@@ -87,7 +87,7 @@ class StaffRefDataControllerTest {
                 .thenReturn(userTypes);
 
         ResponseEntity<?> actual = staffRefDataController.fetchUserTypes();
-        StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
+        final StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
         assertNotNull(actual);
         verify(staffRefDataServiceMock, times(1))
                 .fetchUserTypes();
