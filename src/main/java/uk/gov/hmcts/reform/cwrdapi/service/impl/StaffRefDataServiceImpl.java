@@ -32,12 +32,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Override
     public StaffWorkerSkillResponse getServiceSkills() {
         List<Skill> skills = null;
-        List<ServiceSkill> serviceSkills = new ArrayList<>();
+        List<ServiceSkill> serviceSkills = null;
         try {
             List<SkillDTO> skillData = new ArrayList<>();
             skills = skillRepository.findAll();
-            Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
-            if (skillsOptional.isPresent()) {
+            if (skills != null) {
                 skillData = skills.stream().map(skill -> {
                     SkillDTO skillDTO = new SkillDTO();
                     skillDTO.setServiceId(skill.getServiceId());
@@ -67,26 +66,33 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
      * @return List of ServiceSkill
      */
     public List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData) {
+        Map<String, List<SkillDTO>> result = null;
+        if(skillData != null){
+            result = skillData.stream()
+                    .collect(
+                            Collectors.toMap(
+                                    skill -> skill.getServiceId(),
+                                    skill -> Collections.singletonList(skill),
+                                    this::mergeSkillsWithDuplicateServiceIds
+                            )
+                    );
+        }
 
-        Map<String, List<SkillDTO>> result = skillData.stream()
-                .collect(
-                        Collectors.toMap(
-                                skill -> skill.getServiceId(),
-                                skill -> Collections.singletonList(skill),
-                                this::mergeSkillsWithDuplicateServiceIds
-                        )
-                );
 
 
         List<ServiceSkill> serviceSkills = new ArrayList<>();
-        result.forEach(
-                (key, value) -> {
-                    ServiceSkill serviceSkill = new ServiceSkill();
-                    serviceSkill.setId(key);
-                    serviceSkill.setSkills(value);
-                    serviceSkills.add(serviceSkill);
-                }
-        );
+
+        if(result !=null){
+            result.forEach(
+                    (key, value) -> {
+                        ServiceSkill serviceSkill = new ServiceSkill();
+                        serviceSkill.setId(key);
+                        serviceSkill.setSkills(value);
+                        serviceSkills.add(serviceSkill);
+                    }
+            );
+        }
+
         return serviceSkills;
 
     }

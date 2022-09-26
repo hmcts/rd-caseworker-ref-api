@@ -81,9 +81,8 @@ public class StaffRefDataServiceImplTest {
         assertThat(staffWorkerSkillResponse).isNotNull();
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-        assertThat(serviceSkills).isNotNull();
+        assertThat(serviceSkills).isNull();
 
-        assertThat(serviceSkills.size()).isEqualTo(0);
     }
 
 
