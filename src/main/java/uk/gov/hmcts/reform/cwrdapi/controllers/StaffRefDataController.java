@@ -70,7 +70,7 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE,
             path = {"/job-title"}
     )
-    @Secured("cwd-admin")
+    @Secured("staff-admin")
     public ResponseEntity<Object> retrieveJobTitles() {
 
         log.info("{} : Fetching the Job Titles", loggingComponentName);
