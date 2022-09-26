@@ -91,7 +91,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     void should_return_staff_user_with_status_code_200_when_flag_enabled() {
 
-        String searchString = "cwr-test";
+        String searchString = "cwr";
 
         Response fetchResponse = caseWorkerApiClient
                 .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
@@ -115,7 +115,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     void should_return_staff_user_with_status_code_403_when_flag_false() {
 
-        String searchString = "cwr-test";
+        String searchString = "cwr";
 
         Response fetchResponse = caseWorkerApiClient
                 .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
@@ -133,7 +133,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     void should_return_staff_user_with_status_code_401_when_un_authorized() {
 
-        String searchString = "cwr-test";
+        String searchString = "cwr";
 
 
         Response response = caseWorkerApiClient.withUnauthenticatedRequest()
