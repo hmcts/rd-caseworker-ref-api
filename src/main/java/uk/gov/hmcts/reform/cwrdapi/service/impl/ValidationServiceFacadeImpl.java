@@ -69,9 +69,6 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     @Autowired
     StaffAuditRepository staffAuditRepository;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
     /**
      * Returns invalid record list and JSR Constraint violations pair.
      *
@@ -219,7 +216,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     @Override
     public void saveStaffAudit(AuditStatus auditStatus, String errorMessage,String caseWorkerId,
                                StaffProfileCreationRequest staffProfileCreationRequest) {
-
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
 
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();

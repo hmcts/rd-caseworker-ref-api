@@ -93,7 +93,7 @@ public class StaffRefDataController {
 
         if (null != response) {
 
-            staffProfileService.publishStaffProfileToTopic(response);
+            //staffProfileService.publishStaffProfileToTopic(response);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
