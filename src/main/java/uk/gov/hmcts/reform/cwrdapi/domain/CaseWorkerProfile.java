@@ -114,4 +114,9 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     public boolean isNew() {
         return isNew;
     }
+
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = CaseWorkerSkill.class, mappedBy = "caseWorkerProfile", cascade = ALL,
+            orphanRemoval = true)
+    private List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
 }

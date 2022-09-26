@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,13 +82,19 @@ public class StaffRefDataController {
     //@Secured("staff-admin")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<StaffProfileCreationResponse> createStaffUserProfile(@RequestBody StaffProfileCreationRequest
-                                                                               staffProfileCreationRequest) {
+    @Transactional
+    public ResponseEntity<StaffProfileCreationResponse> createStaffUserProfile(@RequestBody
+                                      StaffProfileCreationRequest staffProfileCreationRequest) {
+
         log.debug("Inside createStaffUserProfile Controller");
         StaffProfileCreationResponse response = null;
 
-        response = staffProfileService.processStaffProfile(staffProfileCreationRequest);
+        response = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
 
+        if (null != response) {
+
+            staffProfileService.publishStaffProfileToTopic(response);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -17,7 +17,6 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
-
 public class Skill implements Serializable {
 
     @Id
@@ -47,5 +46,10 @@ public class Skill implements Serializable {
     @UpdateTimestamp
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
+
+    public Skill(Long skillId, String description) {
+        this.skillId = skillId;
+        this.description = description;
+    }
 
 }

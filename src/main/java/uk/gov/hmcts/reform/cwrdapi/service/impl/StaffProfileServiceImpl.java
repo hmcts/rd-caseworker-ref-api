@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
@@ -38,10 +39,12 @@ import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
 import java.util.ArrayList;
@@ -54,8 +57,10 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
+
 
 
 @Service
@@ -116,48 +121,48 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     @Autowired
     SkillRepository skillRepository;
 
+    @Autowired
+    IJsrValidatorInitializer validateStaffProfile;
+
+
+    @SuppressWarnings("unchecked")
     @Override
-    public StaffProfileCreationResponse processStaffProfile(StaffProfileCreationRequest profileRequest) {
+    public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest profileRequest) {
 
-        CaseWorkerProfile newCaseWorkerProfiles;
-        CaseWorkerProfile processedCwProfiles;
-        StaffProfileCreationResponse response;
-        try {
+        final CaseWorkerProfile newCaseWorkerProfiles;
+        final CaseWorkerProfile processedCwProfiles;
+        StaffProfileCreationResponse response = null;
 
-            newCaseWorkerProfiles =   checkStaffProfileEmail(profileRequest.getEmailId());
+        validateStaffProfile.validateStaffProfile(profileRequest);
 
-            newCaseWorkerProfiles.setFirstName(profileRequest.getFirstName());
-            newCaseWorkerProfiles.setLastName(profileRequest.getLastName());
-            newCaseWorkerProfiles.setSuspended(profileRequest.isSuspended());
-            newCaseWorkerProfiles.setSuspended(profileRequest.isTaskSupervisor());
-            //newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
-            newCaseWorkerProfiles.setNew(true);
+        checkStaffProfileEmail(profileRequest);
+        newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
 
-            // persist in db
-            processedCwProfiles = persistCaseWorker(newCaseWorkerProfiles);
+        processedCwProfiles = persistCaseWorker(newCaseWorkerProfiles);
+
+        if (null != processedCwProfiles) {
+
+            validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS,null,
+                    processedCwProfiles.getCaseWorkerId(),profileRequest);
             response = StaffProfileCreationResponse.builder()
                     .caseWorkerId(processedCwProfiles.getCaseWorkerId())
                     .build();
-        } catch (Exception exp) {
-            log.error("{}:: createCaseWorkerUserProfiles failed :: Job Id {} ::{}", loggingComponentName,
-                    validationServiceFacade.getAuditJobId(), exp);
-            throw exp;
         }
         return response;
     }
 
 
 
-    private CaseWorkerProfile checkStaffProfileEmail(String emailId) {
+    private void checkStaffProfileEmail(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
-        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(emailId);
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId());
 
-        if (caseWorkerProfile == null) {
-            //throw new StaffReferenceException(HttpStatus.BAD_REQUEST, errorResponse.getErrorMessage(),
-            //        errorResponse.getErrorDescription());
+        if (caseWorkerProfile != null) {
+            validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,PROFILE_ALREADY_CREATED,
+                    null,profileRequest);
+            throw new InvalidRequestException(PROFILE_ALREADY_CREATED);
         }
-        return caseWorkerProfile;
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
@@ -191,6 +196,8 @@ public class StaffProfileServiceImpl implements StaffProfileService {
 
             return responseEntity;
         } catch (Exception ex) {
+            validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,ex.getMessage(),
+                    null,staffProfileRequest);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } finally {
             if (nonNull(response)) {
@@ -202,11 +209,13 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     private CaseWorkerProfile persistCaseWorker(CaseWorkerProfile caseWorkerProfile) {
         CaseWorkerProfile processedCwProfiles = null;
 
-        if (caseWorkerProfile.isNew()) {
+        if (null != caseWorkerProfile) {
+            caseWorkerProfile.setNew(true);
             processedCwProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
             log.info("{}:: {} case worker profiles inserted ::", loggingComponentName,
                     processedCwProfiles, validationServiceFacade.getAuditJobId());
         }
+
         return processedCwProfiles;
     }
 
@@ -215,9 +224,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
 
         Set<String> userRoles = new HashSet<>();
         userRoles.add(ROLE_CWD_USER);
-        //if(staffProfileRequest.isStaffAdmin()) {
-        //   userRoles.add(ROLE_STAFF_ADMIN);
-        //}
+
         Set<String> idamRoles = getUserRolesByRoleId(profileRequest);
         if (isNotEmpty(idamRoles)) {
             userRoles.addAll(idamRoles);
@@ -364,12 +371,9 @@ public class StaffProfileServiceImpl implements StaffProfileService {
      */
 
     @Override
-    public void publishCaseWorkerDataToTopic(List<CaseWorkerProfile> caseWorkerData) {
-        List<String> caseWorkerIds = caseWorkerData.stream()
-                .map(CaseWorkerProfile::getCaseWorkerId)
-                .toList();
+    public void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse) {
 
-        topicPublisher.sendMessage(caseWorkerIds);
+        topicPublisher.sendMessage(List.of(staffProfileCreationResponse.getCaseWorkerId()));
     }
 
 }
