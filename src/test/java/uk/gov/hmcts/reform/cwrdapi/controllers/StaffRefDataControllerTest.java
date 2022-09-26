@@ -64,27 +64,30 @@ class StaffRefDataControllerTest {
                 .thenReturn(userTypes);
 
         ResponseEntity<?> actual = staffRefDataController.fetchUserTypes();
-
+        StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
         assertNotNull(actual);
         verify(staffRefDataServiceMock, times(1))
                 .fetchUserTypes();
         assertEquals(responseEntity.getStatusCode(), actual.getStatusCode());
+        assertEquals((actualResponse.getUserTypes().size()), ((StaffRefDataUserTypesResponse) actual.getBody()).getUserTypes().size());
     }
 
 
     @Test
-    void shouldFetchNoUserTypes() {
+    void shouldFetchEmptyUserTypes() {
         responseEntity = ResponseEntity.status(200).body(null);
         userTypes.clear();
         when(staffRefDataServiceMock.fetchUserTypes())
                 .thenReturn(userTypes);
 
         ResponseEntity<?> actual = staffRefDataController.fetchUserTypes();
-
+        StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
         assertNotNull(actual);
         verify(staffRefDataServiceMock, times(1))
                 .fetchUserTypes();
         assertEquals(responseEntity.getStatusCode(), actual.getStatusCode());
+        assertEquals((actualResponse.getUserTypes().size()), 0);
+
     }
 
 }
