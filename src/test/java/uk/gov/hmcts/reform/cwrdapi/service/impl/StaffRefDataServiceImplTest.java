@@ -138,12 +138,6 @@ public class StaffRefDataServiceImplTest {
     @Test
     void should_return_case_worker_profile_with_status_code_200_when_missing_boolean_values() {
 
-        var pageRequest =
-                validateAndBuildPagination(20, 1,
-                        20, 1);
-
-        String searchString = "cwr";
-        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
 
         caseWorkerProfile.setSuspended(null);
@@ -151,9 +145,14 @@ public class StaffRefDataServiceImplTest {
         caseWorkerProfile.setCaseAllocator(null);
         caseWorkerProfile.setUserAdmin(null);
 
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         caseWorkerProfiles.add(caseWorkerProfile);
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 
+        var pageRequest =
+                validateAndBuildPagination(20, 1,
+                        20, 1);
+        String searchString = "cwr";
         when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
