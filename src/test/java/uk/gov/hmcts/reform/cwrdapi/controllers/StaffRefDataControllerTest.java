@@ -88,6 +88,7 @@ class StaffRefDataControllerTest {
                 .fetchUserTypes();
         assertEquals(responseEntity.getStatusCode(), actual.getStatusCode());
         assertEquals((actualResponse.getUserTypes().size()), 0);
+        assertEquals((actualResponse.getUserTypes()), ((StaffRefDataUserTypesResponse) actual.getBody()).getUserTypes());
 
     }
 
