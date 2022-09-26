@@ -257,6 +257,7 @@ public class StaffReferenceDataProviderTest {
         return caseWorkerSkill;
 
     }
+
     private  List<Skill> getSkillsData() {
         Skill skill1 = new Skill();
         skill1.setServiceId("BBA3");
