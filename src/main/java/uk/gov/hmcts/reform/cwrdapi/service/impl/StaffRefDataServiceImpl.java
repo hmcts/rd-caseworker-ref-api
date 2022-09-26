@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,7 +66,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
      */
     public List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData) {
         Map<String, List<SkillDTO>> result = null;
-        if(skillData != null){
+        if (skillData != null) {
             result = skillData.stream()
                     .collect(
                             Collectors.toMap(
@@ -79,10 +78,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
 
 
-
         List<ServiceSkill> serviceSkills = new ArrayList<>();
 
-        if(result !=null){
+        if (result != null) {
             result.forEach(
                     (key, value) -> {
                         ServiceSkill serviceSkill = new ServiceSkill();

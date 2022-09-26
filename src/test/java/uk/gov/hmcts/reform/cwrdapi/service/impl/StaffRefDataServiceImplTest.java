@@ -69,7 +69,7 @@ public class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
         assertThat(serviceSkills).isNotNull();
 
-        assertThat(serviceSkills.size()).isEqualTo(0);
+        assertThat(serviceSkills).isEmpty();
     }
 
     @Test
