@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 @ExtendWith(MockitoExtension.class)
-public class StaffRefDataServiceImplTest {
+class StaffRefDataServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
     @InjectMocks
@@ -67,21 +67,7 @@ public class StaffRefDataServiceImplTest {
         assertThat(staffWorkerSkillResponse).isNotNull();
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-        assertThat(serviceSkills).isNotNull();
-
         assertThat(serviceSkills).isEmpty();
-    }
-
-    @Test
-    void should_return_null_list_of_service_skills() {
-        List<Skill> skills = null;
-        when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
-
-        assertThat(staffWorkerSkillResponse).isNotNull();
-
-        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-        assertThat(serviceSkills).isNull();
 
     }
 

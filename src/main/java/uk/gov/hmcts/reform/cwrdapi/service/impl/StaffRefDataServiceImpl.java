@@ -33,21 +33,20 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<Skill> skills = null;
         List<ServiceSkill> serviceSkills = null;
         try {
-            List<SkillDTO> skillData = new ArrayList<>();
+            List<SkillDTO> skillData = null;
             skills = skillRepository.findAll();
-            if (skills != null) {
-                skillData = skills.stream().map(skill -> {
-                    SkillDTO skillDTO = new SkillDTO();
-                    skillDTO.setServiceId(skill.getServiceId());
-                    skillDTO.setSkillId(skill.getSkillId());
-                    skillDTO.setSkillCode(skill.getSkillCode());
-                    skillDTO.setUserType(skill.getUserType());
-                    skillDTO.setDescription(skill.getDescription());
-                    return skillDTO;
-                }).toList();
 
-                serviceSkills = mapSkillToServicesSkill(skillData);
-            }
+            skillData = skills.stream().map(skill -> {
+                SkillDTO skillDTO = new SkillDTO();
+                skillDTO.setServiceId(skill.getServiceId());
+                skillDTO.setSkillId(skill.getSkillId());
+                skillDTO.setSkillCode(skill.getSkillCode());
+                skillDTO.setUserType(skill.getUserType());
+                skillDTO.setDescription(skill.getDescription());
+                return skillDTO;
+            }).toList();
+
+            serviceSkills = mapSkillToServicesSkill(skillData);
 
         } catch (Exception exp) {
             log.error("{}:: StaffRefDataService getServiceSkills failed :: {}", loggingComponentName,

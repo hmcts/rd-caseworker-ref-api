@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class StaffRefDataControllerTest {
+class StaffRefDataControllerTest {
 
     @Mock
     StaffRefDataService staffRefDataService;
