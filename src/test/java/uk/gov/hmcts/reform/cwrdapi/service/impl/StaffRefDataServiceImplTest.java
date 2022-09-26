@@ -117,7 +117,7 @@ public class StaffRefDataServiceImplTest {
                 validateAndBuildPagination(20, 1,
                         20, 1);
 
-        String searchString = "cwr-test";
+        String searchString = "cwr";
         ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
         caseWorkerProfiles.add(caseWorkerProfile);
@@ -136,13 +136,43 @@ public class StaffRefDataServiceImplTest {
     }
 
     @Test
+    void should_return_case_worker_profile_with_status_code_200_when_missing_boolean_values() {
+
+        var pageRequest =
+                validateAndBuildPagination(20, 1,
+                        20, 1);
+
+        String searchString = "cwr";
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
+
+        caseWorkerProfile.setSuspended(null);
+        caseWorkerProfile.setTaskSupervisor(null);
+        caseWorkerProfile.setCaseAllocator(null);
+        caseWorkerProfile.setUserAdmin(null);
+
+        caseWorkerProfiles.add(caseWorkerProfile);
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+
+        when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+                .thenReturn(pages);
+        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
+                staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+
+        List<SearchStaffUserResponse> searchResponse =
+                responseEntity.getBody();
+        assertThat(responseEntity.getBody()).isNotNull();
+    }
+
+    @Test
     void should_return_empty_list_of_case_worker_profile_with_status_code_200() {
 
         var pageRequest =
                 validateAndBuildPagination(20, 1,
                         20, 1);
 
-        String searchString = "cwr-test";
+        String searchString = "cwr";
         ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 

@@ -68,26 +68,39 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     private List<SearchStaffUserResponse> mapCaseWorkerProfilesToSearchResponse(List<CaseWorkerProfile>
-                                                                                    caseWorkerProfiles) {
+                                                                                        caseWorkerProfiles) {
         List<SearchStaffUserResponse> searchStaffUserResponse = new ArrayList<>();
-        caseWorkerProfiles.forEach(caseWorkerProfile -> searchStaffUserResponse.add(
-            SearchStaffUserResponse.builder()
-                .firstName(caseWorkerProfile.getFirstName())
-                .lastName(caseWorkerProfile.getLastName())
-                .emailId(caseWorkerProfile.getEmailId())
-                .services(mapServicesToDto(caseWorkerProfile.getCaseWorkerWorkAreas()))
-                .region(caseWorkerProfile.getRegion())
-                .regionId(caseWorkerProfile.getRegionId())
-                .roles(mapRolesToDto(caseWorkerProfile.getCaseWorkerRoles()))
-                .taskSupervisor(caseWorkerProfile.getTaskSupervisor())
-                .caseAllocator(caseWorkerProfile.getCaseAllocator())
-                .suspended(caseWorkerProfile.getSuspended())
-                .staffAdmin(caseWorkerProfile.getUserAdmin())
-                .baseLocations(mapBaseLocationsToDto(caseWorkerProfile.getCaseWorkerLocations()))
-                .userType(caseWorkerProfile.getUserType().getDescription())
-                .skills(mapSkillsToDto(caseWorkerProfile.getCaseWorkerSkills()))
-                .build()
-        ));
+        caseWorkerProfiles.forEach(caseWorkerProfile -> {
+            SearchStaffUserResponse searchStaffUserResponseValue =
+                    SearchStaffUserResponse.builder()
+                            .firstName(caseWorkerProfile.getFirstName())
+                            .lastName(caseWorkerProfile.getLastName())
+                            .emailId(caseWorkerProfile.getEmailId())
+                            .services(mapServicesToDto(caseWorkerProfile.getCaseWorkerWorkAreas()))
+                            .region(caseWorkerProfile.getRegion())
+                            .regionId(caseWorkerProfile.getRegionId())
+                            .roles(mapRolesToDto(caseWorkerProfile.getCaseWorkerRoles()))
+                            .baseLocations(mapBaseLocationsToDto(caseWorkerProfile.getCaseWorkerLocations()))
+                            .userType(caseWorkerProfile.getUserType().getDescription())
+                            .skills(mapSkillsToDto(caseWorkerProfile.getCaseWorkerSkills()))
+                            .build();
+
+            if (caseWorkerProfile.getTaskSupervisor() != null) {
+                searchStaffUserResponseValue.setTaskSupervisor(caseWorkerProfile.getTaskSupervisor());
+            }
+            if (caseWorkerProfile.getCaseAllocator() != null) {
+                searchStaffUserResponseValue.setCaseAllocator(caseWorkerProfile.getCaseAllocator());
+            }
+            if (caseWorkerProfile.getSuspended() != null) {
+                searchStaffUserResponseValue.setSuspended(caseWorkerProfile.getSuspended());
+            }
+            if (caseWorkerProfile.getUserAdmin() != null) {
+                searchStaffUserResponseValue.setStaffAdmin(caseWorkerProfile.getUserAdmin());
+            }
+            searchStaffUserResponse.add(
+                    searchStaffUserResponseValue
+            );
+        });
 
         return searchStaffUserResponse;
     }
