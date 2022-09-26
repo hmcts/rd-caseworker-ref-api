@@ -15,6 +15,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_SYSTEM_USER;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
 
 @Slf4j
 public class IdamOpenIdClient extends IdamOpenId {
@@ -51,6 +52,8 @@ public class IdamOpenIdClient extends IdamOpenId {
             if (ROLE_CWD_ADMIN.equals(role)) {
                 return getcwdAdminOpenIdToken(role);
             } else if (ROLE_CWD_SYSTEM_USER.equals(role)) {
+                return getCwdSystemUserOpenIdToken(role);
+            } else if (ROLE_STAFF_ADMIN.equals(role)) {
                 return getCwdSystemUserOpenIdToken(role);
             } else {
                 return getToken(role);

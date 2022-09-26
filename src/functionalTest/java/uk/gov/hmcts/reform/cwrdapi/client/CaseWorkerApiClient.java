@@ -23,7 +23,7 @@ import java.util.Set;
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
 
@@ -222,7 +222,7 @@ public class CaseWorkerApiClient {
     }
 
     public Object fetchUserType(HttpStatus expectedStatus) {
-        Response response = getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+        Response response = getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
                 .get("/refdata/case-worker/user-type")
                 .andReturn();
         response.then()

@@ -7,7 +7,6 @@ import io.swagger.annotations.Authorization;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -63,10 +62,6 @@ public class StaffRefDataController {
                     message = FORBIDDEN_ERROR
             ),
             @ApiResponse(
-                    code = 404,
-                    message = "The User Types could not be found"
-            ),
-            @ApiResponse(
                     code = 500,
                     message = INTERNAL_SERVER_ERROR
             )
@@ -75,25 +70,19 @@ public class StaffRefDataController {
             path = "/user-type",
             produces = APPLICATION_JSON_VALUE
     )
-    @Secured("cwd-admin")
+    @Secured("staff-admin")
     public ResponseEntity<Object> fetchUserTypes() {
         log.info("{} : Fetching the user types", loggingComponentName);
         StaffRefDataUserTypesResponse.StaffRefDataUserTypesResponseBuilder staffReferenceDataUserTypesResponseBuilder
                 = StaffRefDataUserTypesResponse.builder();
         List<UserType> userTypes = staffRefDataService.fetchUserTypes();
-
-        if (ObjectUtils.isNotEmpty(userTypes)) {
-            List<StaffRefDataUserType> refDataUserTypes = userTypes.stream()
-                    .map(StaffRefDataUserType::new)
-                    .toList();
-            staffReferenceDataUserTypesResponseBuilder.userTypes(refDataUserTypes);
-            log.debug("refDataUserTypes = {}", refDataUserTypes);
-            return ResponseEntity
-                    .status(200)
-                    .body(staffReferenceDataUserTypesResponseBuilder.build());
-        } else {
-            log.error("Record not found ");
-            return ResponseEntity.status(404).body(userTypes);
-        }
+        List<StaffRefDataUserType> refDataUserTypes = userTypes.stream()
+                .map(StaffRefDataUserType::new)
+                .toList();
+        staffReferenceDataUserTypesResponseBuilder.userTypes(refDataUserTypes);
+        log.debug("refDataUserTypes = {}", refDataUserTypes);
+        return ResponseEntity
+                .status(200)
+                .body(staffReferenceDataUserTypesResponseBuilder.build());
     }
 }

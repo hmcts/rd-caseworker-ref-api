@@ -74,7 +74,7 @@ class StaffRefDataControllerTest {
 
     @Test
     void shouldFetchNoUserTypes() {
-        responseEntity = ResponseEntity.status(404).body(null);
+        responseEntity = ResponseEntity.status(200).body(null);
         userTypes.clear();
         when(staffRefDataServiceMock.fetchUserTypes())
                 .thenReturn(userTypes);
