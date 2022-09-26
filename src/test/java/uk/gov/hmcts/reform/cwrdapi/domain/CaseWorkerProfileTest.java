@@ -36,6 +36,7 @@ class CaseWorkerProfileTest {
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
         caseWorkerProfile.setCaseAllocator(false);
         caseWorkerProfile.setTaskSupervisor(false);
+        caseWorkerProfile.setUserAdmin(true);
         caseWorkerProfile.setNew(true);
 
         UserType userType = new UserType();
@@ -59,6 +60,7 @@ class CaseWorkerProfileTest {
         assertNotNull(caseWorkerProfile.getLastUpdate());
         assertFalse(caseWorkerProfile.getCaseAllocator());
         assertFalse(caseWorkerProfile.getTaskSupervisor());
+        assertTrue(caseWorkerProfile.getUserAdmin());
         assertTrue(caseWorkerProfile.isNew());
 
         assertNotNull(caseWorkerProfile.getUserType());
