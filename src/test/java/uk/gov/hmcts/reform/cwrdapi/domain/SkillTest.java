@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 
-public class SkillTest {
+class SkillTest {
 
     @Test
     void testSkill() {

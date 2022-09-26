@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class StaffRefDataControllerTest {
+class StaffRefDataControllerTest {
 
     @Mock
     StaffRefDataService staffRefDataService;
@@ -63,6 +63,6 @@ public class StaffRefDataControllerTest {
         assertNotNull(responseEntity);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(responseEntity.getBody().getServiceSkills().size(), 0);
+        assertEquals(0,responseEntity.getBody().getServiceSkills().size());
     }
 }

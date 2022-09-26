@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 
 @SuppressWarnings("AbbreviationAsWordInName")
 @ExtendWith(MockitoExtension.class)
-public class StaffRefDataServiceImplTest {
+class StaffRefDataServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
     @Mock
@@ -93,7 +93,7 @@ public class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
         assertThat(serviceSkills).isNotNull();
 
-        assertThat(serviceSkills.size()).isEqualTo(0);
+        assertThat(serviceSkills.size()).isZero();
     }
 
     @Test
@@ -107,7 +107,7 @@ public class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
         assertThat(serviceSkills).isNotNull();
 
-        assertThat(serviceSkills.size()).isEqualTo(0);
+        assertThat(serviceSkills.size()).isZero();
     }
 
     @Test
@@ -184,21 +184,21 @@ public class StaffRefDataServiceImplTest {
         List<SearchStaffUserResponse> searchResponse =
                 responseEntity.getBody();
         assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(searchResponse.size()).isEqualTo(0);
+        assertThat(searchResponse.size()).isZero();
     }
 
 
     void validateSearchStaffUserResponses(List<SearchStaffUserResponse> searchResponses) {
-        assertThat(searchResponses.size()).isEqualTo(1);
+        assertThat(searchResponses).hasSize(1);
 
         SearchStaffUserResponse searchStaffUserResponse = searchResponses.get(0);
         assertThat(searchStaffUserResponse.getFirstName()).isEqualTo("firstName");
         assertThat(searchStaffUserResponse.getLastName()).isEqualTo("Last`name");
         assertThat(searchStaffUserResponse.getEmailId()).isEqualTo("a@b.com");
-        assertThat(searchStaffUserResponse.isSuspended()).isEqualTo(true);
-        assertThat(searchStaffUserResponse.isTaskSupervisor()).isEqualTo(true);
-        assertThat(searchStaffUserResponse.isCaseAllocator()).isEqualTo(false);
-        assertThat(searchStaffUserResponse.isStaffAdmin()).isEqualTo(true);
+        assertThat(searchStaffUserResponse.isSuspended()).isTrue();
+        assertThat(searchStaffUserResponse.isTaskSupervisor()).isTrue();
+        assertThat(searchStaffUserResponse.isCaseAllocator()).isFalse();
+        assertThat(searchStaffUserResponse.isStaffAdmin()).isTrue();
 
         ServiceResponse serviceResponse = searchStaffUserResponse.getServices().get(0);
 
