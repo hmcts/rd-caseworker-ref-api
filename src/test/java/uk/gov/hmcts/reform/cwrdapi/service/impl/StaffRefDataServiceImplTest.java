@@ -135,6 +135,30 @@ public class StaffRefDataServiceImplTest {
         validateSearchStaffUserResponses(searchResponse);
     }
 
+    @Test
+    void should_return_empty_list_of_case_worker_profile_with_status_code_200() {
+
+        var pageRequest =
+                validateAndBuildPagination(20, 1,
+                        20, 1);
+
+        String searchString = "cwr-test";
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+
+        when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+                .thenReturn(pages);
+        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
+                staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+
+        List<SearchStaffUserResponse> searchResponse =
+                responseEntity.getBody();
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(searchResponse.size()).isEqualTo(0);
+    }
+
+
     void validateSearchStaffUserResponses(List<SearchStaffUserResponse> searchResponses) {
         assertThat(searchResponses.size()).isEqualTo(1);
 
