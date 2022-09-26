@@ -93,7 +93,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
         assertThat(serviceSkills).isNotNull();
 
-        assertThat(serviceSkills.size()).isZero();
+        assertThat(serviceSkills).isEmpty();
     }
 
     @Test
@@ -107,7 +107,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
         assertThat(serviceSkills).isNotNull();
 
-        assertThat(serviceSkills.size()).isZero();
+        assertThat(serviceSkills).isEmpty();
     }
 
     @Test
@@ -184,7 +184,7 @@ class StaffRefDataServiceImplTest {
         List<SearchStaffUserResponse> searchResponse =
                 responseEntity.getBody();
         assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(searchResponse.size()).isZero();
+        assertThat(searchResponse).isEmpty();
     }
 
 

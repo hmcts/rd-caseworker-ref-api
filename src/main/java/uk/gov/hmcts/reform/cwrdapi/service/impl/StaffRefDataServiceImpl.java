@@ -169,13 +169,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Override
     public StaffWorkerSkillResponse getServiceSkills() {
-        List<Skill> skills = null;
-        List<ServiceSkill> serviceSkills = new ArrayList<>();
+        List<ServiceSkill> serviceSkills = null;
         try {
             List<SkillDTO> skillData = new ArrayList<>();
-            skills = skillRepository.findAll();
-            Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
-            if (skillsOptional.isPresent()) {
+            List<Skill> skills  = skillRepository.findAll();
                 skillData = skills.stream().map(skill -> {
                     SkillDTO skillDTO = new SkillDTO();
                     skillDTO.setServiceId(skill.getServiceId());
@@ -187,7 +184,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 }).toList();
 
                 serviceSkills = mapSkillToServicesSkill(skillData);
-            }
 
         } catch (Exception exp) {
             log.error("{}:: StaffRefDataService getServiceSkills failed :: {}", loggingComponentName,
