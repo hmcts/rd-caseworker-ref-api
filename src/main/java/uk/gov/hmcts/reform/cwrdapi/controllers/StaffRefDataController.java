@@ -51,7 +51,7 @@ public class StaffRefDataController {
             @ApiResponse(
                     code = 200,
                     message = "Successfully fetched the user types",
-                    response = UserType.class
+                    response = StaffRefDataUserTypesResponse.class
             ),
             @ApiResponse(
                     code = 401,

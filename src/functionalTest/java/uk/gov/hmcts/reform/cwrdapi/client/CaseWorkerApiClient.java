@@ -228,11 +228,7 @@ public class CaseWorkerApiClient {
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
-        if (expectedStatus.is2xxSuccessful()) {
-            return response.getBody().as(StaffRefDataUserTypesResponse.class);
-        } else {
-            return response.getBody().as(ErrorResponse.class);
-        }
+        return response.getBody().as(StaffRefDataUserTypesResponse.class);
     }
 
 }
