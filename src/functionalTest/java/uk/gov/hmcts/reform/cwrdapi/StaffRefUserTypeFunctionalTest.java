@@ -6,7 +6,6 @@ import net.serenitybdd.rest.SerenityRest;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,18 +66,16 @@ class StaffRefUserTypeFunctionalTest extends AuthorizationFunctionalTest {
     @SuppressWarnings("unchecked")
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
-    @Order(1)
     void should_fetchUserTypes_200() {
         StaffRefDataUserTypesResponse responses = (StaffRefDataUserTypesResponse)
                 caseWorkerApiClient.fetchUserType(
-                HttpStatus.OK
-            );
+                        HttpStatus.OK
+                );
         assertTrue(responses.getUserTypes().size() > 0);
     }
 
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
-    @Order(2)
     @ToggleEnable(mapKey = mapKey, withFeature = false)
     void should_fetchUserTypes_403_when_Api_toggled_off() {
 
@@ -92,10 +89,9 @@ class StaffRefUserTypeFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = mapKey, withFeature = true)
-    @Order(3)
     void should_fetchUserTypes_403_when_Api_toggled_on() {
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
                 .get("/refdata/case-worker/user-type")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());

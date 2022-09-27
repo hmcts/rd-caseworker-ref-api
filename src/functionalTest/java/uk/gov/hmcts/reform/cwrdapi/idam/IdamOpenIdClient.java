@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.idam;
 
-import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.lib.idam.IdamOpenId;
@@ -20,14 +20,7 @@ import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF
 @Slf4j
 public class IdamOpenIdClient extends IdamOpenId {
 
-
-    private final Gson gson = new Gson();
-
-    public static String crdAdminToken;
-
-    private static String sidamPassword;
-
-    public static String cwdSystemUserToken;
+    public static String cwdStaffAdminUserToken;
 
     public IdamOpenIdClient(TestConfigProperties testConfig) {
         super(testConfig);
@@ -53,8 +46,11 @@ public class IdamOpenIdClient extends IdamOpenId {
                 return getcwdAdminOpenIdToken(role);
             } else if (ROLE_CWD_SYSTEM_USER.equals(role)) {
                 return getCwdSystemUserOpenIdToken(role);
-            } else if (ROLE_STAFF_ADMIN.equals(role)) {
-                return getCwdSystemUserOpenIdToken(role);
+            } else if (ROLE_STAFF_ADMIN.equals(role) ) {
+                if(ObjectUtils.isEmpty(cwdStaffAdminUserToken)){
+                    cwdStaffAdminUserToken = getToken(role);
+                }
+                return cwdStaffAdminUserToken;
             } else {
                 return getToken(role);
             }
