@@ -107,8 +107,6 @@ class JsrValidatorInitializerTest {
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
-        Set<ConstraintViolation<CaseWorkerDomain>> constraintViolationSet =
-                jsrValidatorInitializer.getConstraintViolations();
 
         InvalidRequestException exception = Assertions.assertThrows(InvalidRequestException.class, () ->
                 jsrValidatorInitializerProfile.validateStaffProfile(profile));

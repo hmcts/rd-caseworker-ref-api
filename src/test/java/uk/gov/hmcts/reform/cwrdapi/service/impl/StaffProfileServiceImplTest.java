@@ -24,7 +24,9 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationRespo
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
@@ -39,11 +41,14 @@ import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -80,6 +85,7 @@ class StaffProfileServiceImplTest {
     private StaffProfileCreationRequest staffProfileCreationRequest;
     private RoleType roleType;
     private UserType userType;
+    private Skill skill;
     private CaseWorkerProfile caseWorkerProfile;
 
     ObjectMapper mapper = new ObjectMapper();
@@ -96,7 +102,7 @@ class StaffProfileServiceImplTest {
         idamRoles.add("IdamRole2");
 
         CaseWorkerRoleRequest caseWorkerRoleRequest =
-                new CaseWorkerRoleRequest("testRole", true);
+                new CaseWorkerRoleRequest("testRole1", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
@@ -113,7 +119,7 @@ class StaffProfileServiceImplTest {
 
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
-                .skillId("skill")
+                .skillId("1L")
                 .description("training")
                 .build();
 
@@ -155,6 +161,10 @@ class StaffProfileServiceImplTest {
         userType = new UserType();
         userType.setUserTypeId(1L);
         userType.setDescription("testUser1");
+
+        skill = new Skill();
+        skill.setSkillId(1L);
+        skill.setDescription("training");
     }
 
     @Test
@@ -291,6 +301,25 @@ class StaffProfileServiceImplTest {
         assertThat(caseWorkerProfile.getRegion()).isEqualTo(staffProfileCreationRequest.getRegion());
         assertThat(caseWorkerProfile.getCaseAllocator()).isEqualTo(staffProfileCreationRequest.isCaseAllocator());
         assertThat(caseWorkerProfile.getTaskSupervisor()).isEqualTo(staffProfileCreationRequest.isTaskSupervisor());
+    }
+
+    @Test
+    void testCaseWorkerRoleRequestMapping() {
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
+        List<CaseWorkerRole> caseWorkerRole = staffProfileServiceImpl.mapCaseWorkerRoleRequestMapping(
+                "1", staffProfileCreationRequest);
+
+        assertNotNull(caseWorkerRole);
+        assertEquals(1,caseWorkerRole.size());
+    }
+
+    @Test
+    void testCaseWorkerSkillMapping() {
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getSkills()).thenReturn(List.of(skill));
+        List<CaseWorkerSkill> caseWorkerSkill = staffProfileServiceImpl.mapCaseWorkerSkillRequestMapping(
+                "1", staffProfileCreationRequest);
+        assertNotNull(caseWorkerSkill);
+        assertEquals(1,caseWorkerSkill.size());
     }
 
 }

@@ -122,10 +122,8 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     SkillRepository skillRepository;
 
     @Autowired
-    IJsrValidatorInitializer validateStaffProfile;
+    IJsrValidatorInitializer<StaffProfileCreationRequest> validateStaffProfile;
 
-
-    @SuppressWarnings("unchecked")
     @Override
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest profileRequest) {
 
@@ -213,7 +211,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
             caseWorkerProfile.setNew(true);
             processedCwProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
             log.info("{}:: {} case worker profiles inserted ::", loggingComponentName,
-                    processedCwProfiles, validationServiceFacade.getAuditJobId());
+                    processedCwProfiles);
         }
 
         return processedCwProfiles;
@@ -350,7 +348,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     }
 
 
-    private List<CaseWorkerSkill> mapCaseWorkerSkillRequestMapping(String idamId,
+    public List<CaseWorkerSkill> mapCaseWorkerSkillRequestMapping(String idamId,
                                                                  StaffProfileCreationRequest staffProfileRequest) {
         List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
         staffProfileRequest.getSkills().forEach(skill -> caseWorkerStaticValueRepositoryAccessor
