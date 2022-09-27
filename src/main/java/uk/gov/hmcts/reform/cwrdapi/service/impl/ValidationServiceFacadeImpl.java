@@ -238,7 +238,8 @@ public class ValidationServiceFacadeImpl implements IValidationService {
 
             staffAuditRepository.save(staffAudit);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.info("{}:: Failure errorMessager {} in caseworker {}  ", loggingComponentName, errorMessage,
+                    caseWorkerId);
         }
     }
 

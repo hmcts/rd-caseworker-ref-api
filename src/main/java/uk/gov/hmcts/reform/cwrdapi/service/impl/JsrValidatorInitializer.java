@@ -73,9 +73,7 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
         return constraintViolations;
     }
 
-    @Override
-     public void validateStaffProfile(T profileRequest) {
-
+    public void validateStaffProfile(T profileRequest) {
         getInvalidJsrRecords(List.of(profileRequest));
 
         constraintViolations  = getConstraintViolations();
