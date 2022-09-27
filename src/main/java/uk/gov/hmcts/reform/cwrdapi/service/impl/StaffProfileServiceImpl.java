@@ -314,7 +314,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     }
 
     // get the userTypeId by description.
-    public Long getUserTypeIdByDesc(String userTypeReq) {
+    private Long getUserTypeIdByDesc(String userTypeReq) {
         Optional<Long> userTypeId = caseWorkerStaticValueRepositoryAccessor
                 .getUserTypes()
                 .stream().filter(userType ->
@@ -364,11 +364,6 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         return caseWorkerSkills;
 
     }
-    /**
-     * Prepare caseworker data to be published as a message to topic.
-     *
-     * @param caseWorkerData list containing caseworker data
-     */
 
     @Override
     public void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse) {

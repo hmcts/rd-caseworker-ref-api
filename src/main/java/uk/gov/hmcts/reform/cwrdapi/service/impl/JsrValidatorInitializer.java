@@ -77,9 +77,9 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
         getInvalidJsrRecords(List.of(profileRequest));
 
         constraintViolations  = getConstraintViolations();
-        ofNullable(constraintViolations).ifPresent(constraintViolations ->
-                    constraintViolations.stream().forEach(constraintViolation -> {
-                        String errorMsg =    constraintViolation.getMessage();
+        ofNullable(constraintViolations).ifPresent(constraints ->
+                    constraints.stream().forEach(constraintError -> {
+                        String errorMsg =    constraintError.getMessage();
                         validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,errorMsg,
                                 null,null);
                         throw new InvalidRequestException(errorMsg);

@@ -90,11 +90,6 @@ public class StaffRefDataController {
         StaffProfileCreationResponse response = null;
 
         response = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
-
-        if (null != response) {
-
-            //staffProfileService.publishStaffProfileToTopic(response);
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

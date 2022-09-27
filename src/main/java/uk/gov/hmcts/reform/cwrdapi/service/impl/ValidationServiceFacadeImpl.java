@@ -219,6 +219,11 @@ public class ValidationServiceFacadeImpl implements IValidationService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
 
+            if (errorMessage != null && errorMessage.length() > 512) {
+
+                errorMessage = errorMessage.substring(0, 511);
+            }
+
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
             String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : null;
 
@@ -227,9 +232,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
             StaffAudit staffAudit = StaffAudit.builder()
                         .status(auditStatus.getStatus().toUpperCase())
                         .requestTimeStamp(LocalDateTime.now())
-                        .errorDescription(errorMessage != null
-                         ? (errorMessage.length() > 512
-                                ? errorMessage.substring(0,511)  : errorMessage) : null)
+                        .errorDescription(errorMessage)
                         .authenticatedUserId(userId)
                         .caseWorkerId(caseWorkerId)
                         .operationType("CREATE")
