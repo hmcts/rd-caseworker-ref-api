@@ -21,16 +21,7 @@ import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF
 @Slf4j
 public class IdamOpenIdClient extends IdamOpenId {
 
-
-    private final Gson gson = new Gson();
-
-    public static String crdAdminToken;
-
-    private static String sidamPassword;
-
-    public static String cwdSystemUserToken;
     public static String cwdStaffAdminUserToken;
-
 
     public IdamOpenIdClient(TestConfigProperties testConfig) {
         super(testConfig);
@@ -69,6 +60,7 @@ public class IdamOpenIdClient extends IdamOpenId {
         }
         return null;
     }
+
 
 
     public void deleteSidamUser(String email) {
