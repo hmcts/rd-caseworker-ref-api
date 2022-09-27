@@ -42,10 +42,14 @@ class StaffRefDataJobTitleTest {
     @Test
     @SuppressWarnings("unchecked")
     void testFetchJobTitle_one() {
-        when(roleTypeRepository.findAll()).thenReturn(prepareRoleTypeResponse());
+        List<RoleType> roleTypes = new ArrayList<>();
+        roleTypes.add(new RoleType(1l, "Role Type 1"));
+        when(roleTypeRepository.findAll()).thenReturn(roleTypes);
         var staffRefDataUserTypesResponses = (List<RoleType>) staffRefDataService
                 .getJobTitles();
         assertFalse(verifyCurrentRoleTypes(staffRefDataUserTypesResponses.get(0)));
+        //added to verify counts
+        assertEquals(1, staffRefDataUserTypesResponses.size());
     }
 
     @Test
@@ -57,6 +61,7 @@ class StaffRefDataJobTitleTest {
         var staffRefDataUserTypesResponses = (List<RoleType>) staffRefDataService
                 .getJobTitles();
         assertTrue(staffRefDataUserTypesResponses.isEmpty());
+        assertEquals(0, staffRefDataUserTypesResponses.size());
     }
 
     private List<RoleType> prepareRoleTypeResponse() {
