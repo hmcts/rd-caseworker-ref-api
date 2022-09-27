@@ -10,13 +10,15 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class StaffRefDataJobTitleTest {
+class StaffRefDataJobTitleTest {
     @Mock
     private RoleTypeRepository roleTypeRepository;
 
@@ -28,9 +30,13 @@ public class StaffRefDataJobTitleTest {
     void testFetchJobTitle_All() {
         when(roleTypeRepository.findAll())
                 .thenReturn(prepareRoleTypeResponse());
-        var roleTypes =  staffRefDataService
+        var roleTypes = staffRefDataService
                 .getJobTitles();
         verifyAllRoleTypes(roleTypes);
+        //added to verify content
+        assertTrue(verifyAllRoleTypesContent(roleTypes, prepareRoleTypeResponse()));
+        //added to verify counts
+        assertEquals(4, roleTypes.size());
     }
 
     @Test
@@ -55,10 +61,10 @@ public class StaffRefDataJobTitleTest {
 
     private List<RoleType> prepareRoleTypeResponse() {
         var userTypeArrayList = new ArrayList<RoleType>();
-        userTypeArrayList.add(new RoleType(1L,"Role Type 1"));
-        userTypeArrayList.add(new RoleType(2L,"Role Type 2"));
-        userTypeArrayList.add(new RoleType(3L,"Role Type 3"));
-        userTypeArrayList.add(new RoleType(4L,"Role Type 4"));
+        userTypeArrayList.add(new RoleType(1L, "Role Type 1"));
+        userTypeArrayList.add(new RoleType(2L, "Role Type 2"));
+        userTypeArrayList.add(new RoleType(3L, "Role Type 3"));
+        userTypeArrayList.add(new RoleType(4L, "Role Type 4"));
 
         return userTypeArrayList;
     }
@@ -72,5 +78,18 @@ public class StaffRefDataJobTitleTest {
 
     private boolean verifyCurrentRoleTypes(RoleType roleType) {
         return roleType.getRoleId() == null || roleType.getDescription() == null;
+    }
+
+    private boolean verifyAllRoleTypesContent(List<RoleType> roleTypes, List<RoleType> prepareRoleTypeResponse) {
+        for (int i = 0; i < prepareRoleTypeResponse.size(); i++) {
+            RoleType staffRefDataRoleType = prepareRoleTypeResponse.get(i);
+            Optional<RoleType> roleType = roleTypes.stream().filter(e ->
+                    e.getRoleId().equals(staffRefDataRoleType.getRoleId())
+                            && e.getDescription().equals(staffRefDataRoleType.getDescription())).findAny();
+            if (!roleType.isPresent()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
