@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -33,6 +35,10 @@ class StaffRefDataServiceTest {
         var userTypes = staffRefDataService
                 .fetchUserTypes();
         verifyAllUserTypes(userTypes);
+        //added to verify conetent
+        assertTrue(verifyAllUserTypesContent(userTypes, prepareUserTypeResponse()));
+        //added to verify counts
+        assertEquals(4, userTypes.size());
     }
 
     @Test
@@ -75,4 +81,18 @@ class StaffRefDataServiceTest {
     private boolean verifyCurrentUserTypes(UserType userType) {
         return userType.getUserTypeId() == null || userType.getDescription() == null;
     }
+
+    private boolean verifyAllUserTypesContent(List<UserType> userTypes, List<UserType> prepareUserTypeResponse) {
+        for (int i = 0; i < prepareUserTypeResponse.size(); i++) {
+            UserType staffRefDataUserType = prepareUserTypeResponse.get(i);
+            Optional<UserType> userType = userTypes.stream().filter(e ->
+                    e.getUserTypeId().equals(staffRefDataUserType.getUserTypeId())
+                            && e.getDescription().equals(staffRefDataUserType.getDescription())).findAny();
+            if (!userType.isPresent()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
