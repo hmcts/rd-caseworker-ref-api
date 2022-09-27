@@ -7,7 +7,6 @@ import io.swagger.annotations.Authorization;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +40,7 @@ public class StaffRefDataController {
 
     @ApiOperation(
             value = "This API is used to retrieve the Job Title's ",
-            notes = "This API will be invoked by Job Title having idam role of staff-admin",
+            notes = "This API will be invoked by user having idam role of staff-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -77,19 +76,14 @@ public class StaffRefDataController {
         StaffRefJobTitleResponse.StaffRefJobTitleResponseBuilder staffRefJobTitleResponseBuilder
                 = StaffRefJobTitleResponse.builder();
         List<RoleType> roleType = staffRefDataService.getJobTitles();
+        List<StaffRefDataJobTitle> refDataJobTitles = roleType.stream()
+                .map(StaffRefDataJobTitle::new)
+                .toList();
+        staffRefJobTitleResponseBuilder.jobTitles(refDataJobTitles);
+        log.debug("refDataJobTitles = {}", refDataJobTitles);
+        return ResponseEntity
+                .status(200)
+                .body(staffRefJobTitleResponseBuilder.build());
 
-        if (ObjectUtils.isNotEmpty(roleType)) {
-            List<StaffRefDataJobTitle> refDataJobTitles = roleType.stream()
-                    .map(StaffRefDataJobTitle::new)
-                    .toList();
-            staffRefJobTitleResponseBuilder.jobTitles(refDataJobTitles);
-            log.debug("refDataJobTitles = {}", refDataJobTitles);
-            return   ResponseEntity
-                    .status(200)
-                    .body(staffRefJobTitleResponseBuilder.build());
-        } else {
-            log.error("Record not found ");
-            return ResponseEntity.status(404).body(roleType);
-        }
     }
 }

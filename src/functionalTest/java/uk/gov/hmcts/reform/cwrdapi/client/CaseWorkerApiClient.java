@@ -8,7 +8,6 @@ import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -228,10 +227,6 @@ public class CaseWorkerApiClient {
         response.then()
                 .assertThat()
                 .statusCode(expectedStatus.value());
-        if (expectedStatus.is2xxSuccessful()) {
-            return response.getBody().as(StaffRefJobTitleResponse.class);
-        } else {
-            return response.getBody().as(ErrorResponse.class);
-        }
+        return response.getBody().as(StaffRefJobTitleResponse.class);
     }
 }

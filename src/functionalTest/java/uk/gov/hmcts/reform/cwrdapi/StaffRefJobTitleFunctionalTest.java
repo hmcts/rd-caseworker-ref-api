@@ -85,4 +85,15 @@ class StaffRefJobTitleFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(response.getBody().asString()).contains(getToggledOffMessage());
     }
 
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    void should_fetchUserTypes_403_when_Api_toggled_on() {
+
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
+                .get("/refdata/case-worker/job-title")
+                .andReturn();
+        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
+    }
+
 }
