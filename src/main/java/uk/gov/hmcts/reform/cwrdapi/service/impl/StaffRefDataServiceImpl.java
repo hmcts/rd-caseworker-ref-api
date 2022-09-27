@@ -69,8 +69,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             result = skillData.stream()
                     .collect(
                             Collectors.toMap(
-                                    skill -> skill.getServiceId(),
-                                    skill -> Collections.singletonList(skill),
+                                    SkillDTO::getServiceId,
+                                    Collections::singletonList,
                                     this::mergeSkillsWithDuplicateServiceIds
                             )
                     );
