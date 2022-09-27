@@ -38,11 +38,19 @@ class StaffProfileChildListValidatorTest {
 
         CaseWorkerRoleRequest caseWorkerRoleRequest =
                 new CaseWorkerRoleRequest("testRole", true);
+        CaseWorkerRoleRequest caseWorkerRoleRequest2 =
+                new CaseWorkerRoleRequest("adminRole", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
                 .isPrimaryFlag(true)
                 .location("testLocation")
+                .locationId(1)
+                .build();
+        CaseWorkerLocationRequest caseWorkerLocationRequest2 = CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true)
+                .location("LocationSecond")
                 .locationId(1)
                 .build();
 
@@ -52,10 +60,22 @@ class StaffProfileChildListValidatorTest {
                 .service("service")
                 .build();
 
+        CaseWorkerServicesRequest caseWorkerServicesRequest2 = CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .serviceCode("ABCA5")
+                .service("service")
+                .build();
+
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
                 .skillId("skill")
                 .description("training")
+                .build();
+
+        SkillsRequest skillsRequest2 = SkillsRequest
+                .skillsRequest()
+                .skillId("skill2")
+                .description("training2")
                 .build();
 
 
@@ -72,10 +92,10 @@ class StaffProfileChildListValidatorTest {
                 .regionId(1)
                 .region("testRegion")
                 .userType("testUser1")
-                .services(singletonList(caseWorkerServicesRequest))
-                .baseLocations(singletonList(caseWorkerLocationRequest))
-                .roles(singletonList(caseWorkerRoleRequest))
-                .skills(singletonList(skillsRequest))
+                .services(List.of(caseWorkerServicesRequest,caseWorkerServicesRequest2))
+                .baseLocations(List.of(caseWorkerLocationRequest, caseWorkerLocationRequest2))
+                .roles(List.of(caseWorkerRoleRequest,caseWorkerRoleRequest2))
+                .skills(List.of(skillsRequest,skillsRequest2))
                 .build();
 
         context = mock(ConstraintValidatorContext.class);
