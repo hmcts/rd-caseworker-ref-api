@@ -111,4 +111,47 @@ class StaffProfileChildListValidatorTest {
         assertThat(response).isFalse();
     }
 
+    @Test
+    void testIsLocation() {
+        boolean response = sut.isValid(staffProfileCreationRequest, context);
+        when(sut.isValidLocations(staffProfileCreationRequest, context)).thenReturn(true);
+
+        assertThat(response).isFalse();
+
+        staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest().build();
+        boolean responseLocationEmpty = sut.isValid(staffProfileCreationRequest, context);
+        when(sut.isValidLocations(staffProfileCreationRequest, context)).thenReturn(true);
+
+        assertThat(responseLocationEmpty).isFalse();
+    }
+
+    @Test
+    void testisValidRoles() {
+        boolean response = sut.isValid(staffProfileCreationRequest, context);
+        when(sut.isValidRoles(staffProfileCreationRequest, context)).thenReturn(false);
+        assertThat(response).isFalse();
+
+        staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest().build();
+        boolean responseRolesEmpty = sut.isValid(staffProfileCreationRequest, context);
+        when(sut.isValidRoles(staffProfileCreationRequest, context)).thenReturn(false);
+        assertThat(responseRolesEmpty).isFalse();
+    }
+
+    @Test
+    void isValidAreaOfWk() {
+
+        boolean response = sut.isValid(staffProfileCreationRequest, context);
+        when(sut.isValidAreaOfWk(staffProfileCreationRequest, context)).thenReturn(true);
+        assertThat(response).isFalse();
+
+        staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest().build();
+        when(sut.isValidRoles(staffProfileCreationRequest, context)).thenReturn(true);
+        when(sut.isValidLocations(staffProfileCreationRequest, context)).thenReturn(true);
+        boolean responseServiceEmpty = sut.isValid(staffProfileCreationRequest, context);
+
+        assertThat(responseServiceEmpty).isFalse();
+    }
 }

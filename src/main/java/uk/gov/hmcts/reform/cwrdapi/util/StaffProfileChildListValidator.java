@@ -34,7 +34,7 @@ public class StaffProfileChildListValidator implements ConstraintValidator<Valid
             && isValidAreaOfWk(staffProfileCreationRequest, context));
     }
 
-    private boolean isValidAreaOfWk(StaffProfileCreationRequest staffProfileCreationRequest,
+    public boolean isValidAreaOfWk(StaffProfileCreationRequest staffProfileCreationRequest,
                                     ConstraintValidatorContext context) {
         boolean isValidAreaOfWk = true;
         if (isNotEmpty(staffProfileCreationRequest.getServices())
@@ -77,7 +77,7 @@ public class StaffProfileChildListValidator implements ConstraintValidator<Valid
         return isValidLocations;
     }
 
-    private boolean isValidRoles(StaffProfileCreationRequest staffProfileCreationRequest,
+    public boolean isValidRoles(StaffProfileCreationRequest staffProfileCreationRequest,
                                  ConstraintValidatorContext context) {
         boolean isValidRoles = true;
         if (isNotEmpty(staffProfileCreationRequest.getRoles())
