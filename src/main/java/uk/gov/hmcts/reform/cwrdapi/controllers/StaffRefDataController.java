@@ -66,7 +66,7 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE,
             path = {"/skill"}
     )
-    @Secured("cwd-admin")
+    @Secured("staff-admin")
     public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills() {
         log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
 

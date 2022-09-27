@@ -39,7 +39,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     public void should_return_service_skills_with_status_code_200_when_flag_true() {
 
         Response fetchResponse = caseWorkerApiClient
-                .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
+                .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
                 .get(STAFF_REF_DATA_SKILL_URL)
                 .andReturn();
         fetchResponse.then()
@@ -60,7 +60,7 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
     public void should_return_service_skills_with_status_code_403_when_flag_false() {
 
         Response fetchResponse = caseWorkerApiClient
-                .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_ADMIN)
+                .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
                 .get(STAFF_REF_DATA_SKILL_URL)
                 .andReturn();
 
