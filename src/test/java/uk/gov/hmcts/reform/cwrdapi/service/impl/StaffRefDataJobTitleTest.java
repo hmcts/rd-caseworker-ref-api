@@ -43,7 +43,7 @@ class StaffRefDataJobTitleTest {
     @SuppressWarnings("unchecked")
     void testFetchJobTitle_one() {
         List<RoleType> roleTypes = new ArrayList<>();
-        roleTypes.add(new RoleType(1l, "Role Type 1"));
+        roleTypes.add(new RoleType(1L, "Role Type 1"));
         when(roleTypeRepository.findAll()).thenReturn(roleTypes);
         var staffRefDataUserTypesResponses = (List<RoleType>) staffRefDataService
                 .getJobTitles();
