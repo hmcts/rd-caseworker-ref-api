@@ -17,7 +17,9 @@ import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -63,7 +65,8 @@ class StaffRefDataJobTitleControllerTest {
                         .jobTitles(staffRefDataJobTitles)
                         .build();
 
-        final ResponseEntity<Object> expectedResponseEntity = new ResponseEntity<>(srJobTitleResponse, null, HttpStatus.OK);
+        final ResponseEntity<Object> expectedResponseEntity =
+                new ResponseEntity<>(srJobTitleResponse, null, HttpStatus.OK);
 
 
         //when
@@ -75,10 +78,12 @@ class StaffRefDataJobTitleControllerTest {
         assertNotNull(actualReponseEntity);
         assertEquals(expectedResponseEntity.getStatusCode(), actualReponseEntity.getStatusCode());
 
-        final StaffRefJobTitleResponse actualStaffRefJobTitleResponse = (StaffRefJobTitleResponse) actualReponseEntity.getBody();
+        final StaffRefJobTitleResponse actualStaffRefJobTitleResponse =
+                (StaffRefJobTitleResponse) actualReponseEntity.getBody();
         assertNotNull(actualStaffRefJobTitleResponse);
 
-        final StaffRefJobTitleResponse expectedResponseEntityBody = (StaffRefJobTitleResponse) expectedResponseEntity.getBody();
+        final StaffRefJobTitleResponse expectedResponseEntityBody =
+                (StaffRefJobTitleResponse) expectedResponseEntity.getBody();
         assertNotNull(expectedResponseEntityBody);
 
 
@@ -102,7 +107,8 @@ class StaffRefDataJobTitleControllerTest {
                 .jobTitles(List.of())
                 .build();
 
-        final ResponseEntity<Object> expectedResponseEntity = new ResponseEntity<>(srJobTitleResponse, null, HttpStatus.OK);
+        final ResponseEntity<Object> expectedResponseEntity =
+                new ResponseEntity<>(srJobTitleResponse, null, HttpStatus.OK);
         //when
         when(staffRefDataServiceMock.getJobTitles()).thenReturn(List.of());
 
