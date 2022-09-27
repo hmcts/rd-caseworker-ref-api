@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
 
@@ -39,7 +38,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCE
 @DataJpaTest
 @TestPropertySource(properties = {"spring.config.location=classpath:application-test.yml"})
 @ContextConfiguration(classes = {CaseWorkerRefApiApplication.class, TestConfig.class, RepositoryConfig.class})
-public class ValidationServiceFacadeImplTest {
+class ValidationServiceFacadeImplTest {
 
     @Spy
     @Autowired
@@ -51,9 +50,8 @@ public class ValidationServiceFacadeImplTest {
     @MockBean
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-
     @Test
-    public void testAuditJsr() {
+    void testAuditJsr() {
 
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
@@ -78,18 +76,18 @@ public class ValidationServiceFacadeImplTest {
         String error = exceptionCaseWorkers.stream()
             .filter(s -> s.getFieldInError().equalsIgnoreCase("firstName"))
             .map(field -> field.getErrorDescription())
-            .collect(Collectors.toList()).get(0);
+            .toList().get(0);
         assertEquals(CaseWorkerConstants.FIRST_NAME_MISSING, error);
     }
 
     @Test
-    public void testInsertAudit() {
+    void testInsertAudit() {
         assertTrue(validationServiceFacadeImpl.updateCaseWorkerAuditStatus(AuditStatus.IN_PROGRESS, "test")
             > 0);
     }
 
     @Test
-    public void testStartAuditJob() {
+    void testStartAuditJob() {
         assertTrue(validationServiceFacadeImpl.startCaseworkerAuditing(AuditStatus.IN_PROGRESS, "test")
             > 0);
     }
