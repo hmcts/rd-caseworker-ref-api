@@ -30,10 +30,10 @@ public class IdamOpenIdClient extends IdamOpenId {
         log.info(":::: Get a User");
 
         Response generatedUserResponse = RestAssured.given().relaxedHTTPSValidation()
-            .baseUri(testConfig.getIdamApiUrl())
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .get("/testing-support/accounts/" + idamId)
-            .andReturn();
+                .baseUri(testConfig.getIdamApiUrl())
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .get("/testing-support/accounts/" + idamId)
+                .andReturn();
         if (generatedUserResponse.getStatusCode() == 404) {
             log.info("SIDAM getUser response 404");
         }
@@ -46,8 +46,8 @@ public class IdamOpenIdClient extends IdamOpenId {
                 return getcwdAdminOpenIdToken(role);
             } else if (ROLE_CWD_SYSTEM_USER.equals(role)) {
                 return getCwdSystemUserOpenIdToken(role);
-            } else if (ROLE_STAFF_ADMIN.equals(role) ) {
-                if(ObjectUtils.isEmpty(cwdStaffAdminUserToken)){
+            } else if (ROLE_STAFF_ADMIN.equals(role)) {
+                if (ObjectUtils.isEmpty(cwdStaffAdminUserToken)) {
                     cwdStaffAdminUserToken = getToken(role);
                 }
                 return cwdStaffAdminUserToken;
@@ -59,7 +59,6 @@ public class IdamOpenIdClient extends IdamOpenId {
         }
         return null;
     }
-
 
 
     public void deleteSidamUser(String email) {
