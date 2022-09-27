@@ -65,6 +65,8 @@ public class AuthorizationFunctionalTest {
     public static final String CASEWORKER_SENIOR_IAC = "caseworker-senior-iac";
     public static final String USER_STATUS_SUSPENDED = "SUSPENDED";
     public static final String ROLE_CWD_ADMIN = "cwd-admin";
+
+    public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
 
     @Autowired

@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
@@ -33,9 +34,11 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -78,6 +81,11 @@ public class StaffReferenceDataProviderTest {
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
 
+    @InjectMocks
+    private StaffRefDataServiceImpl staffRefDataServiceImpl;
+    @Mock
+    private UserTypeRepository userTypeRepository;
+
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
 
@@ -98,7 +106,9 @@ public class StaffReferenceDataProviderTest {
                         "preview", caseWorkerServiceImpl, caseWorkerDeleteServiceImpl),
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
-                        caseWorkerServiceImpl)
+                        caseWorkerServiceImpl),
+                new StaffRefDataController("RD-Caseworker-Staff-Ref-Api",
+                        staffRefDataServiceImpl)
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -134,7 +144,7 @@ public class StaffReferenceDataProviderTest {
                         .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
 
         CaseWorkerProfile caseWorkerProfile = getCaseWorkerProfile(USER_ID);
-        CaseWorkerWorkArea caseWorkerWorkArea  = new CaseWorkerWorkArea();
+        CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
         caseWorkerWorkArea.setCaseWorkerId("cwId");
         caseWorkerWorkArea.setServiceCode("BFA1");
         caseWorkerWorkArea.setCaseWorkerProfile(caseWorkerProfile);
@@ -174,6 +184,16 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
                 new UserType(1L, "HMCTS"), false);
+    }
+
+    @State({"A list of all staff reference data user-type"})
+    public void fetchUserTypes() {
+        List<UserType> userTypeList = new ArrayList<>();
+        userTypeList.add(new UserType(1L, "User Type 1"));
+        userTypeList.add(new UserType(2L, "User Type 2"));
+        userTypeList.add(new UserType(3L, "User Type 3"));
+        when(userTypeRepository.findAll())
+                .thenReturn(userTypeList);
     }
 
 }
