@@ -79,7 +79,7 @@ class StaffRefUserTypeFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = mapKey, withFeature = false)
     void should_fetchUserTypes_403_when_Api_toggled_off() {
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
                 .get("/refdata/case-worker/user-type")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
