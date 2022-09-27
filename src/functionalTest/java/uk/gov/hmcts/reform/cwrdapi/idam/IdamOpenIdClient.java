@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.idam;
 
-import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
