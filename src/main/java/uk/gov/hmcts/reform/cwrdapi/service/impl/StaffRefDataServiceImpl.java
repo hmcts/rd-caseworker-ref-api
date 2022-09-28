@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
@@ -17,6 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
+
+import java.util.List;
+
+
 @Service
 @Slf4j
 @SuppressWarnings("AbbreviationAsWordInName")
@@ -26,7 +35,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     private String loggingComponentName;
 
     @Autowired
+    private UserTypeRepository userTypeRepository;
+
+    @Autowired
     SkillRepository skillRepository;
+
+    @Override
+    public List<UserType> fetchUserTypes() {
+        return userTypeRepository
+                .findAll();
+    }
+
 
     @Override
     public StaffWorkerSkillResponse getServiceSkills() {
