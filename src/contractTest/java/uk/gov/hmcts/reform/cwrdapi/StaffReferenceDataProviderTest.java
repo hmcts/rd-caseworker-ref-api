@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
@@ -86,6 +87,9 @@ public class StaffReferenceDataProviderTest {
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
     @Mock
     private UserTypeRepository userTypeRepository;
+    @Mock
+    private StaffProfileService staffProfileService;
+
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -109,7 +113,7 @@ public class StaffReferenceDataProviderTest {
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
                 new StaffRefDataController("RD-Caseworker-Staff-Ref-Api",
-                        staffRefDataServiceImpl)
+                        staffRefDataServiceImpl,staffProfileService)
         );
         if (context != null) {
             context.setTarget(testTarget);
