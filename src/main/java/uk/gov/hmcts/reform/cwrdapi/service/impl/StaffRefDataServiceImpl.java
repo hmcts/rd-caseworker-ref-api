@@ -2,14 +2,15 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.ArrayList;
@@ -17,13 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
-
-import java.util.List;
 
 
 @Service

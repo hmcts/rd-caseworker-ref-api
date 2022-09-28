@@ -35,11 +35,8 @@ import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
-
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
