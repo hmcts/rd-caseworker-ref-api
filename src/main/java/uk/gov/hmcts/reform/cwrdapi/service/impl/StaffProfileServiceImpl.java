@@ -122,6 +122,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     IJsrValidatorInitializer validateStaffProfile;
 
     @Override
+    @SuppressWarnings("unchecked")
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest profileRequest) {
 
         final CaseWorkerProfile newCaseWorkerProfiles;
