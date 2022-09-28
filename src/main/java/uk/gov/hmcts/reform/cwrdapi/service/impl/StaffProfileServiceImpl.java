@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
-import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
@@ -105,9 +104,6 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     private UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
-    private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
-
-    @Autowired
     private TopicPublisher topicPublisher;
 
     @Autowired
@@ -122,10 +118,9 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     SkillRepository skillRepository;
 
     @Autowired
-    IJsrValidatorInitializer validateStaffProfile;
+    IJsrValidatorInitializer<StaffProfileCreationRequest> validateStaffProfile;
 
     @Override
-    @SuppressWarnings("unchecked")
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest profileRequest) {
 
         final CaseWorkerProfile newCaseWorkerProfiles;
