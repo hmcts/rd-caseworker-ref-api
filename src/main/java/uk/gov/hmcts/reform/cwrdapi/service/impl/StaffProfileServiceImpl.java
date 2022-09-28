@@ -119,8 +119,7 @@ public class StaffProfileServiceImpl implements StaffProfileService {
     SkillRepository skillRepository;
 
     @Autowired
-    @Qualifier("validateStaffProfile")
-    IJsrValidatorInitializer<StaffProfileCreationRequest> validateStaffProfile;
+    IJsrValidatorInitializer validateStaffProfile;
 
     @Override
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest profileRequest) {
