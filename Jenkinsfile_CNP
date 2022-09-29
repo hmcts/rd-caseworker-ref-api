@@ -8,6 +8,7 @@ def type = "java"
 def product = "rd"
 def component = "caseworker-ref-api"
 
+
 def secrets = [
   's2s-${env}': [
     secret('microservicekey-rd-caseworker-ref-api', 'CASEWORKER_REF_API_S2S_SECRET')
