@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,7 +79,7 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE,
             path = {"/profile"}
     )
-    //@Secured("staff-admin")
+    @Secured("staff-admin")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.CREATED)
     public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfile(@RequestBody StaffProfileCreationRequest

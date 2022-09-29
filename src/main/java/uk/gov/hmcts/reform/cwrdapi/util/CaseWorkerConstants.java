@@ -151,4 +151,5 @@ public final class CaseWorkerConstants {
 
     public static final String LRD_ERROR = "An error occurred while retrieving data from Location Reference Data";
     public static final String SRD = "SRD";
+    public static final String NO_CASE_WORKER_PROFILE_FOUND = "User does not exists.";
 }

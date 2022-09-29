@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
@@ -40,6 +42,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 
 import java.util.ArrayList;
@@ -52,6 +55,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 
@@ -121,6 +125,10 @@ public class StaffProfileServiceImpl implements StaffProfileService {
         try {
 
             newCaseWorkerProfiles =   checkStaffProfileEmail(profileRequest.getEmailId());
+
+            if (ObjectUtils.isEmpty(newCaseWorkerProfiles)) {
+                throw new ResourceNotFoundException(CaseWorkerConstants.NO_CASE_WORKER_PROFILE_FOUND);
+            }
 
             newCaseWorkerProfiles.setFirstName(profileRequest.getFirstName());
             newCaseWorkerProfiles.setLastName(profileRequest.getLastName());
