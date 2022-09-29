@@ -107,13 +107,13 @@ class StaffRefDataControllerTest {
     @Test
     void shouldFetchUserTypes() {
         responseEntity = ResponseEntity.status(200).body(null);
-        when(staffRefDataServiceMock.fetchUserTypes())
+        when(staffRefDataService.fetchUserTypes())
                 .thenReturn(userTypes);
 
         ResponseEntity<?> actual = staffRefDataController.fetchUserTypes();
         final StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
         assertNotNull(actual);
-        verify(staffRefDataServiceMock, times(1))
+        verify(staffRefDataService, times(1))
                 .fetchUserTypes();
         assertEquals(responseEntity.getStatusCode(), actual.getStatusCode());
         assertEquals((userTypes.size()), actualResponse.getUserTypes().size());
@@ -126,13 +126,13 @@ class StaffRefDataControllerTest {
     void shouldFetchEmptyUserTypes() {
         responseEntity = ResponseEntity.status(200).body(null);
         userTypes.clear();
-        when(staffRefDataServiceMock.fetchUserTypes())
+        when(staffRefDataService.fetchUserTypes())
                 .thenReturn(userTypes);
 
         ResponseEntity<?> actual = staffRefDataController.fetchUserTypes();
         final StaffRefDataUserTypesResponse actualResponse = (StaffRefDataUserTypesResponse) actual.getBody();
         assertNotNull(actual);
-        verify(staffRefDataServiceMock, times(1))
+        verify(staffRefDataService, times(1))
                 .fetchUserTypes();
         assertEquals(responseEntity.getStatusCode(), actual.getStatusCode());
         assertEquals(0, (actualResponse.getUserTypes().size()));
