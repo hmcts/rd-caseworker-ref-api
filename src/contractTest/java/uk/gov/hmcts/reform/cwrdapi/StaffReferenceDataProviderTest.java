@@ -36,8 +36,10 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffProfileServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
 
 import java.time.LocalDateTime;
@@ -83,6 +85,10 @@ public class StaffReferenceDataProviderTest {
 
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
+
+    @InjectMocks
+    private StaffProfileServiceImpl staffProfileServiceImpl;
+
     @Mock
     private UserTypeRepository userTypeRepository;
 
@@ -108,7 +114,7 @@ public class StaffReferenceDataProviderTest {
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
                 new StaffRefDataController("RD-Caseworker-Staff-Ref-Api",
-                        staffRefDataServiceImpl)
+                        staffRefDataServiceImpl,staffProfileServiceImpl)
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -155,35 +161,43 @@ public class StaffReferenceDataProviderTest {
 
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+
+        caseWorkerProfile.setCaseWorkerId(caseWorkerId);
+        caseWorkerProfile.setFirstName("firstName");
+        caseWorkerProfile.setLastName("lastName");
+        caseWorkerProfile.setEmailId("sam.test@justice.gov.uk");
+        caseWorkerProfile.setUserTypeId(1L);
+        caseWorkerProfile.setRegion("National");
+        caseWorkerProfile.setRegionId(1);
+        caseWorkerProfile.setSuspended(false);
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setTaskSupervisor(false);
+        caseWorkerProfile.setUserAdmin(true);
+
         LocalDateTime timeNow = LocalDateTime.now();
+
+        caseWorkerProfile.setCreatedDate(timeNow);
+        caseWorkerProfile.setLastUpdate(timeNow);
 
         List<CaseWorkerLocation> caseWorkerLocations =
                 Collections.singletonList(new CaseWorkerLocation(caseWorkerId, 1,
                         "National", true));
-
         List<CaseWorkerWorkArea> caseWorkerWorkAreas =
                 Collections.singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
-
         List<CaseWorkerRole> caseWorkerRoles =
                 Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
         caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
+        caseWorkerProfile.setCaseWorkerLocations(caseWorkerLocations);
+        caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
+        caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
 
-        return new CaseWorkerProfile(caseWorkerId,
-                "firstName",
-                "lastName",
-                "sam.test@justice.gov.uk",
-                1L,
-                "National",
-                1,
-                false,
-                false,
-                false,
-                timeNow,
-                timeNow,
-                caseWorkerLocations,
-                caseWorkerWorkAreas,
-                caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false);
+        //List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
+
+        //caseWorkerProfile.setCaseWorkerSkills(caseWorkerSkills);
+        caseWorkerProfile.setUserType(new UserType(1L, "HMCTS"));
+
+        return caseWorkerProfile;
     }
 
     @State({"A list of all staff reference data user-type"})
