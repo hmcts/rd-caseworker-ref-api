@@ -53,6 +53,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 CWD_FETCH_STAFF_BY_CCD_SERVICE_NAMES);
         launchDarklyMap.put("StaffRefDataController.fetchUserTypes",
                 RD_STAFF_UI);
+        launchDarklyMap.put("StaffRefDataController.retrieveJobTitles",
+                RD_STAFF_UI);
     }
 
     @Override
