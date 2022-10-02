@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.service.FeatureToggleService;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 
 @Service
 public class FeatureToggleServiceImpl implements FeatureToggleService {
