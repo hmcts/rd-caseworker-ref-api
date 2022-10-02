@@ -1,26 +1,19 @@
-package uk.gov.hmcts.reform.cwrdapi.service.impl;
+package uk.gov.hmcts.reform.cwrdapi.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Request;
-import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
-import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -29,69 +22,35 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
-import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class StaffProfileServiceImplTest {
+class StaffProfileCreateUpdateUtilTest {
     @Mock
-    private CaseWorkerProfileRepository caseWorkerProfileRepository;
+    StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
     @Mock
-    CaseWorkerLocationRepository caseWorkerLocationRepository;
-    @Mock
-    CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
-    @Mock
-    CaseWorkerRoleRepository caseWorkerRoleRepository;
-    @Mock
-    CaseWorkerIdamRoleAssociationRepository caseWorkerIdamRoleAssociationRepository;
-    @Mock
-    private UserProfileFeignClient userProfileFeignClient;
-    @Mock
-    private TopicPublisher topicPublisher;
-    @Mock
-    private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
-    @Mock
-    IValidationService validationServiceFacade;
-    @Mock
-    SkillRepository skillRepository;
-    @Mock
-    IJsrValidatorInitializer validateStaffProfile;
-
+    private CaseWorkerStaticValueRepositoryAccessor CaseWorkerStaticValueRepositoryAccessor;
     static final String COMMON_EMAIL_PATTERN = "CWR-func-test-user";
 
-    private StaffProfileCreationRequest staffProfileCreationRequest;
     private RoleType roleType;
     private UserType userType;
     private Skill skill;
     private CaseWorkerProfile caseWorkerProfile;
+    private StaffProfileCreationRequest staffProfileCreationRequest;
 
     ObjectMapper mapper = new ObjectMapper();
-
-    @InjectMocks
-    private StaffProfileServiceImpl staffProfileServiceImpl;
 
     @BeforeEach
     public void setUp() {
@@ -102,13 +61,19 @@ class StaffProfileServiceImplTest {
         idamRoles.add("IdamRole2");
 
         CaseWorkerRoleRequest caseWorkerRoleRequest =
-                new CaseWorkerRoleRequest("testRole1", true);
+                new CaseWorkerRoleRequest("testRole", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
                 .isPrimaryFlag(true)
                 .location("testLocation")
                 .locationId(1)
+                .build();
+
+        CaseWorkerWorkAreaRequest caseWorkerWorkAreaRequest = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .areaOfWork("testAOW")
+                .serviceCode("testServiceCode")
                 .build();
 
         CaseWorkerServicesRequest caseWorkerServicesRequest = CaseWorkerServicesRequest
@@ -122,7 +87,6 @@ class StaffProfileServiceImplTest {
                 .skillId("1L")
                 .description("training")
                 .build();
-
 
         staffProfileCreationRequest = StaffProfileCreationRequest
                 .staffProfileCreationRequest()
@@ -142,6 +106,7 @@ class StaffProfileServiceImplTest {
                 .roles(singletonList(caseWorkerRoleRequest))
                 .skills(singletonList(skillsRequest))
                 .build();
+
 
         Role caseWorkerRole = new Role();
         caseWorkerRole.setRoleId("id");
@@ -166,30 +131,6 @@ class StaffProfileServiceImplTest {
         skill.setSkillId(1L);
         skill.setDescription("training");
     }
-
-    @Test
-    void test_saveStaffProfile() throws JsonProcessingException {
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId("12345678");
-        userProfileCreationResponse.setIdamRegistrationResponse(1);
-
-        String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
-        when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
-        when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
-                .thenReturn(new ArrayList<>());
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
-
-        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
-
-        staffProfileServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
-
-        verify(caseWorkerProfileRepository, times(1)).save(any());
-        verify(caseWorkerIdamRoleAssociationRepository, times(1)).findByRoleTypeInAndServiceCodeIn(any(), any());
-    }
-
-
 
 
 
@@ -235,60 +176,9 @@ class StaffProfileServiceImplTest {
         return caseWorkerProfile;
     }
 
-
-    uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
-        Role
-                role = Role.builder()
-                .roleId("1")
-                .roleName("roleName")
-                .createdTime(LocalDateTime.now())
-                .lastUpdatedTime(LocalDateTime.now())
-                .isPrimary(true)
-                .build();
-        Location location = Location
-                .builder()
-                .baseLocationId(11111)
-                .locationName("LocationName")
-                .isPrimary(true)
-                .createdTime(LocalDateTime.now())
-                .lastUpdatedTime(LocalDateTime.now())
-                .build();
-        WorkArea workArea = WorkArea.builder()
-                .areaOfWork("areaOfWork")
-                .serviceCode("serviceCode")
-                .createdTime(LocalDateTime.now())
-                .lastUpdatedTime(LocalDateTime.now())
-                .build();
-
-        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
-                uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
-                        .id("27fbd198-552e-4c32-9caf-37be1545caaf")
-                        .firstName("firstName")
-                        .lastName("lastName")
-                        .officialEmail("a@b.com")
-                        .regionName("regionName")
-                        .regionId(1)
-                        .userType("userType")
-                        .userId(11111L)
-                        .suspended("false")
-                        .createdTime(LocalDateTime.now())
-                        .lastUpdatedTime(LocalDateTime.now())
-                        .roles(singletonList(role))
-                        .locations(singletonList(location))
-                        .workAreas(singletonList(workArea))
-                        .taskSupervisor("Y")
-                        .caseAllocator("N")
-                        .build();
-
-        return caseWorkerProfile;
-    }
-
-
     @Test
     void testMapCaseWorkerProfileRequest() {
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId("1");
-        CaseWorkerProfile caseWorkerProfile = staffProfileServiceImpl.mapCaseWorkerProfileRequest(
+        CaseWorkerProfile caseWorkerProfile = staffProfileCreateUpdateUtil.mapStaffProfileRequest(
                 "1", staffProfileCreationRequest, new CaseWorkerProfile());
 
         assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("1");
@@ -303,20 +193,11 @@ class StaffProfileServiceImplTest {
         assertThat(caseWorkerProfile.getTaskSupervisor()).isEqualTo(staffProfileCreationRequest.isTaskSupervisor());
     }
 
-    @Test
-    void testCaseWorkerRoleRequestMapping() {
-        when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
-        List<CaseWorkerRole> caseWorkerRole = staffProfileServiceImpl.mapCaseWorkerRoleRequestMapping(
-                "1", staffProfileCreationRequest);
-
-        assertNotNull(caseWorkerRole);
-        assertEquals(1,caseWorkerRole.size());
-    }
 
     @Test
     void testCaseWorkerSkillMapping() {
-        when(caseWorkerStaticValueRepositoryAccessorImpl.getSkills()).thenReturn(List.of(skill));
-        List<CaseWorkerSkill> caseWorkerSkill = staffProfileServiceImpl.mapCaseWorkerSkillRequestMapping(
+        when(CaseWorkerStaticValueRepositoryAccessor.getSkills()).thenReturn(List.of(skill));
+        List<CaseWorkerSkill> caseWorkerSkill = staffProfileCreateUpdateUtil.mapStaffSkillRequestMapping(
                 "1", staffProfileCreationRequest);
         assertNotNull(caseWorkerSkill);
         assertEquals(1,caseWorkerSkill.size());
