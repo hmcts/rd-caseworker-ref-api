@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
@@ -34,11 +36,16 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Autowired
     SkillRepository skillRepository;
 
+
+    @Autowired
+    RoleTypeRepository roleTypeRepository;
+
     @Override
     public List<UserType> fetchUserTypes() {
         return userTypeRepository
                 .findAll();
     }
+
 
 
     @Override
@@ -114,5 +121,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         mergedResults.addAll(newResults);
         return mergedResults;
     }
+
+
+    @Override
+    public List<RoleType> getJobTitles() {
+        return roleTypeRepository.findAll();
+    }
+
+
 
 }
