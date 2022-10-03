@@ -152,4 +152,4 @@ refresh:
 
 ### Email domain list
 email:
-  domainList: justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk
+  domainList: ${EMAIL_DOMAIN_LIST:justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk}
