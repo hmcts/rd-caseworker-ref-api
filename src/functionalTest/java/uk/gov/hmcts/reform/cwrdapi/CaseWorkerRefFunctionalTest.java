@@ -620,7 +620,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 caseWorkersProfileCreationRequests.get(1).setWorkerWorkAreaRequests(areaRequests);
                 caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
                 String ccdServiceNames = "Invalid";
-                Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                Response fetchResponse = caseWorkerApiClient
+                        .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
                         .get(STAFF_BY_SERVICE_NAME_URL
                                 + "?ccd_service_names=" + ccdServiceNames
                                 + "&page_number=1&page_size=100&sort_column=caseWorkerId&sort_direction=DESC")
