@@ -93,7 +93,7 @@ public class CaseWorkerApiClient {
     }
 
 
-    public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(int domainIndex, String... email) {
+    public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String... email) {
         List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
                 .location("test location")
@@ -117,7 +117,7 @@ public class CaseWorkerApiClient {
 
         Set<String> idamRoles = new HashSet<>();
 
-        String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail(domainIndex);
+        String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
         setEmailsTobeDeleted(emailToUsed.toLowerCase());
         return ImmutableList.of(
                 CaseWorkersProfileCreationRequest
@@ -137,7 +137,7 @@ public class CaseWorkerApiClient {
                         .workerWorkAreaRequests(areaRequests).build());
     }
 
-    public List<CaseWorkersProfileCreationRequest> updateCaseWorkerProfileRequest(int domainIndex, String... email) {
+    public List<CaseWorkersProfileCreationRequest> updateCaseWorkerProfileRequest(String... email) {
         List<CaseWorkerLocationRequest> locationRequestList = List.of(
                 CaseWorkerLocationRequest
                         .caseWorkersLocationRequest()
@@ -172,7 +172,7 @@ public class CaseWorkerApiClient {
 
         Set<String> idamRoles = new HashSet<>();
 
-        String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail(domainIndex);
+        String emailToUsed = isNotEmpty(email) && nonNull(email[0]) ? email[0] : generateRandomEmail();
         setEmailsTobeDeleted(emailToUsed);
         return ImmutableList.of(
                 CaseWorkersProfileCreationRequest

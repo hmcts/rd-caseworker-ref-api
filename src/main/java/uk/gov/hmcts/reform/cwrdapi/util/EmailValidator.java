@@ -27,7 +27,6 @@ public class EmailValidator implements ConstraintValidator<ValidateEmail, String
     @Override
     public boolean isValid(String emailAddress, ConstraintValidatorContext constraintValidatorContext) {
         if (ObjectUtils.isEmpty(emailAddress) || ObjectUtils.isEmpty(this.emailDomainList)) {
-            log.error("Email id => '{}' or email.domainList => {} should not empty", emailAddress, emailDomainList);
             return false;
         }
         return this.emailPatternMatches(emailAddress.toLowerCase());
