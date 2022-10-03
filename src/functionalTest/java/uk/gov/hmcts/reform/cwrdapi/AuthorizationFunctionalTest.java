@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +59,7 @@ public class AuthorizationFunctionalTest {
 
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@justice.gov.uk";
+    public static String[] EMAIL_TEMPLATE ;
     public static final String CWD_USER = "cwd-user";
     public static final String CASEWORKER_IAC_BULKSCAN = "caseworker-iac-bulkscan";
     public static final String CASEWORKER_IAC = "caseworker-iac";
@@ -101,8 +102,26 @@ public class AuthorizationFunctionalTest {
                 s2sToken, idamOpenIdClient);
     }
 
-    public static String generateRandomEmail() {
-        return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10)).toLowerCase();
+    public static String generateRandomEmail(int domainIndex) {
+        return String.format(EMAIL_TEMPLATE[domainIndex], randomAlphanumeric(10)).toLowerCase();
+    }
+
+
+    @Value("${email.domainList}")
+    public void setNameStatic(String emailDomainList){
+        List<String> emailArray = new ArrayList();
+        if(ObjectUtils.isNotEmpty(emailDomainList)) {
+            String[] domainArray = convertDomainStringIntoArray(emailDomainList);
+            for(int index=0;index<domainArray.length;index++){
+                emailArray.add("CWR-func-test-user-%s@"+domainArray[index]);
+            }
+        }
+        EMAIL_TEMPLATE = emailArray.toArray(new String[0]);
+        log.debug("Email Template = {}",EMAIL_TEMPLATE);
+    }
+
+    private static String[] convertDomainStringIntoArray(String emailDomainList) {
+        return  emailDomainList.split(",");
     }
 
 
@@ -120,12 +139,12 @@ public class AuthorizationFunctionalTest {
         emailsTobeDeleted.add(emailTobeDeleted);
     }
 
-    public List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
+    public List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile(int domainIndex) {
         Map<String, String> userDetail = idamOpenIdClient.createUser(CASEWORKER_IAC_BULKSCAN);
         String userEmail = userDetail.get(EMAIL);
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-                .createCaseWorkerProfiles(userEmail);
+                .createCaseWorkerProfiles(domainIndex, userEmail);
 
         caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
