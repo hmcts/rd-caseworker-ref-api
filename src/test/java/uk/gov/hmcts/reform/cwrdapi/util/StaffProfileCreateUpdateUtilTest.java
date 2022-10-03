@@ -19,8 +19,9 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerStaticValueRepositoryAccessorImpl;
 
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,9 +44,11 @@ class StaffProfileCreateUpdateUtilTest {
     @Mock
     private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
     @Mock
-    CaseWorkerRoleRepository caseWorkerRoleRepository;
+    CaseWorkerProfileRepository caseWorkerProfileRepo;
     @Mock
     CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
+    @Mock
+    private JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     private StaffProfileCreationRequest staffProfileCreationRequest;
     private RoleType roleType;
@@ -181,5 +185,19 @@ class StaffProfileCreateUpdateUtilTest {
                 staffProfileCreationRequest);
         verify(roleAssocRepository, times(1)).findByRoleTypeInAndServiceCodeIn(any(),any());
         verify(caseWorkerStaticValueRepositoryAccessorImpl, times(2)).getRoleTypes();
+    }
+
+    @Test
+    void testPersistStaffProfileNullValue() {
+        CaseWorkerProfile caseWorkerProfile = staffProfileCreateUpdateUtil.persistStaffProfile(null);
+        assertNull(caseWorkerProfile);
+    }
+
+    @Test
+    void testPersistStaffProfileValid() {
+        when(caseWorkerProfileRepo.save(any())).thenReturn(caseWorkerProfile);
+        CaseWorkerProfile processedCaseWorkerProfile = staffProfileCreateUpdateUtil
+                .persistStaffProfile(caseWorkerProfile);
+        assertNotNull(processedCaseWorkerProfile);
     }
 }

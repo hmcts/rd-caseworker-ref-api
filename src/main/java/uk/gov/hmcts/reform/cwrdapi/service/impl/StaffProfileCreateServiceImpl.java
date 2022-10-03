@@ -111,27 +111,27 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest profileRequest) {
+    public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest staffProfileRequest) {
 
         log.info("{}:: processStaffProfileCreation starts::",
                 loggingComponentName);
-        final CaseWorkerProfile newCaseWorkerProfiles;
-        final CaseWorkerProfile processedCwProfiles;
+        final CaseWorkerProfile newStaffProfiles;
+        final CaseWorkerProfile processedStaffProfiles;
         StaffProfileCreationResponse response = null;
 
-        validateStaffProfile.validateStaffProfile(profileRequest);
+        validateStaffProfile.validateStaffProfile(staffProfileRequest);
 
-        checkStaffProfileEmail(profileRequest);
-        newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
+        checkStaffProfileEmail(staffProfileRequest);
+        newStaffProfiles = createCaseWorkerProfile(staffProfileRequest);
 
-        processedCwProfiles = staffProfileCreateUpdateUtil.persistStaffProfile(newCaseWorkerProfiles);
+        processedStaffProfiles = staffProfileCreateUpdateUtil.persistStaffProfile(newStaffProfiles);
 
-        if (null != processedCwProfiles) {
+        if (nonNull(processedStaffProfiles)) {
 
             validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS,null,
-                    processedCwProfiles.getCaseWorkerId(),profileRequest);
+                    processedStaffProfiles.getCaseWorkerId(),staffProfileRequest);
             response = StaffProfileCreationResponse.builder()
-                    .caseWorkerId(processedCwProfiles.getCaseWorkerId())
+                    .caseWorkerId(processedStaffProfiles.getCaseWorkerId())
                     .build();
         }
         return response;

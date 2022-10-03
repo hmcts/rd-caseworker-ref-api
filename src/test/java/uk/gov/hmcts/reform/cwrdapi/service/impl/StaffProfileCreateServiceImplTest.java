@@ -191,14 +191,14 @@ class StaffProfileCreateServiceImplTest {
     }
 
     @Test
-    void test_saveStaffProfileValidationAudit() throws JsonProcessingException {
+    void test_saveStaffProfileValidationAudit() {
 
         validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS,null,
                 caseWorkerProfile.getCaseWorkerId(),staffProfileCreationRequest);
         verify(staffAuditRepository, times(0)).save(any());
     }
 
-    //@Test
+    @Test
     void test_409WhileCwUserProfileCreation() throws JsonProcessingException {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("123456789");
@@ -215,7 +215,7 @@ class StaffProfileCreateServiceImplTest {
     }
 
     @Test
-    void test_saveStaffProfileAlreadyPresent() throws JsonProcessingException {
+    void test_saveStaffProfileAlreadyPresent() {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
         validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest);
@@ -240,6 +240,20 @@ class StaffProfileCreateServiceImplTest {
     }
 
     @Test
+    void test_createUserProfileRequest_StaffAdmin() {
+        staffProfileCreationRequest.setStaffAdmin(true);
+        UserProfileCreationRequest response = staffProfileServiceImpl
+                .createUserProfileRequest(staffProfileCreationRequest);
+        assertThat(response.getEmail()).isEqualTo("test@test.com");
+        assertThat(response.getFirstName()).isEqualTo("testFN");
+        assertThat(response.getLastName()).isEqualTo("testLN");
+        assertThat(response.getLanguagePreference().toString()).hasToString("EN");
+        assertThat(response.getUserCategory().toString()).hasToString("CASEWORKER");
+        assertThat(response.getUserType().toString()).hasToString("INTERNAL");
+        assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(1);
+    }
+
+    @Test
     void test_createUserProfileRequestEmptyRoles() {
         when(staffProfileCreateUpdateUtil.getUserRolesByRoleId(any())).thenReturn(EMPTY_SET);
         UserProfileCreationRequest response = staffProfileServiceImpl
@@ -252,6 +266,8 @@ class StaffProfileCreateServiceImplTest {
         assertThat(response.getUserType().toString()).hasToString("INTERNAL");
         assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(0);
     }
+
+
 
     @Test
     void test_createUserProfileRequestNullRoles() {
