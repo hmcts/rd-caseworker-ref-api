@@ -117,7 +117,7 @@ public class AuthorizationFunctionalTest {
             }
         }
         EMAIL_TEMPLATE = emailArray.toArray(new String[0]);
-        log.debug("Email Template = {}",EMAIL_TEMPLATE);
+        log.debug("Email Template =>"+EMAIL_TEMPLATE);
     }
 
     private static String[] convertDomainStringIntoArray(String emailDomainList) {
