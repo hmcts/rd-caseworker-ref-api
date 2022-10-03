@@ -20,10 +20,10 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.lib.client.response.S2sClient;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
@@ -59,7 +59,7 @@ public class AuthorizationFunctionalTest {
 
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
-    public static String[] EMAIL_TEMPLATE ;
+    public static String[] EMAIL_TEMPLATE;
     public static final String CWD_USER = "cwd-user";
     public static final String CASEWORKER_IAC_BULKSCAN = "caseworker-iac-bulkscan";
     public static final String CASEWORKER_IAC = "caseworker-iac";
@@ -108,20 +108,20 @@ public class AuthorizationFunctionalTest {
 
 
     @Value("${email.domainList}")
-    public void setNameStatic(String emailDomainList){
+    public void setNameStatic(String emailDomainList) {
         List<String> emailArray = new ArrayList();
-        if(ObjectUtils.isNotEmpty(emailDomainList)) {
+        if (ObjectUtils.isNotEmpty(emailDomainList)) {
             String[] domainArray = convertDomainStringIntoArray(emailDomainList);
-            for(int index=0;index<domainArray.length;index++){
-                emailArray.add("CWR-func-test-user-%s@"+domainArray[index]);
+            for (int index = 0; index < domainArray.length; index++) {
+                emailArray.add("CWR-func-test-user-%s@" + domainArray[index]);
             }
         }
         EMAIL_TEMPLATE = emailArray.toArray(new String[0]);
-        log.debug("Email Template =>"+EMAIL_TEMPLATE);
+        log.debug("Email Template =>" + EMAIL_TEMPLATE);
     }
 
     private static String[] convertDomainStringIntoArray(String emailDomainList) {
-        return  emailDomainList.split(",");
+        return emailDomainList.split(",");
     }
 
 
