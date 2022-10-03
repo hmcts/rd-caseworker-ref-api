@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.util;
+package uk.gov.hmcts.reform.cwrdapi.config;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

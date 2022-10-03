@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import uk.gov.hmcts.reform.cwrdapi.config.EmailDomainPropertyInitiator;
 
 import java.util.List;
 import java.util.regex.Pattern;

@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.config.EmailDomainPropertyInitiator;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.util.EmailDomainPropertyInitiator;
 
 import java.util.ArrayList;
 import java.util.List;
