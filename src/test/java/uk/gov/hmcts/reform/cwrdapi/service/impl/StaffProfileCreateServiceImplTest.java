@@ -6,6 +6,7 @@ import feign.Request;
 import feign.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -59,6 +60,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")
+@Disabled
 class StaffProfileCreateServiceImplTest {
     @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepository;

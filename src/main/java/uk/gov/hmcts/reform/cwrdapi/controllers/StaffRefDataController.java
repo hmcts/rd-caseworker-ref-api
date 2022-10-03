@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
@@ -152,16 +152,16 @@ public class StaffRefDataController {
 
     }
 
-        @ApiOperation(
-                value = "This API creates staff user profile",
-                notes = "This API will be invoked by user having idam role of staff-admin",
-                authorizations = {
-                @Authorization(value = "ServiceAuthorization"),
-                @Authorization(value = "Authorization")
-        }
-        )
-        @ApiResponses({
-                @ApiResponse(
+    @ApiOperation(
+            value = "This API creates staff user profile",
+            notes = "This API will be invoked by user having idam role of staff-admin",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
                     code = 201,
                     message = "Successfully created staff user profile",
                     response = StaffProfileCreationResponse.class,
@@ -194,7 +194,7 @@ public class StaffRefDataController {
     @ResponseStatus(value = HttpStatus.CREATED)
     @Transactional
     public ResponseEntity<StaffProfileCreationResponse> createStaffUserProfile(@RequestBody StaffProfileCreationRequest
-                                                                                staffProfileCreationRequest) {
+                                                                                       staffProfileCreationRequest) {
 
         log.info("Inside createStaffUserProfile Controller");
         StaffProfileCreationResponse response = null;
