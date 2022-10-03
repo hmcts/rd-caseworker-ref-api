@@ -4,10 +4,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import java.util.List;
 import java.util.regex.Pattern;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 @Slf4j
 @NoArgsConstructor
@@ -52,8 +52,8 @@ public class EmailValidator implements ConstraintValidator<ValidateEmail, String
 
     private String getDomainName(String emailAddress) {
         String[] split = emailAddress.split("@");
-        final Integer TWO = 2;
-        if (ObjectUtils.isNotEmpty(split) && split.length == TWO) {
+        final Integer two = 2;
+        if (ObjectUtils.isNotEmpty(split) && split.length == two) {
             return split[1];
         }
         return null;
