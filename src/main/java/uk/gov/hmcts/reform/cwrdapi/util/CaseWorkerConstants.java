@@ -166,4 +166,5 @@ public final class CaseWorkerConstants {
     public static final String LAST_NAME_MISSING_PROFILE = "You must add a last name and try again";
     public static final String MISSING_REGION_PROFILE = "You must add a region and try again";
     public static final String PROFILE_ALREADY_CREATED = "The profile is already created for the given email Id";
+    public static final String PROFILE_NOT_PRESENT_IN_DB = "User does not exists in db";
 }

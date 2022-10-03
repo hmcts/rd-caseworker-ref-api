@@ -15,6 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -203,5 +204,53 @@ public class StaffRefDataController {
         response = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
+    }
+
+    @ApiOperation(
+            value = "This API update staff user profile",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "Successfully updated staff user profile",
+                    response = StaffProfileCreationResponse.class,
+                    responseContainer = "list"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = BAD_REQUEST
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @PutMapping(
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE,
+            path = {"/profile"}
+    )
+    //@Secured("staff-admin")
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfile(@RequestBody StaffProfileCreationRequest
+                                                                                       staffProfileCreationRequest) {
+        log.info("Inside updateStaffUserProfile Controller");
+        StaffProfileCreationResponse response = null;
+
+        response = staffProfileService.updateStaffProfile(staffProfileCreationRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

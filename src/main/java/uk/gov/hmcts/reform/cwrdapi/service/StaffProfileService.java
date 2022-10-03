@@ -7,6 +7,9 @@ public interface StaffProfileService {
 
     StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest staffProfileRequest);
 
+    StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest staffProfileRequest);
+
+
     /**
      * Prepare StaffProfile data to be published as a message to topic.
      *

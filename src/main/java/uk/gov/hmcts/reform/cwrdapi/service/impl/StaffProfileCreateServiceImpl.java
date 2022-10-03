@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
@@ -45,6 +46,7 @@ import java.util.Set;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 
@@ -136,6 +138,34 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
         return response;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest profileRequest) {
+
+        log.info("{}:: processStaffProfileCreation starts::",
+                loggingComponentName);
+        final CaseWorkerProfile newCaseWorkerProfiles;
+        final CaseWorkerProfile processedCwProfiles;
+        StaffProfileCreationResponse response = null;
+
+        validateStaffProfile.validateStaffProfile(profileRequest);
+
+        checkStaffProfileForUpdate(profileRequest);
+        newCaseWorkerProfiles = createCaseWorkerProfile(profileRequest);
+
+        processedCwProfiles = staffProfileCreateUpdateUtil.persistStaffProfile(newCaseWorkerProfiles);
+
+        if (null != processedCwProfiles) {
+
+            validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS,null,
+                    processedCwProfiles.getCaseWorkerId(),profileRequest);
+            response = StaffProfileCreationResponse.builder()
+                    .caseWorkerId(processedCwProfiles.getCaseWorkerId())
+                    .build();
+        }
+        return response;
+    }
+
 
 
     private void checkStaffProfileEmail(StaffProfileCreationRequest profileRequest) {
@@ -147,6 +177,18 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
             validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,PROFILE_ALREADY_CREATED,
                     null,profileRequest);
             throw new InvalidRequestException(PROFILE_ALREADY_CREATED);
+        }
+    }
+
+    private void checkStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
+
+        // get all existing profile from db (used IN clause)
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId());
+        // TODO to update if profile is null throw exception
+        if (caseWorkerProfile == null) {
+            validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
+                    null,profileRequest);
+            throw new ResourceNotFoundException(PROFILE_NOT_PRESENT_IN_DB);
         }
     }
 
