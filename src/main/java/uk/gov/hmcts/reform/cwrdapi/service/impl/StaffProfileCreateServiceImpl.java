@@ -46,6 +46,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 
 
@@ -169,8 +170,6 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
             }
         }
 
-        log.info("{}:: createCaseWorkerProfile UserProfile ends here { }::",
-                loggingComponentName,caseWorkerProfile.getCaseWorkerId());
         return caseWorkerProfile;
     }
 
@@ -204,6 +203,10 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
 
         Set<String> userRoles = new HashSet<>();
         userRoles.add(ROLE_CWD_USER);
+
+        if (profileRequest.isStaffAdmin()) {
+            userRoles.add(ROLE_STAFF_ADMIN);
+        }
 
         Set<String> idamRoles = staffProfileCreateUpdateUtil.getUserRolesByRoleId(profileRequest);
         if (isNotEmpty(idamRoles)) {

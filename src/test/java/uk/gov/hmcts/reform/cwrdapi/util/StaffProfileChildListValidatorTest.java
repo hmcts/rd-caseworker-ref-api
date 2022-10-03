@@ -21,11 +21,7 @@ import javax.validation.ConstraintValidatorContext;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")
@@ -147,35 +143,5 @@ class StaffProfileChildListValidatorTest {
 
         boolean response = sut.isValidAreaOfWk(staffProfileCreationRequest, context);
         assertThat(response).isTrue();
-    }
-
-    @Test
-    void testInValidLocation() {
-
-        when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(builder);
-        when(builder.addPropertyNode(LOCATION_FIELD)).thenReturn(nodeBuilder);
-
-        boolean response = sut.isValidLocations(staffProfileCreationReq, context);
-        assertThat(response).isFalse();
-    }
-
-    @Test
-    void testInValidRoles() {
-
-        when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(builder);
-        when(builder.addPropertyNode(anyString())).thenReturn(nodeBuilder);
-
-        boolean response = sut.isValidRoles(staffProfileCreationReq, context);
-        assertThat(response).isFalse();
-    }
-
-    @Test
-    void testInValidServiceCode() {
-
-        when(context.buildConstraintViolationWithTemplate(any())).thenReturn(builder);
-        when(builder.addPropertyNode(any())).thenReturn(nodeBuilder);
-
-        boolean response = sut.isValidAreaOfWk(staffProfileCreationReq, context);
-        assertThat(response).isFalse();
     }
 }

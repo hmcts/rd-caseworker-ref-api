@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.client;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
@@ -10,18 +11,22 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
@@ -192,6 +197,40 @@ public class CaseWorkerApiClient {
                         .workerWorkAreaRequests(areaRequests).build());
     }
 
+    public StaffProfileCreationRequest createStaffProfileCreationRequest() {
+
+        Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
+        List<CaseWorkerRoleRequest> caseWorkerRoleRequests =
+                ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest().role(" role ")
+                        .isPrimaryFlag(true).build());
+
+        List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(1)
+                .location(" location ").build());
+
+        List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .service(" areaOfWork ").serviceCode(" serviceCode ")
+                .build());
+
+        return   StaffProfileCreationRequest
+                 .staffProfileCreationRequest()
+                 .firstName("StaffProfilefirstName ")
+                 .lastName("StaffProfilelastName ")
+                 .emailId(UUID.randomUUID() + "@justice.gov.uk")
+                 .regionId(1).userType("CTSC")
+                 .region("region")
+                 .suspended(false)
+                 .taskSupervisor(true)
+                 .caseAllocator(false)
+                 .staffAdmin(false)
+                 .roles(caseWorkerRoleRequests)
+                 .baseLocations(caseWorkerLocationRequests)
+                 .services(caseWorkerServicesRequests)
+                 .build();
+    }
+
     public Response createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(caseWorkersProfileCreationRequests)
@@ -230,4 +269,17 @@ public class CaseWorkerApiClient {
         return response.getBody().as(StaffRefDataUserTypesResponse.class);
     }
 
+    public Response createStaffUserProfile(StaffProfileCreationRequest staffProfileCreationRequest) {
+        Response response = getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+                .body(staffProfileCreationRequest)
+                .post("/refdata/case-worker/profile")
+                .andReturn();
+        log.info(":: Create user profile response status code :: " + response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(201);
+
+        return response;
+    }
 }
