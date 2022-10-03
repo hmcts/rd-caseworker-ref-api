@@ -55,6 +55,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_STAFF_UI);
         launchDarklyMap.put("StaffRefDataController.retrieveJobTitles",
                 RD_STAFF_UI);
+        launchDarklyMap.put("StaffRefDataController.createStaffUserProfile",
+                RD_STAFF_UI);
     }
 
     @Override
