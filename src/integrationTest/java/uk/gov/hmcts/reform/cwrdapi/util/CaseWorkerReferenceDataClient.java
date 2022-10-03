@@ -21,6 +21,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -260,5 +261,9 @@ public class CaseWorkerReferenceDataClient {
 
     public static void setBearerToken(String bearerToken) {
         CaseWorkerReferenceDataClient.bearerToken = bearerToken;
+    }
+
+    public Map<String, Object> createStaffProfile(StaffProfileCreationRequest request, String role) {
+        return postRequest(baseUrl + "/profile", request, role, null);
     }
 }

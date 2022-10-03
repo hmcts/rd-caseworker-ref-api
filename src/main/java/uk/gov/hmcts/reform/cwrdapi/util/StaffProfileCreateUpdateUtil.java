@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 @Service
 @Slf4j
 @Setter
@@ -53,8 +55,9 @@ public class StaffProfileCreateUpdateUtil {
         caseWorkerProfile.getCaseWorkerRoles().addAll(mapStaffRoleRequestMapping(idamId, staffProfileRequest));
         //caseWorkerWorkAreas setting to case worker profile
         caseWorkerProfile.getCaseWorkerWorkAreas().addAll(mapStaffAreaOfWork(staffProfileRequest, idamId));
-
-        caseWorkerProfile.getCaseWorkerSkills().addAll(mapStaffSkillRequestMapping(idamId, staffProfileRequest));
+        if (isNotEmpty(staffProfileRequest.getSkills())) {
+            caseWorkerProfile.getCaseWorkerSkills().addAll(mapStaffSkillRequestMapping(idamId, staffProfileRequest));
+        }
     }
 
     public CaseWorkerProfile mapStaffProfileRequest(String idamId,
@@ -166,6 +169,9 @@ public class StaffProfileCreateUpdateUtil {
     }
 
     public CaseWorkerProfile persistStaffProfile(CaseWorkerProfile caseWorkerProfile) {
+
+        log.info("{}:: persistStaffProfile starts::",
+                loggingComponentName);
         CaseWorkerProfile processedStaffProfiles = null;
 
         if (null != caseWorkerProfile) {

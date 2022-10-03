@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerSkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
@@ -79,6 +80,9 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
     CaseWorkerRoleRepository caseWorkerRoleRepository;
 
     @Autowired
+    CaseWorkerSkillRepository caseWorkerSkillRepository;
+
+    @Autowired
     ICwrdCommonRepository cwrCommonRepository;
 
     @Autowired
@@ -108,6 +112,8 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
     @SuppressWarnings("unchecked")
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest profileRequest) {
 
+        log.info("{}:: processStaffProfileCreation starts::",
+                loggingComponentName);
         final CaseWorkerProfile newCaseWorkerProfiles;
         final CaseWorkerProfile processedCwProfiles;
         StaffProfileCreationResponse response = null;
@@ -147,9 +153,14 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
     public CaseWorkerProfile createCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
         CaseWorkerProfile caseWorkerProfile = null;
         //User Profile Call
+        log.info("{}:: createCaseWorkerProfile UserProfile call starts::",
+                loggingComponentName);
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
+        log.info("{}:: createCaseWorkerProfile UserProfile Received  response status {}::",
+                loggingComponentName,responseEntity.getStatusCode());
         if (nonNull(responseEntity) && (responseEntity.getStatusCode().is2xxSuccessful())) {
-
+            log.info("{}:: createCaseWorkerProfile UserProfile Received  successful response {}::",
+                    loggingComponentName,responseEntity.getStatusCode());
             UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
             if (nonNull(upResponse)) {
                 caseWorkerProfile = new CaseWorkerProfile();
@@ -157,6 +168,9 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
                         upResponse.getIdamId());
             }
         }
+
+        log.info("{}:: createCaseWorkerProfile UserProfile ends here { }::",
+                loggingComponentName,caseWorkerProfile.getCaseWorkerId());
         return caseWorkerProfile;
     }
 

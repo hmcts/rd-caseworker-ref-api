@@ -1,40 +1,53 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
 
+@ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class StaffProfileChildListValidatorTest {
 
-    StaffProfileChildListValidator sut = mock(StaffProfileChildListValidator.class);
-    StaffProfileCreationRequest staffProfileCreationRequest;
-    ConstraintValidatorContext context;
-
+    @InjectMocks
+    StaffProfileChildListValidator sut;
+    static StaffProfileCreationRequest staffProfileCreationRequest;
+    static StaffProfileCreationRequest staffProfileCreationReq;
+    static ConstraintValidatorContext context;
+    @Mock
+    private ConstraintValidatorContextImpl.ConstraintViolationBuilder builder;
+    @Mock
+    private ConstraintValidatorContextImpl.ConstraintViolationBuilder.NodeBuilderCustomizableContext nodeBuilder;
 
     @BeforeEach
-    void setUp() {
-        List<WorkArea> workAreas = new ArrayList<>();
-        WorkArea workArea = mock(WorkArea.class);
-        workAreas.add(workArea);
+    void reset() {
+        Mockito.reset();
+    }
 
-        List<Role> roles = new ArrayList<>();
-        Role role = mock(Role.class);
-        roles.add(role);
+    @BeforeAll
+    static void setUp() {
 
         CaseWorkerRoleRequest caseWorkerRoleRequest =
                 new CaseWorkerRoleRequest("testRole", true);
@@ -99,59 +112,70 @@ class StaffProfileChildListValidatorTest {
                 .build();
 
         context = mock(ConstraintValidatorContext.class);
+        //contextImpl = mock(ConstraintValidatorContextImpl.class);
 
-        when(role.getRoleName()).thenReturn("RoleName");
+        staffProfileCreationReq = StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .baseLocations(Collections.EMPTY_LIST)
+                .roles(List.of(caseWorkerRoleRequest, caseWorkerRoleRequest))
+                .services(List.of(caseWorkerServicesRequest,caseWorkerServicesRequest))
+                .skills(Collections.EMPTY_LIST)
+                .build();
+
     }
 
     @Test
     void testIsValid() {
         boolean response = sut.isValid(staffProfileCreationRequest, context);
-        when(sut.isValidLocations(staffProfileCreationRequest, context)).thenReturn(true);
-
-        assertThat(response).isFalse();
+        assertThat(response).isTrue();
     }
 
     @Test
-    void testIsLocation() {
-        boolean response = sut.isValid(staffProfileCreationRequest, context);
-        when(sut.isValidLocations(staffProfileCreationRequest, context)).thenReturn(true);
-
-        assertThat(response).isFalse();
-
-        staffProfileCreationRequest = StaffProfileCreationRequest
-                .staffProfileCreationRequest().build();
-        boolean responseLocationEmpty = sut.isValid(staffProfileCreationRequest, context);
-        when(sut.isValidLocations(staffProfileCreationRequest, context)).thenReturn(true);
-
-        assertThat(responseLocationEmpty).isFalse();
+    void testValidLocation() {
+        boolean response = sut.isValidLocations(staffProfileCreationRequest, context);
+        assertThat(response).isTrue();
     }
 
     @Test
-    void testisValidRoles() {
-        boolean response = sut.isValid(staffProfileCreationRequest, context);
-        when(sut.isValidRoles(staffProfileCreationRequest, context)).thenReturn(false);
-        assertThat(response).isFalse();
-
-        staffProfileCreationRequest = StaffProfileCreationRequest
-                .staffProfileCreationRequest().build();
-        boolean responseRolesEmpty = sut.isValid(staffProfileCreationRequest, context);
-        when(sut.isValidRoles(staffProfileCreationRequest, context)).thenReturn(false);
-        assertThat(responseRolesEmpty).isFalse();
+    void testValidRoles() {
+        boolean response = sut.isValidRoles(staffProfileCreationRequest, context);
+        assertThat(response).isTrue();
     }
 
     @Test
     void isValidAreaOfWk() {
 
-        boolean response = sut.isValid(staffProfileCreationRequest, context);
-        when(sut.isValidAreaOfWk(staffProfileCreationRequest, context)).thenReturn(true);
+        boolean response = sut.isValidAreaOfWk(staffProfileCreationRequest, context);
+        assertThat(response).isTrue();
+    }
+
+    @Test
+    void testInValidLocation() {
+
+        when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(builder);
+        when(builder.addPropertyNode(LOCATION_FIELD)).thenReturn(nodeBuilder);
+
+        boolean response = sut.isValidLocations(staffProfileCreationReq, context);
         assertThat(response).isFalse();
+    }
 
-        staffProfileCreationRequest = StaffProfileCreationRequest
-                .staffProfileCreationRequest().build();
-        when(sut.isValidRoles(staffProfileCreationRequest, context)).thenReturn(true);
-        when(sut.isValidLocations(staffProfileCreationRequest, context)).thenReturn(true);
-        boolean responseServiceEmpty = sut.isValid(staffProfileCreationRequest, context);
+    @Test
+    void testInValidRoles() {
 
-        assertThat(responseServiceEmpty).isFalse();
+        when(context.buildConstraintViolationWithTemplate(anyString())).thenReturn(builder);
+        when(builder.addPropertyNode(anyString())).thenReturn(nodeBuilder);
+
+        boolean response = sut.isValidRoles(staffProfileCreationReq, context);
+        assertThat(response).isFalse();
+    }
+
+    @Test
+    void testInValidServiceCode() {
+
+        when(context.buildConstraintViolationWithTemplate(any())).thenReturn(builder);
+        when(builder.addPropertyNode(any())).thenReturn(nodeBuilder);
+
+        boolean response = sut.isValidAreaOfWk(staffProfileCreationReq, context);
+        assertThat(response).isFalse();
     }
 }
