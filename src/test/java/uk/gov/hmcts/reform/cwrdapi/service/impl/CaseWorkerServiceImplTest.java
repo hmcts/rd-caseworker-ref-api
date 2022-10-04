@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
@@ -197,7 +198,7 @@ class CaseWorkerServiceImplTest {
         when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
                 .thenReturn(new ArrayList<>());
 
-        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+        when(userProfileFeignClient.createUserProfile(any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
 
         List<CaseWorkersProfileCreationRequest> requests = new ArrayList<>();
@@ -238,7 +239,7 @@ class CaseWorkerServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
-        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+        when(userProfileFeignClient.createUserProfile(any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(mapper.writeValueAsString(userProfileCreationResponse),
                         defaultCharset())
                 .status(409).build());
@@ -342,7 +343,7 @@ class CaseWorkerServiceImplTest {
         doThrow(new RuntimeException("Exception message"))
                 .when(idamRoleMappingService).buildIdamRoleAssociation(any());
         Assertions.assertThrows(IdamRolesMappingException.class, () ->
-            caseWorkerServiceImpl.buildIdamRoleMappings(serviceRoleMappingList));
+                caseWorkerServiceImpl.buildIdamRoleMappings(serviceRoleMappingList));
     }
 
     @Test
@@ -369,14 +370,14 @@ class CaseWorkerServiceImplTest {
         doReturn(emptyList())
                 .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(any());
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
-            caseWorkerServiceImpl.fetchCaseworkersById(caseWorkerIds));
+                caseWorkerServiceImpl.fetchCaseworkersById(caseWorkerIds));
     }
 
     @Test
     void test_should_return_caseworker_profile() {
         doReturn(singletonList(buildCaseWorkerProfile()))
                 .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(singletonList(
-                "27fbd198-552e-4c32-9caf-37be1545caaf"));
+                        "27fbd198-552e-4c32-9caf-37be1545caaf"));
         caseWorkerServiceImpl.fetchCaseworkersById(
                 singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
         assertNotNull(caseWorkerServiceImpl
@@ -436,6 +437,11 @@ class CaseWorkerServiceImplTest {
                 .lastUpdatedTime(LocalDateTime.now())
                 .isPrimary(true)
                 .build();
+        Skill skill = Skill.builder()
+                .skillId(1L)
+                .skillCode("1")
+                .description("testSkills")
+                .build();
         Location location = Location
                 .builder()
                 .baseLocationId(11111)
@@ -462,14 +468,16 @@ class CaseWorkerServiceImplTest {
                         .userType("userType")
                         .userId(11111L)
                         .suspended("false")
+                        .staffAdmin("false")
                         .createdTime(LocalDateTime.now())
                         .lastUpdatedTime(LocalDateTime.now())
                         .roles(singletonList(role))
+                        .skills(singletonList(skill))
                         .locations(singletonList(location))
-                        .workAreas(singletonList(workArea))
-                        .taskSupervisor("Y")
-                        .caseAllocator("N")
-                        .build();
+                .workAreas(singletonList(workArea))
+                .taskSupervisor("Y")
+                .caseAllocator("N")
+                .build();
 
         return caseWorkerProfile;
     }
@@ -846,8 +854,8 @@ class CaseWorkerServiceImplTest {
                         .request(mock(Request.class)).body("body", defaultCharset()).status(400).build());
 
         Assertions.assertThrows(StaffReferenceException.class, () ->
-            caseWorkerServiceImpl
-                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
+                caseWorkerServiceImpl
+                        .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
 
     }
 
@@ -872,8 +880,8 @@ class CaseWorkerServiceImplTest {
         when(caseWorkerProfileRepository.findByServiceCodeIn(Set.of("BAA1"), pageRequest))
                 .thenReturn(page);
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
-            caseWorkerServiceImpl
-                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
+                caseWorkerServiceImpl
+                        .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
     }
 
     @Test
@@ -893,8 +901,8 @@ class CaseWorkerServiceImplTest {
                 20, "id", CaseWorkerProfile.class);
 
         Assertions.assertThrows(StaffReferenceException.class, () ->
-            caseWorkerServiceImpl
-                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
+                caseWorkerServiceImpl
+                        .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
     }
 
     @Test
@@ -917,8 +925,8 @@ class CaseWorkerServiceImplTest {
                 20, "id", CaseWorkerProfile.class);
 
         Assertions.assertThrows(StaffReferenceException.class, () ->
-            caseWorkerServiceImpl
-                    .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
+                caseWorkerServiceImpl
+                        .fetchStaffProfilesForRoleRefresh("cmc", pageRequest));
     }
 
     @Test
@@ -945,7 +953,7 @@ class CaseWorkerServiceImplTest {
     }
 
     @Test
-     void testNamesMismatch_Sc1() throws JsonProcessingException {
+    void testNamesMismatch_Sc1() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -961,7 +969,7 @@ class CaseWorkerServiceImplTest {
         userProfileResponse.setRoles(roles);
         cwProfileCreationRequest.setFirstName("Fname");
         cwProfileCreationRequest.setLastName("Lname");
-        Set<String> idamroles = new HashSet<>(Arrays.asList("IdamRole1", "IdamRole4","IdamRole2"));
+        Set<String> idamroles = new HashSet<>(Arrays.asList("IdamRole1", "IdamRole4", "IdamRole2"));
         cwProfileCreationRequest.setIdamRoles(idamroles);
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
@@ -975,13 +983,13 @@ class CaseWorkerServiceImplTest {
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
-        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest,"1");
+        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
     @Test
-     void testNamesMismatch_Sc2() throws JsonProcessingException {
+    void testNamesMismatch_Sc2() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -1006,14 +1014,14 @@ class CaseWorkerServiceImplTest {
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
                         .status(200).build());
-        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest,"1");
+        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
         verify(userProfileFeignClient, times(0)).modifyUserRoles(any(), any(), any());
 
     }
 
     @Test
-     void testNamesMismatch_Sc3() throws JsonProcessingException {
+    void testNamesMismatch_Sc3() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -1043,13 +1051,13 @@ class CaseWorkerServiceImplTest {
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
-        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest,"1");
+        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
     @Test
-     void testNamesMismatch_Sc4() throws JsonProcessingException {
+    void testNamesMismatch_Sc4() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
@@ -1079,13 +1087,13 @@ class CaseWorkerServiceImplTest {
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
-        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest,"1");
+        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
     @Test
-     void testNamesMismatch_Sc5() throws JsonProcessingException {
+    void testNamesMismatch_Sc5() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         AttributeResponse attributeResponse = new AttributeResponse();
@@ -1115,13 +1123,13 @@ class CaseWorkerServiceImplTest {
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
-        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest,"1");
+        caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
     @Test
-     void testNamesMismatch_Sc6() throws JsonProcessingException {
+    void testNamesMismatch_Sc6() throws JsonProcessingException {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         AttributeResponse attributeResponse = new AttributeResponse();
@@ -1151,6 +1159,6 @@ class CaseWorkerServiceImplTest {
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
-        assertEquals(false,caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest,"1"));
+        assertEquals(false, caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1"));
     }
 }
