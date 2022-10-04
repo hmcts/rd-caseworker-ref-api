@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.cwrdapi.config.FeignInterceptorConfiguration;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
@@ -47,9 +48,8 @@ public interface UserProfileFeignClient {
 
     @GetMapping(value = "/v1/userprofile")
     @RequestLine("GET /v1/userprofile")
-    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
-            "UserEmail: {UserEmail}",
+    @Headers({"Authorization: {authorization}","ServiceAuthorization: {serviceAuthorization}",
             "Content-Type: application/json"})
-    Response getUserProfileByEmailId(@RequestParam(value = "userId") String userId);
+    Response getUserProfileByEmail(@RequestHeader("UserEmail") String email);
 
 }

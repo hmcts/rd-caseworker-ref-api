@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import feign.FeignException;
 import feign.Response;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationReque
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.NewUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
@@ -44,6 +46,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
@@ -151,6 +154,7 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
         validateStaffProfile.validateStaffProfile(profileRequest);
 
         checkStaffProfileForUpdate(profileRequest);
+        //TODO processExistingCaseWorkers
         newCaseWorkerProfiles = updateCaseWorkerProfile(profileRequest);
 
         processedCwProfiles = staffProfileCreateUpdateUtil.persistStaffProfile(newCaseWorkerProfiles);
@@ -222,25 +226,30 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
         log.info("{}:: createCaseWorkerProfile UserProfile call starts::",
                 loggingComponentName);
         //TODO Need to discuss and get userDetails from Idam and update data in db
-        ResponseEntity<Object> responseEntityUp = getUserProfileFromIdam(profileRequest);
-        log.info("{}:: createCaseWorkerProfile UserProfile ::",
-                responseEntityUp);
+        UserProfileCreationResponse upResponse = getUserProfileFromIdam(profileRequest);
+        log.info("{}:: updateCaseWorkerProfile UserProfile ::",
+                upResponse);
 
         //TODO Check with Nayeem
-        ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
-        log.info("{}:: createCaseWorkerProfile UserProfile Received  response status {}::",
-                loggingComponentName,responseEntity.getStatusCode());
-        if (nonNull(responseEntity) && (responseEntity.getStatusCode().is2xxSuccessful())) {
-            log.info("{}:: createCaseWorkerProfile UserProfile Received  successful response {}::",
-                    loggingComponentName,responseEntity.getStatusCode());
-            UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
-            if (nonNull(upResponse)) {
-                caseWorkerProfile = new CaseWorkerProfile();
-                staffProfileCreateUpdateUtil.populateStaffProfile(profileRequest, caseWorkerProfile,
-                        upResponse.getIdamId());
-            }
-        }
+//        ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
+//        log.info("{}:: createCaseWorkerProfile UserProfile Received  response status {}::",
+//                loggingComponentName,responseEntity.getStatusCode());
+//        if (nonNull(responseEntity) && (responseEntity.getStatusCode().is2xxSuccessful())) {
+//            log.info("{}:: createCaseWorkerProfile UserProfile Received  successful response {}::",
+//                    loggingComponentName,responseEntity.getStatusCode());
+//            UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
+//            if (nonNull(upResponse)) {
+//                caseWorkerProfile = new CaseWorkerProfile();
+//                staffProfileCreateUpdateUtil.populateStaffProfile(profileRequest, caseWorkerProfile,
+//                        upResponse.getIdamId());
+//            }
+//        }
 
+        if (nonNull(upResponse)) {
+            caseWorkerProfile = new CaseWorkerProfile();
+            staffProfileCreateUpdateUtil.populateStaffProfile(profileRequest, caseWorkerProfile,
+                    upResponse.getIdamId());
+        }
         log.info("{}:: createCaseWorkerProfile UserProfile ends here { }::",
                 loggingComponentName,caseWorkerProfile.getCaseWorkerId());
         return caseWorkerProfile;
@@ -271,30 +280,43 @@ public class StaffProfileCreateServiceImpl implements StaffProfileService {
         }
     }
 
-    public ResponseEntity<Object> getUserProfileFromIdam(StaffProfileCreationRequest staffProfileRequest) {
 
-        ResponseEntity<Object> responseEntity;
+    public  UserProfileCreationResponse getUserProfileFromIdam(StaffProfileCreationRequest staffProfileRequest) {
+
+        NewUserResponse newUserResponse;
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         Response response = null;
-        Object clazz;
-        try {
-            //response = userProfileFeignClient.createUserProfile(createUserProfileRequest(staffProfileRequest), SRD);
-            response = userProfileFeignClient.getUserProfileByEmailId(null);
+        try  {
+            String emailAddress = staffProfileRequest.getEmailId();
+            response = userProfileFeignClient.getUserProfileByEmail(emailAddress);
+            Object clazz = response.status() > 300 ? ErrorResponse.class : NewUserResponse.class;
+            ResponseEntity<Object> responseResponseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
-            clazz = (response.status() == 201 || response.status() == 409)
-                    ? UserProfileCreationResponse.class : ErrorResponse.class;
+            if (response.status() == 200) {
 
-            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+                newUserResponse = (NewUserResponse) requireNonNull(responseResponseEntity.getBody());
+                userProfileCreationResponse.setIdamId(newUserResponse.getUserIdentifier());
+                userProfileCreationResponse.setIdamStatus(newUserResponse.getIdamStatus());
 
-            return responseEntity;
+            } else {
+                ErrorResponse errorResponse = (ErrorResponse) responseResponseEntity.getBody();
+                log.error("{}:: Response from UserProfileByEmail service call {}",
+                        loggingComponentName, errorResponse.getErrorDescription());
+                //newUserResponse = new NewUserResponse();
+            }
+
         } catch (Exception ex) {
             validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,ex.getMessage(),
                     null,staffProfileRequest);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw ex;
         } finally {
             if (nonNull(response)) {
                 response.close();
             }
         }
+
+        return userProfileCreationResponse;
+
     }
 
     // creating user profile request
