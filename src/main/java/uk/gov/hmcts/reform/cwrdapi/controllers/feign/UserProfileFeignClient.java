@@ -44,4 +44,12 @@ public interface UserProfileFeignClient {
         "Content-Type: application/json"})
     Response deleteUserProfile(@RequestParam(value = "userId", required = false) String userId,
                                @RequestParam(value = "emailPattern", required = false) String emailPattern);
+
+    @GetMapping(value = "/v1/userprofile")
+    @RequestLine("GET /v1/userprofile")
+    @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
+            "UserEmail: {UserEmail}",
+            "Content-Type: application/json"})
+    Response getUserProfileByEmailId(@RequestParam(value = "userId") String userId);
+
 }
