@@ -11,6 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
@@ -20,6 +21,9 @@ import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @WithTags({@WithTag("testType:Functional")})
@@ -87,5 +91,22 @@ class StaffProfileCreateFunctionalTest extends AuthorizationFunctionalTest {
 
         Assertions.assertNotNull(staffProfileCreationResponse);
         Assertions.assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
+    }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = false)
+    //this test verifies new User profile is created is prohibited when api is toggled off
+    void createStaffProfile_LD_disabled() {
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN))
+                .body(staffProfileCreationRequest)
+                .post("/refdata/case-worker/profile")
+                .andReturn();
+        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
+        assertThat(response.getBody().asString()).contains(getToggledOffMessage());
+
     }
 }

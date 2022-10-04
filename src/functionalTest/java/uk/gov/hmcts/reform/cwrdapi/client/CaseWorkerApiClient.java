@@ -70,6 +70,10 @@ public class CaseWorkerApiClient {
         return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenByRole(role));
     }
 
+    public RequestSpecification getMultipleAuthHeadersInternal(List<String> roles) {
+        return getMultipleAuthHeaders(idamOpenIdClient.getOpenIdTokenByRoles(roles));
+    }
+
     public RequestSpecification getMultiPartWithAuthHeaders(String role) {
         String userToken = idamOpenIdClient.getOpenIdTokenByRole(role);
         return SerenityRest.with()
@@ -281,11 +285,12 @@ public class CaseWorkerApiClient {
     }
 
     public Response createStaffUserProfile(StaffProfileCreationRequest staffProfileCreationRequest) {
-        Response response = getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+
+        Response response = getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN))
                 .body(staffProfileCreationRequest)
                 .post("/refdata/case-worker/profile")
                 .andReturn();
-        log.info(":: Create user profile response status code :: " + response.statusCode());
+        log.info(":: Create staff profile response status code :: " + response.statusCode());
 
         response.then()
                 .assertThat()

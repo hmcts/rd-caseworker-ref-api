@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.List;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
@@ -148,10 +149,14 @@ public class StaffRefDataController {
                                                                                 staffProfileCreationRequest) {
 
         log.info("Inside createStaffUserProfile Controller");
-        StaffProfileCreationResponse response = null;
+        StaffProfileCreationResponse staffProfileCreationResponse = null;
 
-        response = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        staffProfileCreationResponse = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
+        if (isNotEmpty(staffProfileCreationResponse)) {
+
+            staffProfileService.publishStaffProfileToTopic(staffProfileCreationResponse);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(staffProfileCreationResponse);
     }
 
     @ApiOperation(
