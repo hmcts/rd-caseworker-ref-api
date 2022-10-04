@@ -49,9 +49,8 @@ class EmailValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"@justice.gov.uk", "vilas.shelke 123@justice.gov.uk", "vilas.shelke@gmail.com"})
-    void testInValid_EmailWithoutFirstName_Expected_False() {
-        //if officeEmail is without first name=> expected false
-        var emailId = "@justice.gov.uk";//numbers are not allowed in name
+    void testInValid_EmailWithoutFirstName_Expected_False(String emailId) {
+        //All emails are not in valid format=> expected false
         assertThat(emailValidator.isValid(emailId, context)).isFalse();
     }
 
