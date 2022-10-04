@@ -37,6 +37,7 @@ class CaseWorkerProfileTest {
         caseWorkerProfile.setCaseAllocator(false);
         caseWorkerProfile.setTaskSupervisor(false);
         caseWorkerProfile.setNew(true);
+        caseWorkerProfile.setUserAdmin(false);
 
         UserType userType = new UserType();
         userType.setUserTypeId(1L);
@@ -60,6 +61,7 @@ class CaseWorkerProfileTest {
         assertFalse(caseWorkerProfile.getCaseAllocator());
         assertFalse(caseWorkerProfile.getTaskSupervisor());
         assertTrue(caseWorkerProfile.isNew());
+        assertFalse(caseWorkerProfile.getUserAdmin());
 
         assertNotNull(caseWorkerProfile.getUserType());
         assertThat(caseWorkerProfile.getUserType().getUserTypeId(), is(1L));
@@ -201,5 +203,12 @@ class CaseWorkerProfileTest {
         assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getSkillId(),is(1L));
         assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getCaseWorkerSkillId(), is(1L));
         assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getCaseWorkerId(), is("CaseWorkerId"));
+    }
+
+    @Test
+    void testCaseWorkerProfileContainingStaffAdmin() {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setUserAdmin(true);
+        assertTrue(caseWorkerProfile.getUserAdmin());
     }
 }

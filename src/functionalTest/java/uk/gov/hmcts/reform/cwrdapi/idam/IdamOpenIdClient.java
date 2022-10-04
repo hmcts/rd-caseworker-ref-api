@@ -61,6 +61,7 @@ public class IdamOpenIdClient extends IdamOpenId {
     }
 
 
+
     public void deleteSidamUser(String email) {
         try {
             RestAssured

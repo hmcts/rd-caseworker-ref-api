@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +25,13 @@ import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,6 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
 
 @SerenityTest
@@ -56,10 +62,10 @@ class ValidationServiceFacadeImplTest {
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     StaffAuditRepository staffAuditRepository = mock(StaffAuditRepository.class);
+    ObjectMapper objectMapper = mock(ObjectMapper.class);
 
     @Test
     void testAuditJsr() {
-
         List<CaseWorkerDomain> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile profile = CaseWorkerProfile.builder().build();
         profile.setRowId(1);
@@ -110,5 +116,37 @@ class ValidationServiceFacadeImplTest {
         verify(staffAuditRepository,times(0))
                 .save(any());
     }
+
+    @Test
+    void testSaveStaffAuditErrorMessage() {
+
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder()
+                .uid(UUID.randomUUID().toString()).build());
+        StaffProfileCreationRequest staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest().build();
+        staffProfileCreationRequest.setFirstName("FirstUser");
+        staffProfileCreationRequest.setLastName("LastUser");
+        String generatedString = RandomStringUtils.randomAlphabetic(513);
+
+        validationServiceFacadeImpl.saveStaffAudit(AuditStatus.FAILURE, generatedString,
+                "1234", staffProfileCreationRequest);
+        verify(staffAuditRepository,times(0))
+                .save(any());
+    }
+
+    @Test
+    void testProcessSomething_JsonProcessingException() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest().build();
+        when(objectMapper.writeValueAsString(staffProfileCreationRequest))
+                .thenThrow(JsonProcessingException.class);
+
+        validationServiceFacadeImpl.saveStaffAudit(AuditStatus.FAILURE, null,
+                    "1234", staffProfileCreationRequest);
+        verify(staffAuditRepository,times(0))
+                .save(any());
+    }
+
 }
 
