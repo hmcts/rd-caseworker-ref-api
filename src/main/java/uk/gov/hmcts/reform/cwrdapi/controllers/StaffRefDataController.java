@@ -22,8 +22,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
@@ -101,6 +104,8 @@ public class StaffRefDataController {
 
     @ApiOperation(
             value = "This API creates staff user profile",
+            value = "This API is used to retrieve the Job Title's ",
+            notes = "This API will be invoked by user having idam role of staff-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
@@ -147,5 +152,41 @@ public class StaffRefDataController {
 
         response = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                    code = 200,
+                    message = "Successfully retrieved list of Job Titles for the request provided",
+                    response = StaffRefJobTitleResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request"
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = "Forbidden Error: Access denied"
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error"
+            )
+    })
+    @GetMapping(
+            produces = APPLICATION_JSON_VALUE,
+            path = {"/job-title"}
+    )
+    @Secured("staff-admin")
+    public ResponseEntity<Object> retrieveJobTitles() {
+
+        log.info("{} : Fetching the Job Titles", loggingComponentName);
+        StaffRefJobTitleResponse.StaffRefJobTitleResponseBuilder staffRefJobTitleResponseBuilder
+                = StaffRefJobTitleResponse.builder();
+        List<RoleType> roleType = staffRefDataService.getJobTitles();
+        List<StaffRefDataJobTitle> refDataJobTitles = roleType.stream()
+                .map(StaffRefDataJobTitle::new)
+                .toList();
+        staffRefJobTitleResponseBuilder.jobTitles(refDataJobTitles);
+        log.debug("refDataJobTitles = {}", refDataJobTitles);
+        return ResponseEntity
+                .status(200)
+                .body(staffRefJobTitleResponseBuilder.build());
     }
 }

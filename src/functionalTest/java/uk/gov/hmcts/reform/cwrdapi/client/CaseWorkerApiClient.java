@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
 import java.util.HashSet;
@@ -257,6 +258,16 @@ public class CaseWorkerApiClient {
                 .statusCode(statusCode.value());
 
         return response;
+    }
+
+    public Object fetchJobTitles(HttpStatus expectedStatus) {
+        Response response = getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
+                .get("/refdata/case-worker/job-title")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+        return response.getBody().as(StaffRefJobTitleResponse.class);
     }
 
     public Object fetchUserType(HttpStatus expectedStatus) {
