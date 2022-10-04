@@ -103,8 +103,8 @@ public class StaffRefDataController {
     }
 
     @ApiOperation(
-            value = "This API creates staff user profile",
-            value = "This API is used to retrieve the Job Title's ",
+            value = "This API creates staff user profile"
+                   + "This API is used to retrieve the Job Title's ",
             notes = "This API will be invoked by user having idam role of staff-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
@@ -140,7 +140,7 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE,
             path = {"/profile"}
     )
-    //@Secured("staff-admin")
+    @Secured("staff-admin")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.CREATED)
     @Transactional
@@ -152,6 +152,18 @@ public class StaffRefDataController {
 
         response = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @ApiOperation(
+            value = "This API is used to retrieve the Job Title's ",
+            notes = "This API will be invoked by user having idam role of staff-admin",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
                     code = 200,
                     message = "Successfully retrieved list of Job Titles for the request provided",
                     response = StaffRefJobTitleResponse.class
@@ -188,5 +200,6 @@ public class StaffRefDataController {
         return ResponseEntity
                 .status(200)
                 .body(staffRefJobTitleResponseBuilder.build());
+
     }
 }
