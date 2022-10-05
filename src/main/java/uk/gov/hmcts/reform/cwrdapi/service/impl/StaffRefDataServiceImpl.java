@@ -45,12 +45,11 @@ import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -117,6 +116,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Autowired
     StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
+
+    @Autowired
+    SkillRepository skillRepository;
+
+    @Autowired
+    RoleTypeRepository roleTypeRepository;
 
 
     @SuppressWarnings("unchecked")
@@ -286,13 +291,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
 
-
-    @Autowired
-    SkillRepository skillRepository;
-
-
-    @Autowired
-    RoleTypeRepository roleTypeRepository;
 
     @Override
     public List<UserType> fetchUserTypes() {
