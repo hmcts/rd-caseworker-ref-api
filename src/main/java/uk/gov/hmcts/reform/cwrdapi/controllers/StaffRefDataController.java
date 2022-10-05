@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
@@ -28,6 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
+
 
 @RequestMapping(
         path = "/refdata/case-worker"
@@ -41,8 +43,50 @@ public class StaffRefDataController {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+
     @Autowired
     StaffRefDataService staffRefDataService;
+
+    @ApiOperation(
+
+            value = "This API is used to retrieve the service specific skills ",
+            notes = "This API will be invoked by user having idam role of staff-admin",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "Successfully retrieved list of ServiceSkills for the request provided",
+                    response = StaffWorkerSkillResponse.class
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @GetMapping(
+            produces = APPLICATION_JSON_VALUE,
+            path = {"/skill"}
+    )
+    @Secured("staff-admin")
+    public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills() {
+        log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
+
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataService.getServiceSkills();
+
+        return ResponseEntity.ok().body(staffWorkerSkillResponse);
+    }
 
     @ApiOperation(
             value = "This API gets the user types from staff reference data",
@@ -88,6 +132,7 @@ public class StaffRefDataController {
                 .status(200)
                 .body(staffReferenceDataUserTypesResponseBuilder.build());
     }
+
 
     @ApiOperation(
             value = "This API is used to retrieve the Job Title's ",
@@ -137,4 +182,5 @@ public class StaffRefDataController {
                 .body(staffRefJobTitleResponseBuilder.build());
 
     }
+
 }
