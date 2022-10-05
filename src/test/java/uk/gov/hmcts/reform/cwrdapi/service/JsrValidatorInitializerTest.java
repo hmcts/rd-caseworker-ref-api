@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.config.EmailDomainPropertyInitiator;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ class JsrValidatorInitializerTest {
 
     @BeforeEach
     void init() {
+        EmailDomainPropertyInitiator.emailDomains = "justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk";
         openMocks(this);
         jsrValidatorInitializer.initializeFactory();
     }
