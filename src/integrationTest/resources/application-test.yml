@@ -138,3 +138,7 @@ excel:
 refresh:
   pageSize: 20
   sortColumn: caseWorkerId
+
+### Email domain list
+email:
+  domainList: justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk
