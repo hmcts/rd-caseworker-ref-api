@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateStaffProfileChildren;
 
 import java.util.List;
+import java.util.Set;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
@@ -56,6 +57,9 @@ public class StaffProfileCreationRequest {
     @JsonProperty("region_id")
     private Integer regionId;
 
+    @JsonProperty("idam_roles")
+    private Set<String> idamRoles;
+
     @JsonProperty("roles")
     @NotEmpty(message = CaseWorkerConstants.NO_ROLE_PRESENT_PROFILE)
     private List<CaseWorkerRoleRequest> roles;
@@ -85,4 +89,6 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("skills")
     private List<SkillsRequest> skills;
+    @JsonProperty("rowId")
+    private long rowId;
 }

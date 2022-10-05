@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+
+import java.util.List;
 
 public interface StaffProfileService {
 
@@ -16,5 +20,8 @@ public interface StaffProfileService {
      *
      */
     void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse);
+
+    List<CaseWorkerProfile> updateStaffProfiles(List<StaffProfileCreationRequest>
+                                                              caseWorkersProfileCreationRequest);
 
 }

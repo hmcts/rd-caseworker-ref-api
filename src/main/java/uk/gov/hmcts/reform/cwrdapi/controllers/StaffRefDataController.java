@@ -21,17 +21,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -245,12 +248,36 @@ public class StaffRefDataController {
     //@Secured("staff-admin")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.CREATED)
+    @Transactional
     public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfile(@RequestBody StaffProfileCreationRequest
                                                                                        staffProfileCreationRequest) {
         log.info("Inside updateStaffUserProfile Controller");
         StaffProfileCreationResponse response = null;
 
         response = staffProfileService.updateStaffProfile(staffProfileCreationRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping(
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE,
+            path = {"/profile/test"}
+    )
+    //@Secured("staff-admin")
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @Transactional
+    public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfileTest(@RequestBody StaffProfileCreationRequest
+                                                                                       staffProfileCreationRequest) {
+        log.info("Inside updateStaffUserProfile Controller");
+
+        List<StaffProfileCreationRequest> cwUiRequests = Collections.singletonList(staffProfileCreationRequest);
+        //response = staffProfileService.updateStaffProfile(staffProfileCreationRequest);
+        List<CaseWorkerProfile> caseWorkerProfiles = staffProfileService.updateStaffProfiles(cwUiRequests);
+        StaffProfileCreationResponse response = new StaffProfileCreationResponse();
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfiles.get(0);
+
+        response.setCaseWorkerId(caseWorkerProfile.getCaseWorkerId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
