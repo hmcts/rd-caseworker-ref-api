@@ -16,6 +16,8 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_LAST_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
@@ -81,5 +83,19 @@ public class RequestUtils {
                                              Class<?> entityClass) {
         Field field = ReflectionUtils.findField(entityClass, finalSortColumn);
         return Objects.nonNull(field);
+    }
+
+    public static PageRequest validateAndBuildPagination(Integer pageSize, Integer pageNumber,
+                                                         int configPageSize, int configPageNumber) {
+        if (Objects.nonNull(pageNumber) && pageNumber < 1) {
+            throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_NUMBER));
+        }
+        if (Objects.nonNull(pageSize) && pageSize <= 0) {
+            throw new InvalidRequestException(String.format(INVALID_FIELD, PAGE_SIZE));
+        }
+
+        return PageRequest.of((Objects.isNull(pageNumber) ? configPageNumber : pageNumber) - 1,
+                Objects.isNull(pageSize) ? configPageSize : pageSize,
+                Sort.by(Sort.DEFAULT_DIRECTION, CW_LAST_NAME, CW_FIRST_NAME));
     }
 }

@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
@@ -30,6 +32,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Override
     public List<RoleType> getJobTitles() {
         return roleTypeRepository.findAll();
+    }
+
+    @Override
+    public ResponseEntity<Object> retrieveStaffProfile(SearchRequest searchRequest, Object pageRequest) {
+        return null;
     }
 
 
