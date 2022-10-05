@@ -63,16 +63,16 @@ public class StaffRefDataController {
                     response = StaffWorkerSkillResponse.class
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Bad Request"
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
             ),
             @ApiResponse(
-                    code = 401,
-                    message = "Forbidden Error: Access denied"
+                    code = 403,
+                    message = FORBIDDEN_ERROR
             ),
             @ApiResponse(
                     code = 500,
-                    message = "Internal Server Error"
+                    message = INTERNAL_SERVER_ERROR
             )
     })
     @GetMapping(

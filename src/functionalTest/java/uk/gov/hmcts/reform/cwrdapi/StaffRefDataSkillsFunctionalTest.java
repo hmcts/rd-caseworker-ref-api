@@ -86,4 +86,17 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
                 .statusCode(401);
     }
 
+    @Test
+    @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    public void should_return_403_when_invalid_role() {
+        Response response = caseWorkerApiClient
+                .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get(STAFF_REF_DATA_SKILL_URL)
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(403);
+    }
+
 }

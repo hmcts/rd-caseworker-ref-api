@@ -60,4 +60,5 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
         assertThat(skillDTO.getUserType()).isEqualTo("1");
     }
+
 }
