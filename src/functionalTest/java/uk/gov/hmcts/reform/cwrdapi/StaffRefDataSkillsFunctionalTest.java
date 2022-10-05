@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
@@ -27,7 +28,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SpringBootTest
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
+public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTest {
     public static final String STAFF_REF_DATA_SKILL_URL = "/refdata/case-worker/skill";
     public static final String STAFF_REF_DATA_RD_STAFF_UI_KEY =
             "StaffRefDataController.retrieveAllServiceSkills";
@@ -51,6 +52,10 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(staffWorkerSkillResponse).isNotNull();
         assertThat(staffWorkerSkillResponse.getServiceSkills()).isNotNull();
         assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isEqualTo(5);
+
+        ServiceSkill serviceSkill = staffWorkerSkillResponse.getServiceSkills().get(0);
+        assertThat(serviceSkill.getId()).isEqualTo("1");
+        assertThat(serviceSkill.getSkills().size()).isEqualTo(1);
 
     }
 
