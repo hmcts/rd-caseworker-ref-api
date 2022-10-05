@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.lib.idam.IdamOpenId;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -61,6 +62,11 @@ public class IdamOpenIdClient extends IdamOpenId {
     }
 
 
+    public String getOpenIdTokenByRoles(List<String> userRoles) {
+        Map<String, String> userCreds = createUser(userRoles);
+        cwdStaffAdminUserToken = getOpenIdToken(userCreds.get(EMAIL), userCreds.get(CREDS));
+        return cwdStaffAdminUserToken;
+    }
 
     public void deleteSidamUser(String email) {
         try {

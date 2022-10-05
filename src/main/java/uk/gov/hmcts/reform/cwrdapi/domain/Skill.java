@@ -48,4 +48,9 @@ public class Skill implements Serializable {
     @Column(name = "last_update")
     private LocalDateTime lastUpdate;
 
+    public Skill(Long skillId, String description) {
+        this.skillId = skillId;
+        this.description = description;
+    }
+
 }

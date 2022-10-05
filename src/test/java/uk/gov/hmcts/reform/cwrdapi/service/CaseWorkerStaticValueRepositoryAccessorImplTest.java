@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerStaticValueRepositoryAccessorImpl;
 
@@ -24,6 +25,9 @@ class CaseWorkerStaticValueRepositoryAccessorImplTest {
 
     @Mock
     private SimpleJpaRepository<UserType, Long> userTypeRepository;
+
+    @Mock
+    private SimpleJpaRepository<Skill, Long> skillRepository;
 
     @InjectMocks
     private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
@@ -50,5 +54,17 @@ class CaseWorkerStaticValueRepositoryAccessorImplTest {
         assertEquals("testUser",
                 caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes().get(0).getDescription());
         verify(userTypeRepository, times(1)).findAll();
+    }
+
+    @Test
+    void shouldGetSkillFromSkillRepo() {
+        Skill skill = new Skill();
+        skill.setDescription("testSkill");
+        skill.setSkillId(1L);
+        when(skillRepository.findAll()).thenReturn(Collections.singletonList(skill));
+        caseWorkerStaticValueRepositoryAccessorImpl.initialize();
+        assertEquals("testSkill",
+                caseWorkerStaticValueRepositoryAccessorImpl.getSkills().get(0).getDescription());
+        verify(skillRepository, times(1)).findAll();
     }
 }
