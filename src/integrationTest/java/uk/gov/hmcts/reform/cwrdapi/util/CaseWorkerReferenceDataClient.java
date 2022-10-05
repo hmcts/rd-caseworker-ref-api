@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,9 +15,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
@@ -87,6 +90,51 @@ public class CaseWorkerReferenceDataClient {
                 new HttpEntity<>(body, httpHeaders);
         return sendRequest(uriPath, request);
     }
+
+    public Object retrieveAllServiceSkills(Class<?> clazz,
+                                           String path, String role) throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequest(path, clazz, role);
+        return mapServiceSkillsIdResponse(responseEntity, clazz);
+    }
+
+    private Object mapServiceSkillsIdResponse(ResponseEntity<Object> responseEntity,
+                                              Class<?> clazz) throws JsonProcessingException {
+        HttpStatus status = responseEntity.getStatusCode();
+
+        if (status.is2xxSuccessful()) {
+            return objectMapper.convertValue(responseEntity.getBody(), clazz);
+        } else {
+            Map<String, Object> errorResponseMap = new HashMap<>();
+            errorResponseMap.put(
+                    "response_body",
+                    objectMapper.readValue(responseEntity.getBody().toString(), clazz)
+            );
+            errorResponseMap.put("http_status", status);
+            return errorResponseMap;
+        }
+
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private ResponseEntity<Object> getRequest(String uriPath, Class clasz, String role) {
+
+        ResponseEntity<Object> responseEntity;
+        try {
+            HttpEntity<?> request = new HttpEntity<>(getMultipleAuthHeadersWithoutContentType(role, null));
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl + uriPath,
+                    HttpMethod.GET,
+                    request,
+                    clasz
+            );
+        } catch (HttpStatusCodeException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).body(ex.getResponseBodyAsString());
+        }
+        return responseEntity;
+    }
+
+
 
     public Map<String, Object> fetchStaffProfileByCcdServiceName(String ccdServiceNames, Integer pageSize,
                                                                  Integer pageNumber, String sortDirection,

@@ -16,10 +16,14 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
+import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -39,6 +43,11 @@ import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +61,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 
 @Service
 @Slf4j
+@SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
@@ -277,13 +287,92 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
 
+    @Autowired
+    SkillRepository skillRepository;
+
+
+    @Autowired
+    RoleTypeRepository roleTypeRepository;
+
     @Override
     public List<UserType> fetchUserTypes() {
         return userTypeRepository
                 .findAll();
     }
 
+    @Override
+    public StaffWorkerSkillResponse getServiceSkills() {
+        List<Skill> skills = null;
+        List<ServiceSkill> serviceSkills = null;
+        try {
+            List<SkillDTO> skillData = null;
+            skills = skillRepository.findAll();
 
+            skillData = skills.stream().map(skill -> {
+                SkillDTO skillDTO = new SkillDTO();
+                skillDTO.setServiceId(skill.getServiceId());
+                skillDTO.setSkillId(skill.getSkillId());
+                skillDTO.setSkillCode(skill.getSkillCode());
+                skillDTO.setUserType(skill.getUserType());
+                skillDTO.setDescription(skill.getDescription());
+                return skillDTO;
+            }).toList();
+
+            serviceSkills = mapSkillToServicesSkill(skillData);
+
+        } catch (Exception exp) {
+            log.error("{}:: StaffRefDataService getServiceSkills failed :: {}", loggingComponentName,
+                    exp);
+            throw exp;
+        }
+        StaffWorkerSkillResponse staffWorkerSkillResponse = new StaffWorkerSkillResponse();
+        staffWorkerSkillResponse.setServiceSkills(serviceSkills);
+        return staffWorkerSkillResponse;
+    }
+
+    /**
+     * To convert skills data to ServiceSkills.
+     * @param skillData List of skills
+     * @return List of ServiceSkill
+     */
+    public List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData) {
+        Map<String, List<SkillDTO>> result = null;
+        if (skillData != null) {
+            result = skillData.stream()
+                    .collect(
+                            Collectors.toMap(
+                                    SkillDTO::getServiceId,
+                                    Collections::singletonList,
+                                    this::mergeSkillsWithDuplicateServiceIds
+                            )
+                    );
+        }
+
+
+        List<ServiceSkill> serviceSkills = new ArrayList<>();
+
+        if (result != null) {
+            result.forEach(
+                    (key, value) -> {
+                        ServiceSkill serviceSkill = new ServiceSkill();
+                        serviceSkill.setId(key);
+                        serviceSkill.setSkills(value);
+                        serviceSkills.add(serviceSkill);
+                    }
+            );
+        }
+
+        return serviceSkills;
+
+    }
+
+    private List<SkillDTO> mergeSkillsWithDuplicateServiceIds(List<SkillDTO> existingResults,
+                                                              List<SkillDTO> newResults) {
+        List<SkillDTO> mergedResults = new ArrayList<>();
+        mergedResults.addAll(existingResults);
+        mergedResults.addAll(newResults);
+        return mergedResults;
+    }
 
     @Override
     public List<RoleType> getJobTitles() {
