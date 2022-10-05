@@ -109,4 +109,20 @@ class StaffProfileCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(response.getBody().asString()).contains(getToggledOffMessage());
 
     }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
+    void createStaffProfile_CwdAdminRoleOnly() {
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+                .body(staffProfileCreationRequest)
+                .post("/refdata/case-worker/profile")
+                .andReturn();
+        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
+        assertThat(response.getBody().asString()).contains("Access is denied");
+
+    }
 }

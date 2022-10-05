@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
@@ -25,11 +26,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-
 @Service
 @Slf4j
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class StaffProfileCreateUpdateUtil {
 
     @Value("${loggingComponentName}")
@@ -45,40 +46,9 @@ public class StaffProfileCreateUpdateUtil {
     CaseWorkerProfileRepository caseWorkerProfileRepo;
 
 
-    public void populateStaffProfile(StaffProfileCreationRequest staffProfileRequest,
-                                          CaseWorkerProfile caseWorkerProfile, String idamId) {
-        //case worker profile request mapping
-        mapStaffProfileRequest(idamId, staffProfileRequest, caseWorkerProfile);
-        //Locations data request mapping and setting to case worker profile
-        caseWorkerProfile.getCaseWorkerLocations().addAll(mapStaffLocationRequest(idamId, staffProfileRequest));
-        //caseWorkerRoles roles request mapping and data setting to case worker profile
-        caseWorkerProfile.getCaseWorkerRoles().addAll(mapStaffRoleRequestMapping(idamId, staffProfileRequest));
-        //caseWorkerWorkAreas setting to case worker profile
-        caseWorkerProfile.getCaseWorkerWorkAreas().addAll(mapStaffAreaOfWork(staffProfileRequest, idamId));
-        if (isNotEmpty(staffProfileRequest.getSkills())) {
-            caseWorkerProfile.getCaseWorkerSkills().addAll(mapStaffSkillRequestMapping(idamId, staffProfileRequest));
-        }
-    }
-
-    public CaseWorkerProfile mapStaffProfileRequest(String idamId,
-                                                         StaffProfileCreationRequest staffProfileRequest,
-                                                         CaseWorkerProfile caseWorkerProfile) {
-        caseWorkerProfile.setCaseWorkerId(idamId);
-        caseWorkerProfile.setFirstName(staffProfileRequest.getFirstName());
-        caseWorkerProfile.setLastName(staffProfileRequest.getLastName());
-        caseWorkerProfile.setEmailId(staffProfileRequest.getEmailId().toLowerCase());
-        caseWorkerProfile.setSuspended(staffProfileRequest.isSuspended());
-        caseWorkerProfile.setUserTypeId(getUserTypeIdByDesc(staffProfileRequest.getUserType()));
-        caseWorkerProfile.setRegionId(staffProfileRequest.getRegionId());
-        caseWorkerProfile.setRegion(staffProfileRequest.getRegion());
-        caseWorkerProfile.setCaseAllocator(staffProfileRequest.isCaseAllocator());
-        caseWorkerProfile.setTaskSupervisor(staffProfileRequest.isTaskSupervisor());
-        caseWorkerProfile.setUserAdmin(staffProfileRequest.isStaffAdmin());
-        return caseWorkerProfile;
-    }
 
     // get the userTypeId by description.
-    private Long getUserTypeIdByDesc(String userTypeReq) {
+    public Long getUserTypeIdByDesc(String userTypeReq) {
         Optional<Long> userTypeId = caseWorkerStaticValueRepositoryAccessor
                 .getUserTypes()
                 .stream().filter(userType ->
@@ -168,19 +138,4 @@ public class StaffProfileCreateUpdateUtil {
         return matchedRoles;
     }
 
-    public CaseWorkerProfile persistStaffProfile(CaseWorkerProfile caseWorkerProfile) {
-
-        log.info("{}:: persistStaffProfile starts::",
-                loggingComponentName);
-        CaseWorkerProfile processedStaffProfiles = null;
-
-        if (null != caseWorkerProfile) {
-            caseWorkerProfile.setNew(true);
-            processedStaffProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
-            log.info("{}:: {} case worker profiles inserted ::", loggingComponentName,
-                    processedStaffProfiles);
-        }
-
-        return processedStaffProfiles;
-    }
 }

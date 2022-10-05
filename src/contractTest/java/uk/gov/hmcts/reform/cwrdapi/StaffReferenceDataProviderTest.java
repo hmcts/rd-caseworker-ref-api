@@ -24,8 +24,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -33,26 +36,33 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
-import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,8 +70,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-        host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-        @VersionSelector(tag = "master")})
+        host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:9292}", consumerVersionSelectors = {
+        @VersionSelector(tag = "Dev")})
 @IgnoreNoPactsToVerify
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
@@ -87,13 +97,26 @@ public class StaffReferenceDataProviderTest {
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
 
+    @Mock
+    CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
+
+    @Mock
+    CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
+
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
     @Mock
     private UserTypeRepository userTypeRepository;
+    @MockBean
+    private UserProfileFeignClient userProfileFeignClient;
     @Mock
-    private StaffProfileService staffProfileService;
-
+    IJsrValidatorInitializer validateStaffProfile;
+    @Mock
+    StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
+    @Mock
+    StaffAuditRepository staffAuditRepository;
+    @Mock
+    IValidationService validationServiceFacade;
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -109,6 +132,7 @@ public class StaffReferenceDataProviderTest {
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
@@ -117,7 +141,7 @@ public class StaffReferenceDataProviderTest {
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
                 new StaffRefDataController("RD-Caseworker-Staff-Ref-Api",
-                        staffRefDataServiceImpl,staffProfileService)
+                        staffRefDataServiceImpl)
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -218,6 +242,20 @@ public class StaffReferenceDataProviderTest {
                 .thenReturn(roleTypeList);
     }
 
+    @State({"A Staff profile create request is submitted"})
+    public void createStaffUserProfile() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        UserProfileCreationResponse userProfileResponse = new UserProfileCreationResponse();
+        userProfileResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileResponse.setIdamRegistrationResponse(200);
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        doReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build())
+                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
+        doReturn(getCaseWorkerProfile("123456")).when(caseWorkerProfileRepo).save(any());
+    }
 }
 
 

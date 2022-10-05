@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
@@ -29,10 +28,8 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -134,33 +131,6 @@ class StaffProfileCreateUpdateUtilTest {
     }
 
     @Test
-    void testPopulateStaffProfile() {
-        staffProfileCreateUpdateUtil.populateStaffProfile(
-                  staffProfileCreationRequest,new CaseWorkerProfile(),"1");
-        verify(caseWorkerStaticValueRepositoryAccessorImpl, times(2)).getRoleTypes();
-        verify(caseWorkerStaticValueRepositoryAccessorImpl, times(2)).getSkills();
-    }
-
-    @Test
-    void testMapCaseWorkerProfileRequest() {
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId("1");
-        CaseWorkerProfile caseWorkerProfile = staffProfileCreateUpdateUtil.mapStaffProfileRequest(
-                "1", staffProfileCreationRequest, new CaseWorkerProfile());
-
-        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("1");
-        assertThat(caseWorkerProfile.getFirstName()).isEqualTo(staffProfileCreationRequest.getFirstName());
-        assertThat(caseWorkerProfile.getLastName()).isEqualTo(staffProfileCreationRequest.getLastName());
-        assertThat(caseWorkerProfile.getEmailId()).isEqualTo(staffProfileCreationRequest.getEmailId());
-        assertThat(caseWorkerProfile.getSuspended()).isFalse();
-        assertThat(caseWorkerProfile.getUserTypeId()).isZero();
-        assertThat(caseWorkerProfile.getRegionId()).isEqualTo(staffProfileCreationRequest.getRegionId());
-        assertThat(caseWorkerProfile.getRegion()).isEqualTo(staffProfileCreationRequest.getRegion());
-        assertThat(caseWorkerProfile.getCaseAllocator()).isEqualTo(staffProfileCreationRequest.isCaseAllocator());
-        assertThat(caseWorkerProfile.getTaskSupervisor()).isEqualTo(staffProfileCreationRequest.isTaskSupervisor());
-    }
-
-    @Test
     void testCaseWorkerRoleRequestMapping() {
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         List<CaseWorkerRole> caseWorkerRole = staffProfileCreateUpdateUtil.mapStaffRoleRequestMapping(
@@ -185,19 +155,5 @@ class StaffProfileCreateUpdateUtilTest {
                 staffProfileCreationRequest);
         verify(roleAssocRepository, times(1)).findByRoleTypeInAndServiceCodeIn(any(),any());
         verify(caseWorkerStaticValueRepositoryAccessorImpl, times(2)).getRoleTypes();
-    }
-
-    @Test
-    void testPersistStaffProfileNullValue() {
-        CaseWorkerProfile caseWorkerProfile = staffProfileCreateUpdateUtil.persistStaffProfile(null);
-        assertNull(caseWorkerProfile);
-    }
-
-    @Test
-    void testPersistStaffProfileValid() {
-        when(caseWorkerProfileRepo.save(any())).thenReturn(caseWorkerProfile);
-        CaseWorkerProfile processedCaseWorkerProfile = staffProfileCreateUpdateUtil
-                .persistStaffProfile(caseWorkerProfile);
-        assertNotNull(processedCaseWorkerProfile);
     }
 }

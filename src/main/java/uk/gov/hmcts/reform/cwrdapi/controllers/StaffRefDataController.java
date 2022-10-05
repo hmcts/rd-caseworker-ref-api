@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesRes
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.service.StaffProfileService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.List;
@@ -55,8 +54,6 @@ public class StaffRefDataController {
     @Autowired
     StaffRefDataService staffRefDataService;
 
-    @Autowired
-    StaffProfileService staffProfileService;
 
     @ApiOperation(
             value = "This API gets the user types from staff reference data",
@@ -151,10 +148,10 @@ public class StaffRefDataController {
         log.info("Inside createStaffUserProfile Controller");
         StaffProfileCreationResponse staffProfileCreationResponse = null;
 
-        staffProfileCreationResponse = staffProfileService.processStaffProfileCreation(staffProfileCreationRequest);
+        staffProfileCreationResponse = staffRefDataService.processStaffProfileCreation(staffProfileCreationRequest);
         if (isNotEmpty(staffProfileCreationResponse)) {
 
-            staffProfileService.publishStaffProfileToTopic(staffProfileCreationResponse);
+            staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(staffProfileCreationResponse);
     }

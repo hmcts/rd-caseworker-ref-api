@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateStaffProfileChildren;
@@ -24,6 +26,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
 @Setter
 @Builder(builderMethodName = "staffProfileCreationRequest")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@AllArgsConstructor
+@NoArgsConstructor
 @ValidateStaffProfileChildren
 public class StaffProfileCreationRequest {
 
