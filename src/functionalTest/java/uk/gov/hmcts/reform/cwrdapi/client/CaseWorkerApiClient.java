@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
 import java.util.HashSet;
@@ -21,6 +23,7 @@ import java.util.Set;
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
 
@@ -217,4 +220,25 @@ public class CaseWorkerApiClient {
 
         return response;
     }
+
+    public Object fetchJobTitles(HttpStatus expectedStatus) {
+        Response response = getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
+                .get("/refdata/case-worker/job-title")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+        return response.getBody().as(StaffRefJobTitleResponse.class);
+    }
+
+    public Object fetchUserType(HttpStatus expectedStatus) {
+        Response response = getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
+                .get("/refdata/case-worker/user-type")
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(expectedStatus.value());
+        return response.getBody().as(StaffRefDataUserTypesResponse.class);
+    }
+
 }

@@ -32,10 +32,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
+
+import java.util.List;
+
+
 @Service
 @Slf4j
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataServiceImpl implements StaffRefDataService {
+
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -43,6 +54,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     CaseWorkerProfileRepository caseWorkerProfileRepo;
     @Autowired
     SkillRepository skillRepository;
+    @Autowired
+    private UserTypeRepository userTypeRepository;
+    @Autowired
+    RoleTypeRepository roleTypeRepository;
 
 
     @Override
@@ -234,6 +249,21 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         mergedResults.addAll(existingResults);
         mergedResults.addAll(newResults);
         return mergedResults;
+    }
+
+
+
+    @Override
+    public List<UserType> fetchUserTypes() {
+        return userTypeRepository
+                .findAll();
+    }
+
+
+    @Override
+    public List<RoleType> getJobTitles() {
+        return roleTypeRepository.findAll();
+
     }
 
 

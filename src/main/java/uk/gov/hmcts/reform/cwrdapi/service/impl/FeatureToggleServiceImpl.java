@@ -22,6 +22,7 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
 
     public static final String STAFF_REF_DATA_RD_STAFF_UI = "rd-staff-ui";
 
+    public static final String RD_STAFF_UI = "rd-staff-ui";
 
     @Autowired
     private final LDClient ldClient;
@@ -54,12 +55,14 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 CWD_DELETE_BY_ID_OR_EMAILPATTERN_FLAG);
         launchDarklyMap.put("StaffReferenceInternalController.fetchStaffByCcdServiceNames",
                 CWD_FETCH_STAFF_BY_CCD_SERVICE_NAMES);
-
         launchDarklyMap.put("StaffRefDataController.searchStaffUserByName",
                 SRD_RD_STAFF_UI);
-
         launchDarklyMap.put("StaffRefDataController.retrieveAllServiceSkills",
                 STAFF_REF_DATA_RD_STAFF_UI);
+        launchDarklyMap.put("StaffRefDataController.fetchUserTypes",
+                RD_STAFF_UI);
+        launchDarklyMap.put("StaffRefDataController.retrieveJobTitles",
+                RD_STAFF_UI);
 
     }
 
