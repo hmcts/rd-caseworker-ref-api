@@ -12,6 +12,7 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateCaseWorkerChildren;
+import uk.gov.hmcts.reform.cwrdapi.util.ValidateEmail;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -49,10 +50,7 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     private String lastName;
 
     @MappingField(columnName = "Email", position = 1)
-    @Pattern(regexp = CaseWorkerConstants.USER_NAME_PATTERN + "@"
-            + CaseWorkerConstants.DOMAIN_JUSTICE_GOV_UK,
-            message = CaseWorkerConstants.INVALID_EMAIL,
-            flags = Pattern.Flag.CASE_INSENSITIVE)
+    @ValidateEmail(message = CaseWorkerConstants.INVALID_EMAIL)
     @NotEmpty(message = CaseWorkerConstants.INVALID_EMAIL)
     @JsonProperty("email_id")
     private String officialEmail;
