@@ -68,7 +68,6 @@ public class AuthorizationFunctionalTest {
 
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
-    public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
