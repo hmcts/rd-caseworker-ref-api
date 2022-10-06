@@ -89,16 +89,19 @@ public class StaffReferenceDataProviderTest {
     private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
 
+
     @Mock
     SkillRepository skillRepository;
 
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
 
-    @InjectMocks
-    private StaffRefDataServiceImpl staffRefDataServiceImpl;
     @Mock
     private UserTypeRepository userTypeRepository;
+
+    @InjectMocks
+    private StaffRefDataServiceImpl staffRefDataServiceImpl;
+
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -110,6 +113,8 @@ public class StaffReferenceDataProviderTest {
             context.verifyInteraction();
         }
     }
+
+
 
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
@@ -176,6 +181,7 @@ public class StaffReferenceDataProviderTest {
         when(skillRepository.findAll()).thenReturn(skills);
 
     }
+
 
     @State({"A list of caseworker profiles by name"})
     public void searchCaseWorkerProfileByName() throws JsonProcessingException {
@@ -267,6 +273,7 @@ public class StaffReferenceDataProviderTest {
         return caseWorkerSkill;
 
     }
+
 
     private  List<Skill> getSkillsData() {
         Skill skill1 = new Skill();

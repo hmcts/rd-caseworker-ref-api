@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
 
 
+
 @RequestMapping(
         path = "/refdata/case-worker"
 )
@@ -55,6 +56,7 @@ public class StaffRefDataController {
     @Value("${loggingComponentName}")
     private String loggingComponentName;
 
+
     @Value("${search.pageSize}")
     private int configPageSize;
 
@@ -62,10 +64,12 @@ public class StaffRefDataController {
     private int configPageNumber;
 
 
+
     @Autowired
     StaffRefDataService staffRefDataService;
 
     @ApiOperation(
+
         value = "This API allows the search of staff user by their name or surname.",
         authorizations = {
             @Authorization(value = "ServiceAuthorization"),
@@ -112,6 +116,48 @@ public class StaffRefDataController {
 
 
 
+    @ApiOperation(
+
+    value = "This API is used to retrieve the service specific skills ",
+    notes = "This API will be invoked by user having idam role of staff-admin",
+    authorizations = {
+        @Authorization(value = "ServiceAuthorization"),
+        @Authorization(value = "Authorization")
+    }
+    )
+
+
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = "Successfully retrieved list of ServiceSkills for the request provided",
+                    response = StaffWorkerSkillResponse.class
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @GetMapping(
+            produces = APPLICATION_JSON_VALUE,
+            path = {"/skill"}
+    )
+    @Secured("staff-admin")
+    public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills() {
+        log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
+
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataService.getServiceSkills();
+
+        return ResponseEntity.ok().body(staffWorkerSkillResponse);
+    }
 
 
     @ApiOperation(
@@ -157,51 +203,6 @@ public class StaffRefDataController {
         return ResponseEntity
                 .status(200)
                 .body(staffReferenceDataUserTypesResponseBuilder.build());
-    }
-
-    @ApiOperation(
-            value = "This API is used to retrieve the Job Title's ",
-
-            notes = "This API will be invoked by user having idam role of staff-admin",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
-            }
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    code = 200,
-
-                    message = "Successfully retrieved list of ServiceSkills for the request provided",
-                    response = StaffWorkerSkillResponse.class
-
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "Bad Request"
-            ),
-            @ApiResponse(
-                    code = 401,
-                    message = "Forbidden Error: Access denied"
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
-            )
-    })
-    @GetMapping(
-            produces = APPLICATION_JSON_VALUE,
-
-            path = {"/skill"}
-    )
-    @Secured("cwd-admin")
-    public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills() {
-        log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
-
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataService.getServiceSkills();
-
-        return ResponseEntity.ok().body(staffWorkerSkillResponse);
-
     }
 
 

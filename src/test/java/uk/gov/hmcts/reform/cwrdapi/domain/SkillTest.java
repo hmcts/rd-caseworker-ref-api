@@ -25,11 +25,15 @@ class SkillTest {
         skill.setCreatedDate(LocalDateTime.now());
         skill.setLastUpdate(LocalDateTime.now());
 
+
         CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
         skill.setCaseWorkerSkill(caseWorkerSkill);
 
         assertNotNull(skill);
         assertNotNull(skill.getCaseWorkerSkill());
+
+        assertNotNull(skill);
+
         assertThat(skill.getServiceId(), is("BBA3"));
         assertThat(skill.getSkillId(), is(1L));
         assertThat(skill.getSkillCode(), is("A1"));

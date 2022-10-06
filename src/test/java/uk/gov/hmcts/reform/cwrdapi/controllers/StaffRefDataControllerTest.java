@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,6 +37,7 @@ class StaffRefDataControllerTest {
 
     @Mock
     StaffRefDataService staffRefDataService;
+
 
 
     StaffRefDataUserTypesResponse srResponse;
@@ -75,7 +77,11 @@ class StaffRefDataControllerTest {
                 staffRefDataController.retrieveAllServiceSkills();
 
         assertNotNull(responseEntity);
+
+        assertThat(staffWorkerSkillResponse.getServiceSkills()).isNull();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+
         verify(staffRefDataService, times(1))
                 .getServiceSkills();
     }

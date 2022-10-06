@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
@@ -40,13 +41,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
+import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
+import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+
 @SuppressWarnings("AbbreviationAsWordInName")
 @ExtendWith(MockitoExtension.class)
 class StaffRefDataServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
+
     @Mock
     CaseWorkerProfileRepository caseWorkerProfileRepo;
+
 
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
@@ -91,6 +107,7 @@ class StaffRefDataServiceImplTest {
         assertThat(staffWorkerSkillResponse).isNotNull();
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
         assertThat(serviceSkills).isNotNull();
 
         assertThat(serviceSkills).isEmpty();
@@ -347,6 +364,10 @@ class StaffRefDataServiceImplTest {
 
     }
 
+
+
+
+
     private List<Skill> getSkillsData() {
         Skill skill1 = new Skill();
         skill1.setServiceId("BBA3");
@@ -357,13 +378,32 @@ class StaffRefDataServiceImplTest {
 
         Skill skill2 = new Skill();
         skill2.setServiceId("BBA3");
+
         skill2.setSkillId(1L);
+
+        skill2.setSkillId(3L);
+
         skill2.setSkillCode("A3");
         skill2.setDescription("desc3");
         skill2.setUserType("user_type3");
 
 
-        List<Skill> skills = List.of(skill1, skill2);
+        Skill skill3 = new Skill();
+        skill3.setServiceId("ABA1");
+        skill3.setSkillId(2L);
+        skill3.setSkillCode("A2");
+        skill3.setDescription("desc2");
+        skill3.setUserType("user_type2");
+
+        Skill skill4 = new Skill();
+        skill4.setServiceId("ABA1");
+        skill4.setSkillId(4L);
+        skill4.setSkillCode("A4");
+        skill4.setDescription("desc4");
+        skill4.setUserType("user_type4");
+
+        List<Skill> skills = List.of(skill1, skill2, skill3, skill4);
+
         return skills;
     }
 }

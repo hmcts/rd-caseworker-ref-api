@@ -12,12 +12,18 @@ import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.util.List;
+
 import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
+
+
+import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -41,7 +47,9 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_retrieveAllServiceSkills_return_status_code_200()
             throws JsonProcessingException {
         String path = "/skill";
-        String role = "cwd-admin";
+
+        String role = "staff-admin";
+
 
         final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
                 .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
@@ -63,6 +71,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
         assertThat(skillDTO.getUserType()).isEqualTo("1");
     }
+
 
     @Test
     void should_return_status_code_400_when_page_size_is_zero()
@@ -141,4 +150,5 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
                 .contains("Required request parameter 'search' for method parameter type String is not present");
 
     }
+
 }
