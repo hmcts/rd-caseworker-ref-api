@@ -12,17 +12,12 @@ import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.util.List;
-
 import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
-
-
-import static org.apache.logging.log4j.util.Strings.EMPTY;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SuppressWarnings("AbbreviationAsWordInName")

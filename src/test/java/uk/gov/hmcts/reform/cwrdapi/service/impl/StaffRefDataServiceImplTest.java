@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
@@ -40,18 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
-
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
-import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
-import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
-import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
-import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 
 @SuppressWarnings("AbbreviationAsWordInName")
