@@ -145,4 +145,18 @@ public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
 
     }
 
+    @Test
+    @ToggleEnable(mapKey = SEARCH_STAFF_USER_BY_NAME_KEY, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    public void should_return_403_when_invalid_role() {
+        String searchString = "cwr";
+        Response response = caseWorkerApiClient
+                .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
+                .get(CASE_WORKER_PROFILE_URL + "/search-by-name?search=" + searchString)
+                .andReturn();
+        response.then()
+                .assertThat()
+                .statusCode(403);
+    }
+
 }
