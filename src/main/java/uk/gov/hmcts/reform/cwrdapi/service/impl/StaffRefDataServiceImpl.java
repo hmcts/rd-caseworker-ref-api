@@ -162,7 +162,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
         log.info("{}:: createCaseWorkerProfile UserProfile Received  response status {}::",
                 loggingComponentName,responseEntity.getStatusCode());
-        if (nonNull(responseEntity) && (responseEntity.getStatusCode().is2xxSuccessful())) {
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
             log.info("{}:: createCaseWorkerProfile UserProfile Received  successful response {}::",
                     loggingComponentName,responseEntity.getStatusCode());
             UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
