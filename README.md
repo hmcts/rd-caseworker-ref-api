@@ -46,7 +46,7 @@ If required, to run with a low memory consumption, the following can be used:
 To understand if the application is working, you can call it's health endpoint:
 
 ```
-curl http://localhost:8091/health
+curl http://localhost:8095/health
 ```
 
 If the API is running, you should see this response:
