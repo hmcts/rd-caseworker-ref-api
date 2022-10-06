@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
@@ -52,7 +54,7 @@ class StaffProfileCreateUpdateUtilTest {
     private UserType userType;
     private Skill skill;
     private CaseWorkerProfile caseWorkerProfile;
-    private Set<String> idamRoles = new HashSet<>();
+    private final Set<String> idamRoles = new HashSet<>();
     @InjectMocks
     private StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
 
@@ -155,5 +157,31 @@ class StaffProfileCreateUpdateUtilTest {
                 staffProfileCreationRequest);
         verify(roleAssocRepository, times(1)).findByRoleTypeInAndServiceCodeIn(any(),any());
         verify(caseWorkerStaticValueRepositoryAccessorImpl, times(2)).getRoleTypes();
+    }
+
+
+    @Test
+    void testGetLocations() {
+        List<CaseWorkerLocation> locations = staffProfileCreateUpdateUtil.mapStaffLocationRequest("1",
+                staffProfileCreationRequest);
+        assertNotNull(locations);
+        assertEquals(2,locations.size());
+
+    }
+
+    @Test
+    void testGetAreaOfWork() {
+        List<CaseWorkerWorkArea> services = staffProfileCreateUpdateUtil.mapStaffAreaOfWork(
+                staffProfileCreationRequest,"1");
+        assertNotNull(services);
+        assertEquals(2,services.size());
+
+    }
+
+    @Test
+    void testGetUserTypeIdByDesc() {
+        staffProfileCreateUpdateUtil.getUserTypeIdByDesc(
+                "1");
+        verify(caseWorkerStaticValueRepositoryAccessorImpl, times(1)).getUserTypes();
     }
 }
