@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceRespons
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
@@ -221,6 +222,9 @@ public class StaffReferenceDataProviderTest {
                 Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
         caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
 
+        List<CaseWorkerSkill> caseWorkerSkills =
+                Collections.singletonList(new CaseWorkerSkill(caseWorkerId, 1L));
+
         return new CaseWorkerProfile(caseWorkerId,
                 "firstName",
                 "lastName",
@@ -236,7 +240,7 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false);
+                new UserType(1L, "HMCTS"), false,false, caseWorkerSkills);
     }
 
     @State({"A list of all staff reference data user-type"})

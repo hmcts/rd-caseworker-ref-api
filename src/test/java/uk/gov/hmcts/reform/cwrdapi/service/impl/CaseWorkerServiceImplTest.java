@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
@@ -436,6 +437,11 @@ class CaseWorkerServiceImplTest {
                 .lastUpdatedTime(LocalDateTime.now())
                 .isPrimary(true)
                 .build();
+        Skill skill = Skill.builder()
+                .skillId(1L)
+                .skillCode("1")
+                .description("testSkills")
+                .build();
         Location location = Location
                 .builder()
                 .baseLocationId(11111)
@@ -462,9 +468,11 @@ class CaseWorkerServiceImplTest {
                         .userType("userType")
                         .userId(11111L)
                         .suspended("false")
+                        .staffAdmin("false")
                         .createdTime(LocalDateTime.now())
                         .lastUpdatedTime(LocalDateTime.now())
                         .roles(singletonList(role))
+                        .skills(singletonList(skill))
                         .locations(singletonList(location))
                         .workAreas(singletonList(workArea))
                         .taskSupervisor("Y")

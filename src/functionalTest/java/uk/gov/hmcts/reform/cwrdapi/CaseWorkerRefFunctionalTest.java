@@ -53,6 +53,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -265,9 +266,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getFirstName()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getLastName()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getOfficialEmail()));
+        assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getStaffAdmin()));
 
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getLocations()));
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getRoles()));
+        assertNotNull(caseWorkerProfile.getSkills());
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getWorkAreas()));
 
     }
