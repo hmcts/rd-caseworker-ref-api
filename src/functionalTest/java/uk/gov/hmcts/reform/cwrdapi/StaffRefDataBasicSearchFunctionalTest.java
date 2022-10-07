@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
@@ -36,60 +35,10 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SpringBootTest
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StaffRefDataFunctionalTest extends AuthorizationFunctionalTest {
-    public static final String STAFF_REF_DATA_SKILL_URL = "/refdata/case-worker/skill";
-    public static final String STAFF_REF_DATA_RD_STAFF_UI_KEY =
-            "StaffRefDataController.retrieveAllServiceSkills";
+public class StaffRefDataBasicSearchFunctionalTest extends AuthorizationFunctionalTest {
+
     public static final String SEARCH_STAFF_USER_BY_NAME_KEY = "StaffRefDataController.searchStaffUserByName";
     public static final String CASE_WORKER_PROFILE_URL = "/refdata/case-worker/profile";
-
-    @Test
-    @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    public void should_return_service_skills_with_status_code_200_when_flag_true() {
-
-        Response fetchResponse = caseWorkerApiClient
-                .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
-                .get(STAFF_REF_DATA_SKILL_URL)
-                .andReturn();
-        fetchResponse.then()
-                .assertThat()
-                .statusCode(200);
-
-        StaffWorkerSkillResponse staffWorkerSkillResponse =
-                fetchResponse.getBody().as(StaffWorkerSkillResponse.class);
-        assertThat(staffWorkerSkillResponse).isNotNull();
-        assertThat(staffWorkerSkillResponse.getServiceSkills()).isNotNull();
-        assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isEqualTo(5);
-
-    }
-
-    @Test
-    @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = false)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    public void should_return_service_skills_with_status_code_403_when_flag_false() {
-
-        Response fetchResponse = caseWorkerApiClient
-                .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
-                .get(STAFF_REF_DATA_SKILL_URL)
-                .andReturn();
-
-        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(fetchResponse.statusCode());
-        assertThat(fetchResponse.getBody().asString()).contains(getToggledOffMessage());
-
-    }
-
-    @Test
-    @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    public void should_return_401_when_authentication_invalid() {
-        Response response = caseWorkerApiClient.withUnauthenticatedRequest()
-                .get(STAFF_REF_DATA_SKILL_URL)
-                .andReturn();
-        response.then()
-                .assertThat()
-                .statusCode(401);
-    }
 
     @Test
     @ToggleEnable(mapKey = SEARCH_STAFF_USER_BY_NAME_KEY, withFeature = true)
