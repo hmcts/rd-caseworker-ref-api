@@ -72,7 +72,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_return_status_code_400_when_page_size_is_zero()
             throws JsonProcessingException {
         String path = "/profile/search-by-name";
-        String role = "cwd-admin";
+        String role = "staff-admin";
         String searchString = "cwr-test";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
@@ -87,7 +87,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_return_status_code_400_when_page_num_is_zero()
             throws JsonProcessingException {
         String path = "/profile/search-by-name";
-        String role = "cwd-admin";
+        String role = "staff-admin";
         String searchString = "cwr-test";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
@@ -102,7 +102,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_return_status_code_400_when_search_String_is_not_valid()
             throws JsonProcessingException {
         String path = "/profile/search-by-name";
-        String role = "cwd-admin";
+        String role = "staff-admin";
         String searchString = "1234";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
@@ -118,7 +118,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_return_status_code_400_when_search_String_len_less_3()
             throws JsonProcessingException {
         String path = "/profile/search-by-name";
-        String role = "cwd-admin";
+        String role = "staff-admin";
         String searchString = "ab";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
@@ -134,7 +134,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_return_status_code_400_when_search_String_empty()
             throws JsonProcessingException {
         String path = "/profile/search-by-name";
-        String role = "cwd-admin";
+        String role = "staff-admin";
         String searchString = "";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
