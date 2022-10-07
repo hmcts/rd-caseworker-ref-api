@@ -133,6 +133,8 @@ class StaffRefDataServiceImplTest {
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
+        assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
+
         List<SearchStaffUserResponse> searchResponse =
                 responseEntity.getBody();
         assertThat(responseEntity.getBody()).isNotNull();
@@ -161,11 +163,14 @@ class StaffRefDataServiceImplTest {
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
+
         assertEquals(200, responseEntity.getStatusCodeValue());
+        assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
 
         List<SearchStaffUserResponse> searchResponse =
                 responseEntity.getBody();
         assertThat(responseEntity.getBody()).isNotNull();
+        validateSearchStaffUserFalseResponses(searchResponse);
     }
 
     @Test
@@ -203,6 +208,45 @@ class StaffRefDataServiceImplTest {
         assertThat(searchStaffUserResponse.isTaskSupervisor()).isTrue();
         assertThat(searchStaffUserResponse.isCaseAllocator()).isFalse();
         assertThat(searchStaffUserResponse.isStaffAdmin()).isTrue();
+
+        ServiceResponse serviceResponse = searchStaffUserResponse.getServices().get(0);
+
+        assertThat(serviceResponse.getService()).isEqualTo("TestArea");
+        assertThat(serviceResponse.getServiceCode()).isEqualTo("SvcCode1");
+
+        assertThat(searchStaffUserResponse.getRegionId()).isEqualTo(111122222);
+        assertThat(searchStaffUserResponse.getRegion()).isEqualTo("region");
+
+        Role role = searchStaffUserResponse.getRoles().get(0);
+
+        assertThat(role.getRoleId()).isEqualTo("1");
+        assertThat(role.getRoleName()).isEqualTo("testRole1");
+
+        Location location = searchStaffUserResponse.getBaseLocations().get(0);
+
+        assertThat(location.getBaseLocationId()).isEqualTo(11112);
+        assertThat(location.getLocationName()).isEqualTo("test location");
+        assertThat(searchStaffUserResponse.getUserType()).isEqualTo("userTypeId");
+
+        SkillResponse skillResponse = searchStaffUserResponse.getSkills().get(0);
+
+        assertThat(skillResponse.getSkillId()).isEqualTo(1L);
+        assertThat(skillResponse.getDescription()).isEqualTo("desc1");
+
+
+    }
+
+    void validateSearchStaffUserFalseResponses(List<SearchStaffUserResponse> searchResponses) {
+        assertThat(searchResponses).hasSize(1);
+
+        SearchStaffUserResponse searchStaffUserResponse = searchResponses.get(0);
+        assertThat(searchStaffUserResponse.getFirstName()).isEqualTo("firstName");
+        assertThat(searchStaffUserResponse.getLastName()).isEqualTo("Last`name");
+        assertThat(searchStaffUserResponse.getEmailId()).isEqualTo("a@b.com");
+        assertThat(searchStaffUserResponse.isSuspended()).isFalse();
+        assertThat(searchStaffUserResponse.isTaskSupervisor()).isFalse();
+        assertThat(searchStaffUserResponse.isCaseAllocator()).isFalse();
+        assertThat(searchStaffUserResponse.isStaffAdmin()).isFalse();
 
         ServiceResponse serviceResponse = searchStaffUserResponse.getServices().get(0);
 
