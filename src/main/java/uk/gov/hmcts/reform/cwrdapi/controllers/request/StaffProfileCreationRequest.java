@@ -62,7 +62,7 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("roles")
     @NotEmpty(message = CaseWorkerConstants.NO_ROLE_PRESENT_PROFILE)
-    private List<CaseWorkerRoleRequest> roles;
+    private List<StaffProfileRoleRequest> roles;
 
     @JsonProperty("task_supervisor")
     @JsonInclude(JsonInclude.Include.NON_NULL)

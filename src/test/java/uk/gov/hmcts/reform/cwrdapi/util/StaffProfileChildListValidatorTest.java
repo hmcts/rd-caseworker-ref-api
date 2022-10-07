@@ -10,16 +10,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 
 import java.util.Collections;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -45,10 +44,10 @@ class StaffProfileChildListValidatorTest {
     @BeforeAll
     static void setUp() {
 
-        CaseWorkerRoleRequest caseWorkerRoleRequest =
-                new CaseWorkerRoleRequest("testRole", true);
-        CaseWorkerRoleRequest caseWorkerRoleRequest2 =
-                new CaseWorkerRoleRequest("adminRole", true);
+        StaffProfileRoleRequest staffProfileRoleRequest1 =
+                new StaffProfileRoleRequest(1,"testRole", true);
+        StaffProfileRoleRequest staffProfileRoleRequest2 =
+                new StaffProfileRoleRequest(1,"adminRole", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
@@ -95,7 +94,6 @@ class StaffProfileChildListValidatorTest {
                 .taskSupervisor(true)
                 .staffAdmin(true)
                 .emailId("test@test.com")
-                .roles(singletonList(caseWorkerRoleRequest))
                 .firstName("testFN")
                 .lastName("testLN")
                 .regionId(1)
@@ -103,7 +101,7 @@ class StaffProfileChildListValidatorTest {
                 .userType("testUser1")
                 .services(List.of(caseWorkerServicesRequest,caseWorkerServicesRequest2))
                 .baseLocations(List.of(caseWorkerLocationRequest, caseWorkerLocationRequest2))
-                .roles(List.of(caseWorkerRoleRequest,caseWorkerRoleRequest2))
+                .roles(List.of(staffProfileRoleRequest1,staffProfileRoleRequest2))
                 .skills(List.of(skillsRequest,skillsRequest2))
                 .build();
 
@@ -113,7 +111,7 @@ class StaffProfileChildListValidatorTest {
         staffProfileCreationReq = StaffProfileCreationRequest
                 .staffProfileCreationRequest()
                 .baseLocations(Collections.EMPTY_LIST)
-                .roles(List.of(caseWorkerRoleRequest, caseWorkerRoleRequest))
+                .roles(List.of(staffProfileRoleRequest1, staffProfileRoleRequest2))
                 .services(List.of(caseWorkerServicesRequest,caseWorkerServicesRequest))
                 .skills(Collections.EMPTY_LIST)
                 .build();

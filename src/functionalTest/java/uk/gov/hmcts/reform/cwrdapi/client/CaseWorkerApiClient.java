@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
@@ -205,8 +206,8 @@ public class CaseWorkerApiClient {
     public StaffProfileCreationRequest createStaffProfileCreationRequest() {
 
         Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
-        List<CaseWorkerRoleRequest> caseWorkerRoleRequests =
-                ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest().role(" role ")
+        List<StaffProfileRoleRequest> caseWorkerRoleRequests =
+                ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest().roleId(1).role(" role ")
                         .isPrimaryFlag(true).build());
 
         List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest

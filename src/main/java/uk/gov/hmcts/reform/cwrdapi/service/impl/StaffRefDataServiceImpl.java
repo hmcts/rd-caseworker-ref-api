@@ -19,24 +19,17 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResp
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerSkillRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
-import uk.gov.hmcts.reform.cwrdapi.service.IdamRoleMappingService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
@@ -53,6 +46,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
@@ -80,24 +74,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     UserTypeRepository userTypeRepository;
 
     @Autowired
-    CaseWorkerLocationRepository caseWorkerLocationRepository;
-
-    @Autowired
-    CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
-
-    @Autowired
-    CaseWorkerRoleRepository caseWorkerRoleRepository;
-
-    @Autowired
-    CaseWorkerSkillRepository caseWorkerSkillRepository;
-
-    @Autowired
-    ICwrdCommonRepository cwrCommonRepository;
-
-    @Autowired
-    IdamRoleMappingService idamRoleMappingService;
-
-    @Autowired
     private UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
@@ -105,8 +81,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Autowired
     IValidationService validationServiceFacade;
-
-    List<ExceptionCaseWorker> upExceptionCaseWorkers;
 
     @Autowired
     SkillRepository skillRepository;
@@ -127,7 +101,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         validateStaffProfile.validateStaffProfile(staffProfileRequest);
 
-        checkStaffProfileEmail(staffProfileRequest);
+        checkStaffProfileEmailAndSuspendFlag(staffProfileRequest);
         newStaffProfiles = createCaseWorkerProfile(staffProfileRequest);
 
         processedStaffProfiles = persistStaffProfile(newStaffProfiles,staffProfileRequest);
@@ -142,16 +116,25 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
 
-    private void checkStaffProfileEmail(StaffProfileCreationRequest profileRequest) {
+    private void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId());
 
-        if (dbCaseWorker != null) {
-            validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,PROFILE_ALREADY_CREATED,
-                    null,profileRequest);
-            throw new InvalidRequestException(PROFILE_ALREADY_CREATED);
+        if (isNotEmpty(dbCaseWorker)) {
+            invalidRequestError(profileRequest, PROFILE_ALREADY_CREATED);
         }
+
+        if (profileRequest.isSuspended()) {
+            invalidRequestError(profileRequest, NO_USER_TO_SUSPEND_PROFILE);
+        }
+    }
+
+    private void invalidRequestError(StaffProfileCreationRequest profileRequest, String errorMessage) {
+
+        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,NO_USER_TO_SUSPEND_PROFILE,
+                null,profileRequest);
+        throw new InvalidRequestException(errorMessage);
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
@@ -263,7 +246,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         log.info("{}:: persistStaffProfile starts::", loggingComponentName);
         CaseWorkerProfile processedStaffProfiles = null;
 
-        if (null != caseWorkerProfile) {
+        if (isNotEmpty(caseWorkerProfile)) {
             caseWorkerProfile.setNew(true);
             processedStaffProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
 

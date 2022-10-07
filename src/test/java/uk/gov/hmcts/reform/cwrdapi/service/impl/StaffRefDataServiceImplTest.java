@@ -18,10 +18,10 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
@@ -110,8 +110,8 @@ class StaffRefDataServiceImplTest {
         idamRoles.add("IdamRole1");
         idamRoles.add("IdamRole2");
 
-        CaseWorkerRoleRequest caseWorkerRoleRequest =
-                new CaseWorkerRoleRequest("testRole1", true);
+        StaffProfileRoleRequest staffProfileRoleRequest =
+                new StaffProfileRoleRequest(1,"testRole1", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
@@ -140,7 +140,6 @@ class StaffRefDataServiceImplTest {
                 .taskSupervisor(true)
                 .staffAdmin(true)
                 .emailId("test@test.com")
-                .roles(singletonList(caseWorkerRoleRequest))
                 .firstName("testFN")
                 .lastName("testLN")
                 .regionId(1)
@@ -148,7 +147,7 @@ class StaffRefDataServiceImplTest {
                 .userType("testUser1")
                 .services(singletonList(caseWorkerServicesRequest))
                 .baseLocations(singletonList(caseWorkerLocationRequest))
-                .roles(singletonList(caseWorkerRoleRequest))
+                .roles(singletonList(staffProfileRoleRequest))
                 .skills(singletonList(skillsRequest))
                 .build();
 
@@ -285,6 +284,20 @@ class StaffRefDataServiceImplTest {
         });
 
         assertThat(thrown.getMessage()).contains("The profile is already created for the given email Id");
+    }
+
+    @Test
+    void test_newStaffProfileSuspended() {
+        PowerMockito.when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest);
+        staffProfileCreationRequest.setSuspended(true);
+        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+            staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
+        });
+        String errorMsg = "There is no user present to suspend. "
+                + "Please try again or check with HMCTS Support Team";
+        assertThat(thrown.getMessage()).contains(errorMsg);
     }
 
     @Test
