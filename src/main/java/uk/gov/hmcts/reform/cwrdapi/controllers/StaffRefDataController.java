@@ -194,9 +194,8 @@ public class StaffRefDataController {
     }
 
     @ApiOperation(
-            value = "This API creates staff user profile"
-                    + "This API is used to retrieve the Job Title's ",
-            notes = "This API will be invoked by user having idam role of staff-admin",
+            value = "This API creates staff user profile",
+            notes = "This API will be invoked by user having idam role with cwd-admin and staff-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
                     @Authorization(value = "Authorization")
