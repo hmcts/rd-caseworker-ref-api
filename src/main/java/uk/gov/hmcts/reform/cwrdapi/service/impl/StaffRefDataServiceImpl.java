@@ -4,11 +4,11 @@ import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
@@ -106,7 +106,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         processedStaffProfiles = persistStaffProfile(newStaffProfiles,staffProfileRequest);
 
-
         response = StaffProfileCreationResponse.builder()
                     .caseWorkerId(processedStaffProfiles.getCaseWorkerId())
                     .build();
@@ -139,20 +138,16 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public CaseWorkerProfile createCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
         CaseWorkerProfile finalCaseWorkerProfile = null;
-        //User Profile Call
         log.info("{}:: createCaseWorkerProfile UserProfile call starts::",
                 loggingComponentName);
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
         log.info("{}:: createCaseWorkerProfile UserProfile Received  response status {}::",
                 loggingComponentName,responseEntity.getStatusCode());
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            log.info("{}:: createCaseWorkerProfile UserProfile Received  successful response {}::",
-                    loggingComponentName,responseEntity.getStatusCode());
-            UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
-            if (nonNull(upResponse)) {
-                finalCaseWorkerProfile = new CaseWorkerProfile();
-                populateStaffProfile(profileRequest,finalCaseWorkerProfile, upResponse.getIdamId());
-            }
+
+        UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
+        if (nonNull(upResponse)) {
+            finalCaseWorkerProfile = new CaseWorkerProfile();
+            populateStaffProfile(profileRequest,finalCaseWorkerProfile, upResponse.getIdamId());
         }
 
         return finalCaseWorkerProfile;
@@ -171,11 +166,22 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
+            if (clazz instanceof ErrorResponse
+                    && responseEntity.getStatusCode().is4xxClientError()
+                    || responseEntity.getStatusCode().is5xxServerError()
+                    && nonNull(responseEntity.getBody())) {
+
+                ErrorResponse error = (ErrorResponse) responseEntity.getBody();
+
+                String errorMessage = error != null ? error.getErrorMessage() : null;
+                String errorDescription = error != null ? error.getErrorDescription() : null;
+
+                validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, errorMessage,
+                            null, staffProfileRequest);
+                throw new StaffReferenceException(responseEntity.getStatusCode(), errorMessage,
+                        errorDescription);
+            }
             return responseEntity;
-        } catch (Exception ex) {
-            validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,ex.getMessage(),
-                    null,staffProfileRequest);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } finally {
             if (nonNull(response)) {
                 response.close();
@@ -253,7 +259,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (isNotEmpty(processedStaffProfiles)) {
                 validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS, null,
                         processedStaffProfiles.getCaseWorkerId(), request);
-                log.info("{}:: {} case worker profiles inserted ::", loggingComponentName, caseWorkerProfile);
+                log.info("{}::persistStaffProfile inserted {} ::",
+                        loggingComponentName,caseWorkerProfile.getCaseWorkerId());
             } else {
                 validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
                         caseWorkerProfile.getCaseWorkerId(), request);
@@ -265,6 +272,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse) {
 
         topicPublisher.sendMessage(List.of(staffProfileCreationResponse.getCaseWorkerId()));
+
+        log.info("{}:: publishStaffProfileToTopic ends::", loggingComponentName);
     }
 
 

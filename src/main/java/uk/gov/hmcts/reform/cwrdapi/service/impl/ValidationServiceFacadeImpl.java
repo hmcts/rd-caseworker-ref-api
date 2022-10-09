@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
@@ -68,6 +69,8 @@ public class ValidationServiceFacadeImpl implements IValidationService {
 
     @Autowired
     StaffAuditRepository staffAuditRepository;
+
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Returns invalid record list and JSR Constraint violations pair.
@@ -214,19 +217,18 @@ public class ValidationServiceFacadeImpl implements IValidationService {
     }
 
     @Override
+    @Async
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void saveStaffAudit(AuditStatus auditStatus, String errorMessage,String caseWorkerId,
                                StaffProfileCreationRequest staffProfileCreationRequest) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
 
             if (errorMessage != null && errorMessage.length() > 512) {
-
                 errorMessage = errorMessage.substring(0, 511);
             }
 
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
             String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : null;
-
             String request = objectMapper.writeValueAsString(staffProfileCreationRequest);
 
             StaffAudit staffAudit = StaffAudit.builder()
@@ -241,7 +243,7 @@ public class ValidationServiceFacadeImpl implements IValidationService {
 
             staffAuditRepository.save(staffAudit);
         } catch (JsonProcessingException e) {
-            log.info("{}:: Failure errorMessager {} in caseworker {}  ", loggingComponentName, errorMessage,
+            log.info("{}:: Failure errorMessager {} in saveStaffAudit {}  ", loggingComponentName, errorMessage,
                     caseWorkerId);
         }
     }

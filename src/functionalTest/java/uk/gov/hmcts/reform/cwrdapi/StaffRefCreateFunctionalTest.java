@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SpringBootTest
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class StaffProfileCreateFunctionalTest extends AuthorizationFunctionalTest {
+class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_STAFF_PROFILE = "StaffRefDataController.createStaffUserProfile";
 

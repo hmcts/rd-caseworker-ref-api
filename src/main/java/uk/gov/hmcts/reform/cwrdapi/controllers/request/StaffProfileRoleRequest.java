@@ -18,8 +18,12 @@ public class StaffProfileRoleRequest {
 
     @JsonProperty("role_id")
     private Integer roleId;
+
+    @JsonProperty("role")
     @JsonDeserialize(using = TrimStringFields.class)
     private String role;
+
+    @JsonProperty("is_primary")
     private boolean isPrimaryFlag;
 
     @JsonCreator
