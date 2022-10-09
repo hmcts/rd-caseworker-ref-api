@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -124,8 +125,11 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
 
-        Object response =  caseworkerReferenceDataClient
-                .searchStaffUserByName(path,searchString,"1","1",role);
+//        Object response =  caseworkerReferenceDataClient
+//                .searchStaffUserByName(path,searchString,"1","1",role);
+        ResponseEntity<SearchStaffUserResponse[]> response =  caseworkerReferenceDataClient
+               .searchStaffUserByNameExchange(path,searchString,"1","1",role);
+
 
         assertThat(response).isNotNull();
 

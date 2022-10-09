@@ -24,7 +24,9 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -221,6 +223,45 @@ public class CaseWorkerReferenceDataClient {
         }
 
         return getResponse(responseEntity);
+    }
+
+    public ResponseEntity<SearchStaffUserResponse[]> searchStaffUserByNameExchange(String path,String searchString, String pageSize,
+
+                                                     String pageNumber,  String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(path);
+
+        if (StringUtils.isNotBlank(searchString)) {
+            stringBuilder.append("?search=");
+            stringBuilder.append(searchString);
+        }
+
+        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+        //headers.add("page-number",pageNumber);
+        //headers.add("page-size",pageSize);
+
+        ResponseEntity<SearchStaffUserResponse[]> responseEntity = null;
+        HttpEntity<String> request =
+                new HttpEntity<>(headers);
+        SearchStaffUserResponse result[] = null;
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl  + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    SearchStaffUserResponse[].class
+            );
+
+        } catch (RestClientResponseException ex) {
+            //HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            //statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+           // statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            //return statusAndBody;
+        }
+
+        return responseEntity;
     }
 
 
