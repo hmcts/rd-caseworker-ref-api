@@ -250,15 +250,15 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                                                  StaffProfileCreationRequest request) {
 
         log.info("{}:: persistStaffProfile starts::", loggingComponentName);
-        CaseWorkerProfile processedStaffProfiles = null;
+        CaseWorkerProfile savedStaffProfiles = null;
 
         if (isNotEmpty(caseWorkerProfile)) {
             caseWorkerProfile.setNew(true);
-            processedStaffProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
+            savedStaffProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
 
-            if (isNotEmpty(processedStaffProfiles)) {
+            if (isNotEmpty(savedStaffProfiles)) {
                 validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS, null,
-                        processedStaffProfiles.getCaseWorkerId(), request);
+                        savedStaffProfiles.getCaseWorkerId(), request);
                 log.info("{}::persistStaffProfile inserted {} ::",
                         loggingComponentName,caseWorkerProfile.getCaseWorkerId());
             } else {
@@ -266,7 +266,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                         caseWorkerProfile.getCaseWorkerId(), request);
             }
         }
-        return caseWorkerProfile;
+        return savedStaffProfiles;
     }
 
     public void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse) {

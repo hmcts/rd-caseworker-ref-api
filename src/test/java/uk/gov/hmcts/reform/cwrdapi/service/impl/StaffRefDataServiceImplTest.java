@@ -54,6 +54,7 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -260,7 +261,7 @@ class StaffRefDataServiceImplTest {
 
         PowerMockito.when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
-
+        PowerMockito.when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
         staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
         verify(caseWorkerProfileRepository, times(1)).save(any());
         verify(validateStaffProfile, times(1)).validateStaffProfile(any());
@@ -363,5 +364,23 @@ class StaffRefDataServiceImplTest {
         staffProfileCreationRespone.setCaseWorkerId("1");
         staffRefDataServiceImpl.publishStaffProfileToTopic(staffProfileCreationRespone);
         verify(topicPublisher, times(1)).sendMessage(any());
+
+    }
+
+
+    @Test
+    void test_persistStaffProfileNull() {
+        PowerMockito.when(caseWorkerProfileRepository.save(any())).thenReturn(null);
+        caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile,staffProfileCreationRequest);
+        assertNull(caseWorkerProfile);
+    }
+
+    @Test
+    void test_persistStaffProfile() {
+        PowerMockito.when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+        caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile,staffProfileCreationRequest);
+        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("CWFirstName");
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo("CWLastName");
     }
 }
