@@ -76,7 +76,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         String searchString = "cwr-test";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
-                .searchStaffUserByName(path,searchString,0,20,role);
+                .searchStaffUserByName(path,searchString,"0","20",role);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString()).contains(PAGE_SIZE + " is invalid");
@@ -91,7 +91,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         String searchString = "cwr-test";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
-                .searchStaffUserByName(path,searchString,1,0,role);
+                .searchStaffUserByName(path,searchString,"1","0",role);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString()).contains(PAGE_NUMBER + " is invalid");
@@ -106,7 +106,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         String searchString = "1234";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
-                .searchStaffUserByName(path,searchString,0,20,role);
+                .searchStaffUserByName(path,searchString,"0","20",role);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
@@ -122,7 +122,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         String searchString = "ab";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
-                .searchStaffUserByName(path,searchString,0,20,role);
+                .searchStaffUserByName(path,searchString,"0","20",role);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
@@ -138,7 +138,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         String searchString = "";
 
         Map<String, Object> response =  caseworkerReferenceDataClient
-                .searchStaffUserByName(path,searchString,0,20,role);
+                .searchStaffUserByName(path,searchString,"0","20",role);
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())

@@ -184,9 +184,9 @@ public class CaseWorkerReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> searchStaffUserByName(String path,String searchString, Integer pageSize,
+    public Map<String, Object> searchStaffUserByName(String path,String searchString, String pageSize,
 
-                                                                 Integer pageNumber,  String role) {
+                                                                 String pageNumber,  String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(path);
@@ -196,9 +196,9 @@ public class CaseWorkerReferenceDataClient {
             stringBuilder.append(searchString);
         }
 
-        HttpHeaders headers =  getMultipleAuthHeadersWithoutContentType(role, null);
-        headers.add("page-number",pageNumber.toString());
-        headers.add("page-size",pageSize.toString());
+        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+        //headers.add("page-number",pageNumber);
+        //headers.add("page-size",pageSize);
 
         ResponseEntity<Map> responseEntity;
         HttpEntity<String> request =
@@ -287,6 +287,25 @@ public class CaseWorkerReferenceDataClient {
         return headers;
     }
 
+    private HttpHeaders getMultipleAuthHeadersWithPagination(
+            String role,
+            String userId,
+            String pageNumber,
+            String pageSize) {
+
+        HttpHeaders headers = getMultipleAuthHeadersWithoutContentType(role, userId);
+        headers.setContentType(APPLICATION_JSON);
+        if(StringUtils.isNotBlank(pageNumber)){
+            headers.add("page-number", pageNumber);
+        }
+        if(StringUtils.isNotBlank(pageSize)){
+            headers.add("page-size", pageSize);
+        }
+
+
+        return headers;
+    }
+
     private HttpHeaders getMultipleAuthHeaders(String role) {
 
         return getMultipleAuthHeaders(role, null);
@@ -312,6 +331,19 @@ public class CaseWorkerReferenceDataClient {
     }
 
     private Map getResponse(ResponseEntity<Map> responseEntity) {
+
+        Map response = objectMapper
+                .convertValue(
+                        responseEntity.getBody(),
+                        Map.class);
+
+        response.put("http_status", responseEntity.getStatusCode().toString());
+        response.put("headers", responseEntity.getHeaders().toString());
+        response.put("body", responseEntity.getBody());
+        return response;
+    }
+
+    private Object getNewResponse(ResponseEntity<Map> responseEntity) {
 
         Map response = objectMapper
                 .convertValue(
