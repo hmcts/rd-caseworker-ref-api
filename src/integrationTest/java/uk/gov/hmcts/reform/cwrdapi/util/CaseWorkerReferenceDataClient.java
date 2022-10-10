@@ -198,8 +198,6 @@ public class CaseWorkerReferenceDataClient {
         }
 
         HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
-        //headers.add("page-number",pageNumber);
-        //headers.add("page-size",pageSize);
 
         ResponseEntity<Map> responseEntity;
         HttpEntity<String> request =
