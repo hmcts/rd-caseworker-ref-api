@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -225,9 +224,8 @@ public class CaseWorkerReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public ResponseEntity<SearchStaffUserResponse[]> searchStaffUserByNameExchange(String path,String searchString, String pageSize,
-
-                                                     String pageNumber,  String role) {
+    public ResponseEntity<SearchStaffUserResponse[]> searchStaffUserByNameExchange(
+            String path,String searchString, String pageSize, String pageNumber,  String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(path);
@@ -238,13 +236,10 @@ public class CaseWorkerReferenceDataClient {
         }
 
         HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
-        //headers.add("page-number",pageNumber);
-        //headers.add("page-size",pageSize);
 
         ResponseEntity<SearchStaffUserResponse[]> responseEntity = null;
         HttpEntity<String> request =
                 new HttpEntity<>(headers);
-        SearchStaffUserResponse result[] = null;
 
         try {
 
@@ -255,10 +250,7 @@ public class CaseWorkerReferenceDataClient {
             );
 
         } catch (RestClientResponseException ex) {
-            //HashMap<String, Object> statusAndBody = new HashMap<>(2);
-            //statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
-           // statusAndBody.put("response_body", ex.getResponseBodyAsString());
-            //return statusAndBody;
+            log.error(ex.getResponseBodyAsString());
         }
 
         return responseEntity;
@@ -328,6 +320,11 @@ public class CaseWorkerReferenceDataClient {
         return headers;
     }
 
+    private HttpHeaders getMultipleAuthHeaders(String role) {
+
+        return getMultipleAuthHeaders(role, null);
+    }
+
     private HttpHeaders getMultipleAuthHeadersWithPagination(
             String role,
             String userId,
@@ -336,10 +333,10 @@ public class CaseWorkerReferenceDataClient {
 
         HttpHeaders headers = getMultipleAuthHeadersWithoutContentType(role, userId);
         headers.setContentType(APPLICATION_JSON);
-        if(StringUtils.isNotBlank(pageNumber)){
+        if (StringUtils.isNotBlank(pageNumber)) {
             headers.add("page-number", pageNumber);
         }
-        if(StringUtils.isNotBlank(pageSize)){
+        if (StringUtils.isNotBlank(pageSize)) {
             headers.add("page-size", pageSize);
         }
 
@@ -347,10 +344,7 @@ public class CaseWorkerReferenceDataClient {
         return headers;
     }
 
-    private HttpHeaders getMultipleAuthHeaders(String role) {
 
-        return getMultipleAuthHeaders(role, null);
-    }
 
 
     @NotNull
