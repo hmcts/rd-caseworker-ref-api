@@ -209,6 +209,18 @@ public class StaffReferenceDataProviderTest {
     }
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
+        Skill skill = new Skill();
+        skill.setSkillId(1L);
+        skill.setSkillCode("1");
+        skill.setDescription("testSkill");
+
+        List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        caseWorkerSkills.add(caseWorkerSkill);
+        caseWorkerSkill.setCaseWorkerSkillId(1L);
+        caseWorkerSkill.setSkillId(1L);
+        caseWorkerSkill.setSkill(skill);
+
         LocalDateTime timeNow = LocalDateTime.now();
 
         List<CaseWorkerLocation> caseWorkerLocations =
@@ -221,9 +233,6 @@ public class StaffReferenceDataProviderTest {
         List<CaseWorkerRole> caseWorkerRoles =
                 Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
         caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
-
-        List<CaseWorkerSkill> caseWorkerSkills =
-                Collections.singletonList(new CaseWorkerSkill(caseWorkerId, 1L));
 
         return new CaseWorkerProfile(caseWorkerId,
                 "firstName",
