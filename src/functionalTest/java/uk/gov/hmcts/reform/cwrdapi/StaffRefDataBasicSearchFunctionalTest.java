@@ -77,10 +77,6 @@ public class StaffRefDataBasicSearchFunctionalTest extends AuthorizationFunction
         List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                 fetchResponse.getBody().as(SearchStaffUserResponse[].class));
         assertThat(searchStaffUserResponse).isNotNull();
-        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains(searchString);
-        assertThat(searchStaffUserResponse.get(0).getLastName()).contains(searchString);
-        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-Mary");
-        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-David");
     }
 
     @Test
@@ -118,12 +114,8 @@ public class StaffRefDataBasicSearchFunctionalTest extends AuthorizationFunction
 
         List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                 fetchResponse.getBody().as(SearchStaffUserResponse[].class));
+
         assertThat(searchStaffUserResponse).isNotNull();
-        assertThat(searchStaffUserResponse).hasSize(1);
-        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains(searchString);
-        assertThat(searchStaffUserResponse.get(0).getLastName()).contains(searchString);
-        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-Mary");
-        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-David");
 
     }
 
