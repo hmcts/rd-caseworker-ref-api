@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +38,6 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 
 public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEnabledIntegrationTest {
 
@@ -100,6 +96,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
     public static void tearDown() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
+
     @Test
     void should_return_staff_user_with_status_code_200_when_flag_enabled_default_pagination() {
 
@@ -108,14 +105,14 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
         createCaseWorkerTestData("sbn-James", "sbn-Smith",email);
 
-//        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-//        createCaseWorkerTestData("sbn-Michael", "sbn-Smith",email);
-//        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-//        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia",email);
-//        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-//        createCaseWorkerTestData("sbn-Ron", "sbn-David",email);
-//        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-//        createCaseWorkerTestData("sbn-Mary", "sbn-David",email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Michael", "sbn-Smith",email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia",email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Ron", "sbn-David",email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Mary", "sbn-David",email);
 
         String searchString = "sbn";
 
@@ -125,34 +122,73 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
 
-//        Object response =  caseworkerReferenceDataClient
-//                .searchStaffUserByName(path,searchString,"1","1",role);
         ResponseEntity<SearchStaffUserResponse[]> response =  caseworkerReferenceDataClient
                .searchStaffUserByNameExchange(path,searchString,"1","1",role);
 
 
         assertThat(response).isNotNull();
 
-        //assertThat(response).containsEntry("http_status", "200");
-        //assertThat(response.get("response_body").toString()).contains(PAGE_SIZE + " is invalid");
-
-  /*              .andReturn();
-        fetchResponse.then()
-                .assertThat()
-                .statusCode(200);
 
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
 
         assertThat(totalRecords).isGreaterThan(0);
 
         List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
-                fetchResponse.getBody().as(SearchStaffUserResponse[].class));
+                response.getBody());
+
         assertThat(searchStaffUserResponse).isNotNull();
         assertThat(searchStaffUserResponse.get(0).getFirstName()).contains(searchString);
         assertThat(searchStaffUserResponse.get(0).getLastName()).contains(searchString);
         assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-Mary");
-        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-David");*/
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-David");
+    }
+
+    @Test
+    void should_return_staff_user_with_status_code_200_when_flag_enabled_with_pagination() {
+
+        String emailPattern = "sbnTest1234";
+        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+
+        createCaseWorkerTestData("sbn-James", "sbn-Smith",email);
+
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Michael", "sbn-Smith",email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia",email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Ron", "sbn-David",email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Mary", "sbn-David",email);
+
+        String searchString = "sbn";
+
+        String path = "/profile/search-by-name";
+        String role = "staff-admin";
+        //String searchString = "cwr-test";
+
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+
+        ResponseEntity<SearchStaffUserResponse[]> response =  caseworkerReferenceDataClient
+                .searchStaffUserByNameExchange(path,searchString,"1","1",role);
+
+
+        assertThat(response).isNotNull();
+
+
+
+        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+
+        assertThat(totalRecords).isGreaterThan(0);
+
+        List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
+                response.getBody());
+
+        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains(searchString);
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains(searchString);
+        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-Mary");
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-David");
     }
 
 
