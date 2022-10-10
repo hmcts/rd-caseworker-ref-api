@@ -166,10 +166,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
-            if (clazz instanceof ErrorResponse
-                    && responseEntity.getStatusCode().is4xxClientError()
-                    || responseEntity.getStatusCode().is5xxServerError()
-                    && nonNull(responseEntity.getBody())) {
+            if ((response.status() != 409 && isNotEmpty(responseEntity.getBody()))
+                    && (responseEntity.getStatusCode().is4xxClientError()
+                    || responseEntity.getStatusCode().is5xxServerError())) {
 
                 ErrorResponse error = (ErrorResponse) responseEntity.getBody();
 

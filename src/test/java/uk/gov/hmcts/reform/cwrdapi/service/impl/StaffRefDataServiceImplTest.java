@@ -12,10 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.powermock.api.mockito.PowerMockito;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
@@ -54,8 +57,12 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -257,11 +264,11 @@ class StaffRefDataServiceImplTest {
         userProfileCreationResponse.setIdamRegistrationResponse(1);
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        PowerMockito.when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
 
-        PowerMockito.when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
-        PowerMockito.when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
         staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
         verify(caseWorkerProfileRepository, times(1)).save(any());
         verify(validateStaffProfile, times(1)).validateStaffProfile(any());
@@ -277,7 +284,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_saveStaffProfileAlreadyPresent() {
-        PowerMockito.when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
         validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
@@ -289,7 +296,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_newStaffProfileSuspended() {
-        PowerMockito.when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
         validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest);
         staffProfileCreationRequest.setSuspended(true);
@@ -330,7 +337,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_createUserProfileRequestEmptyRoles() {
-        PowerMockito.when(staffProfileCreateUpdateUtil.getUserRolesByRoleId(any())).thenReturn(EMPTY_SET);
+        when(staffProfileCreateUpdateUtil.getUserRolesByRoleId(any())).thenReturn(EMPTY_SET);
         UserProfileCreationRequest response = staffRefDataServiceImpl
                 .createUserProfileRequest(staffProfileCreationRequest);
         assertThat(response.getEmail()).isEqualTo("test@test.com");
@@ -346,7 +353,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_createUserProfileRequestNullRoles() {
-        PowerMockito.when(staffProfileCreateUpdateUtil.getUserRolesByRoleId(any())).thenReturn(null);
+        when(staffProfileCreateUpdateUtil.getUserRolesByRoleId(any())).thenReturn(null);
         UserProfileCreationRequest response = staffRefDataServiceImpl
                 .createUserProfileRequest(staffProfileCreationRequest);
         assertThat(response.getEmail()).isEqualTo("test@test.com");
@@ -370,17 +377,61 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_persistStaffProfileNull() {
-        PowerMockito.when(caseWorkerProfileRepository.save(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(null);
         caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile,staffProfileCreationRequest);
         assertNull(caseWorkerProfile);
     }
 
     @Test
     void test_persistStaffProfile() {
-        PowerMockito.when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
         caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile,staffProfileCreationRequest);
         assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
         assertThat(caseWorkerProfile.getFirstName()).isEqualTo("CWFirstName");
         assertThat(caseWorkerProfile.getLastName()).isEqualTo("CWLastName");
+    }
+
+    @Test
+    void test_createUserProfileInIdamUP() throws JsonProcessingException {
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(409).build());
+        ResponseEntity<Object> response = staffRefDataServiceImpl
+                .createUserProfileInIdamUP(staffProfileCreationRequest);
+        assertNotNull(response);
+    }
+
+    @Test
+    void test_createUserProfileInIdamUP_error() throws JsonProcessingException {
+        ErrorResponse errorResponse = new ErrorResponse(500,"Failure","Method Not Allowed ",
+                "Internal Server Error", "2022-01-10");
+        String body = mapper.writeValueAsString(errorResponse);
+        doReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(500).build())
+                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
+
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            staffRefDataServiceImpl.createUserProfileInIdamUP(staffProfileCreationRequest);
+        });
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,thrown.getStatus());
+    }
+
+    @Test
+    void test_createUserProfileInIdamUP_forbiddenError() throws JsonProcessingException {
+        ErrorResponse errorResponse = new ErrorResponse(405,"Failure","Method Not Allowed ",
+                "Method Not Allowed", "2022-01-10");
+        String body = mapper.writeValueAsString(errorResponse);
+
+        doReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(405).build())
+                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            staffRefDataServiceImpl.createUserProfileInIdamUP(staffProfileCreationRequest);
+        });
+        assertEquals(HttpStatus.METHOD_NOT_ALLOWED,thrown.getStatus());
     }
 }
