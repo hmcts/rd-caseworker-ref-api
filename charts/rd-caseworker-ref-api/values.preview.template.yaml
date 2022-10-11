@@ -4,10 +4,10 @@ java:
 
   secrets:
     CWRD_MQ_PASSWORD:
-      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
+      secretRef: servicebus-secret-namespace-aat-servicebus
       key: primaryKey
     CWRD_MQ_HOST:
-      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
+      secretRef: servicebus-secret-namespace-aat-servicebus
       key: namespaceName
 
   environment:
@@ -42,7 +42,7 @@ java:
           alias: LD_SDK_KEY
 
 servicebus:
-  enabled: true
+  enabled: false
   teamName: RD
   resourceGroup: rd-aks
   serviceplan: standard

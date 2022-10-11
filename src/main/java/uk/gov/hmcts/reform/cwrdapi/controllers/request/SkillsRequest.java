@@ -14,11 +14,11 @@ import lombok.Setter;
 @Builder(builderMethodName = "skillsRequest")
 public class SkillsRequest {
 
-    private String skillId;
+    private int skillId;
     private String description;
 
     @JsonCreator
-    public SkillsRequest(@JsonProperty("skill_id") String skillId,
+    public SkillsRequest(@JsonProperty("skill_id") int skillId,
                                      @JsonProperty("description") String description) {
         this.skillId = skillId;
         this.description = description;

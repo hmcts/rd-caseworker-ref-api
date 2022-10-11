@@ -76,7 +76,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
-                .skillId("1L")
+                .skillId(1)
                 .description("training")
                 .build();
 

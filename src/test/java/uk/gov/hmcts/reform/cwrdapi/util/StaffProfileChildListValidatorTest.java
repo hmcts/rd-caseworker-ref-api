@@ -76,13 +76,13 @@ class StaffProfileChildListValidatorTest {
 
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
-                .skillId("skill")
+                .skillId(1)
                 .description("training")
                 .build();
 
         SkillsRequest skillsRequest2 = SkillsRequest
                 .skillsRequest()
-                .skillId("skill2")
+                .skillId(1)
                 .description("training2")
                 .build();
 
