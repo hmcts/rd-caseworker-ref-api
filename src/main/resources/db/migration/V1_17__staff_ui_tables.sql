@@ -42,16 +42,15 @@ INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, cre
 INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(4, '4', 'testskill4', '4', '4', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(5, '5', 'testskill5', '5', '5', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO case_worker_skill (case_worker_skill_id, case_worker_id, skill_id, created_date, last_update) VALUES(1, 'test1', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO case_worker_skill (case_worker_skill_id, case_worker_id, skill_id, created_date, last_update) VALUES(2, 'test2', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO case_worker_skill (case_worker_skill_id, case_worker_id, skill_id, created_date, last_update) VALUES(3, 'test3', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO case_worker_skill (case_worker_skill_id, case_worker_id, skill_id, created_date, last_update) VALUES(4, 'test4', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO case_worker_skill (case_worker_skill_id, case_worker_id, skill_id, created_date, last_update) VALUES(5, 'test5', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
 INSERT INTO staff_audit (id, authenticated_user_id, request_timestamp, status, error_description, case_worker_id, operation_type, request_log) VALUES(1, '1', CURRENT_TIMESTAMP, 'test1', 'testerror1', '1', 'test1', null);
 INSERT INTO staff_audit (id, authenticated_user_id, request_timestamp, status, error_description, case_worker_id, operation_type, request_log) VALUES(2, '2', CURRENT_TIMESTAMP, 'test2', 'testerror2', '2', 'test2', null);
 INSERT INTO staff_audit (id, authenticated_user_id, request_timestamp, status, error_description, case_worker_id, operation_type, request_log) VALUES(3, '3', CURRENT_TIMESTAMP, 'test3', 'testerror3', '3', 'test3', null);
 INSERT INTO staff_audit (id, authenticated_user_id, request_timestamp, status, error_description, case_worker_id, operation_type, request_log) VALUES(4, '4', CURRENT_TIMESTAMP, 'test4', 'testerror4', '4', 'test4', null);
 INSERT INTO staff_audit (id, authenticated_user_id, request_timestamp, status, error_description, case_worker_id, operation_type, request_log) VALUES(5, '5', CURRENT_TIMESTAMP, 'test5', 'testerror5', '5', 'test5', null);
 
+alter table case_worker_skill add constraint skill_id_fk1 foreign key (skill_id)
+references skill (skill_id);
+
+alter table case_worker_skill add constraint case_worker_id_fk4 foreign key (case_worker_id)
+references case_worker_profile (case_worker_id);
 COMMIT;
