@@ -271,7 +271,6 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                 createCaseWorkerProfiles(firstName, lastName, email);
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
-        //Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, ROLE_CWD_ADMIN);
@@ -305,7 +304,6 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         Set<String> idamRoles = new HashSet<>();
 
         String emailToUsed = nonNull(email) ? email : generateRandomEmail();
-        // setEmailsTobeDeleted(emailToUsed.toLowerCase());
         return ImmutableList.of(
                 CaseWorkersProfileCreationRequest
                         .caseWorkersProfileCreationRequest()
