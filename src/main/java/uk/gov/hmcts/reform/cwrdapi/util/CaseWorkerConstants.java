@@ -94,8 +94,7 @@ public final class CaseWorkerConstants {
     public static final String DOMAIN_JUSTICE_GOV_UK = "justice.gov.uk";
     public static final String USER_NAME_PATTERN = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+"
         + "(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
-    public static final String INVALID_EMAIL = "You must add a valid justice.gov.uk email"
-            + " address and upload the file again";
+    public static final String INVALID_EMAIL = "You must add a valid email address";
 
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the file uploaded."
             + " Upload a valid file in xlsx or xls format";
