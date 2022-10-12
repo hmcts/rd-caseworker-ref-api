@@ -455,7 +455,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_update_staff_profile_with_changed_values() throws JsonProcessingException {
-        
+
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
