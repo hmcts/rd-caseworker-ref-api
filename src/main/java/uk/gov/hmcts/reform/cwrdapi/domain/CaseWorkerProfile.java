@@ -99,6 +99,11 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
         insertable = false, updatable = false, nullable = false)
     private UserType userType;
 
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = CaseWorkerSkill.class,
+            mappedBy = "caseWorkerProfile", cascade = ALL, orphanRemoval = true)
+    private List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
+
     @Transient
     private boolean isNew = false;
 
