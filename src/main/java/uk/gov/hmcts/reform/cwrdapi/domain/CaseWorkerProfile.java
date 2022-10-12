@@ -107,6 +107,9 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     @Transient
     private boolean isNew = false;
 
+    @Column(name = "user_admin")
+    private Boolean userAdmin;
+
     @Override
     public String getId() {
         return caseWorkerId;
@@ -116,4 +119,6 @@ public class CaseWorkerProfile implements Persistable<String>, Serializable {
     public boolean isNew() {
         return isNew;
     }
+
+
 }

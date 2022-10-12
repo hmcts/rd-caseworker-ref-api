@@ -55,4 +55,9 @@ public class Skill implements Serializable {
     @JoinColumn(name = "skill_id",insertable = false, updatable = false, nullable = false)
     private CaseWorkerSkill caseWorkerSkill;
 
+    public Skill(Long skillId, String description) {
+        this.skillId = skillId;
+        this.description = description;
+    }
+
 }
