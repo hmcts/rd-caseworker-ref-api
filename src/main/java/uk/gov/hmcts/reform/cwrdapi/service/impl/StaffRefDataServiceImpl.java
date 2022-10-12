@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationReques
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
@@ -56,7 +58,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 @Slf4j
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataServiceImpl implements StaffRefDataService {
-
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -361,4 +362,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public List<RoleType> getJobTitles() {
         return roleTypeRepository.findAll();
     }
+
+    @Override
+    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest, Object pageRequest) {
+        return null;
+    }
+
+
+
 }
