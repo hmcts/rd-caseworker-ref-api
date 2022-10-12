@@ -10,8 +10,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SuppressWarnings("AbbreviationAsWordInName")
 
+@SuppressWarnings("AbbreviationAsWordInName")
 class SkillTest {
 
     @Test
