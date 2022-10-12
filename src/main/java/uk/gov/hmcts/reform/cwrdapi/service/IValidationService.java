@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 
 import java.util.List;
@@ -43,4 +44,8 @@ public interface IValidationService {
     long getAuditJobId();
 
     void logFailures(String message, long rowId);
+
+    void saveStaffAudit(AuditStatus auditStatus, final String errorMessage,String caseWorkerId,
+                        StaffProfileCreationRequest request);
+
 }
