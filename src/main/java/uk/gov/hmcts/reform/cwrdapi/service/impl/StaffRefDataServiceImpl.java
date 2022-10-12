@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
@@ -131,7 +132,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     @Override
-    public ResponseEntity<Object> retrieveStaffProfile(SearchRequest searchRequest, Object pageRequest) {
+    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest, Object pageRequest) {
         return null;
     }
 
