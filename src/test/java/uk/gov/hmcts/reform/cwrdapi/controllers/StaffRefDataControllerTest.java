@@ -30,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,7 +43,6 @@ class StaffRefDataControllerTest {
 
 
 
-    StaffRefDataService staffRefDataServiceMock;
     StaffRefDataUserTypesResponse srResponse;
     ResponseEntity<Object> responseEntity;
     @InjectMocks
@@ -57,7 +55,6 @@ class StaffRefDataControllerTest {
 
     @BeforeEach
     void setUp() {
-        staffRefDataServiceMock = mock(StaffRefDataService.class);
 
         srResponse = StaffRefDataUserTypesResponse
                 .builder()
@@ -91,8 +88,10 @@ class StaffRefDataControllerTest {
                 staffRefDataController.retrieveAllServiceSkills();
 
         assertNotNull(responseEntity);
+
         assertThat(staffWorkerSkillResponse.getServiceSkills()).isNull();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
 
         verify(staffRefDataService, times(1))
                 .getServiceSkills();
