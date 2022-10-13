@@ -267,10 +267,11 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getLastName()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getOfficialEmail()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getStaffAdmin()));
-
+        assertEquals("N",caseWorkerProfile.getStaffAdmin());
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getLocations()));
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getRoles()));
         assertNotNull(caseWorkerProfile.getSkills());
+        assertEquals(0L,caseWorkerProfile.getSkills().size());
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getWorkAreas()));
 
     }
