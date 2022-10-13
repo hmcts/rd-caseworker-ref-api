@@ -88,9 +88,6 @@ class StaffRefDataServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
 
-    @Mock
-    CaseWorkerProfileRepository caseWorkerProfileRepo;
-
 
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
@@ -270,7 +267,7 @@ class StaffRefDataServiceImplTest {
         caseWorkerProfiles.add(caseWorkerProfile);
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 
-        when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
@@ -302,7 +299,7 @@ class StaffRefDataServiceImplTest {
                 validateAndBuildPagination(20, 1,
                         20, 1);
         String searchString = "cwr";
-        when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
@@ -327,7 +324,7 @@ class StaffRefDataServiceImplTest {
         ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 
-        when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
