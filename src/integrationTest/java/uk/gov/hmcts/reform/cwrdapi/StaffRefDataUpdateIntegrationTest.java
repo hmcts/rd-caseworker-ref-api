@@ -101,13 +101,20 @@ public class StaffRefDataUpdateIntegrationTest extends AuthorizationEnabledInteg
     }
 
     @Test
-    void should_return_status_code_400_when_page_size_is_zero() {
+    @Disabled
+    void should_return_status_code_400_when_invalid_staff_profile() {
+
+        //StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileCreationRequest();
+
+        StaffProfileCreationRequest profile = StaffProfileCreationRequest.staffProfileCreationRequest().build();
+        profile.setEmailId("abc.com");
+        profile.setFirstName("tester");
+        profile.setLastName("tester");
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .updateStaffProfile(staffProfileCreationRequest, ROLE_STAFF_ADMIN);
+                .updateStaffProfile(profile, ROLE_STAFF_ADMIN);
 
         assertThat(response).containsEntry("http_status", "400");
-       // assertThat(response.get("response_body").toString()).contains(PAGE_SIZE + " is invalid");
 
     }
 

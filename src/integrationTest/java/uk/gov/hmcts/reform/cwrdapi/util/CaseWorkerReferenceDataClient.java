@@ -341,6 +341,6 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public Map<String, Object> updateStaffProfile(StaffProfileCreationRequest request, String role) {
-        return postRequest(baseUrl + "/profile", request, role, null);
+        return putRequest(baseUrl + "/profile", request, role, null);
     }
 }

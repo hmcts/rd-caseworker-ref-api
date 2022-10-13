@@ -34,6 +34,4 @@ public interface StaffRefDataService {
 
 
     StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest staffProfileRequest);
-   // List<CaseWorkerProfile> updateStaffProfiles(List<StaffProfileCreationRequest>
-                                                        //caseWorkersProfileCreationRequest);
 }
