@@ -214,9 +214,9 @@ public class StaffReferenceDataProviderTest {
         skill.setSkillCode("1");
         skill.setDescription("testSkill");
 
-        List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
+        List<CaseWorkerSkill> cwSkills = new ArrayList<>();
         CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
-        caseWorkerSkills.add(caseWorkerSkill);
+        cwSkills.add(caseWorkerSkill);
         caseWorkerSkill.setCaseWorkerSkillId(1L);
         caseWorkerSkill.setSkillId(1L);
         caseWorkerSkill.setSkill(skill);
@@ -249,7 +249,7 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false,false, caseWorkerSkills);
+                new UserType(1L, "HMCTS"), false,false, cwSkills);
     }
 
     @State({"A list of all staff reference data user-type"})
