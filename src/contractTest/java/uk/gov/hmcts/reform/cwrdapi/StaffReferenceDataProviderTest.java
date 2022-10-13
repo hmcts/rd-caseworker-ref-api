@@ -26,9 +26,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -58,13 +56,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -195,7 +191,7 @@ public class StaffReferenceDataProviderTest {
 
     }
 
-    private  List<Skill> getSkillsData() {
+    private List<Skill> getSkillsData() {
         Skill skill1 = new Skill();
         skill1.setServiceId("BBA3");
         skill1.setSkillId(1L);
@@ -225,8 +221,8 @@ public class StaffReferenceDataProviderTest {
         skill4.setDescription("desc4");
         skill4.setUserType("user_type4");
 
-        List<Skill> skills = List.of(skill1,skill2,skill3,skill4);
-        return  skills;
+        List<Skill> skills = List.of(skill1, skill2, skill3, skill4);
+        return skills;
     }
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
@@ -270,7 +266,7 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false,false, cwSkills);
+                new UserType(1L, "HMCTS"), false, false, cwSkills);
     }
 
     @State({"A list of all staff reference data user-type"})
