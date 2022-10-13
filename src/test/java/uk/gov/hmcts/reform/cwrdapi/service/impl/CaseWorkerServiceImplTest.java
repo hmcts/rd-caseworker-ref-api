@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -387,11 +386,11 @@ class CaseWorkerServiceImplTest {
                         singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfiles =
                 (List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile>) response.getBody();
-        Assert.assertEquals(1L, caseWorkerProfiles.get(0).getSkills().size());
+        assertEquals(1L, caseWorkerProfiles.get(0).getSkills().size());
         assertEquals(1L, caseWorkerProfiles.get(0).getSkills().get(0).getSkillId());
-        Assert.assertEquals("A1", caseWorkerProfiles.get(0).getSkills().get(0).getSkillCode());
-        Assert.assertEquals("desc1", caseWorkerProfiles.get(0).getSkills().get(0).getDescription());
-        Assert.assertEquals("Y", caseWorkerProfiles.get(0).getStaffAdmin());
+        assertEquals("A1", caseWorkerProfiles.get(0).getSkills().get(0).getSkillCode());
+        assertEquals("desc1", caseWorkerProfiles.get(0).getSkills().get(0).getDescription());
+        assertEquals("Y", caseWorkerProfiles.get(0).getStaffAdmin());
         assertNotNull(caseWorkerServiceImpl
                 .fetchCaseworkersById(singletonList("27fbd198-552e-4c32-9caf-37be1545caaf")));
         verify(caseWorkerProfileRepository, times(2)).findByCaseWorkerIdIn(any());
@@ -403,13 +402,14 @@ class CaseWorkerServiceImplTest {
         doReturn(singletonList(buildCaseWorkerProfileDto()))
                 .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(singletonList(
                         "27fbd198-552e-4c32-9caf-37be1545caaf"));
+
         ResponseEntity<Object> response =
                 caseWorkerServiceImpl.fetchCaseworkersById(
                         singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfiles =
                 (List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile>) response.getBody();
-        Assert.assertEquals(0L, caseWorkerProfiles.get(0).getSkills().size());
-        Assert.assertEquals("Y", caseWorkerProfiles.get(0).getStaffAdmin());
+        assertEquals(0L, caseWorkerProfiles.get(0).getSkills().size());
+        assertEquals("Y", caseWorkerProfiles.get(0).getStaffAdmin());
         assertNotNull(caseWorkerServiceImpl
                 .fetchCaseworkersById(singletonList("27fbd198-552e-4c32-9caf-37be1545caaf")));
         verify(caseWorkerProfileRepository, times(2)).findByCaseWorkerIdIn(any());
