@@ -55,14 +55,4 @@ INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, cre
 INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(4, '4', 'testskill4', '4', '4', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(5, '5', 'testskill5', '5', '5', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-CREATE SEQUENCE CASE_WORKER_SKILL_ID_SEQ;
-ALTER TABLE case_worker_skill ALTER COLUMN case_worker_skill_id
-SET DEFAULT nextval('CASE_WORKER_SKILL_ID_SEQ');
-
-create sequence STAFF_AUDIT_ID_SEQ;
-ALTER TABLE staff_audit ALTER COLUMN id
-SET DEFAULT nextval('STAFF_AUDIT_ID_SEQ');
-
 COMMIT;
-
-
