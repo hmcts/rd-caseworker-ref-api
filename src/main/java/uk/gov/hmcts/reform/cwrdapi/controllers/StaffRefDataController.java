@@ -15,6 +15,8 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -192,6 +194,61 @@ public class StaffRefDataController {
                 .status(200)
                 .body(staffRefJobTitleResponseBuilder.build());
 
+    }
+
+    @ApiOperation(
+            value = "This API creates staff user profile",
+            notes = "This API will be invoked by user having idam role with cwd-admin and staff-admin",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "Successfully created staff user profile",
+                    response = StaffProfileCreationResponse.class,
+                    responseContainer = "list"
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = BAD_REQUEST
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @PostMapping(
+            consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE,
+            path = {"/profile"}
+    )
+    @Secured("staff-admin")
+    @ResponseBody
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @Transactional
+    public ResponseEntity<StaffProfileCreationResponse> createStaffUserProfile(@RequestBody StaffProfileCreationRequest
+                                                                                       staffProfileCreationRequest) {
+
+        log.info("Inside createStaffUserProfile Controller");
+        StaffProfileCreationResponse staffProfileCreationResponse = null;
+
+        staffProfileCreationResponse = staffRefDataService.processStaffProfileCreation(staffProfileCreationRequest);
+        if (isNotEmpty(staffProfileCreationResponse)) {
+
+            staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(staffProfileCreationResponse);
     }
 
     @ApiOperation(

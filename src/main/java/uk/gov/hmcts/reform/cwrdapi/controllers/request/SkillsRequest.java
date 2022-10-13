@@ -14,6 +14,11 @@ import lombok.Setter;
 @Builder(builderMethodName = "skillsRequest")
 public class SkillsRequest {
 
+    private int skillId;
+    private String description;
+
+    @JsonCreator
+    public SkillsRequest(@JsonProperty("skill_id") int skillId,
     private String skillId;
     private String description;
 

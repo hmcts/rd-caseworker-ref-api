@@ -14,7 +14,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.12'
     id 'jacoco'
     id 'pmd'
-    id 'com.github.ben-manes.versions' version '0.42.0'
+    id 'com.github.ben-manes.versions' version '0.41.0'
     id "info.solidsoft.pitest" version '1.7.0'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'org.sonarqube' version '3.3'
@@ -41,7 +41,7 @@ def versions = [
   pact_version       : '4.1.7',
   launchDarklySdk    : "5.10.2",
   restAssured        : '4.3.3',
-  jackson            : '2.13.1',
+  jackson            : '2.14.0-rc1',
   log4j              : '2.17.1',
   springVersion      : '5.3.20',
   poi                : '4.1.2',
@@ -368,7 +368,7 @@ dependencies {
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.1'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
   implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.2.20220324', ext: 'pom'
   implementation group: 'org.jetbrains', name: 'annotations', version: '13.0'
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
@@ -384,9 +384,8 @@ dependencies {
 
   implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
   implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
+  implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.2'
-  implementation group:"org.yaml", name: "snakeyaml", version:"1.33"
-
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j

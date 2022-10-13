@@ -34,6 +34,21 @@ CREATE TABLE staff_audit (
     CONSTRAINT staff_audit_pk PRIMARY KEY (id)
 );
 
+alter table case_worker_skill add constraint skill_id_fk1 foreign key (skill_id)
+references skill (skill_id);
+
+alter table case_worker_skill add constraint case_worker_id_fk4 foreign key (case_worker_id)
+references case_worker_profile (case_worker_id);
+
+CREATE SEQUENCE CASE_WORKER_SKILL_ID_SEQ;
+ALTER TABLE case_worker_skill ALTER COLUMN case_worker_skill_id
+SET DEFAULT nextval('CASE_WORKER_SKILL_ID_SEQ');
+
+create sequence STAFF_AUDIT_ID_SEQ;
+ALTER TABLE staff_audit ALTER COLUMN id
+SET DEFAULT nextval('STAFF_AUDIT_ID_SEQ');
+
+
 
 --dummy data
 INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(1, '1', 'testskill1', '1', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
