@@ -11,6 +11,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,8 +49,11 @@ class StaffRefDataControllerTest {
     ResponseEntity<Object> responseEntity;
     @InjectMocks
     private StaffRefDataController staffRefDataController;
-
+    @Mock
+    StaffRefDataService staffProfileService;
     List<UserType> userTypes = null;
+    StaffProfileCreationRequest request;
+    StaffProfileCreationResponse response;
 
     @BeforeEach
     void setUp() {
@@ -56,6 +62,11 @@ class StaffRefDataControllerTest {
         srResponse = StaffRefDataUserTypesResponse
                 .builder()
                 .userTypes(Collections.emptyList())
+                .build();
+        request = StaffProfileCreationRequest.staffProfileCreationRequest().build();
+
+        response = StaffProfileCreationResponse.builder()
+                .caseWorkerId(UUID.randomUUID().toString())
                 .build();
 
         responseEntity = new ResponseEntity<>(srResponse, null, HttpStatus.OK);
@@ -155,5 +166,11 @@ class StaffRefDataControllerTest {
         return true;
     }
 
+    @Test
+    void should_return_staffCreateResponse_with_status_code_200() {
 
+        ResponseEntity<StaffProfileCreationResponse> actual = staffRefDataController
+                .createStaffUserProfile(request);
+        assertThat(actual.getStatusCodeValue()).isEqualTo(201);
+    }
 }

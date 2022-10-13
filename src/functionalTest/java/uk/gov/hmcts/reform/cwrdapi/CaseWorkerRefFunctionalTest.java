@@ -93,7 +93,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
         roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-            .createCaseWorkerProfiles();
+                .createCaseWorkerProfiles();
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
         Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
@@ -101,26 +101,26 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         List<String> caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
-            .body(UserRequest.builder().userIds(caseWorkerIds).build())
-            .post("/refdata/case-worker/users/fetchUsersById/")
-            .andReturn();
+                .body(UserRequest.builder().userIds(caseWorkerIds).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
         fetchResponse.then()
-            .assertThat()
-            .statusCode(200);
+                .assertThat()
+                .statusCode(200);
 
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
-            Arrays.asList(fetchResponse.getBody().as(
-                uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
         assertEquals("Regional Centre Team Leader", fetchedList.get(0).getRoles().get(1).getRoleName());
         List<String> workAreas = fetchedList.stream().flatMap(fw -> fw.getWorkAreas().stream().map(
-            WorkArea::getAreaOfWork)).collect(
-            Collectors.toList());
+                WorkArea::getAreaOfWork)).collect(
+                Collectors.toList());
         assertTrue(workAreas.contains(caseWorkersProfileCreationRequests.get(0)
-            .getWorkerWorkAreaRequests().get(0).getAreaOfWork()));
+                .getWorkerWorkAreaRequests().get(0).getAreaOfWork()));
         caseWorkersProfileCreationRequests.get(0)
-            .getWorkerWorkAreaRequests().forEach(workerWorkAreaRequest ->
-                assertTrue(workAreas.contains(workerWorkAreaRequest.getAreaOfWork())));
+                .getWorkerWorkAreaRequests().forEach(workerWorkAreaRequest ->
+                        assertTrue(workAreas.contains(workerWorkAreaRequest.getAreaOfWork())));
         assertEquals(fetchedList.get(0).getFirstName(), caseWorkersProfileCreationRequests.get(0).getFirstName());
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
     }
@@ -170,7 +170,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         var profileCreateRequests = createNewActiveCaseWorkerProfile();
         var upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         var caseWorkersProfileCreationRequests = caseWorkerApiClient
-            .createCaseWorkerProfiles(upResponse.getEmail());
+                .createCaseWorkerProfiles(upResponse.getEmail());
         caseWorkersProfileCreationRequests.get(0).setFirstName("cwr-test-one");
         caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         var idamResponse = getIdamResponse(upResponse.getIdamId());
@@ -301,7 +301,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
         assertTrue(caseWorkerFileCreationResponse.getMessage().contains(REQUEST_COMPLETED_SUCCESSFULLY));
-        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage().contains(format(RECORDS_UPLOADED, 4)));
+        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage().contains(format(RECORDS_UPLOADED, 6)));
     }
 
     @Test
@@ -545,26 +545,26 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
             caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+                    .createCaseWorkerProfiles());
             caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+                    .createCaseWorkerProfiles());
             caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         }
         String ccdServiceNames = "all";
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-            .get(STAFF_BY_SERVICE_NAME_URL
-                + "?ccd_service_names=" + ccdServiceNames
-                + "&page_number=0&page_size=40&sort_column=caseWorkerId&sort_direction=DESC")
-            .andReturn();
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=" + ccdServiceNames
+                        + "&page_number=0&page_size=40&sort_column=caseWorkerId&sort_direction=DESC")
+                .andReturn();
         fetchResponse.then()
-            .assertThat()
-            .statusCode(200);
+                .assertThat()
+                .statusCode(200);
         List<StaffProfileWithServiceName> paginatedStaffProfile =
-            Arrays.asList(fetchResponse.getBody().as(StaffProfileWithServiceName[].class));
+                Arrays.asList(fetchResponse.getBody().as(StaffProfileWithServiceName[].class));
 
         List<String> caseWorkerIds = paginatedStaffProfile.stream()
-             .map(ps -> ps.getStaffProfile().getId())
-            .distinct().collect(Collectors.toList());
+                .map(ps -> ps.getStaffProfile().getId())
+                .distinct().collect(Collectors.toList());
         assertTrue(Ordering.natural().reverse().isOrdered(caseWorkerIds));
 
     }
@@ -578,33 +578,33 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
             List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = new ArrayList<>();
 
             CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
-                .caseWorkerWorkAreaRequest()
-                .serviceCode("ABA4").areaOfWork("Adoption").build();
+                    .caseWorkerWorkAreaRequest()
+                    .serviceCode("ABA4").areaOfWork("Adoption").build();
 
             CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
-                .caseWorkerWorkAreaRequest()
-                .serviceCode("BHA3").areaOfWork("Specified Money Claims").build();
+                    .caseWorkerWorkAreaRequest()
+                    .serviceCode("BHA3").areaOfWork("Specified Money Claims").build();
 
             List<CaseWorkerWorkAreaRequest> areaRequests =
-                ImmutableList.of(workerWorkAreaRequest1, workerWorkAreaRequest2);
+                    ImmutableList.of(workerWorkAreaRequest1, workerWorkAreaRequest2);
 
             caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+                    .createCaseWorkerProfiles());
             caseWorkersProfileCreationRequests.get(0).setWorkerWorkAreaRequests(areaRequests);
             caseWorkersProfileCreationRequests.addAll(caseWorkerApiClient
-                .createCaseWorkerProfiles());
+                    .createCaseWorkerProfiles());
             caseWorkersProfileCreationRequests.get(1).setWorkerWorkAreaRequests(areaRequests);
             caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         }
         String ccdServiceNames = "Invalid";
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
-            .get(STAFF_BY_SERVICE_NAME_URL
-                + "?ccd_service_names=" + ccdServiceNames
-                + "&page_number=1&page_size=100&sort_column=caseWorkerId&sort_direction=DESC")
-            .andReturn();
+                .get(STAFF_BY_SERVICE_NAME_URL
+                        + "?ccd_service_names=" + ccdServiceNames
+                        + "&page_number=1&page_size=100&sort_column=caseWorkerId&sort_direction=DESC")
+                .andReturn();
         fetchResponse.then()
-            .assertThat()
-            .statusCode(404);
+                .assertThat()
+                .statusCode(404);
 
 
     }
