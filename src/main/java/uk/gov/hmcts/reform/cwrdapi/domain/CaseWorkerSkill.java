@@ -5,6 +5,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -30,12 +47,20 @@ import static javax.persistence.CascadeType.ALL;
 public class CaseWorkerSkill {
     @Id
     @Column(name = "case_worker_skill_id")
+@SequenceGenerator(name = "case_worker_skill_id_seq", sequenceName = "case_worker_skill_id_seq", allocationSize = 1)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "skill_id"}))
+public class CaseWorkerSkill implements Serializable {
+
+    @Id
+    @Column(name = "case_worker_skill_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_worker_skill_id_seq")
     private Long caseWorkerSkillId;
 
     @Column(name = "case_worker_id")
     private String caseWorkerId;
 
     @Column(name = "skill_id")
+    @Column(name = "skill_id", unique = true)
     private Long skillId;
 
     @CreationTimestamp
@@ -54,5 +79,14 @@ public class CaseWorkerSkill {
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = Skill.class, mappedBy = "caseWorkerSkill", cascade = ALL, orphanRemoval = true)
     private List<Skill> skills = new ArrayList<>();
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
+    @JoinColumn(name = "skill_id", referencedColumnName = "skill_id",
+            insertable = false, updatable = false, nullable = false)
+    private Skill skill;
+
+    public CaseWorkerSkill(String caseWorkerId, Long skillId) {
+        this.caseWorkerId = caseWorkerId;
+        this.skillId = skillId;
+    }
 
 }

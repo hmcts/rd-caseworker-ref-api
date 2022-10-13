@@ -38,6 +38,7 @@ class CaseWorkerProfileTest {
         caseWorkerProfile.setTaskSupervisor(false);
         caseWorkerProfile.setUserAdmin(true);
         caseWorkerProfile.setNew(true);
+        caseWorkerProfile.setUserAdmin(false);
 
         UserType userType = new UserType();
         userType.setUserTypeId(1L);
@@ -62,6 +63,7 @@ class CaseWorkerProfileTest {
         assertFalse(caseWorkerProfile.getTaskSupervisor());
         assertTrue(caseWorkerProfile.getUserAdmin());
         assertTrue(caseWorkerProfile.isNew());
+        assertFalse(caseWorkerProfile.getUserAdmin());
 
         assertNotNull(caseWorkerProfile.getUserType());
         assertThat(caseWorkerProfile.getUserType().getUserTypeId(), is(1L));
@@ -177,5 +179,38 @@ class CaseWorkerProfileTest {
         assertTrue(caseWorkerProfile.getCaseAllocator());
         assertTrue(caseWorkerProfile.getTaskSupervisor());
         assertFalse(caseWorkerProfile.isNew());
+    }
+
+    @Test
+    void testCaseWorkerProfileContainingUserAdmin() {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setUserAdmin(true);
+        assertTrue(caseWorkerProfile.getUserAdmin());
+    }
+
+    @Test
+    void testCaseWorkerProfileContainingCaseWorkerSkill() {
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        caseWorkerSkill.setSkillId(1L);
+        caseWorkerSkill.setCaseWorkerSkillId(1L);
+        caseWorkerSkill.setCaseWorkerId("CaseWorkerId");
+        caseWorkerSkill.setCreatedDate(LocalDateTime.now());
+        caseWorkerSkill.setLastUpdate(LocalDateTime.now());
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerSkills(Collections.singletonList(caseWorkerSkill));
+
+        assertNotNull(caseWorkerProfile.getCaseWorkerSkills());
+        assertFalse(caseWorkerProfile.getCaseWorkerSkills().isEmpty());
+        assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getSkillId(),is(1L));
+        assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getCaseWorkerSkillId(), is(1L));
+        assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getCaseWorkerId(), is("CaseWorkerId"));
+    }
+
+    @Test
+    void testCaseWorkerProfileContainingStaffAdmin() {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setUserAdmin(true);
+        assertTrue(caseWorkerProfile.getUserAdmin());
     }
 }

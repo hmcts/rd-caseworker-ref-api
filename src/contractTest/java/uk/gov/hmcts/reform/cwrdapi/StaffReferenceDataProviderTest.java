@@ -25,8 +25,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -35,27 +38,35 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
+import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -97,11 +108,29 @@ public class StaffReferenceDataProviderTest {
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
 
     @Mock
+    CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
+
+    @Mock
+    CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
+
     private UserTypeRepository userTypeRepository;
 
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
-
+    @Mock
+    private UserTypeRepository userTypeRepository;
+    @MockBean
+    private UserProfileFeignClient userProfileFeignClient;
+    @Mock
+    IJsrValidatorInitializer validateStaffProfile;
+    @Mock
+    StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
+    @Mock
+    StaffAuditRepository staffAuditRepository;
+    @Mock
+    IValidationService validationServiceFacade;
+    @Mock
+    SkillRepository skillRepository;
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -113,8 +142,6 @@ public class StaffReferenceDataProviderTest {
             context.verifyInteraction();
         }
     }
-
-
 
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
@@ -342,6 +369,25 @@ public class StaffReferenceDataProviderTest {
                 Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
         caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
 
+        List<CaseWorkerSkill> caseWorkerSkills =
+                Collections.singletonList(new CaseWorkerSkill(caseWorkerId, 1L));
+
+        return new CaseWorkerProfile(caseWorkerId,
+                "firstName",
+                "lastName",
+                "sam.test@justice.gov.uk",
+                1L,
+                "National",
+                1,
+                false,
+                false,
+                false,
+                timeNow,
+                timeNow,
+                caseWorkerLocations,
+                caseWorkerWorkAreas,
+                caseWorkerRoles,
+                new UserType(1L, "HMCTS"), false,false, caseWorkerSkills);
         caseWorkerProfile.setCaseWorkerLocations(caseWorkerLocations);
         caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
         caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
@@ -375,6 +421,20 @@ public class StaffReferenceDataProviderTest {
                 .thenReturn(roleTypeList);
     }
 
+    @State({"A Staff profile create request is submitted"})
+    public void createStaffUserProfile() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        UserProfileCreationResponse userProfileResponse = new UserProfileCreationResponse();
+        userProfileResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileResponse.setIdamRegistrationResponse(200);
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        doReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build())
+                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
+        doReturn(getCaseWorkerProfile(UUID.randomUUID().toString())).when(caseWorkerProfileRepo).save(any());
+    }
 }
 
 

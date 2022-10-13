@@ -63,7 +63,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
 
         launchDarklyMap.put("StaffRefDataController.fetchUserTypes",
                 RD_STAFF_UI);
-
+        launchDarklyMap.put("StaffRefDataController.createStaffUserProfile",
+                RD_STAFF_UI);
         launchDarklyMap.put("StaffRefDataController.retrieveJobTitles",
                 RD_STAFF_UI);
 
