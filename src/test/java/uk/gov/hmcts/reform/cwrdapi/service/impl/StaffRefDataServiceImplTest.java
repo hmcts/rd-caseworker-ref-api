@@ -12,10 +12,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
@@ -26,20 +32,10 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -55,8 +51,6 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
@@ -74,7 +68,6 @@ import java.util.Set;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -85,7 +78,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
@@ -540,7 +532,7 @@ class StaffRefDataServiceImplTest {
         CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
         caseWorkerSkill.setCaseWorkerId("423ec46f-359f-4fcc-9ecc-b1cab4d7e683");
         caseWorkerSkill.setSkillId(1L);
-        caseWorkerSkill.setSkills(getSkillsData());
+        caseWorkerSkill.setSkill(getSkillData());
 
         return caseWorkerSkill;
 
@@ -587,6 +579,17 @@ class StaffRefDataServiceImplTest {
         List<Skill> skills = List.of(skill1, skill2, skill3, skill4);
 
         return skills;
+    }
+
+    private Skill getSkillData() {
+        Skill skill = new Skill();
+        skill.setServiceId("BBA3");
+        skill.setSkillId(1L);
+        skill.setSkillCode("A1");
+        skill.setDescription("desc1");
+        skill.setUserType("user_type1");
+
+        return skill;
     }
 
     @Test

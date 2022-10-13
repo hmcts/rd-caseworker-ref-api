@@ -117,8 +117,6 @@ public class StaffReferenceDataProviderTest {
 
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
-    @Mock
-    private UserTypeRepository userTypeRepository;
     @MockBean
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
@@ -129,8 +127,6 @@ public class StaffReferenceDataProviderTest {
     StaffAuditRepository staffAuditRepository;
     @Mock
     IValidationService validationServiceFacade;
-    @Mock
-    SkillRepository skillRepository;
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -295,7 +291,7 @@ public class StaffReferenceDataProviderTest {
         CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
         caseWorkerSkill.setCaseWorkerId("423ec46f-359f-4fcc-9ecc-b1cab4d7e683");
         caseWorkerSkill.setSkillId(1L);
-        caseWorkerSkill.setSkills(getSkillsData());
+        caseWorkerSkill.setSkill(getSkillData());
 
         return caseWorkerSkill;
 
@@ -334,6 +330,18 @@ public class StaffReferenceDataProviderTest {
 
         List<Skill> skills = List.of(skill1,skill2,skill3,skill4);
         return  skills;
+    }
+
+    private  Skill getSkillData() {
+        Skill skill = new Skill();
+        skill.setServiceId("BBA3");
+        skill.setSkillId(1L);
+        skill.setSkillCode("A1");
+        skill.setDescription("desc1");
+        skill.setUserType("user_type1");
+
+        return skill;
+
     }
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
@@ -388,16 +396,7 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
                 new UserType(1L, "HMCTS"), false,false, caseWorkerSkills);
-        caseWorkerProfile.setCaseWorkerLocations(caseWorkerLocations);
-        caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
-        caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
 
-        List<CaseWorkerSkill> caseWorkerSkills = new ArrayList<>();
-
-        caseWorkerProfile.setCaseWorkerSkills(caseWorkerSkills);
-        caseWorkerProfile.setUserType(new UserType(1L, "HMCTS"));
-
-        return caseWorkerProfile;
 
     }
 

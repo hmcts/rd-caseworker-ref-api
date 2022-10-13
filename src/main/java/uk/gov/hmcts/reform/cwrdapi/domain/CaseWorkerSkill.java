@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,31 +21,11 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import static javax.persistence.CascadeType.ALL;
 
 @Entity(name = "case_worker_skill")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class CaseWorkerSkill {
-    @Id
-    @Column(name = "case_worker_skill_id")
 @SequenceGenerator(name = "case_worker_skill_id_seq", sequenceName = "case_worker_skill_id_seq", allocationSize = 1)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"case_worker_id", "skill_id"}))
 public class CaseWorkerSkill implements Serializable {
@@ -59,7 +38,6 @@ public class CaseWorkerSkill implements Serializable {
     @Column(name = "case_worker_id")
     private String caseWorkerId;
 
-    @Column(name = "skill_id")
     @Column(name = "skill_id", unique = true)
     private Long skillId;
 
@@ -76,9 +54,6 @@ public class CaseWorkerSkill implements Serializable {
             insertable = false, updatable = false, nullable = false)
     private CaseWorkerProfile caseWorkerProfile;
 
-    @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Skill.class, mappedBy = "caseWorkerSkill", cascade = ALL, orphanRemoval = true)
-    private List<Skill> skills = new ArrayList<>();
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},fetch = FetchType.LAZY)
     @JoinColumn(name = "skill_id", referencedColumnName = "skill_id",
             insertable = false, updatable = false, nullable = false)
