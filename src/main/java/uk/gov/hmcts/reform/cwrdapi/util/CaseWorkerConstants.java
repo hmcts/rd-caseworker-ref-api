@@ -167,22 +167,5 @@ public final class CaseWorkerConstants {
     public static final String PROFILE_ALREADY_CREATED = "The profile is already created for the given email Id";
     public static final String NO_USER_TO_SUSPEND_PROFILE = "There is no user present to suspend. "
             + "Please try again or check with HMCTS Support Team";
-    public static final String TRY_AGAIN =   " and try again";
-    public static final String INVALID_EMAIL_PROFILE = "You must add a valid justice.gov.uk email"
-            + " address and try again";
-    public static final String NO_PRIMARY_LOCATION_PRESENT_PROFILE = "You must add Primary Base Location Name"
-            + TRY_AGAIN;
-    public static final String NO_ROLE_PRESENT_PROFILE = "You must add details of at least one role"
-            + TRY_AGAIN;
-    public static final String NO_WORK_AREA_PRESENT_PROFILE = "You must add details of at least one Service"
-            + TRY_AGAIN;
-    public static final String NO_USER_TYPE_PRESENT_PROFILE = "You must add a user type and try again";
-
-    public static final String FIRST_NAME_MISSING_PROFILE = "You must add a first name and try again";
-    public static final String LAST_NAME_MISSING_PROFILE = "You must add a last name and try again";
-    public static final String MISSING_REGION_PROFILE = "You must add a region and try again";
-    public static final String PROFILE_ALREADY_CREATED = "The profile is already created for the given email Id";
-    public static final String NO_USER_TO_SUSPEND_PROFILE = "There is no user present to suspend. "
-            + "Please try again or check with HMCTS Support Team";
     public static final String PROFILE_NOT_PRESENT_IN_DB = "User does not exists in db";
 }

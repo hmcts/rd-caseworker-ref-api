@@ -31,14 +31,7 @@ public interface StaffRefDataService {
      *
      */
     void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse);
-    StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest staffProfileRequest);
 
-    /**
-     * Prepare StaffProfile data to be published as a message to topic.
-     *
-     *
-     */
-    void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse);
 
     StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest staffProfileRequest);
    // List<CaseWorkerProfile> updateStaffProfiles(List<StaffProfileCreationRequest>

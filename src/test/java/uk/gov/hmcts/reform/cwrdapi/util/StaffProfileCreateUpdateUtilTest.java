@@ -84,7 +84,6 @@ class StaffProfileCreateUpdateUtilTest {
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
                 .skillId(1)
-                .skillId("1L")
                 .description("training")
                 .build();
 

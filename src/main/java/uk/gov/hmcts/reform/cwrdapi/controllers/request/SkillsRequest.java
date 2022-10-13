@@ -19,12 +19,9 @@ public class SkillsRequest {
 
     @JsonCreator
     public SkillsRequest(@JsonProperty("skill_id") int skillId,
-    private String skillId;
-    private String description;
+     String description)
 
-    @JsonCreator
-    public SkillsRequest(@JsonProperty("skill_id") String skillId,
-                                     @JsonProperty("description") String description) {
+    {
         this.skillId = skillId;
         this.description = description;
     }
