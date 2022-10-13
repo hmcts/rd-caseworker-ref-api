@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -376,6 +377,7 @@ class CaseWorkerServiceImplTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void test_should_return_caseworker_profile() {
         doReturn(singletonList(buildCaseWorkerProfile()))
                 .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(singletonList(
@@ -383,6 +385,31 @@ class CaseWorkerServiceImplTest {
         ResponseEntity<Object> response =
                 caseWorkerServiceImpl.fetchCaseworkersById(
                         singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfiles =
+                (List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile>) response.getBody();
+        Assert.assertEquals(1L, caseWorkerProfiles.get(0).getSkills().size());
+        assertEquals(1L, caseWorkerProfiles.get(0).getSkills().get(0).getSkillId());
+        Assert.assertEquals("A1", caseWorkerProfiles.get(0).getSkills().get(0).getSkillCode());
+        Assert.assertEquals("desc1", caseWorkerProfiles.get(0).getSkills().get(0).getDescription());
+        Assert.assertEquals("Y", caseWorkerProfiles.get(0).getStaffAdmin());
+        assertNotNull(caseWorkerServiceImpl
+                .fetchCaseworkersById(singletonList("27fbd198-552e-4c32-9caf-37be1545caaf")));
+        verify(caseWorkerProfileRepository, times(2)).findByCaseWorkerIdIn(any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_should_return_caseworker_profile_empty_skills() {
+        doReturn(singletonList(buildCaseWorkerProfileDto()))
+                .when(caseWorkerProfileRepository).findByCaseWorkerIdIn(singletonList(
+                        "27fbd198-552e-4c32-9caf-37be1545caaf"));
+        ResponseEntity<Object> response =
+                caseWorkerServiceImpl.fetchCaseworkersById(
+                        singletonList("27fbd198-552e-4c32-9caf-37be1545caaf"));
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> caseWorkerProfiles =
+                (List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile>) response.getBody();
+        Assert.assertEquals(0L, caseWorkerProfiles.get(0).getSkills().size());
+        Assert.assertEquals("Y", caseWorkerProfiles.get(0).getStaffAdmin());
         assertNotNull(caseWorkerServiceImpl
                 .fetchCaseworkersById(singletonList("27fbd198-552e-4c32-9caf-37be1545caaf")));
         verify(caseWorkerProfileRepository, times(2)).findByCaseWorkerIdIn(any());
@@ -439,6 +466,49 @@ class CaseWorkerServiceImplTest {
 
         caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
         caseWorkerProfile.setCaseWorkerSkills(caseWorkerSkills);
+        caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
+        caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
+        return caseWorkerProfile;
+    }
+
+    CaseWorkerProfile buildCaseWorkerProfileDto() {
+
+        CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
+        caseWorkerRole.setCaseWorkerRoleId(1L);
+        caseWorkerRole.setCaseWorkerId("CWID1");
+        caseWorkerRole.setRoleId(1L);
+        caseWorkerRole.setPrimaryFlag(false);
+        caseWorkerRole.setCreatedDate(LocalDateTime.now());
+        caseWorkerRole.setLastUpdate(LocalDateTime.now());
+        caseWorkerRole.setRoleType(roleType);
+
+        CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
+        caseWorkerLocation.setCaseWorkerId("CWID1");
+        caseWorkerLocation.setCaseWorkerLocationId(11111L);
+        caseWorkerLocation.setCreatedDate(LocalDateTime.now());
+        caseWorkerLocation.setLastUpdate(LocalDateTime.now());
+        caseWorkerLocation.setLocationId(11112);
+        caseWorkerLocation.setPrimaryFlag(true);
+
+        UserType userType = new UserType();
+        userType.setDescription("userTypeId");
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+
+        caseWorkerProfile.setFirstName("firstName");
+        caseWorkerProfile.setLastName("Last`name");
+        caseWorkerProfile.setEmailId("a@b.com");
+        caseWorkerProfile.setRegion("region");
+        caseWorkerProfile.setRegionId(111122222);
+        caseWorkerProfile.setUserTypeId(112L);
+        caseWorkerProfile.setUserType(userType);
+        caseWorkerProfile.setSuspended(true);
+        caseWorkerProfile.setUserAdmin(true);
+        caseWorkerProfile.setTaskSupervisor(true);
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setCreatedDate(LocalDateTime.now());
+        caseWorkerProfile.setLastUpdate(LocalDateTime.now());
+
+        caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
         caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
         caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
         return caseWorkerProfile;
