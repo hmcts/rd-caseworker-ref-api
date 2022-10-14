@@ -135,6 +135,7 @@ public class StaffReferenceDataProviderTest {
     @BeforeEach
     void beforeCreate(PactVerificationContext context) {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
+        System.getProperties().setProperty("pact.verifier.publishResults", "true");
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
@@ -286,6 +287,21 @@ public class StaffReferenceDataProviderTest {
 
     @State({"A Staff profile create request is submitted"})
     public void createStaffUserProfile() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        UserProfileCreationResponse userProfileResponse = new UserProfileCreationResponse();
+        userProfileResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileResponse.setIdamRegistrationResponse(200);
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        doReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build())
+                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
+        doReturn(getCaseWorkerProfile(UUID.randomUUID().toString())).when(caseWorkerProfileRepo).save(any());
+    }
+
+    @State({"A Staff profile update request is submitted"})
+    public void updateStaffUserProfile() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
 
         UserProfileCreationResponse userProfileResponse = new UserProfileCreationResponse();
