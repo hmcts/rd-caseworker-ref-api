@@ -16,22 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
-import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
@@ -58,21 +42,9 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepos
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
-import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerSkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
-import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
-import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
-import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
-import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
@@ -82,7 +54,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,15 +64,6 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -536,7 +498,7 @@ class StaffRefDataServiceImplTest {
     @Test
     void test_update_staff_profile_with_changed_values() throws JsonProcessingException {
 
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName("CWFirstName");
@@ -585,6 +547,8 @@ class StaffRefDataServiceImplTest {
                                 defaultCharset())
                         .status(200).build());
 
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
         StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
                 .updateStaffProfile(staffProfileCreationRequest);
 
@@ -595,14 +559,14 @@ class StaffRefDataServiceImplTest {
         assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
     }
 
-    private StaffProfileCreationRequest getStaffProfileUpdateRequest(){
+    private StaffProfileCreationRequest getStaffProfileUpdateRequest() {
 
         Set<String> idamRoles = new HashSet<>();
         idamRoles.add("IdamRole1");
         idamRoles.add("IdamRole2");
 
         StaffProfileRoleRequest staffProfileRoleRequest =
-                new StaffProfileRoleRequest(1,"testRole1", true);
+                new StaffProfileRoleRequest(1, "testRole1", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
@@ -642,7 +606,7 @@ class StaffRefDataServiceImplTest {
                 .skills(singletonList(skillsRequest))
                 .build();
 
-            return staffProfileCreationRequest;
+        return staffProfileCreationRequest;
 
     }
 }

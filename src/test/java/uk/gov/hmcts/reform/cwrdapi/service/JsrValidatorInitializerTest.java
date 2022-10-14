@@ -13,11 +13,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationReque
 import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
 import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
-import uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter;
-import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.JsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;

@@ -43,9 +43,9 @@ class CaseWorkerProfileRepositoryTest {
     @Test
     void findByCaseWorkerIds() {
         List<CaseWorkerProfile> caseworkerProfiles = Collections.singletonList(new CaseWorkerProfile());
-        List<String> Ids = Collections.singletonList("id_abcd");
-        when(cwProfileRepository.findByCaseWorkerIdIn(Ids)).thenReturn(caseworkerProfiles);
-        assertNotNull(cwProfileRepository.findByCaseWorkerIdIn(Ids));
+        List<String> workerIds = Collections.singletonList("id_abcd");
+        when(cwProfileRepository.findByCaseWorkerIdIn(workerIds)).thenReturn(caseworkerProfiles);
+        assertNotNull(cwProfileRepository.findByCaseWorkerIdIn(workerIds));
         verify(cwProfileRepository, times(1)).findByCaseWorkerIdIn(any());
     }
 

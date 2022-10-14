@@ -201,12 +201,6 @@ public class CaseWorkerReferenceDataClient {
 
         try {
             responseEntity = restTemplate.exchange(uriPath, HttpMethod.PUT, request, Map.class);
-//
-//            responseEntity = restTemplate.ForEntity(
-//                    uriPath,
-//                    request,
-//                    Map.class);
-
 
         } catch (RestClientResponseException ex) {
             HashMap<String, Object> statusAndBody = new HashMap<>(2);

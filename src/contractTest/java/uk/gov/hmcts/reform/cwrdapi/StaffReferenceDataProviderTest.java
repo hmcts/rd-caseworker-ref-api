@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationReque
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
@@ -78,7 +77,6 @@ import java.util.UUID;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -335,9 +333,7 @@ public class StaffReferenceDataProviderTest {
 
     @State({"A Staff profile update request is submitted"})
     public void updateStaffUserProfile() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
 
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName("CWFirstName");
@@ -361,6 +357,7 @@ public class StaffReferenceDataProviderTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
+        ObjectMapper mapper = new ObjectMapper();
         when(userProfileFeignClient.getUserProfileWithRolesById(any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
@@ -386,19 +383,21 @@ public class StaffReferenceDataProviderTest {
                                 defaultCharset())
                         .status(200).build());
 
-       staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+
+        staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
 
 
     }
 
-    private StaffProfileCreationRequest getStaffProfileUpdateRequest(){
+    private StaffProfileCreationRequest getStaffProfileUpdateRequest() {
 
         Set<String> idamRoles = new HashSet<>();
         idamRoles.add("IdamRole1");
         idamRoles.add("IdamRole2");
 
         StaffProfileRoleRequest staffProfileRoleRequest =
-                new StaffProfileRoleRequest(1,"testRole1", true);
+                new StaffProfileRoleRequest(1, "testRole1", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
@@ -437,8 +436,6 @@ public class StaffReferenceDataProviderTest {
                 .roles(singletonList(staffProfileRoleRequest))
                 .skills(singletonList(skillsRequest))
                 .build();
-
-
     }
 }
 

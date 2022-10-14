@@ -96,12 +96,12 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = false)
-        //this test verifies new User profile is created is prohibited when api is toggled off
     void createStaffProfile_LD_disabled() {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
 
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN, ROLE_STAFF_ADMIN))
+        Response response = caseWorkerApiClient
+                .getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN, ROLE_STAFF_ADMIN))
                 .body(staffProfileCreationRequest)
                 .post("/refdata/case-worker/profile")
                 .andReturn();

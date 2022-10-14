@@ -7,13 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
-
-import java.util.List;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,6 +26,7 @@ public class StaffRefDataUserProfileControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
     @Test
     void shouldUpdateStaffUserProfileTest() {
         StaffProfileCreationRequest staffProfileCreationRequest = StaffProfileCreationRequest
