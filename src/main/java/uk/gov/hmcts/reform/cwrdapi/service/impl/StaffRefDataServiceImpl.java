@@ -4,9 +4,15 @@ import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
@@ -21,7 +27,11 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
@@ -280,9 +290,117 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Override
     public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest, PageRequest pageRequest) {
-        return null;
+        Page<CaseWorkerProfile> pageable =
+                caseWorkerProfileRepo.findByCaseWorkerProfiles(searchRequest,pageRequest);
+        long totalRecords = pageable.getTotalElements();
+
+        List<CaseWorkerProfile> caseWorkerProfiles = pageable.getContent();
+
+        List<SearchStaffUserResponse> searchResponse = new ArrayList<>();
+
+        if (!caseWorkerProfiles.isEmpty()) {
+            searchResponse = mapCaseWorkerProfilesToSearchResponse(caseWorkerProfiles);
+        }
+
+        return ResponseEntity
+                .status(200)
+                .header("total-records",String.valueOf(totalRecords))
+                .body(searchResponse);
     }
 
+    private List<SearchStaffUserResponse> mapCaseWorkerProfilesToSearchResponse(List<CaseWorkerProfile>
+                                                                                        caseWorkerProfiles) {
+        List<SearchStaffUserResponse> searchStaffUserResponse = new ArrayList<>();
+        caseWorkerProfiles.forEach(caseWorkerProfile -> {
+            SearchStaffUserResponse searchStaffUserResponseValue =
+                    SearchStaffUserResponse.builder()
+                            .firstName(caseWorkerProfile.getFirstName())
+                            .lastName(caseWorkerProfile.getLastName())
+                            .emailId(caseWorkerProfile.getEmailId())
+                            .services(mapServicesToDto(caseWorkerProfile.getCaseWorkerWorkAreas()))
+                            .region(caseWorkerProfile.getRegion())
+                            .regionId(caseWorkerProfile.getRegionId())
+                            .roles(mapRolesToDto(caseWorkerProfile.getCaseWorkerRoles()))
+                            .baseLocations(mapBaseLocationsToDto(caseWorkerProfile.getCaseWorkerLocations()))
+                            .userType(caseWorkerProfile.getUserType().getDescription())
+                            .skills(mapSkillsToDto(caseWorkerProfile.getCaseWorkerSkills()))
+                            .build();
+
+            if (caseWorkerProfile.getTaskSupervisor() != null) {
+                searchStaffUserResponseValue.setTaskSupervisor(caseWorkerProfile.getTaskSupervisor());
+            }
+            if (caseWorkerProfile.getCaseAllocator() != null) {
+                searchStaffUserResponseValue.setCaseAllocator(caseWorkerProfile.getCaseAllocator());
+            }
+            if (caseWorkerProfile.getSuspended() != null) {
+                searchStaffUserResponseValue.setSuspended(caseWorkerProfile.getSuspended());
+            }
+            if (caseWorkerProfile.getUserAdmin() != null) {
+                searchStaffUserResponseValue.setStaffAdmin(caseWorkerProfile.getUserAdmin());
+            }
+            searchStaffUserResponse.add(
+                    searchStaffUserResponseValue
+            );
+        });
+
+        return searchStaffUserResponse;
+    }
+
+    private List<Role> mapRolesToDto(List<CaseWorkerRole> caseWorkerRoles) {
+        List<Role> rolesDto = new ArrayList<>();
+        for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
+            var roleDto = Role.builder()
+                    .roleId(caseWorkerRole.getRoleId().toString())
+                    .roleName(caseWorkerRole.getRoleType().getDescription())
+                    .isPrimary(caseWorkerRole.getPrimaryFlag())
+                    .build();
+
+            rolesDto.add(roleDto);
+        }
+        return rolesDto;
+    }
+
+    private List<Location> mapBaseLocationsToDto(List<CaseWorkerLocation> caseWorkerLocations) {
+        List<Location> locations = new ArrayList<>();
+        for (CaseWorkerLocation caseWorkerLocation : caseWorkerLocations) {
+            var location = Location.builder()
+                    .baseLocationId(caseWorkerLocation.getLocationId())
+                    .locationName(caseWorkerLocation.getLocation())
+                    .isPrimary(caseWorkerLocation.getPrimaryFlag())
+                    .build();
+
+            locations.add(location);
+        }
+        return locations;
+    }
+
+    private List<ServiceResponse> mapServicesToDto(List<CaseWorkerWorkArea> caseWorkerWorkAreas) {
+        List<ServiceResponse> serviceResponses = new ArrayList<>();
+        for (CaseWorkerWorkArea caseWorkerWorkArea : caseWorkerWorkAreas) {
+            var service = ServiceResponse.builder()
+                    .service(caseWorkerWorkArea.getAreaOfWork())
+                    .serviceCode(caseWorkerWorkArea.getServiceCode())
+                    .build();
+
+            serviceResponses.add(service);
+        }
+        return serviceResponses;
+    }
+
+    private List<SkillResponse> mapSkillsToDto(List<CaseWorkerSkill> caseWorkerSkills) {
+
+        List<SkillResponse> skills = new ArrayList<>();
+        caseWorkerSkills.forEach(caseWorkerSkill -> {
+            var skillResponse = SkillResponse.builder()
+                        .skillId(caseWorkerSkill.getSkill().getSkillId())
+                        .description(caseWorkerSkill.getSkill().getDescription())
+                        .build();
+
+                skills.add(skillResponse);
+
+        });
+        return skills;
+    }
 
     @Override
     public List<UserType> fetchUserTypes() {
