@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
@@ -54,6 +53,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -288,6 +288,30 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         log.info("{}:: publishStaffProfileToTopic ends::", loggingComponentName);
     }
 
+
+
+    @Override
+    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffUserByName(String searchString,
+                                                                                 PageRequest pageRequest) {
+
+        Page<CaseWorkerProfile> pageable =
+                caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest);
+        long totalRecords = pageable.getTotalElements();
+
+        List<CaseWorkerProfile> caseWorkerProfiles = pageable.getContent();
+
+        List<SearchStaffUserResponse> searchResponse = new ArrayList<>();
+
+        if (!caseWorkerProfiles.isEmpty()) {
+            searchResponse = mapCaseWorkerProfilesToSearchResponse(caseWorkerProfiles);
+        }
+
+        return ResponseEntity
+                .status(200)
+                .header("total-records", String.valueOf(totalRecords))
+                .body(searchResponse);
+    }
+
     @Override
     public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest, PageRequest pageRequest) {
         Page<CaseWorkerProfile> pageable =
@@ -391,42 +415,39 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         List<SkillResponse> skills = new ArrayList<>();
         caseWorkerSkills.forEach(caseWorkerSkill -> {
+            Skill skill = caseWorkerSkill.getSkill();
             var skillResponse = SkillResponse.builder()
-                        .skillId(caseWorkerSkill.getSkill().getSkillId())
-                        .description(caseWorkerSkill.getSkill().getDescription())
-                        .build();
-
-                skills.add(skillResponse);
+                    .skillId(skill.getSkillId())
+                    .description(skill.getDescription())
+                    .build();
+            skills.add(skillResponse);
 
         });
+
         return skills;
     }
 
-    @Override
-    public List<UserType> fetchUserTypes() {
-        return userTypeRepository
-                .findAll();
-    }
 
     @Override
     public StaffWorkerSkillResponse getServiceSkills() {
-        List<Skill> skills = null;
-        List<ServiceSkill> serviceSkills = null;
+        List<ServiceSkill> serviceSkills = new ArrayList<>();
         try {
-            List<SkillDTO> skillData = null;
-            skills = skillRepository.findAll();
+            List<SkillDTO> skillData = new ArrayList<>();
+            List<Skill> skills = skillRepository.findAll();
+            Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
+            if (skillsOptional.isPresent()) {
+                skillData = skills.stream().map(skill -> {
+                    SkillDTO skillDTO = new SkillDTO();
+                    skillDTO.setServiceId(skill.getServiceId());
+                    skillDTO.setSkillId(skill.getSkillId());
+                    skillDTO.setSkillCode(skill.getSkillCode());
+                    skillDTO.setUserType(skill.getUserType());
+                    skillDTO.setDescription(skill.getDescription());
+                    return skillDTO;
+                }).toList();
 
-            skillData = skills.stream().map(skill -> {
-                SkillDTO skillDTO = new SkillDTO();
-                skillDTO.setServiceId(skill.getServiceId());
-                skillDTO.setSkillId(skill.getSkillId());
-                skillDTO.setSkillCode(skill.getSkillCode());
-                skillDTO.setUserType(skill.getUserType());
-                skillDTO.setDescription(skill.getDescription());
-                return skillDTO;
-            }).toList();
-
-            serviceSkills = mapSkillToServicesSkill(skillData);
+                serviceSkills = mapSkillToServicesSkill(skillData);
+            }
 
         } catch (Exception exp) {
             log.error("{}:: StaffRefDataService getServiceSkills failed :: {}", loggingComponentName,
@@ -444,32 +465,26 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
      * @return List of ServiceSkill
      */
     public List<ServiceSkill> mapSkillToServicesSkill(List<SkillDTO> skillData) {
-        Map<String, List<SkillDTO>> result = null;
-        if (skillData != null) {
-            result = skillData.stream()
-                    .collect(
-                            Collectors.toMap(
-                                    SkillDTO::getServiceId,
-                                    Collections::singletonList,
-                                    this::mergeSkillsWithDuplicateServiceIds
-                            )
-                    );
-        }
+
+        Map<String, List<SkillDTO>> result = skillData.stream()
+                .collect(
+                        Collectors.toMap(
+                                skill -> skill.getServiceId(),
+                                skill -> Collections.singletonList(skill),
+                                this::mergeSkillsWithDuplicateServiceIds
+                        )
+                );
 
 
         List<ServiceSkill> serviceSkills = new ArrayList<>();
-
-        if (result != null) {
-            result.forEach(
-                    (key, value) -> {
-                        ServiceSkill serviceSkill = new ServiceSkill();
-                        serviceSkill.setId(key);
-                        serviceSkill.setSkills(value);
-                        serviceSkills.add(serviceSkill);
-                    }
-            );
-        }
-
+        result.forEach(
+                (key, value) -> {
+                    ServiceSkill serviceSkill = new ServiceSkill();
+                    serviceSkill.setId(key);
+                    serviceSkill.setSkills(value);
+                    serviceSkills.add(serviceSkill);
+                }
+        );
         return serviceSkills;
 
     }
@@ -487,5 +502,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return roleTypeRepository.findAll();
     }
 
+    @Override
+    public List<UserType> fetchUserTypes() {
+        return userTypeRepository
+                .findAll();
+    }
 
 }

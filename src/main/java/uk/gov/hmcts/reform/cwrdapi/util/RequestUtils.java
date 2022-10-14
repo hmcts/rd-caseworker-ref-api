@@ -16,11 +16,13 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_LAST_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SEARCH_STRING_REGEX_PATTERN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_COLUMN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
 
@@ -84,6 +86,27 @@ public class RequestUtils {
         Field field = ReflectionUtils.findField(entityClass, finalSortColumn);
         return Objects.nonNull(field);
     }
+
+    public static String removeEmptySpaces(String value) {
+        if (isNotBlank(value)) {
+            return value.trim().replaceAll("\\s+", " ");
+        }
+        return value;
+    }
+
+    public static void validateSearchString(String searchString) {
+        if (isNotEmpty(searchString)) {
+            if (searchString.length() < 3) {
+                throw new InvalidRequestException("The search string should contain at least 3 characters.");
+            }
+            if (!searchString.matches(SEARCH_STRING_REGEX_PATTERN)) {
+                throw new InvalidRequestException("Invalid search string. Please input a valid string.");
+            }
+        } else {
+            throw new InvalidRequestException("Empty search string. Please enter a valid search string.");
+        }
+    }
+
     public static PageRequest validateAndBuildPagination(Integer pageSize, Integer pageNumber,
                                                          int configPageSize, int configPageNumber) {
         if (Objects.nonNull(pageNumber) && pageNumber < 1) {
@@ -94,7 +117,7 @@ public class RequestUtils {
         }
 
         return PageRequest.of((Objects.isNull(pageNumber) ? configPageNumber : pageNumber) - 1,
-                Objects.isNull(pageSize) ? configPageSize : pageSize,
-                Sort.by(Sort.DEFAULT_DIRECTION, CW_LAST_NAME, CW_FIRST_NAME));
+            Objects.isNull(pageSize) ? configPageSize : pageSize,
+            Sort.by(Sort.DEFAULT_DIRECTION, CW_LAST_NAME, CW_FIRST_NAME));
     }
 }
