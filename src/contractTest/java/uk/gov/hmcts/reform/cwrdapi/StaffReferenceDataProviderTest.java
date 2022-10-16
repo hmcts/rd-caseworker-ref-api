@@ -46,8 +46,8 @@ import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
@@ -111,15 +111,16 @@ public class StaffReferenceDataProviderTest {
     @MockBean
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
-    IJsrValidatorInitializer validateStaffProfile;
-    @Mock
     StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
     @Mock
     StaffAuditRepository staffAuditRepository;
     @Mock
-    IValidationService validationServiceFacade;
-    @Mock
     SkillRepository skillRepository;
+    @Mock
+    IJsrValidatorStaffProfile jsrValidatorStaffProfile;
+    @Mock
+    IStaffProfileAuditService staffProfileAuditService;
+
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";

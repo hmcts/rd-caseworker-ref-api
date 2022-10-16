@@ -167,4 +167,5 @@ public final class CaseWorkerConstants {
     public static final String PROFILE_ALREADY_CREATED = "The profile is already created for the given email Id";
     public static final String NO_USER_TO_SUSPEND_PROFILE = "There is no user present to suspend. "
             + "Please try again or check with HMCTS Support Team";
+    public static final String STAFF_PROFILE_CREATE = "CREATE";
 }

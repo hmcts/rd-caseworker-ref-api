@@ -6,8 +6,15 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 
 import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 public class TestSupport {
 
@@ -78,4 +85,50 @@ public class TestSupport {
                 .roles(roles)
                 .build());
     }
+
+    public static StaffProfileCreationRequest  buildStaffProfileRequest() {
+
+        StaffProfileRoleRequest caseWorkerRoleRequest =
+                new StaffProfileRoleRequest(1,"testRole1", true);
+
+        CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true)
+                .location("testLocation")
+                .locationId(1)
+                .build();
+
+        CaseWorkerServicesRequest caseWorkerServicesRequest = CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .serviceCode("ABCA4")
+                .service("service")
+                .build();
+
+        SkillsRequest skillsRequest = SkillsRequest
+                .skillsRequest()
+                .skillId(1)
+                .description("training")
+                .build();
+
+
+        return StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .suspended(false)
+                .caseAllocator(false)
+                .taskSupervisor(true)
+                .staffAdmin(true)
+                .emailId("test@justice.gov.uk")
+                .roles(singletonList(caseWorkerRoleRequest))
+                .firstName("testFN")
+                .lastName("testLN")
+                .regionId(1)
+                .region("testRegion")
+                .userType("testUser1")
+                .services(singletonList(caseWorkerServicesRequest))
+                .baseLocations(singletonList(caseWorkerLocationRequest))
+                .roles(singletonList(caseWorkerRoleRequest))
+                .skills(singletonList(skillsRequest))
+                .build();
+    }
+
 }
