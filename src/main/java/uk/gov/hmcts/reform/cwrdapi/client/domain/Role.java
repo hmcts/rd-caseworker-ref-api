@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.client.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -32,7 +33,8 @@ public class Role implements Serializable {
     @JsonProperty("is_primary")
     private boolean isPrimary;
 
+    @JsonIgnore
     private LocalDateTime createdTime;
-
+    @JsonIgnore
     private LocalDateTime lastUpdatedTime;
 }
