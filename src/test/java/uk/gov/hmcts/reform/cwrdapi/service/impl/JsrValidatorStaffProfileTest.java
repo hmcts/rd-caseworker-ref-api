@@ -109,4 +109,16 @@ class JsrValidatorStaffProfileTest {
         assertThat(lastNameException.getMessage()).contains(MISSING_REGION_PROFILE);
     }
 
+    @Test
+    @DisplayName("staff profile empty request")
+    void testValidateStaffProfileEmptyRequest() {
+        StaffProfileCreationRequest profile = StaffProfileCreationRequest.staffProfileCreationRequest().build();
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
+
+        InvalidRequestException exception = Assertions.assertThrows(InvalidRequestException.class, () ->
+                jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE));
+        Assertions.assertNotNull(exception.getLocalizedMessage());
+
+    }
 }
