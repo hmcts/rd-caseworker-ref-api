@@ -124,8 +124,6 @@ public class StaffReferenceDataProviderTest {
     @Mock
     StaffAuditRepository staffAuditRepository;
     @Mock
-    SkillRepository skillRepository;
-    @Mock
     IJsrValidatorStaffProfile jsrValidatorStaffProfile;
     @Mock
     IStaffProfileAuditService staffProfileAuditService;
