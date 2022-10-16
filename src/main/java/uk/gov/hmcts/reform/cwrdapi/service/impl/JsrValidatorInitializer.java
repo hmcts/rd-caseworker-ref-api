@@ -4,10 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
-import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,7 +17,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 
 @Component
@@ -71,20 +68,6 @@ public class JsrValidatorInitializer<T> implements IJsrValidatorInitializer<T> {
 
     public Set<ConstraintViolation<T>> getConstraintViolations() {
         return constraintViolations;
-    }
-
-    public void validateStaffProfile(T profileRequest) {
-        getInvalidJsrRecords(List.of(profileRequest));
-
-        constraintViolations  = getConstraintViolations();
-        ofNullable(constraintViolations).ifPresent(constraints ->
-                    constraints.forEach(constraintError -> {
-                        String errorMsg =    constraintError.getMessage();
-                        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,errorMsg,
-                                null,null);
-                        throw new InvalidRequestException(errorMsg);
-                    }));
-
     }
 }
 
