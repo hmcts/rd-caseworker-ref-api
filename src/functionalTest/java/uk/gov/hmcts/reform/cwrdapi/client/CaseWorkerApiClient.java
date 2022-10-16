@@ -237,6 +237,41 @@ public class CaseWorkerApiClient {
                  .build();
     }
 
+    public StaffProfileCreationRequest createStaffProfileCreationRequest(
+            String emailId, String firstName, String lastName) {
+
+        Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
+        List<StaffProfileRoleRequest> caseWorkerRoleRequests =
+                ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest().roleId(1).role(" role ")
+                        .isPrimaryFlag(true).build());
+
+        List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(1)
+                .location(" location ").build());
+
+        List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .service(" areaOfWork ").serviceCode(" serviceCode ")
+                .build());
+
+        return   StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .emailId(emailId)
+                .regionId(1).userType("CTSC")
+                .region("region")
+                .suspended(false)
+                .taskSupervisor(true)
+                .caseAllocator(false)
+                .staffAdmin(false)
+                .roles(caseWorkerRoleRequests)
+                .baseLocations(caseWorkerLocationRequests)
+                .services(caseWorkerServicesRequests)
+                .build();
+    }
+
     public Response createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(caseWorkersProfileCreationRequests)
@@ -290,6 +325,21 @@ public class CaseWorkerApiClient {
         Response response = getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN))
                 .body(staffProfileCreationRequest)
                 .post("/refdata/case-worker/profile")
+                .andReturn();
+        log.info(":: Create staff profile response status code :: " + response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(201);
+
+        return response;
+    }
+
+    public Response updateStaffUserProfile(StaffProfileCreationRequest staffProfileCreationRequest) {
+
+        Response response = getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN))
+                .body(staffProfileCreationRequest)
+                .put("/refdata/case-worker/profile")
                 .andReturn();
         log.info(":: Create staff profile response status code :: " + response.statusCode());
 
