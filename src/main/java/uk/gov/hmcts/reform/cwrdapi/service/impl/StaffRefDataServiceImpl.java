@@ -111,6 +111,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @SuppressWarnings("unchecked")
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest staffProfileRequest) {
 
+        log.info("{}:: processStaffProfileCreation starts::", loggingComponentName);
+
         final CaseWorkerProfile newStaffProfiles;
         final CaseWorkerProfile processedStaffProfiles;
         final StaffProfileCreationResponse response;
@@ -125,7 +127,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         response = StaffProfileCreationResponse.builder()
                 .caseWorkerId(processedStaffProfiles.getCaseWorkerId())
                 .build();
-
+        log.info("{}:: processStaffProfileCreation ends::", loggingComponentName);
         return response;
     }
 
@@ -316,6 +318,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse) {
 
+        log.info("{}:: publishStaffProfileToTopic starts::", loggingComponentName);
         topicPublisher.sendMessage(List.of(staffProfileCreationResponse.getCaseWorkerId()));
 
         log.info("{}:: publishStaffProfileToTopic ends::", loggingComponentName);
