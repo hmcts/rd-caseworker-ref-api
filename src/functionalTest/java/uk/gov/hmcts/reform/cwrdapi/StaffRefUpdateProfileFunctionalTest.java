@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
