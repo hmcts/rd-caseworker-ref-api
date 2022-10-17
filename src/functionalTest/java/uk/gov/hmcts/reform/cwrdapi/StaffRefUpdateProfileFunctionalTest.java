@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
@@ -112,7 +111,7 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
                 .put("/refdata/case-worker/profile")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
-        assertThat(response.getBody().asString()).contains(getToggledOffMessage());
+        assertThat(response.getBody().asString()).contains("Access is denied");
 
     }
 
