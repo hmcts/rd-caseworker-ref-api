@@ -331,7 +331,7 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE,
             path = {"/profile"}
     )
-    //@Secured("staff-admin")
+    @Secured("staff-admin")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.CREATED)
     @Transactional

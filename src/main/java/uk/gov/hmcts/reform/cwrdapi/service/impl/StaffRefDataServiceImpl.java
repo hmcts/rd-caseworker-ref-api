@@ -137,7 +137,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Autowired
     StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
 
-    //TODO need to discuss
     @Autowired
     CaseWorkerLocationRepository caseWorkerLocationRepository;
 
@@ -551,14 +550,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         log.info("{}:: processStaffProfileCreation starts::",
                 loggingComponentName);
-        final CaseWorkerProfile newCaseWorkerProfiles;
-        final CaseWorkerProfile processedCwProfiles;
-        //StaffProfileCreationResponse response = null;
 
         validateStaffProfile.validateStaffProfile(profileRequest);
 
         checkStaffProfileForUpdate(profileRequest);
-        //TODO processExistingCaseWorkers
+
         List<StaffProfileCreationRequest> cwUiRequests = Collections.singletonList(profileRequest);
 
 
@@ -569,11 +565,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         response.setCaseWorkerId(caseWorkerProfile.getCaseWorkerId());
 
-        // processExistingCaseWorkers End
-
-        //newCaseWorkerProfiles = updateCaseWorkerProfile(profileRequest);
-
-        //processedCwProfiles = staffProfileCreateUpdateUtil.persistStaffProfile(newCaseWorkerProfiles);
 
         if (null != caseWorkerProfile) {
 
@@ -590,7 +581,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId());
-        // TODO to update if profile is null throw exception
         if (caseWorkerProfile == null) {
             validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
                     null,profileRequest);
@@ -598,7 +588,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
-    //TODO Added temporary chenge need to remove
 
     public List<CaseWorkerProfile> updateStaffProfiles(List<StaffProfileCreationRequest> cwUiRequests) {
 
@@ -615,13 +604,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             // get all existing profiles from db (used IN clause)
             List<CaseWorkerProfile> cwDbProfiles = caseWorkerProfileRepo.findByEmailIdIn(emailToRequestMap.keySet());
 
-            //remove all existing profiles requests from cwUiRequests to separate out new and update/suspend profiles
-            for (CaseWorkerProfile dbProfile : cwDbProfiles) {
-                // cwUiRequests.remove(emailToRequestMap.get(dbProfile.getEmailId().toLowerCase()));
-            }
-
-            //process new CW profiles
-            //newCaseWorkerProfiles = processNewCaseWorkers(cwUiRequests);
             //process update and suspend CW profiles
             Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = processExistingCaseWorkers(
                     emailToRequestMap, cwDbProfiles);
@@ -672,7 +654,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<CaseWorkerProfile> processedCwProfiles = null;
         List<CaseWorkerProfile> profilesToBePersisted = new ArrayList<>();
 
-        //profilesToBePersisted.addAll(newCaseWorkerProfiles);
         profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfiles, emailToRequestMap));
         profilesToBePersisted.addAll(suspendedCaseWorkerProfiles);
         profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
@@ -691,7 +672,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                                                                               emailToRequestMap) {
         List<CaseWorkerProfile> updatedProfiles = new ArrayList<>();
         if (isNotEmpty(updateCaseWorkerProfiles)) {
-            //TODO Need to discuss with Nayeem
             caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
             caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
@@ -906,11 +886,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                         .toList())
         );
 
-        // get work area codes TODO Check for Data
-        //        List<String> serviceCodes = cwProfileRequest.getWorkerWorkAreaRequests()
-        //                .stream()
-        //                .map(CaseWorkerWorkAreaRequest::getServiceCode)
-        //                .toList();
 
         List<String> serviceCodes = cwProfileRequest.getServices()
                 .stream()

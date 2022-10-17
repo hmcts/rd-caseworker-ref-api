@@ -90,7 +90,6 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("skills")
     private List<SkillsRequest> skills;
-    //TODO Need to check
 
     @JsonProperty("idam_roles")
     private Set<String> idamRoles;
