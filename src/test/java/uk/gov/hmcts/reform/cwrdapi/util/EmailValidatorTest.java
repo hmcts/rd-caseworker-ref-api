@@ -27,7 +27,7 @@ class EmailValidatorTest {
         MockitoAnnotations.openMocks(this);
         context = mock(ConstraintValidatorContext.class);
         emailValidator = new EmailValidator();
-        EmailDomainPropertyInitiator.emailDomains = "justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk";
+        EmailDomainPropertyInitiator.emailDomains = "justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk";
         validateEmail = mock(ValidateEmail.class);
         emailValidator.initialize(validateEmail);
     }
@@ -54,11 +54,9 @@ class EmailValidatorTest {
         assertThat(emailValidator.isValid(emailId, context)).isFalse();
     }
 
-    @Test
-    void testIsValid() {
-        //if officeEmail is valid and emailDomain also valid  it should be true
-        var emailId = "vilas.shelke@justice.gov.uk";
-        assertThat(emailValidator.isValid(emailId, context)).isTrue();
+    @ParameterizedTest
+    @ValueSource(strings = {"justice.gov.uk","dwp.gov.uk","hmrc.gov.uk","hmcts.net","dfcni.gov.uk"})
+    void testIsValid(String email) {
+        assertThat(emailValidator.isValid("test@"+email, context)).isTrue();
     }
-
 }
