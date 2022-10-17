@@ -53,7 +53,6 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -90,8 +89,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     //this test verifies new User profile is created
     public void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
         List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
-        roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
-        roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
+        roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader", true));
+        roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader", false));
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
@@ -162,7 +161,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         UserProfileResponse upResponseUpdated =
                 getUserProfileFromUp(caseWorkersProfileCreationRequests.get(0).getEmailId());
-        assertEquals("cwr-test-one",upResponseUpdated.getFirstName());
+        assertEquals("cwr-test-one", upResponseUpdated.getFirstName());
     }
 
     @Test
@@ -174,7 +173,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         caseWorkersProfileCreationRequests.get(0).setFirstName("cwr-test-one");
         caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         var idamResponse = getIdamResponse(upResponse.getIdamId());
-        assertEquals(idamResponse.get("forename"),caseWorkersProfileCreationRequests.get(0).getFirstName());
+        assertEquals(idamResponse.get("forename"), caseWorkersProfileCreationRequests.get(0).getFirstName());
     }
 
     @Test
@@ -267,11 +266,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getLastName()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getOfficialEmail()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getStaffAdmin()));
-        assertEquals("N",caseWorkerProfile.getStaffAdmin());
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getLocations()));
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getRoles()));
-        assertNotNull(caseWorkerProfile.getSkills());
-        assertEquals(0L,caseWorkerProfile.getSkills().size());
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getWorkAreas()));
 
     }

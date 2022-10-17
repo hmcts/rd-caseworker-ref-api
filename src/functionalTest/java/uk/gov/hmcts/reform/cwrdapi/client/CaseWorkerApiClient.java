@@ -205,25 +205,27 @@ public class CaseWorkerApiClient {
 
     public StaffProfileCreationRequest createStaffProfileCreationRequest() {
 
-        Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
+        Set<String> roles = ImmutableSet.of("tribunal_case_worker");
         List<StaffProfileRoleRequest> caseWorkerRoleRequests =
-                ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest().roleId(1).role(" role ")
+                ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest()
+                         .roleId(1)
+                        .role("Senior Legal Caseworker")
                         .isPrimaryFlag(true).build());
 
         List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
                 .isPrimaryFlag(true).locationId(1)
-                .location(" location ").build());
+                .location("location").build());
 
         List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
                 .caseWorkerServicesRequest()
-                .service(" areaOfWork ").serviceCode(" serviceCode ")
+                .service("areaOfWork").serviceCode("serviceCode")
                 .build());
 
         return   StaffProfileCreationRequest
                  .staffProfileCreationRequest()
-                 .firstName("StaffProfilefirstName ")
-                 .lastName("StaffProfilelastName ")
+                 .firstName("StaffProfilefirstName")
+                 .lastName("StaffProfilelastName")
                  .emailId(UUID.randomUUID() + "@justice.gov.uk")
                  .regionId(1).userType("CTSC")
                  .region("region")
