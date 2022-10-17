@@ -47,7 +47,7 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
     void should_update_staff_profile_and_returns_status_200() {
         String emailPattern = "sbnTest1234";
         String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        List<String> roles = Collections.singletonList(ROLE_STAFF_ADMIN);
+        List<String> roles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
         //createUser(List<String> userRoles, String userEmail, String firstName, String lastName)
         String firstName = "StaffProfilefirstName";
         String lastName = "StaffProfilelastName";
