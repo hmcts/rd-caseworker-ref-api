@@ -13,18 +13,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -73,6 +77,28 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
 
         Assertions.assertNotNull(staffProfileResponse);
         Assertions.assertNotNull(staffProfileResponse.getCaseWorkerId());
+
+        //UserProfileResponse upResponseUpdated =
+        //        getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+
+
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(staffProfileResponse.getCaseWorkerId())).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo(firstNameUpdated);
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo(firstNameUpdated);
 
 
 
