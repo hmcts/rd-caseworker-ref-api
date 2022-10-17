@@ -288,6 +288,7 @@ pitest {
     'uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl',
     'uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl',
     'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
+    'uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl',
     'uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher'
   ]
   threads = 10
