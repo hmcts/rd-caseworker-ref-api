@@ -57,6 +57,6 @@ class EmailValidatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"justice.gov.uk","dwp.gov.uk","hmrc.gov.uk","hmcts.net","dfcni.gov.uk"})
     void testIsValid(String email) {
-        assertThat(emailValidator.isValid("test@"+email, context)).isTrue();
+        assertThat(emailValidator.isValid("test@" + email, context)).isTrue();
     }
 }
