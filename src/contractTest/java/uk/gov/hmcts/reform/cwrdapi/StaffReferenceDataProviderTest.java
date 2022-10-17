@@ -27,7 +27,9 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.StaffRefDataController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.StaffReferenceInternalController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.LrdOrgInfoServiceResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
@@ -55,11 +57,11 @@ import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -67,6 +69,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_caseworkerRefUsers")
@@ -123,8 +126,6 @@ public class StaffReferenceDataProviderTest {
     StaffAuditRepository staffAuditRepository;
     @Mock
     IValidationService validationServiceFacade;
-    @Mock
-    SkillRepository skillRepository;
 
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
@@ -158,7 +159,7 @@ public class StaffReferenceDataProviderTest {
 
     @State({"A list of users for CRD request"})
     public void fetchListOfUsersById() {
-        List<CaseWorkerProfile> caseWorkerProfile = Collections.singletonList(getCaseWorkerProfile(USER_ID));
+        List<CaseWorkerProfile> caseWorkerProfile = singletonList(getCaseWorkerProfile(USER_ID));
         doReturn(caseWorkerProfile).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(anyList());
     }
 
@@ -375,14 +376,14 @@ public class StaffReferenceDataProviderTest {
         caseWorkerProfile.setLastUpdate(timeNow);
 
         List<CaseWorkerLocation> caseWorkerLocations =
-                Collections.singletonList(new CaseWorkerLocation(caseWorkerId, 1,
+                singletonList(new CaseWorkerLocation(caseWorkerId, 1,
                         "National", true));
 
         List<CaseWorkerWorkArea> caseWorkerWorkAreas =
-                Collections.singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
+                singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
 
         List<CaseWorkerRole> caseWorkerRoles =
-                Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
+                singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
         caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
 
         return new CaseWorkerProfile(caseWorkerId,
@@ -400,7 +401,7 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false,false, caseWorkerSkills);
+                new UserType(1L, "HMCTS"), false,false, cwSkills);
     }
 
     @State({"A list of all staff reference data user-type"})
