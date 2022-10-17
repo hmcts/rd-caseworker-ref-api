@@ -16,6 +16,7 @@ import java.util.List;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 
+
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -38,7 +39,9 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_retrieveAllServiceSkills_return_status_code_200()
             throws JsonProcessingException {
         String path = "/skill";
+
         String role = "staff-admin";
+
 
         final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
                 .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);

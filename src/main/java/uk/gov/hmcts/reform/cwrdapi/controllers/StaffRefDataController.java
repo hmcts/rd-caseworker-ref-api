@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -13,15 +14,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
@@ -33,13 +38,20 @@ import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.removeEmptySpaces;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
+
 
 
 @RequestMapping(
@@ -55,8 +67,63 @@ public class StaffRefDataController {
     private String loggingComponentName;
 
 
+    @Value("${search.pageSize}")
+    private int configPageSize;
+
+    @Value("${search.pageNumber}")
+    private int configPageNumber;
+
+
+
     @Autowired
     StaffRefDataService staffRefDataService;
+
+    @ApiOperation(
+
+        value = "This API allows the search of staff user by their name or surname.",
+        authorizations = {
+            @Authorization(value = "ServiceAuthorization"),
+            @Authorization(value = "Authorization")
+        }
+    )
+    @ApiResponses({
+        @ApiResponse(
+            code = 201,
+            message = REQUEST_COMPLETED_SUCCESSFULLY
+        ),
+        @ApiResponse(
+            code = 400,
+            message = BAD_REQUEST
+        ),
+        @ApiResponse(
+            code = 401,
+            message = UNAUTHORIZED_ERROR
+        ),
+        @ApiResponse(
+            code = 403,
+            message = FORBIDDEN_ERROR
+        ),
+        @ApiResponse(
+            code = 500,
+            message = INTERNAL_SERVER_ERROR
+        )
+    })
+    @Validated
+    @GetMapping(path = "/profile/search-by-name",
+                produces = APPLICATION_JSON_VALUE)
+    @Secured("staff-admin")
+    public ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserByName(
+        @RequestHeader(name = "page-number", required = false) Integer pageNumber,
+        @RequestHeader(name = "page-size", required = false) Integer pageSize,
+        @RequestParam(value = "search") @NotEmpty @NotNull String searchString) {
+
+        validateSearchString(removeEmptySpaces(searchString));
+        var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize, configPageNumber);
+
+        return staffRefDataService.retrieveStaffUserByName(searchString, pageRequest);
+
+    }
+
 
     @ApiOperation(
 
@@ -67,6 +134,8 @@ public class StaffRefDataController {
                     @Authorization(value = "Authorization")
             }
     )
+
+
     @ApiResponses({
             @ApiResponse(
                     code = 200,
@@ -98,6 +167,7 @@ public class StaffRefDataController {
 
         return ResponseEntity.ok().body(staffWorkerSkillResponse);
     }
+
 
     @ApiOperation(
             value = "This API gets the user types from staff reference data",
@@ -147,6 +217,7 @@ public class StaffRefDataController {
 
     @ApiOperation(
             value = "This API is used to retrieve the Job Title's ",
+
             notes = "This API will be invoked by user having idam role of staff-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
@@ -156,8 +227,10 @@ public class StaffRefDataController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
+
                     message = "Successfully retrieved list of Job Titles for the request provided",
                     response = StaffRefJobTitleResponse.class
+
             ),
             @ApiResponse(
                     code = 400,
@@ -172,9 +245,11 @@ public class StaffRefDataController {
                     message = "Internal Server Error"
             )
     })
+
+
     @GetMapping(
-            produces = APPLICATION_JSON_VALUE,
-            path = {"/job-title"}
+            path = {"/job-title"},
+            produces = APPLICATION_JSON_VALUE
     )
     @Secured("staff-admin")
     public ResponseEntity<Object> retrieveJobTitles() {

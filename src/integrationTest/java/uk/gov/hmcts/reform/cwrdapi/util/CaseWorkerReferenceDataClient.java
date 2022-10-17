@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -185,6 +186,75 @@ public class CaseWorkerReferenceDataClient {
         return getResponse(responseEntity);
     }
 
+    public Map<String, Object> searchStaffUserByName(String path,String searchString, String pageSize,
+
+                                                                 String pageNumber,  String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(path);
+
+        if (StringUtils.isNotBlank(searchString)) {
+            stringBuilder.append("?search=");
+            stringBuilder.append(searchString);
+        }
+
+        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+
+        ResponseEntity<Map> responseEntity;
+        HttpEntity<String> request =
+                new HttpEntity<>(headers);
+
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl  + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    Map.class
+            );
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
+    public ResponseEntity<SearchStaffUserResponse[]> searchStaffUserByNameExchange(
+            String path,String searchString, String pageSize, String pageNumber,  String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(path);
+
+        if (StringUtils.isNotBlank(searchString)) {
+            stringBuilder.append("?search=");
+            stringBuilder.append(searchString);
+        }
+
+        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+
+        ResponseEntity<SearchStaffUserResponse[]> responseEntity = null;
+        HttpEntity<String> request =
+                new HttpEntity<>(headers);
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl  + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    SearchStaffUserResponse[].class
+            );
+
+        } catch (RestClientResponseException ex) {
+            log.error(ex.getResponseBodyAsString());
+        }
+
+        return responseEntity;
+    }
+
 
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 
@@ -273,6 +343,27 @@ public class CaseWorkerReferenceDataClient {
         return getMultipleAuthHeaders(role, null);
     }
 
+    private HttpHeaders getMultipleAuthHeadersWithPagination(
+            String role,
+            String userId,
+            String pageNumber,
+            String pageSize) {
+
+        HttpHeaders headers = getMultipleAuthHeadersWithoutContentType(role, userId);
+        headers.setContentType(APPLICATION_JSON);
+        if (StringUtils.isNotBlank(pageNumber)) {
+            headers.add("page-number", pageNumber);
+        }
+        if (StringUtils.isNotBlank(pageSize)) {
+            headers.add("page-size", pageSize);
+        }
+
+
+        return headers;
+    }
+
+
+
 
     @NotNull
     private HttpHeaders getMultipleAuthHeadersWithoutContentType(String role, String userId) {
@@ -293,6 +384,19 @@ public class CaseWorkerReferenceDataClient {
     }
 
     private Map getResponse(ResponseEntity<Map> responseEntity) {
+
+        Map response = objectMapper
+                .convertValue(
+                        responseEntity.getBody(),
+                        Map.class);
+
+        response.put("http_status", responseEntity.getStatusCode().toString());
+        response.put("headers", responseEntity.getHeaders().toString());
+        response.put("body", responseEntity.getBody());
+        return response;
+    }
+
+    private Object getNewResponse(ResponseEntity<Map> responseEntity) {
 
         Map response = objectMapper
                 .convertValue(
