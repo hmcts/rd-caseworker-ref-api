@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
@@ -120,5 +122,15 @@ class JsrValidatorStaffProfileTest {
                 jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE));
         Assertions.assertNotNull(exception.getLocalizedMessage());
 
+    }
+
+    @Test
+    @DisplayName("staff profile no violations")
+    void testValidateStaffProfileNoViolations() {
+        StaffProfileCreationRequest profile = buildStaffProfileRequest();
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
+        jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE);
+        verify(staffAuditRepository, times(0)).save(any());
     }
 }
