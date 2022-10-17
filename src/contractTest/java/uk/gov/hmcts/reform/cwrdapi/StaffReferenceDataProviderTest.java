@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.controllers.CaseWorkerRefUsersController;
@@ -56,11 +57,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -91,6 +94,12 @@ public class StaffReferenceDataProviderTest {
 
     @MockBean
     private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
+
+
+
+    @Mock
+    SkillRepository skillRepository;
+
     @Mock
     private CaseWorkerServiceFacade caseWorkerServiceFacade;
 
@@ -100,10 +109,10 @@ public class StaffReferenceDataProviderTest {
     @Mock
     CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
 
+    private UserTypeRepository userTypeRepository;
+
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
-    @Mock
-    private UserTypeRepository userTypeRepository;
     @MockBean
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
@@ -138,7 +147,8 @@ public class StaffReferenceDataProviderTest {
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
-                new StaffRefDataController("RD-Caseworker-Staff-Ref-Api",
+
+                new StaffRefDataController("RD-Caseworker-Ref-Api",20,1,
                         staffRefDataServiceImpl)
         );
         if (context != null) {
@@ -191,7 +201,100 @@ public class StaffReferenceDataProviderTest {
 
     }
 
-    private List<Skill> getSkillsData() {
+
+    @State({"A list of caseworker profiles by name"})
+    public void searchCaseWorkerProfileByName() throws JsonProcessingException {
+        var pageRequest =
+                validateAndBuildPagination(20, 1,
+                        20, 1);
+
+        String searchString = "cwr-test";
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
+        caseWorkerProfiles.add(caseWorkerProfile);
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+
+        when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+                .thenReturn(pages);
+
+
+    }
+
+    CaseWorkerProfile buildCaseWorkerProfile() {
+
+        CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
+        caseWorkerRole.setCaseWorkerRoleId(1L);
+        caseWorkerRole.setCaseWorkerId("CWID1");
+        caseWorkerRole.setRoleId(1L);
+        caseWorkerRole.setPrimaryFlag(false);
+        caseWorkerRole.setCreatedDate(LocalDateTime.now());
+        caseWorkerRole.setLastUpdate(LocalDateTime.now());
+
+        RoleType roleType = new RoleType();
+        roleType.setRoleId(1L);
+        roleType.setDescription("testRole1");
+
+        caseWorkerRole.setRoleType(roleType);
+
+        CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
+        caseWorkerLocation.setCaseWorkerId("CWID1");
+        caseWorkerLocation.setCaseWorkerLocationId(11111L);
+        caseWorkerLocation.setCreatedDate(LocalDateTime.now());
+        caseWorkerLocation.setLastUpdate(LocalDateTime.now());
+        caseWorkerLocation.setLocationId(11112);
+        caseWorkerLocation.setLocation("test location");
+        caseWorkerLocation.setPrimaryFlag(true);
+
+        UserType userType = new UserType();
+        userType.setDescription("userTypeId");
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setFirstName("firstName");
+        caseWorkerProfile.setLastName("Last`name");
+        caseWorkerProfile.setEmailId("a@b.com");
+        caseWorkerProfile.setRegion("region");
+        caseWorkerProfile.setRegionId(111122222);
+        caseWorkerProfile.setUserTypeId(112L);
+        caseWorkerProfile.setUserType(userType);
+        caseWorkerProfile.setSuspended(true);
+        caseWorkerProfile.setTaskSupervisor(true);
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setUserAdmin(true);
+        caseWorkerProfile.setCreatedDate(LocalDateTime.now());
+        caseWorkerProfile.setLastUpdate(LocalDateTime.now());
+
+        caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
+        caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
+        caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
+        CaseWorkerSkill caseWorkerSkill = getCaseWorkerSkill();
+
+        caseWorkerProfile.setCaseWorkerSkills(singletonList(caseWorkerSkill));
+
+        CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
+        caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
+        caseWorkerWorkArea.setCaseWorkerId("CWID1");
+        caseWorkerWorkArea.setAreaOfWork("TestArea");
+        caseWorkerWorkArea.setServiceCode("SvcCode1");
+        caseWorkerWorkArea.setCreatedDate(LocalDateTime.now());
+        caseWorkerWorkArea.setLastUpdate(LocalDateTime.now());
+
+        caseWorkerProfile.setCaseWorkerWorkAreas(singletonList(caseWorkerWorkArea));
+        return caseWorkerProfile;
+    }
+
+    private CaseWorkerSkill getCaseWorkerSkill() {
+
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        caseWorkerSkill.setCaseWorkerId("423ec46f-359f-4fcc-9ecc-b1cab4d7e683");
+        caseWorkerSkill.setSkillId(1L);
+        caseWorkerSkill.setSkill(getSkillData());
+
+        return caseWorkerSkill;
+
+    }
+
+
+    private  List<Skill> getSkillsData() {
         Skill skill1 = new Skill();
         skill1.setServiceId("BBA3");
         skill1.setSkillId(1L);
@@ -221,11 +324,39 @@ public class StaffReferenceDataProviderTest {
         skill4.setDescription("desc4");
         skill4.setUserType("user_type4");
 
-        List<Skill> skills = List.of(skill1, skill2, skill3, skill4);
-        return skills;
+        List<Skill> skills = List.of(skill1,skill2,skill3,skill4);
+        return  skills;
+    }
+
+    private  Skill getSkillData() {
+        Skill skill = new Skill();
+        skill.setServiceId("BBA3");
+        skill.setSkillId(1L);
+        skill.setSkillCode("A1");
+        skill.setDescription("desc1");
+        skill.setUserType("user_type1");
+
+        return skill;
+
     }
 
     private CaseWorkerProfile getCaseWorkerProfile(String caseWorkerId) {
+
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+
+        caseWorkerProfile.setCaseWorkerId(caseWorkerId);
+        caseWorkerProfile.setFirstName("firstName");
+        caseWorkerProfile.setLastName("lastName");
+        caseWorkerProfile.setEmailId("sam.test@justice.gov.uk");
+        caseWorkerProfile.setUserTypeId(1L);
+        caseWorkerProfile.setRegion("National");
+        caseWorkerProfile.setRegionId(1);
+        caseWorkerProfile.setSuspended(false);
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setTaskSupervisor(false);
+        caseWorkerProfile.setUserAdmin(true);
+
         Skill skill = new Skill();
         skill.setSkillId(1L);
         skill.setSkillCode("1");
@@ -239,6 +370,9 @@ public class StaffReferenceDataProviderTest {
         caseWorkerSkill.setSkill(skill);
 
         LocalDateTime timeNow = LocalDateTime.now();
+
+        caseWorkerProfile.setCreatedDate(timeNow);
+        caseWorkerProfile.setLastUpdate(timeNow);
 
         List<CaseWorkerLocation> caseWorkerLocations =
                 Collections.singletonList(new CaseWorkerLocation(caseWorkerId, 1,
@@ -266,7 +400,7 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false, false, cwSkills);
+                new UserType(1L, "HMCTS"), false,false, caseWorkerSkills);
     }
 
     @State({"A list of all staff reference data user-type"})
@@ -289,6 +423,20 @@ public class StaffReferenceDataProviderTest {
                 .thenReturn(roleTypeList);
     }
 
+    @State({"A Staff profile create request is submitted"})
+    public void createStaffUserProfile() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        UserProfileCreationResponse userProfileResponse = new UserProfileCreationResponse();
+        userProfileResponse.setIdamId(UUID.randomUUID().toString());
+        userProfileResponse.setIdamRegistrationResponse(200);
+        String body = mapper.writeValueAsString(userProfileResponse);
+
+        doReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build())
+                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
+        doReturn(getCaseWorkerProfile(UUID.randomUUID().toString())).when(caseWorkerProfileRepo).save(any());
+    }
 }
 
 

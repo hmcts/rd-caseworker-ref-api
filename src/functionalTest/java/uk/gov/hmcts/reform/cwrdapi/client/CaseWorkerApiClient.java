@@ -105,6 +105,20 @@ public class CaseWorkerApiClient {
                 .header(AUTHORIZATION_HEADER, "Bearer " + userToken);
     }
 
+    public RequestSpecification getMultipleAuthHeadersWithoutContentTypeWithPagination(String role,
+                    String pageNumber, String pageSize) {
+
+        String userToken = idamOpenIdClient.getOpenIdTokenByRole(role);
+        return SerenityRest.with()
+                .relaxedHTTPSValidation()
+                .baseUri(caseWorkerApiUrl)
+                .header("Accepts", APPLICATION_JSON_VALUE)
+                .header(SERVICE_HEADER, "Bearer " + s2sToken)
+                .header(AUTHORIZATION_HEADER, "Bearer " + userToken)
+                .header("page-number", pageNumber)
+                .header("page-size", pageSize);
+    }
+
 
     public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String... email) {
         List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest
@@ -137,6 +151,51 @@ public class CaseWorkerApiClient {
                         .caseWorkersProfileCreationRequest()
                         .firstName("cwr-test")
                         .lastName("cwr-test")
+                        .emailId(emailToUsed.toLowerCase())
+                        .regionId(1)
+                        .region("National")
+                        .userType("CTSC")
+                        .suspended(false)
+                        .caseAllocator(true)
+                        .taskSupervisor(false)
+                        .idamRoles(idamRoles)
+                        .baseLocations(locationRequestList)
+                        .roles(roleRequests)
+                        .workerWorkAreaRequests(areaRequests).build());
+    }
+
+    public List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String firstName,
+                                                                            String lastName,String email) {
+        List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .location("test location")
+                .locationId(2).isPrimaryFlag(true).build());
+
+        List<CaseWorkerRoleRequest> roleRequests = ImmutableList.of(CaseWorkerRoleRequest
+                .caseWorkerRoleRequest()
+                .role("Legal Caseworker").isPrimaryFlag(true).build());
+
+
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("BBA9").areaOfWork("Immigration and Asylum Appeals").build();
+
+        CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .serviceCode("ABA1").areaOfWork("Divorce").build();
+
+        List<CaseWorkerWorkAreaRequest> areaRequests =
+                ImmutableList.of(workerWorkAreaRequest1, workerWorkAreaRequest2);
+
+        Set<String> idamRoles = new HashSet<>();
+
+        String emailToUsed =  nonNull(email) ? email : generateRandomEmail();
+        setEmailsTobeDeleted(emailToUsed.toLowerCase());
+        return ImmutableList.of(
+                CaseWorkersProfileCreationRequest
+                        .caseWorkersProfileCreationRequest()
+                        .firstName(firstName)
+                        .lastName(lastName)
                         .emailId(emailToUsed.toLowerCase())
                         .regionId(1)
                         .region("National")
@@ -301,4 +360,6 @@ public class CaseWorkerApiClient {
 
         return response;
     }
+
+
 }
