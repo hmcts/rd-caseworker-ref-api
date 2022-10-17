@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
@@ -67,9 +69,11 @@ import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -83,11 +87,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
@@ -829,6 +835,8 @@ class StaffRefDataServiceImplTest {
     @Test
     void test_update_staff_profile_with_changed_values() throws JsonProcessingException {
 
+        //ValidateStaffProfile
+        //doNothing().when(validateStaffProfile).validateStaffProfile(any());
 
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
@@ -883,12 +891,94 @@ class StaffRefDataServiceImplTest {
         StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
                 .updateStaffProfile(staffProfileCreationRequest);
 
-        UserProfileCreationRequest response = staffRefDataServiceImpl
-                .createUserProfileRequest(staffProfileCreationRequest);
 
         assertThat(staffProfileCreationResponse).isNotNull();
         assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
     }
+
+    @Test
+    void test_check_staff_profile_for_update() throws JsonProcessingException {
+
+        //ValidateStaffProfile
+        doNothing().when(validateStaffProfile).validateStaffProfile(any());
+        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest);
+        CaseWorkerProfile caseWorkerProfile = null;
+
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
+        });
+
+        assertThat(thrown.getMessage()).contains(PROFILE_NOT_PRESENT_IN_DB);
+
+
+    }
+
+    @Test
+    void test_processExistingCaseWorkers() throws JsonProcessingException {
+
+        //ValidateStaffProfile
+        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest);
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        Map<String, StaffProfileCreationRequest> emailToRequestMap = new HashMap<>();
+
+        emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
+
+        List<CaseWorkerProfile> cwDbProfiles = Collections.singletonList(caseWorkerProfile);
+        Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
+                .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
+
+
+        assertThat(updateAndSuspendedLists).isNotNull();
+
+
+    }
+
+    @Test
+    void test_populateStaffProfile() throws JsonProcessingException {
+
+        //ValidateStaffProfile
+        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest);
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        staffRefDataServiceImpl.populateStaffProfile(staffProfileCreationRequest,caseWorkerProfile,"CWID1");
+
+        assertThat(caseWorkerProfile).isNotNull();
+        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
+        assertThat(caseWorkerProfile.getSuspended()).isFalse();
+        assertThat(caseWorkerProfile.getCaseAllocator()).isFalse();
+        assertThat(caseWorkerProfile.getTaskSupervisor()).isTrue();
+        assertThat(caseWorkerProfile.getUserAdmin()).isTrue();
+        assertThat(caseWorkerProfile.getEmailId()).isEqualTo("cwr-func-test-user@test.com");
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("testFN");
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo("testLN");
+        assertThat(caseWorkerProfile.getRegionId()).isEqualTo(1);
+        assertThat(caseWorkerProfile.getRegion()).isEqualTo("testRegion");
+
+    }
+
 
     private StaffProfileCreationRequest getStaffProfileUpdateRequest() {
 
