@@ -144,6 +144,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     CaseWorkerRoleRepository caseWorkerRoleRepository;
 
 
+    @Autowired
     CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
 
     @Autowired
