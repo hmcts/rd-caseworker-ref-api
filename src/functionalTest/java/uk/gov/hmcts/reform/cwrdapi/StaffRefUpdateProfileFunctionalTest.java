@@ -75,11 +75,7 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
         Assertions.assertNotNull(staffProfileResponse);
         Assertions.assertNotNull(staffProfileResponse.getCaseWorkerId());
 
-        UserProfileResponse upResponseUpdated =
-                getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
 
-        assertThat(upResponseUpdated.getFirstName()).isEqualTo(firstNameUpdated);
-        assertThat(upResponseUpdated.getFirstName()).isEqualTo(firstNameUpdated);
 
     }
 
