@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 
-import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolation;
@@ -19,8 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
 /**
  * The type Jsr validator staff profile.
@@ -44,7 +42,7 @@ public class JsrValidatorStaffProfile implements IJsrValidatorStaffProfile {
     }
 
     /**
-     * The Validation service facade.
+     * The IStaffProfileAuditService.
      */
     @Autowired
     IStaffProfileAuditService staffProfileAuditService;
@@ -52,22 +50,16 @@ public class JsrValidatorStaffProfile implements IJsrValidatorStaffProfile {
     @Override
     public void validateStaffProfile(StaffProfileCreationRequest profileRequest, String operationType) {
 
-        Set<ConstraintViolation<StaffProfileCreationRequest>>  constraintViolations = new HashSet<>();
-
-        log.info("{}:: JsrValidatorStaffProfile data processing validate starts::",
-                logComponentName);
+        log.info("{}:: JsrValidatorStaffProfile data processing validate starts::", logComponentName);
         Set<ConstraintViolation<StaffProfileCreationRequest>> constraintErrors = validator.validate(profileRequest);
-        if (isNotTrue(constraintErrors.isEmpty())) {
-            constraintViolations.addAll(constraintErrors);
-        }
-
-        ofNullable(constraintViolations).ifPresent(constraints ->
-                constraints.forEach(constraintError -> {
-                    String errorMsg =    constraintError.getMessage();
-                    staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,errorMsg,
+        if (isNotEmpty(constraintErrors)) {
+            constraintErrors.forEach(constraintError -> {
+                String errorMsg =    constraintError.getMessage();
+                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,errorMsg,
                             StringUtils.EMPTY,profileRequest,operationType);
-                    throw new InvalidRequestException(errorMsg);
-                }));
+                throw new InvalidRequestException(errorMsg);
+            });
+        }
         log.info("{}:: JsrValidatorStaffProfile data processing validate complete::", logComponentName);
     }
 }
