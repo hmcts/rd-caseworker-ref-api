@@ -20,10 +20,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -88,9 +88,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
-
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"AbbreviationAsWordInName", "unchecked"})

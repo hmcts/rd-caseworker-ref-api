@@ -85,8 +85,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_caseworkerRefUsers")
