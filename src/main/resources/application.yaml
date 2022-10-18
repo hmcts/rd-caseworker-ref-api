@@ -155,4 +155,4 @@ search:
   pageNumber: ${REFRESH_PAGE_NUMBER:1}
 ### Email domain list
 email:
-  domainList: ${EMAIL_DOMAIN_LIST:justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk}
+  domainList: ${EMAIL_DOMAIN_LIST:justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk}

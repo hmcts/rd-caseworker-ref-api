@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,8 +33,8 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
@@ -47,13 +48,16 @@ import java.util.Set;
 import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")
@@ -80,15 +84,15 @@ class StaffRefDataServiceTest {
     @Mock
     CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
     @Mock
-    IValidationService validationServiceFacade;
-    @Mock
     SkillRepository skillRepository;
     @Mock
-    IJsrValidatorInitializer validateStaffProfile;
+    IStaffProfileAuditService staffProfileAuditService;
     @Mock
     private StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
     @Mock
     StaffAuditRepository staffAuditRepository;
+    @Mock
+    IJsrValidatorStaffProfile jsrValidatorStaffProfile;
 
     private StaffProfileCreationRequest staffProfileCreationRequest;
     private StaffProfileCreationResponse staffProfileCreationRespone = new StaffProfileCreationResponse();
@@ -243,23 +247,38 @@ class StaffRefDataServiceTest {
     @Test
     void test_saveStaffProfileValidationAudit() {
 
-        validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS,null,
-                caseWorkerProfile.getCaseWorkerId(),staffProfileCreationRequest);
+        staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS,null,
+                caseWorkerProfile.getCaseWorkerId(),staffProfileCreationRequest,STAFF_PROFILE_CREATE);
         verify(staffAuditRepository, times(0)).save(any());
     }
 
-
     @Test
+    @DisplayName("staff profile email id already present")
     void test_saveStaffProfileAlreadyPresent() {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
-        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
-                "1234", staffProfileCreationRequest);
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234",staffProfileCreationRequest, STAFF_PROFILE_CREATE);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
             staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
         });
 
-        assertThat(thrown.getMessage()).contains("The profile is already created for the given email Id");
+        assertThat(thrown.getMessage()).contains(PROFILE_ALREADY_CREATED);
     }
+
+    @Test
+    @DisplayName("suspended flag true for new create staff user")
+    void test_SuspendStaffProfileTrue() {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+        staffProfileCreationRequest.setSuspended(true);
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234",staffProfileCreationRequest, STAFF_PROFILE_CREATE);
+        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+            staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
+        });
+
+        assertThat(thrown.getMessage()).contains(NO_USER_TO_SUSPEND_PROFILE);
+    }
+
 
     @Test
     void test_createUserProfileRequest() {

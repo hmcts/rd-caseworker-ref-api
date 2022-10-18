@@ -58,6 +58,8 @@ import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
 import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
@@ -135,13 +137,13 @@ public class StaffReferenceDataProviderTest {
     @MockBean
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
-    IJsrValidatorInitializer validateStaffProfile;
-    @Mock
     StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
     @Mock
     StaffAuditRepository staffAuditRepository;
     @Mock
-    IValidationService validationServiceFacade;
+    IJsrValidatorStaffProfile jsrValidatorStaffProfile;
+    @Mock
+    IStaffProfileAuditService staffProfileAuditService;
 
     @Mock
     CaseWorkerLocationRepository caseWorkerLocationRepository;
