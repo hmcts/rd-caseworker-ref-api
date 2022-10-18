@@ -471,7 +471,8 @@ public class StaffRefDataUpdateStaffServiceImplTest {
 
         StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
 
-        boolean suspended = staffRefDataServiceImpl.isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+        boolean suspended = staffRefDataServiceImpl
+                .isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                 dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId());
         assertThat(suspended).isFalse();
 
@@ -485,10 +486,8 @@ public class StaffRefDataUpdateStaffServiceImplTest {
         dbProfile.setLastName("CWLastName");
         dbProfile.setEmailId("cwr-func-test-user@test.com");
 
-        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
-       // userProfileCreationResponse.setIdamId("12345678");
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
@@ -500,8 +499,10 @@ public class StaffRefDataUpdateStaffServiceImplTest {
                                 null)).body(mapper.writeValueAsString(userProfileRolesResponse),
                                 defaultCharset())
                         .status(200).build());
+        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
 
-        boolean suspended = staffRefDataServiceImpl.isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+        boolean suspended = staffRefDataServiceImpl
+                .isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                 dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId());
         assertThat(suspended).isFalse();
 
@@ -515,7 +516,6 @@ public class StaffRefDataUpdateStaffServiceImplTest {
         dbProfile.setLastName("CWLastName");
         dbProfile.setEmailId("cwr-func-test-user@test.com");
 
-        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         // userProfileCreationResponse.setIdamId("12345678");
@@ -524,13 +524,14 @@ public class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
+        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
 
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
 
 
-
-        boolean updateUserRolesInIdam = staffRefDataServiceImpl.updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl
+                .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
         assertThat(updateUserRolesInIdam).isFalse();
 
     }
