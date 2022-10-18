@@ -33,8 +33,7 @@ public class Role implements Serializable {
     @JsonProperty("is_primary")
     private boolean isPrimary;
 
-    @JsonIgnore
     private LocalDateTime createdTime;
-    @JsonIgnore
+
     private LocalDateTime lastUpdatedTime;
 }

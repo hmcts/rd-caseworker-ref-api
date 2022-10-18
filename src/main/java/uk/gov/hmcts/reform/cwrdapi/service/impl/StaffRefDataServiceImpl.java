@@ -395,6 +395,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<Role> rolesDto = new ArrayList<>();
         for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
             var roleDto = Role.builder()
+                    .createdTime(caseWorkerRole.getCreatedDate())
+                    .lastUpdatedTime(caseWorkerRole.getLastUpdate())
                     .roleId(caseWorkerRole.getRoleId().toString())
                     .roleName(caseWorkerRole.getRoleType().getDescription())
                     .isPrimary(caseWorkerRole.getPrimaryFlag())
@@ -409,6 +411,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<Location> locations = new ArrayList<>();
         for (CaseWorkerLocation caseWorkerLocation : caseWorkerLocations) {
             var location = Location.builder()
+                    .createdTime(caseWorkerLocation.getCreatedDate())
+                    .lastUpdatedTime(caseWorkerLocation.getLastUpdate())
                     .baseLocationId(caseWorkerLocation.getLocationId())
                     .locationName(caseWorkerLocation.getLocation())
                     .isPrimary(caseWorkerLocation.getPrimaryFlag())
