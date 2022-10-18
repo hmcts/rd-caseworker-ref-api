@@ -5,9 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.ReflectionUtils;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.EmptyRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -15,6 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME;
@@ -120,4 +125,15 @@ public class RequestUtils {
             Objects.isNull(pageSize) ? configPageSize : pageSize,
             Sort.by(Sort.DEFAULT_DIRECTION, CW_LAST_NAME, CW_FIRST_NAME));
     }
-}
+
+    public static void validateSearchRequest(SearchRequest searchRequest) {
+        if (isEmpty(searchRequest.getJobTitle()) && isEmpty(searchRequest.getLocation()) &&
+                isEmpty(searchRequest.getRole()) && isEmpty(searchRequest.getServiceCode()) &&
+                isEmpty(searchRequest.getSkill()) &&
+                isEmpty(searchRequest.getUserType()))
+            throw new EmptyRequestException("Unexpected character");
+        }
+    }
+
+
+

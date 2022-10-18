@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.removeEmptySpaces;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchRequest;
 
 
 
@@ -297,7 +298,7 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE,
             path = {"/profile"}
     )
-    @Secured("staff-admin")
+   // @Secured("staff-admin")
     @ResponseBody
     @ResponseStatus(value = HttpStatus.CREATED)
     @Transactional
@@ -353,13 +354,8 @@ public class StaffRefDataController {
             @RequestHeader(name = "page-size", required = false) Integer pageSize,
             SearchRequest searchRequest)
     {
-
-        //validateSearchString(removeEmptySpaces(searchString));
+        validateSearchRequest(searchRequest);
         var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize, configPageNumber);
-
         return staffRefDataService.retrieveStaffProfile(searchRequest, pageRequest);
     }
-
-
-
 }
