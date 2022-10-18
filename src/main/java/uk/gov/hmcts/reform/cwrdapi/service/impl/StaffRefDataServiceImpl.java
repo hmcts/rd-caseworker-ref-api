@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -318,7 +319,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest, PageRequest pageRequest) {
         List<String> serviceCodes = null;
         List<Integer> locationId = null;
-        List<String> roles = null;
+
         if(searchRequest.getServiceCode() != null) {
             serviceCodes = Splitter.on(',').trimResults().omitEmptyStrings()
                     .splitToList(searchRequest.getServiceCode().toUpperCase());
@@ -328,12 +329,14 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     .splitToList(searchRequest.getLocation()).stream().map(s -> Integer.parseInt(s))
                     .collect(Collectors.toList());
         }
-        if(searchRequest.getRole() != null) {
-            roles = Splitter.on(',').trimResults().omitEmptyStrings()
-                    .splitToList(searchRequest.getRole().toLowerCase());
-        }
+
+        List<String> roles = Splitter.on(',').trimResults().omitEmptyStrings()
+                    .splitToList(Objects.toString(searchRequest.getRole(), "").toLowerCase());
+
         Page<CaseWorkerProfile> pageable =
-                caseWorkerProfileRepo.findByCaseWorkerProfiles(searchRequest,serviceCodes,locationId,roles,pageRequest);
+                caseWorkerProfileRepo.findByCaseWorkerProfiles(searchRequest, serviceCodes, locationId,
+                        roles.contains("task supervisor"), roles.contains("case allocator"),
+                        roles.contains("staff administrator"), pageRequest);
         long totalRecords = pageable.getTotalElements();
 
         List<CaseWorkerProfile> caseWorkerProfiles = pageable.getContent();
