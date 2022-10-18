@@ -280,7 +280,7 @@ jacocoTestReport {
 pitest {
   junit5PluginVersion = '0.15'
   targetClasses = ['uk.gov.hmcts.reform.*']
-  testSourceSets = [sourceSets.test]
+  testSourceSets = [sourceSets.test,sourceSets.integrationTest]
   excludedClasses = [
     'uk.gov.hmcts.reform.cwrdapi.config.*',
     'uk.gov.hmcts.reform.cwrdapi.controllers.*',
@@ -288,7 +288,6 @@ pitest {
     'uk.gov.hmcts.reform.cwrdapi.service.impl.ValidationServiceFacadeImpl',
     'uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl',
     'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication',
-    'uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl',
     'uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher'
   ]
   threads = 10

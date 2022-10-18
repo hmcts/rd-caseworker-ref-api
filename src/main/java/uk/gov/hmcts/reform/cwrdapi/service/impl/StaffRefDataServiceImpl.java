@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import feign.Response;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,12 +55,10 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
-import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
@@ -99,6 +98,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
@@ -593,7 +593,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         log.info("{}:: processStaffProfileCreation starts::",
                 loggingComponentName);
 
-        validateStaffProfile.validateStaffProfile(profileRequest);
+        jsrValidatorStaffProfile.validateStaffProfile(profileRequest,STAFF_PROFILE_UPDATE);
 
         checkStaffProfileForUpdate(profileRequest);
 
@@ -610,8 +610,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         if (null != caseWorkerProfile) {
 
-            validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS,null,
-                    caseWorkerProfile.getCaseWorkerId(),profileRequest);
+            staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtils.EMPTY,
+                    caseWorkerProfile.getCaseWorkerId(),profileRequest,STAFF_PROFILE_UPDATE);
             response = StaffProfileCreationResponse.builder()
                     .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
                     .build();
@@ -624,8 +624,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId());
         if (caseWorkerProfile == null) {
-            validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
-                    null,profileRequest);
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
+                    StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
             throw new ResourceNotFoundException(PROFILE_NOT_PRESENT_IN_DB);
         }
     }
@@ -653,8 +653,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             processedCwProfiles = persistCaseWorkerInBatch(updateAndSuspendedLists.getLeft(),
                     updateAndSuspendedLists.getRight(), emailToRequestMap);
         } catch (Exception exp) {
-            log.error("{}:: createCaseWorkerUserProfiles failed :: Job Id {} ::{}", loggingComponentName,
-                    validationServiceFacade.getAuditJobId(), exp);
+            log.error("{}:: createCaseWorkerUserProfiles failed  ::{}", loggingComponentName,
+                    exp);
             throw exp;
         }
         return processedCwProfiles;
@@ -670,7 +670,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             StaffProfileCreationRequest cwUiRequest = emailToRequestMap.get(dbProfile.getEmailId());
             if (isTrue(dbProfile.getSuspended())) {
                 //when existing profile with delete flag is true then log exception add entry in exception table
-                validationServiceFacade.logFailures(ALREADY_SUSPENDED_ERROR_MESSAGE, cwUiRequest.getRowId());
+                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,ALREADY_SUSPENDED_ERROR_MESSAGE,
+                        StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
             } else if (cwUiRequest.isSuspended()) {
                 //when existing profile with delete flag is true in request then suspend user
                 if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
@@ -702,8 +703,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         if (isNotEmpty(profilesToBePersisted)) {
             processedCwProfiles = caseWorkerProfileRepo.saveAll(profilesToBePersisted);
-            log.info("{}:: {} case worker profiles inserted :: Job Id {}", loggingComponentName,
-                    processedCwProfiles.size(), validationServiceFacade.getAuditJobId());
+            log.info("{}:: {} case worker profiles inserted ", loggingComponentName,
+                    processedCwProfiles.size());
         }
         return processedCwProfiles;
     }
@@ -749,14 +750,14 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     .getAttributeResponse()))
                     || (!(((UserProfileRolesResponse) resultResponse.get())
                     .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.OK.value())))) {
-                validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                log.info("{}:: {} case worker profiles isUserSuspended ", loggingComponentName,
+                        UP_FAILURE_ROLES);
                 status = false;
             }
 
         } catch (Exception ex) {
-            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
-                    loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
-            validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}::  {}",
+                    loggingComponentName, rowId, ex.getMessage(), UP_FAILURE_ROLES);
             status = false;
         }
         return status;
@@ -765,8 +766,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     private Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
                                                           String userId, String origin) {
         Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
-        log.info("{}:: UserProfile update roles :: status code {}:: Job Id {}", loggingComponentName,
-                response.status(), validationServiceFacade.getAuditJobId());
+        log.info("{}:: UserProfile update roles :: status code {}", loggingComponentName,
+                response.status());
 
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
 
@@ -803,13 +804,18 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
                 if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
-                    validationServiceFacade.logFailures(String.format(IDAM_STATUS, profileResponse.getIdamStatus()),
-                            cwrProfileRequest.getRowId());
+
+                    staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
+                            StringUtils.EMPTY,cwrProfileRequest,STAFF_PROFILE_UPDATE);
+
+                    log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
+                            profileResponse.getIdamStatus());
                     return false;
                 }
 
             } else {
-                validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
+                log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
+                        UP_FAILURE_ROLES);
                 return false;
             }
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
@@ -832,10 +838,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
             }
         } catch (Exception exception) {
-            log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
-                    exception.getMessage(), validationServiceFacade.getAuditJobId(), cwrProfileRequest.getRowId());
+            log.error("{}:: Update Users api failed:: message {}", loggingComponentName,
+                    exception.getMessage());
 
-            validationServiceFacade.logFailures(UP_FAILURE_ROLES, cwrProfileRequest.getRowId());
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,UP_FAILURE_ROLES,
+                    StringUtils.EMPTY,cwrProfileRequest,STAFF_PROFILE_UPDATE);
             return false;
         }
         return true;
@@ -876,18 +883,19 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse,rowId);
 
                 } else {
-                    validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                    log.info("{}:: isEachRoleUpdated  failed:: message {}", loggingComponentName,
+                            UP_FAILURE_ROLES);
                     isEachRoleUpdated = false;
                 }
             } else {
-                validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+                log.info("{}:: isEachRoleUpdated  failed:: message {}", loggingComponentName,
+                        UP_FAILURE_ROLES);
                 isEachRoleUpdated = false;
             }
 
         } catch (Exception ex) {
-            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}:: Job Id {}",
-                    loggingComponentName, rowId, ex.getMessage(), validationServiceFacade.getAuditJobId());
-            validationServiceFacade.logFailures(UP_FAILURE_ROLES, rowId);
+            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}::  {}",
+                    loggingComponentName, rowId, ex.getMessage(), UP_FAILURE_ROLES);
             isEachRoleUpdated = false;
         }
         return isEachRoleUpdated;
@@ -900,16 +908,16 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 && isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
                 .equals(valueOf(HttpStatus.CREATED.value())))) {
 
-            validationServiceFacade.logFailures(
-                    userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage(), rowId);
+            log.info("{}:: isRecordupdatedinUP  failed:: message {}", loggingComponentName,
+                    userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage());
             isRecordUpdate = false;
         }
         if (nonNull(userProfileRolesResponse.getAttributeResponse())
                 && !(userProfileRolesResponse.getAttributeResponse().getIdamStatusCode()
                 .equals(Integer.valueOf(HttpStatus.OK.value())))) {
 
-            validationServiceFacade.logFailures(
-                    userProfileRolesResponse.getAttributeResponse().getIdamMessage(), rowId);
+            log.info("{}:: isRecordupdatedinUP  failed:: message {}", loggingComponentName,
+                    userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage());
             isRecordUpdate = false;
         }
         return isRecordUpdate;
