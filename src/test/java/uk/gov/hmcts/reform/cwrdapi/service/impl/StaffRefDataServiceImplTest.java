@@ -997,7 +997,8 @@ class StaffRefDataServiceImplTest {
 
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 
-        CaseWorkerProfile caseWorkerProfile = staffRefDataServiceImpl.updateUserProfile(staffProfileCreationRequest,caseWorkerProfileInput);
+        CaseWorkerProfile caseWorkerProfile = staffRefDataServiceImpl
+                .updateUserProfile(staffProfileCreationRequest,caseWorkerProfileInput);
 
 
         assertThat(caseWorkerProfile).isNotNull();
