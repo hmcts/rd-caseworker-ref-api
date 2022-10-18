@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,33 +14,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
@@ -47,9 +34,8 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
-import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
-import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
@@ -77,30 +63,25 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.nio.charset.Charset.defaultCharset;
-import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"AbbreviationAsWordInName", "unchecked"})
-class StaffRefDataServiceImplTest {
+public class StaffRefDataUpdateStaffServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
 
@@ -262,220 +243,7 @@ class StaffRefDataServiceImplTest {
 
     }
 
-    @Test
-    void should_return_non_empty_list_of_service_skills() {
-        List<Skill> skills = getSkillsData();
-        when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
 
-        assertThat(staffWorkerSkillResponse).isNotNull();
-
-        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-
-        assertThat(serviceSkills).isNotNull();
-
-        ServiceSkill serviceSkill = serviceSkills.get(0);
-
-        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
-
-        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
-
-        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
-        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
-        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
-        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
-
-    }
-
-    @Test
-    void should_return_empty_list_of_service_skills() {
-        List<Skill> skills = new ArrayList<>();
-        when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
-
-        assertThat(staffWorkerSkillResponse).isNotNull();
-
-        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-
-        assertThat(serviceSkills).isNotNull();
-
-        assertThat(serviceSkills).isEmpty();
-    }
-
-    @Test
-    void should_return_null_list_of_service_skills() {
-        List<Skill> skills = null;
-        when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
-
-        assertThat(staffWorkerSkillResponse).isNotNull();
-
-        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-        assertThat(serviceSkills).isNotNull();
-
-        assertThat(serviceSkills).isEmpty();
-    }
-
-    @Test
-    void should_return_case_worker_profile_with_status_code_200() {
-
-        var pageRequest =
-                validateAndBuildPagination(20, 1,
-                        20, 1);
-
-        String searchString = "cwr";
-        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
-        caseWorkerProfiles.add(caseWorkerProfile);
-        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
-
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
-                .thenReturn(pages);
-        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
-                staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
-        assertEquals(200, responseEntity.getStatusCodeValue());
-
-        assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
-
-        List<SearchStaffUserResponse> searchResponse =
-                responseEntity.getBody();
-        assertThat(responseEntity.getBody()).isNotNull();
-        validateSearchStaffUserResponses(searchResponse);
-    }
-
-    @Test
-    void should_return_case_worker_profile_with_status_code_200_when_missing_boolean_values() {
-
-        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
-
-        caseWorkerProfile.setSuspended(null);
-        caseWorkerProfile.setTaskSupervisor(null);
-        caseWorkerProfile.setCaseAllocator(null);
-        caseWorkerProfile.setUserAdmin(null);
-
-        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        caseWorkerProfiles.add(caseWorkerProfile);
-        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
-
-        var pageRequest =
-                validateAndBuildPagination(20, 1,
-                        20, 1);
-        String searchString = "cwr";
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
-                .thenReturn(pages);
-        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
-                staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
-
-        assertEquals(200, responseEntity.getStatusCodeValue());
-        assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
-
-        List<SearchStaffUserResponse> searchResponse =
-                responseEntity.getBody();
-        assertThat(responseEntity.getBody()).isNotNull();
-        validateSearchStaffUserFalseResponses(searchResponse);
-    }
-
-    @Test
-    void should_return_empty_list_of_case_worker_profile_with_status_code_200() {
-
-        var pageRequest =
-                validateAndBuildPagination(20, 1,
-                        20, 1);
-
-        String searchString = "cwr";
-        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
-
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
-                .thenReturn(pages);
-        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
-                staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
-        assertEquals(200, responseEntity.getStatusCodeValue());
-
-        List<SearchStaffUserResponse> searchResponse =
-                responseEntity.getBody();
-        assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(searchResponse).isEmpty();
-    }
-
-
-    void validateSearchStaffUserResponses(List<SearchStaffUserResponse> searchResponses) {
-        assertThat(searchResponses).hasSize(1);
-
-        SearchStaffUserResponse searchStaffUserResponse = searchResponses.get(0);
-        assertThat(searchStaffUserResponse.getFirstName()).isEqualTo("firstName");
-        assertThat(searchStaffUserResponse.getLastName()).isEqualTo("Last`name");
-        assertThat(searchStaffUserResponse.getEmailId()).isEqualTo("a@b.com");
-        assertThat(searchStaffUserResponse.isSuspended()).isTrue();
-        assertThat(searchStaffUserResponse.isTaskSupervisor()).isTrue();
-        assertThat(searchStaffUserResponse.isCaseAllocator()).isFalse();
-        assertThat(searchStaffUserResponse.isStaffAdmin()).isTrue();
-
-        ServiceResponse serviceResponse = searchStaffUserResponse.getServices().get(0);
-
-        assertThat(serviceResponse.getService()).isEqualTo("TestArea");
-        assertThat(serviceResponse.getServiceCode()).isEqualTo("SvcCode1");
-
-        assertThat(searchStaffUserResponse.getRegionId()).isEqualTo(111122222);
-        assertThat(searchStaffUserResponse.getRegion()).isEqualTo("region");
-
-        Role role = searchStaffUserResponse.getRoles().get(0);
-
-        assertThat(role.getRoleId()).isEqualTo("1");
-        assertThat(role.getRoleName()).isEqualTo("testRole1");
-
-        Location location = searchStaffUserResponse.getBaseLocations().get(0);
-
-        assertThat(location.getBaseLocationId()).isEqualTo(11112);
-        assertThat(location.getLocationName()).isEqualTo("test location");
-        assertThat(searchStaffUserResponse.getUserType()).isEqualTo("userTypeId");
-
-        SkillResponse skillResponse = searchStaffUserResponse.getSkills().get(0);
-
-        assertThat(skillResponse.getSkillId()).isEqualTo(1L);
-        assertThat(skillResponse.getDescription()).isEqualTo("desc1");
-
-
-    }
-
-    void validateSearchStaffUserFalseResponses(List<SearchStaffUserResponse> searchResponses) {
-        assertThat(searchResponses).hasSize(1);
-
-        SearchStaffUserResponse searchStaffUserResponse = searchResponses.get(0);
-        assertThat(searchStaffUserResponse.getFirstName()).isEqualTo("firstName");
-        assertThat(searchStaffUserResponse.getLastName()).isEqualTo("Last`name");
-        assertThat(searchStaffUserResponse.getEmailId()).isEqualTo("a@b.com");
-        assertThat(searchStaffUserResponse.isSuspended()).isFalse();
-        assertThat(searchStaffUserResponse.isTaskSupervisor()).isFalse();
-        assertThat(searchStaffUserResponse.isCaseAllocator()).isFalse();
-        assertThat(searchStaffUserResponse.isStaffAdmin()).isFalse();
-
-        ServiceResponse serviceResponse = searchStaffUserResponse.getServices().get(0);
-
-        assertThat(serviceResponse.getService()).isEqualTo("TestArea");
-        assertThat(serviceResponse.getServiceCode()).isEqualTo("SvcCode1");
-
-        assertThat(searchStaffUserResponse.getRegionId()).isEqualTo(111122222);
-        assertThat(searchStaffUserResponse.getRegion()).isEqualTo("region");
-
-        Role role = searchStaffUserResponse.getRoles().get(0);
-
-        assertThat(role.getRoleId()).isEqualTo("1");
-        assertThat(role.getRoleName()).isEqualTo("testRole1");
-
-        Location location = searchStaffUserResponse.getBaseLocations().get(0);
-
-        assertThat(location.getBaseLocationId()).isEqualTo(11112);
-        assertThat(location.getLocationName()).isEqualTo("test location");
-        assertThat(searchStaffUserResponse.getUserType()).isEqualTo("userTypeId");
-
-        SkillResponse skillResponse = searchStaffUserResponse.getSkills().get(0);
-
-        assertThat(skillResponse.getSkillId()).isEqualTo(1L);
-        assertThat(skillResponse.getDescription()).isEqualTo("desc1");
-
-
-    }
 
     CaseWorkerProfile buildCaseWorkerProfile() {
 
@@ -539,66 +307,6 @@ class StaffRefDataServiceImplTest {
         return caseWorkerProfile;
     }
 
-    uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile buildCaseWorkerProfileForDto() {
-        Role
-                role = Role.builder()
-                .roleId("1")
-                .roleName("roleName")
-                .createdTime(LocalDateTime.now())
-                .lastUpdatedTime(LocalDateTime.now())
-                .isPrimary(true)
-                .build();
-        Location location = Location
-                .builder()
-                .baseLocationId(11111)
-                .locationName("LocationName")
-                .isPrimary(true)
-                .createdTime(LocalDateTime.now())
-                .lastUpdatedTime(LocalDateTime.now())
-                .build();
-        WorkArea workArea = WorkArea.builder()
-                .areaOfWork("areaOfWork")
-                .serviceCode("serviceCode")
-                .createdTime(LocalDateTime.now())
-                .lastUpdatedTime(LocalDateTime.now())
-                .build();
-
-        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
-                uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile.builder()
-                        .id("27fbd198-552e-4c32-9caf-37be1545caaf")
-                        .firstName("firstName")
-                        .lastName("lastName")
-                        .officialEmail("a@b.com")
-                        .regionName("regionName")
-                        .regionId(1)
-                        .userType("userType")
-                        .userId(11111L)
-                        .suspended("false")
-                        .createdTime(LocalDateTime.now())
-                        .lastUpdatedTime(LocalDateTime.now())
-                        .roles(singletonList(role))
-                        .locations(singletonList(location))
-                        .workAreas(singletonList(workArea))
-                        .taskSupervisor("Y")
-                        .caseAllocator("N")
-                        .build();
-
-        return caseWorkerProfile;
-    }
-
-    private CaseWorkerSkill getCaseWorkerSkill() {
-
-        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
-        caseWorkerSkill.setCaseWorkerId("423ec46f-359f-4fcc-9ecc-b1cab4d7e683");
-        caseWorkerSkill.setSkillId(1L);
-        caseWorkerSkill.setSkill(getSkillData());
-
-        return caseWorkerSkill;
-
-    }
-
-
-
 
 
     private List<Skill> getSkillsData() {
@@ -651,22 +359,6 @@ class StaffRefDataServiceImplTest {
         return skill;
     }
 
-    @Test
-    void test_saveStaffProfile() throws JsonProcessingException {
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId("12345678");
-        userProfileCreationResponse.setIdamRegistrationResponse(1);
-
-        String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
-
-        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
-        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
-        staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
-        verify(caseWorkerProfileRepository, times(1)).save(any());
-        verify(jsrValidatorStaffProfile, times(1)).validateStaffProfile(any(),any());
-    }
 
     @Test
     void test_saveStaffProfileValidationAudit() {
@@ -701,134 +393,6 @@ class StaffRefDataServiceImplTest {
                 + "Please try again or check with HMCTS Support Team";
         assertThat(thrown.getMessage()).contains(errorMsg);
     }
-
-    @Test
-    void test_createUserProfileRequest() {
-        UserProfileCreationRequest response = staffRefDataServiceImpl
-                .createUserProfileRequest(staffProfileCreationRequest);
-        assertThat(response.getEmail()).isEqualTo("test@test.com");
-        assertThat(response.getFirstName()).isEqualTo("testFN");
-        assertThat(response.getLastName()).isEqualTo("testLN");
-        assertThat(response.getLanguagePreference().toString()).hasToString("EN");
-        assertThat(response.getUserCategory().toString()).hasToString("CASEWORKER");
-        assertThat(response.getUserType().toString()).hasToString("INTERNAL");
-        assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(1);
-    }
-
-    @Test
-    void test_createUserProfileRequest_StaffAdmin() {
-        staffProfileCreationRequest.setStaffAdmin(true);
-        UserProfileCreationRequest response = staffRefDataServiceImpl
-                .createUserProfileRequest(staffProfileCreationRequest);
-        assertThat(response.getEmail()).isEqualTo("test@test.com");
-        assertThat(response.getFirstName()).isEqualTo("testFN");
-        assertThat(response.getLastName()).isEqualTo("testLN");
-        assertThat(response.getLanguagePreference().toString()).hasToString("EN");
-        assertThat(response.getUserCategory().toString()).hasToString("CASEWORKER");
-        assertThat(response.getUserType().toString()).hasToString("INTERNAL");
-        assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(1);
-    }
-
-    @Test
-    void test_createUserProfileRequestEmptyRoles() {
-        when(staffProfileCreateUpdateUtil.getUserRolesByRoleId(any())).thenReturn(EMPTY_SET);
-        UserProfileCreationRequest response = staffRefDataServiceImpl
-                .createUserProfileRequest(staffProfileCreationRequest);
-        assertThat(response.getEmail()).isEqualTo("test@test.com");
-        assertThat(response.getFirstName()).isEqualTo("testFN");
-        assertThat(response.getLastName()).isEqualTo("testLN");
-        assertThat(response.getLanguagePreference().toString()).hasToString("EN");
-        assertThat(response.getUserCategory().toString()).hasToString("CASEWORKER");
-        assertThat(response.getUserType().toString()).hasToString("INTERNAL");
-        assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(0);
-    }
-
-
-
-    @Test
-    void test_createUserProfileRequestNullRoles() {
-        when(staffProfileCreateUpdateUtil.getUserRolesByRoleId(any())).thenReturn(null);
-        UserProfileCreationRequest response = staffRefDataServiceImpl
-                .createUserProfileRequest(staffProfileCreationRequest);
-        assertThat(response.getEmail()).isEqualTo("test@test.com");
-        assertThat(response.getFirstName()).isEqualTo("testFN");
-        assertThat(response.getLastName()).isEqualTo("testLN");
-        assertThat(response.getLanguagePreference().toString()).hasToString("EN");
-        assertThat(response.getUserCategory().toString()).hasToString("CASEWORKER");
-        assertThat(response.getUserType().toString()).hasToString("INTERNAL");
-        assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(0);
-    }
-
-    @Test
-    void test_publishCaseWorkerDataToTopic() {
-        ReflectionTestUtils.setField(staffRefDataServiceImpl, "caseWorkerDataPerMessage", 1);
-        staffProfileCreationRespone.setCaseWorkerId("1");
-        staffRefDataServiceImpl.publishStaffProfileToTopic(staffProfileCreationRespone);
-        verify(topicPublisher, times(1)).sendMessage(any());
-
-    }
-
-
-    @Test
-    void test_persistStaffProfileNull() {
-        when(caseWorkerProfileRepository.save(any())).thenReturn(null);
-        caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile,staffProfileCreationRequest);
-        assertNull(caseWorkerProfile);
-    }
-
-    @Test
-    void test_persistStaffProfile() {
-        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
-        caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile,staffProfileCreationRequest);
-        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
-        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("CWFirstName");
-        assertThat(caseWorkerProfile.getLastName()).isEqualTo("CWLastName");
-    }
-
-    @Test
-    void test_createUserProfileInIdamUP() throws JsonProcessingException {
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId("12345678");
-        userProfileCreationResponse.setIdamRegistrationResponse(1);
-
-        String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(409).build());
-        ResponseEntity<Object> response = staffRefDataServiceImpl
-                .createUserProfileInIdamUP(staffProfileCreationRequest);
-        assertNotNull(response);
-    }
-
-    @Test
-    void test_createUserProfileInIdamUP_error() throws JsonProcessingException {
-        ErrorResponse errorResponse = new ErrorResponse(500,"Failure","Method Not Allowed ",
-                "Internal Server Error", "2022-01-10");
-        String body = mapper.writeValueAsString(errorResponse);
-        doReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(500).build())
-                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
-
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl.createUserProfileInIdamUP(staffProfileCreationRequest);
-        });
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,thrown.getStatus());
-    }
-
-    @Test
-    void test_createUserProfileInIdamUP_forbiddenError() throws JsonProcessingException {
-        ErrorResponse errorResponse = new ErrorResponse(405,"Failure","Method Not Allowed ",
-                "Method Not Allowed", "2022-01-10");
-        String body = mapper.writeValueAsString(errorResponse);
-
-        doReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(405).build())
-                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class),anyString());
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl.createUserProfileInIdamUP(staffProfileCreationRequest);
-        });
-        assertEquals(HttpStatus.METHOD_NOT_ALLOWED,thrown.getStatus());
-    }
-
 
 
 
@@ -896,6 +460,81 @@ class StaffRefDataServiceImplTest {
         assertThat(staffProfileCreationResponse).isNotNull();
         assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
     }
+
+    @Test
+    void test_isUserSuspended_should_return_false() throws JsonProcessingException {
+        CaseWorkerProfile dbProfile = new CaseWorkerProfile();
+        dbProfile.setCaseWorkerId("CWID1");
+        dbProfile.setFirstName("CWFirstName");
+        dbProfile.setLastName("CWLastName");
+        dbProfile.setEmailId("cwr-func-test-user@test.com");
+
+        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
+
+        boolean suspended = staffRefDataServiceImpl.isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+                dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId());
+        assertThat(suspended).isFalse();
+
+    }
+
+    @Test
+    void test_isUserSuspended_should_return_false_with_roles_data() throws JsonProcessingException {
+        CaseWorkerProfile dbProfile = new CaseWorkerProfile();
+        dbProfile.setCaseWorkerId("CWID1");
+        dbProfile.setFirstName("CWFirstName");
+        dbProfile.setLastName("CWLastName");
+        dbProfile.setEmailId("cwr-func-test-user@test.com");
+
+        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+       // userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        boolean suspended = staffRefDataServiceImpl.isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+                dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId());
+        assertThat(suspended).isFalse();
+
+    }
+
+    @Test
+    void test_updateUserRolesInIdam() throws JsonProcessingException {
+        CaseWorkerProfile dbProfile = new CaseWorkerProfile();
+        dbProfile.setCaseWorkerId("CWID1");
+        dbProfile.setFirstName("CWFirstName");
+        dbProfile.setLastName("CWLastName");
+        dbProfile.setEmailId("cwr-func-test-user@test.com");
+
+        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        // userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
+                StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
+
+
+
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl.updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
+        assertThat(updateUserRolesInIdam).isFalse();
+
+    }
+
 
     @Test
     void test_check_staff_profile_for_update() throws JsonProcessingException {
@@ -1097,6 +736,17 @@ class StaffRefDataServiceImplTest {
                 .build();
 
         return staffProfileCreationRequest;
+
+    }
+
+    private CaseWorkerSkill getCaseWorkerSkill() {
+
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        caseWorkerSkill.setCaseWorkerId("423ec46f-359f-4fcc-9ecc-b1cab4d7e683");
+        caseWorkerSkill.setSkillId(1L);
+        caseWorkerSkill.setSkill(getSkillData());
+
+        return caseWorkerSkill;
 
     }
 }

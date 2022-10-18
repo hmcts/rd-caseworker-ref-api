@@ -729,10 +729,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public CaseWorkerProfile updateUserProfile(StaffProfileCreationRequest cwrdProfileRequest,
                                                CaseWorkerProfile caseWorkerProfile) {
-        caseWorkerProfile.getCaseWorkerLocations().clear();
-        caseWorkerProfile.getCaseWorkerWorkAreas().clear();
-        caseWorkerProfile.getCaseWorkerRoles().clear();
-        //update existing profile with file values
+        //update existing profile with file StaffProfileCreationRequest
         populateStaffProfile(cwrdProfileRequest, caseWorkerProfile, caseWorkerProfile.getCaseWorkerId());
         return caseWorkerProfile;
     }
