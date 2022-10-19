@@ -141,19 +141,14 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-     void shouldGetOnlyCaseWorkerDetails() {
+    void shouldGetOnlyCaseWorkerDetails() {
 
-        List<SkillsRequest> skillRequest = Collections.singletonList(SkillsRequest
-                .skillsRequest()
-                .skillId(1).skillCode("1").description("testskill1")
-                .build());
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
-        log.info("createStaffUserProfile Request");
-        staffProfileCreationRequest.setSkills(skillRequest);
+
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
-        log.info("createStaffUserProfile response");
+
         assertNotNull(response);
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
@@ -194,13 +189,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(staffProfileCreationRequest.getRoles().size(), caseWorkerProfile.getRoles().size());
         assertEquals(staffProfileCreationRequest.getRoles().get(0).getRole(),
                 caseWorkerProfile.getRoles().get(0).getRoleName());
-        assertEquals(staffProfileCreationRequest.getSkills().size(), caseWorkerProfile.getSkills().size());
-        assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillId(),
-                caseWorkerProfile.getSkills().get(0).getSkillId());
-        assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillCode(),
-                caseWorkerProfile.getSkills().get(0).getSkillCode());
-        assertEquals(staffProfileCreationRequest.getSkills().get(0).getDescription(),
-                caseWorkerProfile.getSkills().get(0).getDescription());
         assertEquals(staffProfileCreationRequest.getServices().size(), caseWorkerProfile.getWorkAreas().size());
 
     }
@@ -210,7 +198,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-     void shouldGetOnlyCaseWorkerDetailsWithEmptySkills() {
+    void shouldGetOnlyCaseWorkerDetailsWithEmptySkills() {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
         assertNotNull(staffProfileCreationRequest);
@@ -265,7 +253,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are not fetched from CWR when user is invalid
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-     void shouldThrowForbiddenExceptionForNonAdminRole() {
+    void shouldThrowForbiddenExceptionForNonAdminRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("prd-admin")
                 .body(UserRequest.builder().userIds(Collections.singletonList("someUUID")).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
