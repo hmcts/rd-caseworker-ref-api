@@ -113,6 +113,7 @@ public class StaffRefDataUpdateStaffServiceImplTest {
     @Mock
     StaffAuditRepository staffAuditRepository;
 
+
     private StaffProfileCreationRequest staffProfileCreationRequest;
     private StaffProfileCreationResponse staffProfileCreationRespone = new StaffProfileCreationResponse();
     private RoleType roleType;
@@ -688,6 +689,22 @@ public class StaffRefDataUpdateStaffServiceImplTest {
 
 
     }
+    
+    @Test
+    void test_setNewCaseWorkerProfileFlag() throws JsonProcessingException {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+        staffRefDataServiceImpl.setNewCaseWorkerProfileFlag(caseWorkerProfile);
+
+        assertThat(caseWorkerProfile.isNew()).isTrue();
+
+    }
+
+
 
     private StaffProfileCreationRequest getStaffProfileUpdateRequest() {
 
