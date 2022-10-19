@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
@@ -468,6 +470,70 @@ public class StaffRefDataUpdateStaffServiceImplTest {
                 dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId());
         assertThat(suspended).isFalse();
 
+    }
+
+    @Test
+    void testSuspendStaffUserProfile() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+        staffProfileCreationRequest.setSuspended(true);
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setSuspended(false);
+        profile.setEmailId(staffProfileCreationRequest.getEmailId());
+
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        AttributeResponse attributeResponse = new AttributeResponse();
+        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
+        userProfileRolesResponse.setAttributeResponse(attributeResponse);
+
+        when(caseWorkerProfileRepository.findByEmailIdIn(any()))
+                .thenReturn(Arrays.asList(profile));
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        List<StaffProfileCreationRequest> requests = new ArrayList<>();
+        requests.add(staffProfileCreationRequest);
+        staffRefDataServiceImpl.updateStaffProfiles(requests);
+
+        verify(caseWorkerProfileRepository, times(1)).saveAll(any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
+    }
+
+    @Test
+    void testSuspendCwUserProfile() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+        staffProfileCreationRequest.setSuspended(true);
+        CaseWorkerProfile profile = new CaseWorkerProfile();
+        profile.setCaseWorkerId("1");
+        profile.setSuspended(true);
+        profile.setEmailId(staffProfileCreationRequest.getEmailId());
+
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        AttributeResponse attributeResponse = new AttributeResponse();
+        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
+        userProfileRolesResponse.setAttributeResponse(attributeResponse);
+
+        when(caseWorkerProfileRepository.findByEmailIdIn(any()))
+                .thenReturn(Arrays.asList(profile));
+
+
+        List<StaffProfileCreationRequest> requests = new ArrayList<>();
+        requests.add(staffProfileCreationRequest);
+        staffRefDataServiceImpl.updateStaffProfiles(requests);
+
+        //verify(caseWorkerProfileRepository, times(1)).saveAll(any());
+        //verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
     }
 
     @Test
