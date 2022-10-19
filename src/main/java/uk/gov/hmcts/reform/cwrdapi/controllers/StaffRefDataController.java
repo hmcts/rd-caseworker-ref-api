@@ -348,7 +348,7 @@ public class StaffRefDataController {
     @Validated
     @GetMapping(path = "/profile/search",
             produces = APPLICATION_JSON_VALUE)
-    @Secured("cwd-admin")
+    @Secured("staff-admin")
     public ResponseEntity<List<SearchStaffUserResponse>> searchStaffProfile(
             @RequestHeader(name = "page-number", required = false) Integer pageNumber,
             @RequestHeader(name = "page-size", required = false) Integer pageSize,

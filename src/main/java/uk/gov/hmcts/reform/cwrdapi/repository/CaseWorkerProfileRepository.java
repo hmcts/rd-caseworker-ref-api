@@ -42,7 +42,7 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
         "join case_worker_work_area cwa on cwp.caseWorkerId=cwa.caseWorkerId " +
         "join case_worker_role cwr on cwr.caseWorkerId=cwp.caseWorkerId " +
         "join case_worker_location cwl on cwl.caseWorkerId=cwp.caseWorkerId " +
-        "join case_worker_skill cws on cws.caseWorkerId=cwp.caseWorkerId " +
+        "left join case_worker_skill cws on cws.caseWorkerId=cwp.caseWorkerId " +
         "WHERE " +
         "(:#{#searchRequest.userType} is NULL or " +
             "cwp.userTypeId = CAST(CAST(:#{#searchRequest.userType} AS text) AS int)) " +

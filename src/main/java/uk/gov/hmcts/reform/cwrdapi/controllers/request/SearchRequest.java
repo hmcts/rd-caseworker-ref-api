@@ -13,7 +13,6 @@ import lombok.Setter;
 @Getter
 @Builder
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.KebabCaseStrategy.class)
 public class SearchRequest {
 
     @ApiParam(name = "serviceCode", value = "Any Valid String is allowed")
