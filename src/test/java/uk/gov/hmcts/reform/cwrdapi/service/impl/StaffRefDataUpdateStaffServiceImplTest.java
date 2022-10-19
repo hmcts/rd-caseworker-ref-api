@@ -79,7 +79,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"AbbreviationAsWordInName", "unchecked"})
-public class StaffRefDataUpdateStaffServiceImplTest {
+class StaffRefDataUpdateStaffServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
 
@@ -805,9 +805,9 @@ public class StaffRefDataUpdateStaffServiceImplTest {
         assertThat(caseWorkerProfile.getLastName()).isEqualTo("testLN");
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(1);
         assertThat(caseWorkerProfile.getRegion()).isEqualTo("testRegion");
-        assertThat(caseWorkerProfile.getCaseWorkerLocations()).hasSize(0);
-        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas()).hasSize(0);
-        assertThat(caseWorkerProfile.getCaseWorkerRoles()).hasSize(0);
+        assertThat(caseWorkerProfile.getCaseWorkerLocations()).isEmpty();
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas()).isEmpty();
+        assertThat(caseWorkerProfile.getCaseWorkerRoles()).isEmpty();
 
 
     }
