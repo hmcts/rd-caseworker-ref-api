@@ -537,6 +537,37 @@ public class StaffRefDataUpdateStaffServiceImplTest {
 
     }
 
+    @Test
+    void test_updateUserRolesInIdamDataMistmatch() throws JsonProcessingException {
+        CaseWorkerProfile dbProfile = new CaseWorkerProfile();
+        dbProfile.setCaseWorkerId("CWID1");
+        dbProfile.setFirstName("CWFirstNameU");
+        dbProfile.setLastName("CWLastNameU");
+        dbProfile.setEmailId("cwr-func-test-user@test.com");
+
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        // userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
+        Set<String> idamRoles = new HashSet<>();
+        idamRoles.add("IdamRole1");
+        idamRoles.add("IdamRole2");
+        cwUiRequest.setIdamRoles(idamRoles);
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
+                StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
+
+
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl
+                .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
+        assertThat(updateUserRolesInIdam).isFalse();
+
+    }
+
 
     @Test
     void test_check_staff_profile_for_update() throws JsonProcessingException {
@@ -689,9 +720,9 @@ public class StaffRefDataUpdateStaffServiceImplTest {
 
 
     }
-    
+
     @Test
-    void test_setNewCaseWorkerProfileFlag() throws JsonProcessingException {
+    void test_setNewCaseWorkerProfileFlagFlow1() throws JsonProcessingException {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName("CWFirstName");
@@ -701,6 +732,16 @@ public class StaffRefDataUpdateStaffServiceImplTest {
         staffRefDataServiceImpl.setNewCaseWorkerProfileFlag(caseWorkerProfile);
 
         assertThat(caseWorkerProfile.isNew()).isTrue();
+
+    }
+
+    @Test
+    void test_setNewCaseWorkerProfileFlagFlow2() throws JsonProcessingException {
+        CaseWorkerProfile caseWorkerProfile = null;
+
+        staffRefDataServiceImpl.setNewCaseWorkerProfileFlag(caseWorkerProfile);
+
+        assertThat(caseWorkerProfile).isNull();
 
     }
 
