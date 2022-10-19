@@ -143,9 +143,17 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     void shouldGetOnlyCaseWorkerDetails() {
 
+        SkillsRequest skillsRequest = SkillsRequest
+                .skillsRequest()
+                .skillId(1)
+                .skillCode("1")
+                .description("testskill1")
+                .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
+
+        staffProfileCreationRequest.setSkills(List.of(skillsRequest));
 
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
 
@@ -189,6 +197,13 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(staffProfileCreationRequest.getRoles().size(), caseWorkerProfile.getRoles().size());
         assertEquals(staffProfileCreationRequest.getRoles().get(0).getRole(),
                 caseWorkerProfile.getRoles().get(0).getRoleName());
+        assertEquals(staffProfileCreationRequest.getSkills().size(), caseWorkerProfile.getSkills().size());
+        assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillId(),
+                caseWorkerProfile.getSkills().get(0).getSkillId());
+        assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillCode(),
+                caseWorkerProfile.getSkills().get(0).getSkillCode());
+        assertEquals(staffProfileCreationRequest.getSkills().get(0).getDescription(),
+                caseWorkerProfile.getSkills().get(0).getDescription());
         assertEquals(staffProfileCreationRequest.getServices().size(), caseWorkerProfile.getWorkAreas().size());
 
     }
