@@ -30,8 +30,11 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationReque
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
@@ -66,6 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -722,7 +726,32 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
+        CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
+        caseWorkerLocation.setLocation("Location1");
+        caseWorkerLocation.setLocationId(1);
+        when(staffProfileCreateUpdateUtil.mapStaffLocationRequest(anyString(), any()))
+                .thenReturn(List.of(caseWorkerLocation));
 
+        CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
+        caseWorkerRole.setRoleId(1L);
+        caseWorkerRole.setPrimaryFlag(true);
+
+        when(staffProfileCreateUpdateUtil.mapStaffRoleRequestMapping(anyString(), any()))
+                .thenReturn(List.of(caseWorkerRole));
+
+        CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
+        caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
+        caseWorkerWorkArea.setAreaOfWork("Service1");
+
+
+        when(staffProfileCreateUpdateUtil.mapStaffAreaOfWork(any(),anyString()))
+                .thenReturn(List.of(caseWorkerWorkArea));
+
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        caseWorkerSkill.setSkillId(1L);
+
+        when(staffProfileCreateUpdateUtil.mapStaffSkillRequestMapping(anyString(),any()))
+                .thenReturn(List.of(caseWorkerSkill));
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 
         staffRefDataServiceImpl.populateStaffProfile(staffProfileCreationRequest,caseWorkerProfile,"CWID1");
@@ -738,6 +767,21 @@ class StaffRefDataUpdateStaffServiceImplTest {
         assertThat(caseWorkerProfile.getLastName()).isEqualTo("testLN");
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(1);
         assertThat(caseWorkerProfile.getRegion()).isEqualTo("testRegion");
+        assertThat(caseWorkerProfile.isNew()).isFalse();
+        assertThat(caseWorkerProfile.getUserType()).isNull();
+
+        //Validate
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId()).isEqualTo(1);
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation()).isEqualTo("Location1");
+
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getRoleId()).isEqualTo(1L);
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag()).isEqualTo(true);
+
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getCaseWorkerWorkAreaId()).isEqualTo(1L);
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getAreaOfWork()).isEqualTo("Service1");
+
+        assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getSkillId()).isEqualTo(1L);
+
 
     }
 
