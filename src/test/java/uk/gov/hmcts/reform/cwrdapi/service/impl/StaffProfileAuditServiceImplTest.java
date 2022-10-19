@@ -54,7 +54,7 @@ public class StaffProfileAuditServiceImplTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void testSaveStaffAudit() throws JsonProcessingException {
+    void test_SaveStaffAudit() throws JsonProcessingException {
         StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
         UserInfo userInfo = UserInfo.builder()
                             .uid("12345")
@@ -76,6 +76,40 @@ public class StaffProfileAuditServiceImplTest {
                 + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
                 + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
                 + "to define the maximum number of columns your input can have";
+
+        StaffAudit staffAudit = StaffAudit.builder()
+                .status(AuditStatus.FAILURE.getStatus().toUpperCase())
+                .requestTimeStamp(LocalDateTime.now())
+                .errorDescription(testErrorDescription)
+                .authenticatedUserId(userId)
+                .caseWorkerId("1234")
+                .operationType(STAFF_PROFILE_UPDATE)
+                .requestLog(request)
+                .build();
+
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit);
+
+
+        staffProfileAuditServiceImpl.saveStaffAudit(AuditStatus.FAILURE, testErrorDescription,
+                "1234", staffProfileCreationRequest, STAFF_PROFILE_UPDATE);
+
+        verify(staffAuditRepository, times(1))
+                .save(any());
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_SaveStaffAudit_with_empty_userInfo() throws JsonProcessingException {
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+        UserInfo userInfo = null;
+
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(userInfo);
+
+        String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : null;
+        String request = objectMapper.writeValueAsString(staffProfileCreationRequest);
+
+        String testErrorDescription = "Invalid data";
 
         StaffAudit staffAudit = StaffAudit.builder()
                 .status(AuditStatus.FAILURE.getStatus().toUpperCase())

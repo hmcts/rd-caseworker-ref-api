@@ -113,6 +113,17 @@ class StaffRefDataControllerTest {
         assertEquals(0,responseEntity.getBody().getServiceSkills().size());
     }
 
+    @Test
+    void test_StaffRefDataController_Args() {
+
+        StaffRefDataController staffRefDataController =
+
+                new StaffRefDataController("RD-Caseworker-Ref-Api", 20, 1,
+                        staffRefDataService);
+        assertThat(staffRefDataController).isNotNull();
+
+    }
+
 
 
 
