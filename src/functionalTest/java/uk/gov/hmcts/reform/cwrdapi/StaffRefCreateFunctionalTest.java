@@ -143,16 +143,17 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
      void shouldGetOnlyCaseWorkerDetails() {
 
-        List<SkillsRequest> caseWorkerSkillRequest = Collections.singletonList(SkillsRequest
+        List<SkillsRequest> skillRequest = Collections.singletonList(SkillsRequest
                 .skillsRequest()
                 .skillId(1).skillCode("1").description("testskill1")
                 .build());
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
-        staffProfileCreationRequest.setSkills(caseWorkerSkillRequest);
-        assertNotNull(staffProfileCreationRequest);
+        log.info("createStaffUserProfile Request");
+        staffProfileCreationRequest.setSkills(skillRequest);
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        log.info("createStaffUserProfile response");
         assertNotNull(response);
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
@@ -169,6 +170,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         fetchResponse.then()
                 .assertThat()
                 .statusCode(200);
+        log.info("createStaffUserProfile Request");
 
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
                 Arrays.asList(fetchResponse.getBody().as(
