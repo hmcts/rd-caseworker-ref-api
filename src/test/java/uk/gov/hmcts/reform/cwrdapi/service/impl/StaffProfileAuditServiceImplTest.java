@@ -56,15 +56,31 @@ public class StaffProfileAuditServiceImplTest {
     @SuppressWarnings("unchecked")
     void testSaveStaffAudit() throws JsonProcessingException {
         StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
-        UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
+        UserInfo userInfo = UserInfo.builder()
+                            .uid("12345")
+                        .build();
+
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(userInfo);
+
         String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : null;
         String request = objectMapper.writeValueAsString(staffProfileCreationRequest);
 
+        String testErrorDescription = "nHint: Number of columns processed may "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "nHint: Number of columns processed may "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
+                + "to define the maximum number of columns your input can have";
 
         StaffAudit staffAudit = StaffAudit.builder()
                 .status(AuditStatus.FAILURE.getStatus().toUpperCase())
                 .requestTimeStamp(LocalDateTime.now())
-                .errorDescription(null)
+                .errorDescription(testErrorDescription)
                 .authenticatedUserId(userId)
                 .caseWorkerId("1234")
                 .operationType(STAFF_PROFILE_UPDATE)
@@ -74,13 +90,15 @@ public class StaffProfileAuditServiceImplTest {
         when(staffAuditRepository.save(any())).thenReturn(staffAudit);
 
 
-        staffProfileAuditServiceImpl.saveStaffAudit(AuditStatus.FAILURE, null,
+        staffProfileAuditServiceImpl.saveStaffAudit(AuditStatus.FAILURE, testErrorDescription,
                 "1234", staffProfileCreationRequest, STAFF_PROFILE_UPDATE);
 
         verify(staffAuditRepository, times(1))
                 .save(any());
 
     }
+
+
 
 
     private StaffProfileCreationRequest getStaffProfileUpdateRequest() {
