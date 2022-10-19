@@ -775,7 +775,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation()).isEqualTo("Location1");
 
         assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getRoleId()).isEqualTo(1L);
-        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag()).isEqualTo(true);
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag()).isTrue();
 
         assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getCaseWorkerWorkAreaId()).isEqualTo(1L);
         assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getAreaOfWork()).isEqualTo("Service1");
