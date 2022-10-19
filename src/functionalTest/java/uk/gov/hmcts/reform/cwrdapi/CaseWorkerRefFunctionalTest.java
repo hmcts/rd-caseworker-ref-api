@@ -13,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -410,7 +411,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by ID
-    public void deleteCaseworkerById() {
+    public static void deleteCaseworkerById() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                 caseWorkerApiClient.createCaseWorkerProfiles();
 
@@ -441,7 +442,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
-    public void deleteCaseworkerByEmailPattern() {
+    public static void deleteCaseworkerByEmailPattern() {
         String emailPattern = "deleteTest1234";
         String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
 
@@ -730,5 +731,16 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+    }
+
+
+    @AfterAll
+    public static void cleanUpTestData() {
+        try {
+            deleteCaseworkerById();
+            deleteCaseworkerByEmailPattern();
+        } catch (Exception e) {
+            log.error("cleanUpTestData :: threw the following exception: " + e);
+        }
     }
 }

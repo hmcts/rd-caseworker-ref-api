@@ -23,13 +23,15 @@ import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.STAFF_EMAIL_TEMPLATE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
 
@@ -278,12 +280,13 @@ public class CaseWorkerApiClient {
                 .caseWorkerServicesRequest()
                 .service(" areaOfWork ").serviceCode(" serviceCode ")
                 .build());
-
+        String emailPattern = "deleteTest1234";
+        String email = format(STAFF_EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
         return   StaffProfileCreationRequest
                  .staffProfileCreationRequest()
-                 .firstName("StaffProfilefirstName ")
-                 .lastName("StaffProfilelastName ")
-                 .emailId(UUID.randomUUID() + "@justice.gov.uk")
+                 .firstName("StaffProfilefirstName")
+                 .lastName("StaffProfilelastName")
+                 .emailId(email)
                  .regionId(1).userType("CTSC")
                  .region("region")
                  .suspended(false)

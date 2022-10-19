@@ -68,6 +68,7 @@ public class AuthorizationFunctionalTest {
 
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
+    public static final String STAFF_EMAIL_TEMPLATE = "staff-profile-func-test-user-%s@justice.gov.uk";
 
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
