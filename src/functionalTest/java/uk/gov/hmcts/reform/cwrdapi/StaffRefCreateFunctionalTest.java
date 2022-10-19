@@ -30,6 +30,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefFunctionalTest.DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
@@ -152,7 +153,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
         //delete user
         caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?userId=" + caseWorkerIds, NO_CONTENT);
+                "/refdata/case-worker/users?userId=" + caseWorkerIds, BAD_REQUEST);
 
         //search for deleted user
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
