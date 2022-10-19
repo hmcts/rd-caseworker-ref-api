@@ -141,7 +141,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldGetOnlyCaseWorkerDetails() {
+     void shouldGetOnlyCaseWorkerDetails() {
 
         List<SkillsRequest> caseWorkerSkillRequest = Collections.singletonList(SkillsRequest
                 .skillsRequest()
@@ -208,7 +208,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldGetOnlyCaseWorkerDetailsWithEmptySkills() {
+     void shouldGetOnlyCaseWorkerDetailsWithEmptySkills() {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
         assertNotNull(staffProfileCreationRequest);
@@ -263,7 +263,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are not fetched from CWR when user is invalid
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldThrowForbiddenExceptionForNonAdminRole() {
+     void shouldThrowForbiddenExceptionForNonAdminRole() {
         Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal("prd-admin")
                 .body(UserRequest.builder().userIds(Collections.singletonList("someUUID")).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
