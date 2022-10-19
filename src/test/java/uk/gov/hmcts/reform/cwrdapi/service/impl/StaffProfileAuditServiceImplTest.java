@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 
-public class StaffProfileAuditServiceImplTest {
+class StaffProfileAuditServiceImplTest {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;

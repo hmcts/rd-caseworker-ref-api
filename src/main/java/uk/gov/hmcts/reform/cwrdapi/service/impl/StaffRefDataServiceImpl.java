@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
@@ -507,10 +508,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public StaffWorkerSkillResponse getServiceSkills() {
         List<ServiceSkill> serviceSkills = new ArrayList<>();
         try {
-            List<SkillDTO> skillData = new ArrayList<>();
+            List<SkillDTO> skillData = null;
             List<Skill> skills = skillRepository.findAll();
-            Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
-            if (skillsOptional.isPresent()) {
+            if (!ObjectUtils.isEmpty(skills)) {
                 skillData = skills.stream().map(skill -> {
                     SkillDTO skillDTO = new SkillDTO();
                     skillDTO.setServiceId(skill.getServiceId());
@@ -545,8 +545,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         Map<String, List<SkillDTO>> result = skillData.stream()
                 .collect(
                         Collectors.toMap(
-                                skill -> skill.getServiceId(),
-                                skill -> Collections.singletonList(skill),
+                                SkillDTO::getServiceId,
+                                Collections::singletonList,
                                 this::mergeSkillsWithDuplicateServiceIds
                         )
                 );
@@ -605,8 +605,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         StaffProfileCreationResponse response = new StaffProfileCreationResponse();
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfiles.get(0);
 
-        response.setCaseWorkerId(caseWorkerProfile.getCaseWorkerId());
-
 
         if (null != caseWorkerProfile) {
 
@@ -634,7 +632,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public List<CaseWorkerProfile> updateStaffProfiles(List<StaffProfileCreationRequest> cwUiRequests) {
 
         List<CaseWorkerProfile> processedCwProfiles;
-        List<CaseWorkerProfile> newCaseWorkerProfiles;
         Map<String, StaffProfileCreationRequest> emailToRequestMap = new HashMap<>();
 
         //create map for input request to email
@@ -877,7 +874,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     userProfileRolesResponse) {
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
                         || nonNull(userProfileRolesResponse.getAttributeResponse())) {
-                    isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse,rowId);
+                    isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse);
 
                 } else {
                     log.info("{}:: isEachRoleUpdated  failed:: message {}", loggingComponentName,
@@ -898,7 +895,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return isEachRoleUpdated;
     }
 
-    private boolean isRecordupdatedinUP(UserProfileRolesResponse userProfileRolesResponse,long rowId) {
+    private boolean isRecordupdatedinUP(UserProfileRolesResponse userProfileRolesResponse) {
 
         boolean isRecordUpdate = true;
         if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
