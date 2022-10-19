@@ -87,7 +87,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 .skillsRequest()
                 .skillId(1)
                 .skillCode("1")
-                .description("training")
+                .description("testskill1")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
@@ -121,33 +121,15 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
-    void createStaffProfile_CwdAdminRoleOnly() {
-        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
-                .createStaffProfileCreationRequest();
-
-        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
-                .body(staffProfileCreationRequest)
-                .post("/refdata/case-worker/profile")
-                .andReturn();
-        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
-        assertThat(response.getBody().asString()).contains("Access is denied");
-
-    }
-
-
-    @Test
-    // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
-    @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void shouldGetOnlyCaseWorkerDetails() {
 
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
                 .skillId(1)
-                .skillCode("1")
                 .description("testskill1")
+                .skillCode("1")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
@@ -278,4 +260,21 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 .statusCode(403);
 
     }
+
+    @Test
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
+    void createStaffProfile_CwdAdminRoleOnly() {
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+
+        Response response = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_ADMIN)
+                .body(staffProfileCreationRequest)
+                .post("/refdata/case-worker/profile")
+                .andReturn();
+        assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
+        assertThat(response.getBody().asString()).contains("Access is denied");
+
+    }
+
 }
