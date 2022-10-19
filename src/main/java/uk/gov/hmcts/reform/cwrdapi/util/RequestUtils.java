@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,9 +15,11 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -30,6 +33,20 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SEARCH_STRING_REGEX_PATTERN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_COLUMN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_SPCL_CHAR;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_WHITE_SPACE;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.EXCEPTION_MSG_SPCL_CHAR;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.NUMERIC_REGEX;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.NUMERIC_VALUE_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.LOCATION_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_COMMA_DILIMETER;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.SKILL_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.USER_TYPE_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.JOB_TITLE_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.SERVICE_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
+import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.ROLE_START_END_WITH_COMMA;
 
 @Slf4j
 @Getter
@@ -132,8 +149,102 @@ public class RequestUtils {
                 isEmpty(searchRequest.getSkill()) &&
                 isEmpty(searchRequest.getUserType()))
             throw new EmptyRequestException("Unexpected character");
+
+
+        if(searchRequest.getJobTitle()!= null) {
+            checkSpecialCharacters(searchRequest.getJobTitle());
+            checkNumericValues(searchRequest.getJobTitle());
+            checkIfStringStartsAndEndsWithComma(searchRequest.getJobTitle(), JOB_TITLE_ID_START_END_WITH_COMMA);
+            }
+
+        if(!StringUtils.isEmpty(searchRequest.getUserType())) {
+            checkSpecialCharacters(searchRequest.getUserType());
+            checkNumericValues(searchRequest.getUserType());
+            checkIfStringStartsAndEndsWithComma(searchRequest.getUserType(), USER_TYPE_ID_START_END_WITH_COMMA);
+
+        }
+
+        if(!StringUtils.isEmpty(searchRequest.getSkill())) {
+            checkSpecialCharacters(searchRequest.getSkill());
+            checkNumericValues(searchRequest.getSkill());
+            checkIfStringStartsAndEndsWithComma(searchRequest.getSkill(), SKILL_ID_START_END_WITH_COMMA);
+
+        }
+
+        if(!StringUtils.isEmpty(searchRequest.getLocation())) {
+            validateLocationId(searchRequest.getLocation());
+        }
+
+        if(!StringUtils.isEmpty(searchRequest.getServiceCode())) {
+            validateServiceId(searchRequest.getServiceCode());
+        }
+
+        if(!StringUtils.isEmpty(searchRequest.getRole())) {
+            validateRole(searchRequest.getRole());
+        }
+
+        }
+
+
+
+    private static void checkSpecialCharacters(String inputValue) {
+        inputValue = StringUtils.trim(inputValue);
+        if (Pattern.compile(REG_EXP_WHITE_SPACE).matcher(inputValue).find()
+                || !Pattern.compile(REG_EXP_SPCL_CHAR).matcher(inputValue).matches()) {
+            throw new InvalidRequestException(EXCEPTION_MSG_SPCL_CHAR);
         }
     }
+
+    private static void checkNumericValues(String inputValue) {
+        inputValue = StringUtils.trim(inputValue);
+        if(!Pattern.compile(NUMERIC_REGEX).matcher(inputValue).find()) {
+            throw new InvalidRequestException(NUMERIC_VALUE_ERROR_MESSAGE);
+        }
+    }
+
+    public static void validateLocationId(String locationId) {
+        checkIfStringStartsAndEndsWithComma(locationId, LOCATION_ID_START_END_WITH_COMMA);
+        Arrays.stream(locationId.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
+            if (!isRegexSatisfied(c.trim(), NUMERIC_REGEX)) {
+                throw new InvalidRequestException(String.format(LOCATION_ID_START_END_WITH_COMMA, locationId));
+            }
+        });
+    }
+
+    private static void checkIfStringStartsAndEndsWithComma(String csvIds, String exceptionMessage) {
+        if (StringUtils.startsWith(csvIds, COMMA) || StringUtils.endsWith(csvIds, COMMA)) {
+            throw new InvalidRequestException(String.format(exceptionMessage, csvIds));
+        }
+    }
+
+    public static boolean isRegexSatisfied(String stringToEvaluate, String regex) {
+        return Pattern.compile(regex).matcher(stringToEvaluate).matches();
+    }
+
+    public static void validateServiceId(String serviceId) {
+        checkIfStringStartsAndEndsWithComma(serviceId, SERVICE_ID_START_END_WITH_COMMA);
+        Arrays.stream(serviceId.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
+            if (!isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
+                throw new InvalidRequestException(String.format(SERVICE_ID_START_END_WITH_COMMA, serviceId));
+            }
+        });
+    }
+
+    public static void validateRole(String role) {
+        checkIfStringStartsAndEndsWithComma(role, ROLE_START_END_WITH_COMMA);
+        Arrays.stream(role.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
+            if (!isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
+                throw new InvalidRequestException(String.format(ROLE_START_END_WITH_COMMA, role));
+            }
+        });
+    }
+
+
+
+}
+
+
+
 
 
 
