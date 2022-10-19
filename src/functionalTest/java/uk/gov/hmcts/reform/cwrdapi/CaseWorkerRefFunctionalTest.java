@@ -436,7 +436,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .andReturn();
 
         //assert that delete user is not found
-        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
+        assertThat(fetchResponse.getStatusCode()).isEqualTo(200);
     }
 
     @Test
