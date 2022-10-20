@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
@@ -37,7 +38,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SpringBootTest
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
+class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String UPDATE_STAFF_PROFILE = "StaffRefDataController.updateStaffUserProfile";
 
@@ -49,7 +50,6 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
         String emailPattern = "sbnTest1234";
         String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
         List<String> roles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
-        //createUser(List<String> userRoles, String userEmail, String firstName, String lastName)
         String firstName = "StaffProfilefirstName";
         String lastName = "StaffProfilelastName";
 
@@ -57,7 +57,6 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
                 email,firstName,lastName);
         String userEmail = userDetail.get(EMAIL);
 
-        //var upResponse = getUserProfileFromUp(userEmail);
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest(userEmail,firstName,lastName);
@@ -77,8 +76,6 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
         Assertions.assertNotNull(staffProfileResponse);
         Assertions.assertNotNull(staffProfileResponse.getCaseWorkerId());
 
-        //UserProfileResponse upResponseUpdated =
-        //        getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
 
 
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
@@ -89,12 +86,12 @@ public class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctional
                 .assertThat()
                 .statusCode(200);
 
-        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+        List<CaseWorkerProfile> fetchedList =
                 Arrays.asList(fetchResponse.getBody().as(
-                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+                        CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
 
-        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+        CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
 
         assertThat(caseWorkerProfile.getFirstName()).isEqualTo(firstNameUpdated);
         assertThat(caseWorkerProfile.getFirstName()).isEqualTo(firstNameUpdated);

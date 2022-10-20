@@ -300,8 +300,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     @Test
     void test_updateStaffProfile_with_changed_values() throws JsonProcessingException {
 
-        //ValidateStaffProfile
-        //doNothing().when(validateStaffProfile).validateStaffProfile(any());
 
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
@@ -371,12 +369,10 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        //when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
         when(caseWorkerProfileRepository.findByEmailIdIn(anySet()))
                 .thenReturn(caseWorkerProfiles);
-        //when(caseWorkerProfileRepository.saveAll(anyList())).thenReturn(caseWorkerProfiles);
 
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
@@ -535,8 +531,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         requests.add(staffProfileCreationRequest);
         staffRefDataServiceImpl.updateStaffProfiles(requests);
 
-        //verify(caseWorkerProfileRepository, times(1)).saveAll(any());
-        //verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
     }
 
@@ -611,7 +605,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
-        // userProfileCreationResponse.setIdamId("12345678");
+
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
@@ -639,7 +633,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
-        // userProfileCreationResponse.setIdamId("12345678");
+
         RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
@@ -664,7 +658,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     @Test
     void test_check_staff_profile_for_update() throws JsonProcessingException {
 
-        //ValidateStaffProfile
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
         CaseWorkerProfile caseWorkerProfile = null;
@@ -686,7 +679,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     @Test
     void test_processExistingCaseWorkers() throws JsonProcessingException {
 
-        //ValidateStaffProfile
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
 
@@ -716,7 +708,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     @Test
     void test_PopulateStaffProfile() throws JsonProcessingException {
 
-        //ValidateStaffProfile
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
 
@@ -770,7 +761,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         assertThat(caseWorkerProfile.isNew()).isFalse();
         assertThat(caseWorkerProfile.getUserType()).isNull();
 
-        //Validate
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId()).isEqualTo(1);
         assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation()).isEqualTo("Location1");
 
@@ -788,7 +778,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     @Test
     void test_PopulateStaffProfile_with_empty_Skills() throws JsonProcessingException {
 
-        //ValidateStaffProfile
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
 
@@ -822,7 +811,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     @Test
     void test_updateUserProfile() throws JsonProcessingException {
 
-        //ValidateStaffProfile
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
 
@@ -859,7 +847,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     @Test
     void test_processExistingCaseWorkers_suspendedUsers() throws JsonProcessingException {
 
-        //ValidateStaffProfile
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
 
