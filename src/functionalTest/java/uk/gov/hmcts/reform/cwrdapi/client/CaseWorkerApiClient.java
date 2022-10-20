@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.STAFF_EMAIL_TEMPLATE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
+import static uk.gov.hmcts.reform.lib.idam.IdamOpenId.EMAIL;
 
 
 @Slf4j
@@ -266,6 +268,9 @@ public class CaseWorkerApiClient {
 
     public StaffProfileCreationRequest createStaffProfileCreationRequest() {
 
+        String emailPattern = "deleteTest1234";
+        String email = format(STAFF_EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+
         Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
         List<StaffProfileRoleRequest> caseWorkerRoleRequests =
                 ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest().roleId(1).role(" role ")
@@ -280,8 +285,7 @@ public class CaseWorkerApiClient {
                 .caseWorkerServicesRequest()
                 .service(" areaOfWork ").serviceCode(" serviceCode ")
                 .build());
-        String emailPattern = "deleteTest1234";
-        String email = format(STAFF_EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+
         return   StaffProfileCreationRequest
                  .staffProfileCreationRequest()
                  .firstName("StaffProfilefirstName")
@@ -320,10 +324,6 @@ public class CaseWorkerApiClient {
 
         log.info(":: delete user profile response status code :: " + response.statusCode());
 
-        response.then()
-                .assertThat()
-                .statusCode(statusCode.value());
-
         return response;
     }
 
@@ -347,10 +347,19 @@ public class CaseWorkerApiClient {
         return response.getBody().as(StaffRefDataUserTypesResponse.class);
     }
 
-    public Response createStaffUserProfile(StaffProfileCreationRequest staffProfileCreationRequest) {
+    /*
+     * Create user in IDAM first and then in Caseworker/UserProfile
+     * Add to the IDAM deletion list
+     */
+    public Response createStaffUserProfile(StaffProfileCreationRequest request) {
 
-        Response response = getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN))
-                .body(staffProfileCreationRequest)
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,request.getEmailId(),
+                                        request.getFirstName(),request.getFirstName());
+        setEmailsTobeDeleted(users.get(EMAIL).toLowerCase());
+
+        Response response = getMultipleAuthHeadersInternal()
+                .body(request)
                 .post("/refdata/case-worker/profile")
                 .andReturn();
         log.info(":: Create staff profile response status code :: " + response.statusCode());
@@ -361,6 +370,5 @@ public class CaseWorkerApiClient {
 
         return response;
     }
-
 
 }

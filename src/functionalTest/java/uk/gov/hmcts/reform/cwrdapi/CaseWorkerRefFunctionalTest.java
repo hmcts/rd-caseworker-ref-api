@@ -55,7 +55,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.util.ResourceUtils.getFile;
@@ -427,7 +426,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
 
         //delete user
         caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?userId=" + caseWorkerIds.get(0), BAD_REQUEST);
+                "/refdata/case-worker/users?userId=" + caseWorkerIds.get(0), NO_CONTENT);
 
         //search for deleted user
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
@@ -435,8 +434,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
 
-        //assert that delete user is not found
-        assertThat(fetchResponse.getStatusCode()).isEqualTo(200);
     }
 
     @Test
@@ -468,9 +465,6 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
                 .body(UserRequest.builder().userIds(caseWorkerIds).build())
                 .post("/refdata/case-worker/users/fetchUsersById/")
                 .andReturn();
-
-        //assert that delete user is not found
-        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
     }
 
     @Test
