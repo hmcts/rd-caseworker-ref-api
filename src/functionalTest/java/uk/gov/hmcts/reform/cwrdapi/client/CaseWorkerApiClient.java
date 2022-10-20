@@ -358,7 +358,7 @@ public class CaseWorkerApiClient {
                                         request.getFirstName(),request.getFirstName());
         setEmailsTobeDeleted(users.get(EMAIL).toLowerCase());
 
-        Response response = getMultipleAuthHeadersInternal()
+        Response response = getMultipleAuthHeadersInternal(userRoles)
                 .body(request)
                 .post("/refdata/case-worker/profile")
                 .andReturn();
