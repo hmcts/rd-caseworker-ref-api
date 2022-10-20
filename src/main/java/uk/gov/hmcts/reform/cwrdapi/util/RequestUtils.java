@@ -233,11 +233,12 @@ public class RequestUtils {
             if (!isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
                 throw new InvalidRequestException(String.format(ROLE_START_END_WITH_COMMA, role));
             }
+            if (!(c.trim().equals("case allocator") || c.trim().equals("task supervisor")
+                    || c.trim().equals("staff administrator"))) {
+                throw new InvalidRequestException("Invalid search string. Please input a valid string.");
+            }
         });
     }
-
-
-
 }
 
 
