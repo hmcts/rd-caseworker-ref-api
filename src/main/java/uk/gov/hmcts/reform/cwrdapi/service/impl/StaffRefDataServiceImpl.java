@@ -50,7 +50,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -316,15 +315,16 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     @Override
-    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest, PageRequest pageRequest) {
+    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest,
+                                                                              PageRequest pageRequest) {
         List<String> serviceCodes = null;
         List<Integer> locationId = null;
 
-        if(searchRequest.getServiceCode() != null) {
+        if (searchRequest.getServiceCode() != null) {
             serviceCodes = Splitter.on(',').trimResults().omitEmptyStrings()
                     .splitToList(searchRequest.getServiceCode().toUpperCase());
         }
-        if(searchRequest.getLocation() != null) {
+        if (searchRequest.getLocation() != null) {
             locationId = Splitter.on(',').trimResults().omitEmptyStrings()
                     .splitToList(searchRequest.getLocation()).stream().map(s -> Integer.parseInt(s))
                     .collect(Collectors.toList());

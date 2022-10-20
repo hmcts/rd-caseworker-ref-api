@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.cwrdapi.controllers.constants;
 
 public class CaseWorkerRefConstants {
 
+    private CaseWorkerRefConstants() {
+    }
+
     public static final String REG_EXP_SPCL_CHAR = "^[^<>{}\"/|;:.~!?@#$%^=&*\\]\\\\()\\[¿§«»ω⊙¤°℃℉€¥£¢¡®©09+]*$";
 
     public static final String REG_EXP_WHITE_SPACE = "\\s";

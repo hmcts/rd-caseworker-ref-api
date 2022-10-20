@@ -2,12 +2,9 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.ReflectionUtils;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.EmptyRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -31,8 +28,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SEARCH_STRING_REGEX_PATTERN;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_COLUMN;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_SPCL_CHAR;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_WHITE_SPACE;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.EXCEPTION_MSG_SPCL_CHAR;
@@ -47,6 +42,8 @@ import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefCon
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.SERVICE_ID_START_END_WITH_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.ROLE_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_COLUMN;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
 
 @Slf4j
 @Getter
@@ -145,11 +142,11 @@ public class RequestUtils {
 
     public static void validateSearchRequest(SearchRequest searchRequest) {
         if (isEmpty(searchRequest.getJobTitle()) && isEmpty(searchRequest.getLocation()) &&
-                isEmpty(searchRequest.getRole()) && isEmpty(searchRequest.getServiceCode()) &&
-                isEmpty(searchRequest.getSkill()) &&
-                isEmpty(searchRequest.getUserType()))
+                    isEmpty(searchRequest.getRole()) && isEmpty(searchRequest.getServiceCode()) &&
+                    isEmpty(searchRequest.getSkill()) &&
+                    isEmpty(searchRequest.getUserType())) {
             throw new EmptyRequestException("Unexpected character");
-
+        }
 
         if(searchRequest.getJobTitle()!= null) {
             checkSpecialCharacters(searchRequest.getJobTitle());
