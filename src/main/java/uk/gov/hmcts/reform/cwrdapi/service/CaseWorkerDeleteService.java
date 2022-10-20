@@ -12,7 +12,7 @@ public interface CaseWorkerDeleteService {
      * @param userId String
      * @return CaseWorkerProfilesDeletionResponse
      */
-    CaseWorkerProfilesDeletionResponse deleteByUserId(String userId);
+    CaseWorkerProfilesDeletionResponse deleteByUserId(String userId)
 
     /**
      * Deletes caseworkers by associated email pattern.
