@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
@@ -74,6 +75,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ROLE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
@@ -360,6 +362,55 @@ class StaffRefDataUpdateStaffServiceImplTest {
     }
 
     @Test
+    void test_updateStaffProfile_when_idam_profile_is_inactive() throws JsonProcessingException {
+
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+
+        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        when(caseWorkerProfileRepository.findByEmailIdIn(anySet()))
+                .thenReturn(caseWorkerProfiles);
+
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
+                .updateStaffProfile(staffProfileCreationRequest);
+
+
+        assertThat(staffProfileCreationResponse).isNull();
+    }
+
+    @Test
     void test_updateStaffProfile_with_changed_values_with_exception() throws JsonProcessingException {
 
 
@@ -417,11 +468,17 @@ class StaffRefDataUpdateStaffServiceImplTest {
                 .region("testRegion")
                 .userType("testUser1").build();
 
-        List<CaseWorkerProfile> updateCaseWorkerProfiles = staffRefDataServiceImpl
-                .updateStaffProfiles(List.of(staffProfileCreationRequest, staffProfileCreationRequestEmpty));
+
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            List<CaseWorkerProfile> updateCaseWorkerProfiles = staffRefDataServiceImpl
+                    .updateStaffProfiles(List.of(staffProfileCreationRequest, staffProfileCreationRequestEmpty));
 
 
-        assertThat(updateCaseWorkerProfiles).isNull();
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
+
 
     }
 
@@ -616,10 +673,14 @@ class StaffRefDataUpdateStaffServiceImplTest {
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
 
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            boolean updateUserRolesInIdam = staffRefDataServiceImpl
+                    .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
 
-        boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
-        assertThat(updateUserRolesInIdam).isFalse();
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
 
     }
 
@@ -647,10 +708,16 @@ class StaffRefDataUpdateStaffServiceImplTest {
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
 
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            boolean updateUserRolesInIdam = staffRefDataServiceImpl
+                    .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
 
-        boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
-        assertThat(updateUserRolesInIdam).isFalse();
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
+
+
 
     }
 
@@ -696,11 +763,14 @@ class StaffRefDataUpdateStaffServiceImplTest {
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
         List<CaseWorkerProfile> cwDbProfiles = Collections.singletonList(caseWorkerProfile);
-        Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
-                .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
+                    .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
 
+        });
 
-        assertThat(updateAndSuspendedLists).isNotNull();
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
 
 
     }
@@ -864,11 +934,15 @@ class StaffRefDataUpdateStaffServiceImplTest {
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
         List<CaseWorkerProfile> cwDbProfiles = Collections.singletonList(caseWorkerProfile);
-        Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
-                .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
+                    .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
 
+        });
 
-        assertThat(updateAndSuspendedLists).isNotNull();
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
+
 
 
     }

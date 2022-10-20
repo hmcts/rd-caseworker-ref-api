@@ -89,8 +89,10 @@ import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ROLE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
@@ -602,17 +604,21 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
         List<CaseWorkerProfile> caseWorkerProfiles =  updateStaffProfiles(cwUiRequests);
-        StaffProfileCreationResponse response = new StaffProfileCreationResponse();
-        CaseWorkerProfile caseWorkerProfile = caseWorkerProfiles.get(0);
+        StaffProfileCreationResponse response = null;
+        if (!ObjectUtils.isEmpty(caseWorkerProfiles)) {
+
+            CaseWorkerProfile caseWorkerProfile = caseWorkerProfiles.get(0);
 
 
-        if (null != caseWorkerProfile) {
+            if (null != caseWorkerProfile) {
 
-            staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtils.EMPTY,
-                    caseWorkerProfile.getCaseWorkerId(),profileRequest,STAFF_PROFILE_UPDATE);
-            response = StaffProfileCreationResponse.builder()
-                    .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
-                    .build();
+                staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtils.EMPTY,
+                        caseWorkerProfile.getCaseWorkerId(),profileRequest,STAFF_PROFILE_UPDATE);
+
+                response = StaffProfileCreationResponse.builder()
+                        .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
+                        .build();
+            }
         }
         return response;
     }
@@ -791,6 +797,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId) {
 
+        boolean result = true;
         try {
             Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
@@ -799,18 +806,24 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
                 if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
 
-                    staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
+                    staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS_NOT_ACTIVE,
                             StringUtils.EMPTY,cwrProfileRequest,STAFF_PROFILE_UPDATE);
 
                     log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                             profileResponse.getIdamStatus());
-                    return false;
+
+                    result = false;
+                    throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                            IDAM_STATUS_NOT_ACTIVE);
                 }
 
             } else {
                 log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                         UP_FAILURE_ROLES);
-                return false;
+                result = false;
+                throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                        IDAM_STATUS_USER_PROFILE);
+
             }
             UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
@@ -837,9 +850,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,UP_FAILURE_ROLES,
                     StringUtils.EMPTY,cwrProfileRequest,STAFF_PROFILE_UPDATE);
-            return false;
+            result = false;
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                    IDAM_STATUS_ROLE_UPDATE);
         }
-        return true;
+        return result;
     }
 
     private boolean updateMismatchedDatatoUP(StaffProfileCreationRequest cwrProfileRequest, String idamId,
@@ -891,6 +906,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}::  {}",
                     loggingComponentName, rowId, ex.getMessage(), UP_FAILURE_ROLES);
             isEachRoleUpdated = false;
+
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                    UP_FAILURE_ROLES);
         }
         return isEachRoleUpdated;
     }

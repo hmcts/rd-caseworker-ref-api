@@ -92,6 +92,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ROLE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
@@ -937,11 +938,15 @@ class StaffRefDataServiceImplTest {
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
         List<CaseWorkerProfile> cwDbProfiles = Collections.singletonList(caseWorkerProfile);
-        Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
-                .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
+                    .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
 
+        });
 
-        assertThat(updateAndSuspendedLists).isNotNull();
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
+
 
 
     }
@@ -1037,11 +1042,16 @@ class StaffRefDataServiceImplTest {
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
         List<CaseWorkerProfile> cwDbProfiles = Collections.singletonList(caseWorkerProfile);
-        Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
-                .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
 
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
+                    .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
 
-        assertThat(updateAndSuspendedLists).isNotNull();
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
+
 
 
     }
