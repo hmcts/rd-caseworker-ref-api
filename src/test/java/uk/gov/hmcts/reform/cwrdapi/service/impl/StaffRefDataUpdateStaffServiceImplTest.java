@@ -468,10 +468,12 @@ class StaffRefDataUpdateStaffServiceImplTest {
                 .region("testRegion")
                 .userType("testUser1").build();
 
+        List<StaffProfileCreationRequest> stafProfiles  =
+                List.of(staffProfileCreationRequest, staffProfileCreationRequestEmpty);
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             List<CaseWorkerProfile> updateCaseWorkerProfiles = staffRefDataServiceImpl
-                    .updateStaffProfiles(List.of(staffProfileCreationRequest, staffProfileCreationRequestEmpty));
+                    .updateStaffProfiles(stafProfiles);
 
 
         });
@@ -672,10 +674,10 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
-
+        String caserWorkerId = dbProfile.getCaseWorkerId();
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
+                    .updateUserRolesInIdam(cwUiRequest,caserWorkerId);
 
         });
 
@@ -707,10 +709,10 @@ class StaffRefDataUpdateStaffServiceImplTest {
         cwUiRequest.setIdamRoles(idamRoles);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
-
+        String caserWorkerId = dbProfile.getCaseWorkerId();
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,dbProfile.getCaseWorkerId());
+                    .updateUserRolesInIdam(cwUiRequest,caserWorkerId);
 
         });
 

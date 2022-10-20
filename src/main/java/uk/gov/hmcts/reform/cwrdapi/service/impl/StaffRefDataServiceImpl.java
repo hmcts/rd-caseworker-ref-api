@@ -797,7 +797,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId) {
 
-        boolean result = true;
+        boolean result = false;
         try {
             Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
@@ -812,7 +812,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                             profileResponse.getIdamStatus());
 
-                    result = false;
                     throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
                             IDAM_STATUS_NOT_ACTIVE);
                 }
@@ -820,7 +819,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             } else {
                 log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                         UP_FAILURE_ROLES);
-                result = false;
                 throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
                         IDAM_STATUS_USER_PROFILE);
 
@@ -850,10 +848,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,UP_FAILURE_ROLES,
                     StringUtils.EMPTY,cwrProfileRequest,STAFF_PROFILE_UPDATE);
-            result = false;
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
                     IDAM_STATUS_ROLE_UPDATE);
         }
+        result = true;
         return result;
     }
 
@@ -905,7 +903,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         } catch (Exception ex) {
             log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}::  {}",
                     loggingComponentName, rowId, ex.getMessage(), UP_FAILURE_ROLES);
-            isEachRoleUpdated = false;
 
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
                     UP_FAILURE_ROLES);
