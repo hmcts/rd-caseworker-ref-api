@@ -128,7 +128,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 .skillsRequest()
                 .skillId(1)
                 .description("testskill1")
-                .skillCode("10")
+                .skillCode("1")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
