@@ -123,18 +123,16 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void shouldGetOnlyCaseWorkerDetails() {
-
+    void fetchCaseWorkerDetails() {
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
                 .skillId(1)
                 .description("testskill1")
-                .skillCode("1")
+                .skillCode("10")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
-
         staffProfileCreationRequest.setSkills(List.of(skillsRequest));
 
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
@@ -155,7 +153,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         fetchResponse.then()
                 .assertThat()
                 .statusCode(200);
-        log.info("createStaffUserProfile Request");
 
         List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
                 Arrays.asList(fetchResponse.getBody().as(
@@ -195,7 +192,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     // this test verifies User profile are fetched from CWR when id matched what given in request rest should be ignored
     @ToggleEnable(mapKey = FETCH_BY_CASEWORKER_ID, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void shouldGetOnlyCaseWorkerDetailsWithEmptySkills() {
+    void fetchCaseWorkerDetailsWithEmptySkills() {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
         assertNotNull(staffProfileCreationRequest);
