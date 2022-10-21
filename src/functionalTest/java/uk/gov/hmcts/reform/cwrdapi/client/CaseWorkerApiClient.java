@@ -326,10 +326,6 @@ public class CaseWorkerApiClient {
 
         log.info(":: delete user profile response status code :: " + response.statusCode());
 
-        response.then()
-                .assertThat()
-                .statusCode(statusCode.value());
-
         return response;
     }
 
