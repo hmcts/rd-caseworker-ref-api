@@ -9,6 +9,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -159,11 +161,12 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"deleteTest1234"})
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
-    static void deleteStaffProfileByEmailPattern() {
+    static void deleteStaffProfileByEmailPattern(String emailPattern) {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
@@ -175,7 +178,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertNotNull(caseWorkerIds);
         //delete user by email pattern
         caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?emailPattern=" + "staff-profile-func-test-user", NO_CONTENT);
+                "/refdata/case-worker/users?emailPattern=" + emailPattern,NO_CONTENT);
 
         //search for deleted user
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
@@ -190,8 +193,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     @AfterAll
     public static void cleanUpTestData() {
         try {
-            deleteStaffProfileById();
-            deleteStaffProfileByEmailPattern();
+            deleteStaffProfileByEmailPattern("staff-profile-func-test-user");
         } catch (Exception e) {
             log.error("cleanUpTestData :: threw the following exception: " + e);
         }
