@@ -13,11 +13,14 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -49,7 +52,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -412,7 +414,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     //this test verifies that a User Profile is deleted by ID
     public void deleteCaseworkerById() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                caseWorkerApiClient.createCaseWorkerProfiles();
+                createNewActiveCaseWorkerProfile();
 
         // create user
         Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
@@ -437,16 +439,15 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"cwr-func-test-user"})
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
-    public void deleteCaseworkerByEmailPattern() {
-        String emailPattern = "deleteTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+    public static void deleteCaseworkerByEmailPattern(String emailPattern) {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                caseWorkerApiClient.createCaseWorkerProfiles(email);
+                createNewActiveCaseWorkerProfile();
 
         // create user with email pattern
         Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
@@ -730,5 +731,14 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+    }
+
+    @AfterAll
+    public static void cleanUpTestData() {
+        try {
+            deleteCaseworkerByEmailPattern("cwr-func-test-user");
+        } catch (Exception e) {
+            log.error("cleanUpTestData :: threw the following exception: " + e);
+        }
     }
 }

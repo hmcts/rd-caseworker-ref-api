@@ -24,13 +24,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.STAFF_EMAIL_TEMPLATE;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.generateRandomEmail;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.setEmailsTobeDeleted;
 import static uk.gov.hmcts.reform.lib.idam.IdamOpenId.EMAIL;
@@ -266,7 +268,10 @@ public class CaseWorkerApiClient {
 
     public StaffProfileCreationRequest createStaffProfileCreationRequest() {
 
-        Set<String> roles = ImmutableSet.of("tribunal_case_worker");
+        String emailPattern = "deleteTest1234";
+        String email = format(STAFF_EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+
+        Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
         List<StaffProfileRoleRequest> caseWorkerRoleRequests =
                 ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest()
                          .roleId(1)
@@ -287,7 +292,7 @@ public class CaseWorkerApiClient {
                  .staffProfileCreationRequest()
                  .firstName("StaffProfilefirstName")
                  .lastName("StaffProfilelastName")
-                 .emailId(UUID.randomUUID() + "@justice.gov.uk")
+                 .emailId(email)
                  .regionId(1).userType("CTSC")
                  .region("region")
                  .suspended(false)

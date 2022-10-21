@@ -123,7 +123,7 @@ public class AuthorizationFunctionalTest {
         emailsTobeDeleted.add(emailTobeDeleted);
     }
 
-    public List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
+    public static List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
         Map<String, String> userDetail = idamOpenIdClient.createUser(CASEWORKER_IAC_BULKSCAN);
         String userEmail = userDetail.get(EMAIL);
 
