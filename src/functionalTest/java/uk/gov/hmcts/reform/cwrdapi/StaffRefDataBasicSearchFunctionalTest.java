@@ -4,6 +4,7 @@ import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -26,6 +27,7 @@ import java.util.List;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -179,6 +181,17 @@ public class StaffRefDataBasicSearchFunctionalTest extends AuthorizationFunction
 
 
     }
+
+    @AfterAll
+    public static void cleanUpTestData() {
+        try {
+            caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                    "/refdata/case-worker/users?emailPattern=" + "cwr-func-test-user",NO_CONTENT);
+        } catch (Exception e) {
+            log.error("cleanUpTestData :: threw the following exception: " + e);
+        }
+    }
+
 
 
 }

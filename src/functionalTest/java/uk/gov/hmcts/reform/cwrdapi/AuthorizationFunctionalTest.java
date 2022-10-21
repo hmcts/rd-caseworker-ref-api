@@ -70,6 +70,8 @@ public class AuthorizationFunctionalTest {
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
     public static final String STAFF_EMAIL_TEMPLATE = "staff-profile-func-test-user-%s@justice.gov.uk";
+    public static final String STAFF_EMAIL_PATTERN = "staff-profile-func-test-user";
+    public static final String CWR_EMAIL_PATTERN = "cwr-func-test-user";
 
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
@@ -116,10 +118,6 @@ public class AuthorizationFunctionalTest {
         log.info("delete idam user called");
         emailsTobeDeleted.forEach(email -> caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
                 "/refdata/case-worker/users?emailPattern=" + email, NO_CONTENT));
-
-        //deleting the profiles uploaded using xls and xlsx files
-        emailsTobeDeleted.forEach(email -> caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?emailPattern=" + "cwr-func-test-user", NO_CONTENT));
     }
 
     public static String getS2sToken() {

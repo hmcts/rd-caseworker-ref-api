@@ -13,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -730,5 +731,14 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+    }
+
+    @AfterAll
+    public static void cleanUpTestData() {
+        try {
+            deleteCaseworkerByEmailPattern(CWR_EMAIL_PATTERN);
+        } catch (Exception e) {
+            log.error("cleanUpTestData :: threw the following exception: " + e);
+        }
     }
 }
