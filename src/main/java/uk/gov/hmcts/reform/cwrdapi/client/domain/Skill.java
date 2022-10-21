@@ -8,10 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uk.gov.hmcts.reform.cwrdapi.util.MappingField;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -19,20 +17,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Role implements Serializable {
+public class Skill implements Serializable {
 
     private static final long serialVersionUID = 2020L;
 
-    private String roleId;
 
-    @MappingField(columnName = "Primary Role,Secondary Role", isPrimary = "Primary Role")
-    @JsonProperty("role")
-    private String roleName;
+    @JsonProperty("skill_id")
+    private Long skillId;
 
-    @JsonProperty("is_primary")
-    private boolean isPrimary;
+    @JsonProperty("skill_code")
+    private String skillCode;
 
-    private LocalDateTime createdTime;
+    @JsonProperty("description")
+    private String description;
 
-    private LocalDateTime lastUpdatedTime;
 }

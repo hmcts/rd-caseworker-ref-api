@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleName;
@@ -455,9 +457,11 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .userType(profile.getUserType().getDescription())
                 .userId(profile.getUserTypeId())
                 .suspended(profile.getSuspended().toString())
+                .staffAdmin(Boolean.TRUE.equals(profile.getUserAdmin()) ? "Y" : "N")
                 .createdTime(profile.getCreatedDate())
                 .lastUpdatedTime(profile.getLastUpdate())
                 .roles(mapRolesToDto(profile.getCaseWorkerRoles()))
+                .skills(mapSkillsToDto(profile.getCaseWorkerSkills()))
                 .locations(mapLocationsToDto(profile.getCaseWorkerLocations()))
                 .workAreas(mapWorkAreasToDto(profile.getCaseWorkerWorkAreas()))
                 .taskSupervisor(Boolean.TRUE.equals(profile.getTaskSupervisor()) ? "Y" : "N")
@@ -509,6 +513,19 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         }
         return rolesDto;
+    }
+
+    private List<Skill> mapSkillsToDto(List<CaseWorkerSkill> caseWorkerSkills) {
+        List<Skill> skillsDto = new ArrayList<>();
+        for (CaseWorkerSkill caseWorkerSkill : caseWorkerSkills) {
+            Skill skillDto = Skill.builder()
+                    .skillId(caseWorkerSkill.getSkillId())
+                    .skillCode(caseWorkerSkill.getSkill().getSkillCode())
+                    .description(caseWorkerSkill.getSkill().getDescription()).build();
+            skillsDto.add(skillDto);
+
+        }
+        return skillsDto;
     }
 
     public CaseWorkerProfile createCaseWorkerProfile(CaseWorkersProfileCreationRequest cwrdProfileRequest) {

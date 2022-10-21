@@ -37,7 +37,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
     @Test
     @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void should_return_service_skills_with_status_code_200_when_flag_true() {
+     void should_return_service_skills_with_status_code_200_when_flag_true() {
 
         Response fetchResponse = caseWorkerApiClient
                 .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
