@@ -26,6 +26,7 @@ import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class})
@@ -113,6 +114,12 @@ public class AuthorizationFunctionalTest {
     public static void destroy() {
         emailsTobeDeleted.forEach(email -> idamOpenIdClient.deleteSidamUser(email));
         log.info("delete idam user called");
+        emailsTobeDeleted.forEach(email -> caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?emailPattern=" + email, NO_CONTENT));
+
+        //deleting the profiles uploaded using xls and xlsx files
+        emailsTobeDeleted.forEach(email -> caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?emailPattern=" + "cwr-func-test-user", NO_CONTENT));
     }
 
     public static String getS2sToken() {

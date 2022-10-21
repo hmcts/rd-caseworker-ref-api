@@ -4,7 +4,6 @@ import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -336,14 +335,4 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         //assert that delete user is not found
         assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
     }
-
-    @AfterAll
-    public static void cleanUpTestData() {
-        try {
-            deleteStaffProfileByEmailPattern("staff-profile-func-test-user");
-        } catch (Exception e) {
-            log.error("cleanUpTestData :: threw the following exception: " + e);
-        }
-    }
-
 }
