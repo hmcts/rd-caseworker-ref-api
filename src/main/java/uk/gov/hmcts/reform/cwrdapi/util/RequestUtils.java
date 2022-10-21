@@ -56,10 +56,10 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.USER_TYPE_ID_
 @Getter
 public class RequestUtils {
 
-    final static List<String> supportedRoles = List.of(CASE_ALLOCATOR, TASK_SUPERVISOR, STAFF_ADMIN);
-
     private RequestUtils() {
     }
+
+    static final List<String> supportedRoles = List.of(CASE_ALLOCATOR, TASK_SUPERVISOR, STAFF_ADMIN);
 
     /**
      * trims idam roles for all requests.
@@ -238,7 +238,7 @@ public class RequestUtils {
         checkIfStringStartsAndEndsWithComma(role, ROLE_START_END_WITH_COMMA);
         List<String> actualRoles = convertToList(Objects.toString(role, "").toLowerCase());
 
-        if (Collections.indexOfSubList(supportedRoles , actualRoles) != 0) {
+        if (Collections.indexOfSubList(supportedRoles, actualRoles) != 0) {
             throw new InvalidRequestException("Invalid search string. Please input a valid string.");
         }
     }
