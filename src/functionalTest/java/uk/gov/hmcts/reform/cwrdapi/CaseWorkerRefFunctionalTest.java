@@ -440,7 +440,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"cwr-func-test-user"})
+    @ValueSource(strings = {""})
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
@@ -449,6 +449,9 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                 createNewActiveCaseWorkerProfile();
 
+        if (emailPattern.isEmpty()) {
+            emailPattern = caseWorkersProfileCreationRequests.get(0).getEmailId();
+        }
         // create user with email pattern
         Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 

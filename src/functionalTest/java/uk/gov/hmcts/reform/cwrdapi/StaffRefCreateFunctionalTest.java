@@ -309,7 +309,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"deleteTest1234"})
+    @ValueSource(strings = {""})
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
@@ -323,6 +323,10 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
         String caseWorkerIds = staffProfileCreationResponse.getCaseWorkerId();
         assertNotNull(caseWorkerIds);
+
+        if (emailPattern.isEmpty()) {
+            emailPattern = staffProfileCreationRequest.getEmailId();
+        }
         //delete user by email pattern
         caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
                 "/refdata/case-worker/users?emailPattern=" + emailPattern,NO_CONTENT);
