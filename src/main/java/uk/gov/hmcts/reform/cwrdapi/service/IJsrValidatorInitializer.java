@@ -15,6 +15,4 @@ public interface IJsrValidatorInitializer<T> {
     List<T> getInvalidJsrRecords(List<T> domains);
 
     Set<ConstraintViolation<T>> getConstraintViolations();
-
-    void validateStaffProfile(T request);
 }
