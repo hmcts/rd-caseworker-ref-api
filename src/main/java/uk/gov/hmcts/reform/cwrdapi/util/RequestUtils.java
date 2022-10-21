@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import com.google.common.base.Splitter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.ReflectionUtils;
@@ -13,41 +15,48 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.logging.log4j.util.Strings.isNotBlank;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.COMMA;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.JOB_TITLE_ID_START_END_WITH_COMMA;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.LOCATION_ID_START_END_WITH_COMMA;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.NUMERIC_REGEX;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_COMMA_DILIMETER;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_SPCL_CHAR;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.REG_EXP_WHITE_SPACE;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.ROLE_START_END_WITH_COMMA;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.SERVICE_ID_START_END_WITH_COMMA;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.SKILL_ID_START_END_WITH_COMMA;
-import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.CaseWorkerRefConstants.USER_TYPE_ID_START_END_WITH_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.EXCEPTION_MSG_SPCL_CHAR;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.NUMERIC_VALUE_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_LAST_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.JOB_TITLE_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NUMERIC_REGEX;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REG_EXP_COMMA_DILIMETER;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REG_EXP_SPCL_CHAR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REG_EXP_WHITE_SPACE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_START_END_WITH_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SEARCH_STRING_REGEX_PATTERN;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SERVICE_ID_START_END_WITH_COMMA;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SKILL_ID_START_END_WITH_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_COLUMN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.USER_TYPE_ID_START_END_WITH_COMMA;
 
 @Slf4j
 @Getter
 public class RequestUtils {
+
+    final static List<String> supportedRoles = List.of(CASE_ALLOCATOR, TASK_SUPERVISOR, STAFF_ADMIN);
 
     private RequestUtils() {
     }
@@ -158,14 +167,12 @@ public class RequestUtils {
             checkSpecialCharacters(searchRequest.getUserType());
             checkNumericValues(searchRequest.getUserType());
             checkIfStringStartsAndEndsWithComma(searchRequest.getUserType(), USER_TYPE_ID_START_END_WITH_COMMA);
-
         }
 
         if (!StringUtils.isEmpty(searchRequest.getSkill())) {
             checkSpecialCharacters(searchRequest.getSkill());
             checkNumericValues(searchRequest.getSkill());
             checkIfStringStartsAndEndsWithComma(searchRequest.getSkill(), SKILL_ID_START_END_WITH_COMMA);
-
         }
 
         if (!StringUtils.isEmpty(searchRequest.getLocation())) {
@@ -202,7 +209,7 @@ public class RequestUtils {
     public static void validateLocationId(String locationId) {
         checkIfStringStartsAndEndsWithComma(locationId, LOCATION_ID_START_END_WITH_COMMA);
         Arrays.stream(locationId.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
-            if (!isRegexSatisfied(c.trim(), NUMERIC_REGEX)) {
+            if (isRegexNotSatisfied(c.trim(), NUMERIC_REGEX)) {
                 throw new InvalidRequestException(String.format(LOCATION_ID_START_END_WITH_COMMA, locationId));
             }
         });
@@ -214,14 +221,14 @@ public class RequestUtils {
         }
     }
 
-    public static boolean isRegexSatisfied(String stringToEvaluate, String regex) {
-        return Pattern.compile(regex).matcher(stringToEvaluate).matches();
+    public static boolean isRegexNotSatisfied(String stringToEvaluate, String regex) {
+        return !Pattern.compile(regex).matcher(stringToEvaluate).matches();
     }
 
     public static void validateServiceId(String serviceId) {
         checkIfStringStartsAndEndsWithComma(serviceId, SERVICE_ID_START_END_WITH_COMMA);
         Arrays.stream(serviceId.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
-            if (!isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
+            if (isRegexNotSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
                 throw new InvalidRequestException(String.format(SERVICE_ID_START_END_WITH_COMMA, serviceId));
             }
         });
@@ -229,15 +236,23 @@ public class RequestUtils {
 
     public static void validateRole(String role) {
         checkIfStringStartsAndEndsWithComma(role, ROLE_START_END_WITH_COMMA);
-        Arrays.stream(role.strip().split(REG_EXP_COMMA_DILIMETER)).forEach(c -> {
-            if (!isRegexSatisfied(c.trim(), ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX)) {
-                throw new InvalidRequestException(String.format(ROLE_START_END_WITH_COMMA, role));
-            }
-            if (!(c.trim().equals("case allocator") || c.trim().equals("task supervisor")
-                    || c.trim().equals("staff administrator"))) {
-                throw new InvalidRequestException("Invalid search string. Please input a valid string.");
-            }
-        });
+        List<String> actualRoles = convertToList(Objects.toString(role, "").toLowerCase());
+
+        if (Collections.indexOfSubList(supportedRoles , actualRoles) != 0) {
+            throw new InvalidRequestException("Invalid search string. Please input a valid string.");
+        }
+    }
+
+    @NotNull
+    public static List<String> convertToList(String s) {
+        return Splitter.on(',').trimResults().omitEmptyStrings().splitToList(s);
+    }
+
+    @NotNull
+    public static List<Integer> getAsIntegerList(SearchRequest searchRequest) {
+        return Splitter.on(',').trimResults().omitEmptyStrings()
+                .splitToList(searchRequest.getLocation()).stream().map(Integer::parseInt)
+                .collect(Collectors.toList());
     }
 }
 

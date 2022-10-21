@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
-import com.google.common.base.Splitter;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,12 +60,16 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
-
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
 @Service
 @Slf4j
 @SuppressWarnings("AbbreviationAsWordInName")
@@ -321,24 +324,19 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<Integer> locationId = null;
 
         if (searchRequest.getServiceCode() != null) {
-            serviceCodes = Splitter.on(',').trimResults().omitEmptyStrings()
-                    .splitToList(searchRequest.getServiceCode().toUpperCase());
+            serviceCodes = convertToList(searchRequest.getServiceCode().toUpperCase());
         }
         if (searchRequest.getLocation() != null) {
-            locationId = Splitter.on(',').trimResults().omitEmptyStrings()
-                    .splitToList(searchRequest.getLocation()).stream().map(s -> Integer.parseInt(s))
-                    .collect(Collectors.toList());
+            locationId = getAsIntegerList(searchRequest);
         }
 
-        List<String> roles = Splitter.on(',').trimResults().omitEmptyStrings()
-                    .splitToList(Objects.toString(searchRequest.getRole(), "").toLowerCase());
+        List<String> roles = convertToList(Objects.toString(searchRequest.getRole(), "").toLowerCase());
 
         Page<CaseWorkerProfile> pageable =
                 caseWorkerProfileRepo.findByCaseWorkerProfiles(searchRequest, serviceCodes, locationId,
-                        roles.contains("task supervisor"), roles.contains("case allocator"),
-                        roles.contains("staff administrator"), pageRequest);
+                        roles.contains(TASK_SUPERVISOR), roles.contains(CASE_ALLOCATOR), roles.contains(STAFF_ADMIN),
+                        pageRequest);
         long totalRecords = pageable.getTotalElements();
-
         List<CaseWorkerProfile> caseWorkerProfiles = pageable.getContent();
 
         List<SearchStaffUserResponse> searchResponse = new ArrayList<>();

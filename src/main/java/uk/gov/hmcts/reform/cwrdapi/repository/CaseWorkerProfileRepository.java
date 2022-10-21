@@ -37,7 +37,7 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
             where wa.serviceCode IN :serviceCode""")
     Page<CaseWorkerProfile> findByServiceCodeIn(Set<String> serviceCode, Pageable pageable);
 
-    @Query(value = "Select cwp from case_worker_profile cwp "
+    @Query(value = "Select distinct cwp from case_worker_profile cwp "
             + "join case_worker_work_area cwa on cwp.caseWorkerId=cwa.caseWorkerId "
             + "join case_worker_role cwr on cwr.caseWorkerId=cwp.caseWorkerId "
             + "join case_worker_location cwl on cwl.caseWorkerId=cwp.caseWorkerId "
@@ -47,13 +47,13 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
             + "cwp.userTypeId = CAST(CAST(:#{#searchRequest.userType} AS text) AS int)) "
             + "and (:#{#searchRequest.jobTitle} is NULL or "
             + "cwr.roleId = CAST(CAST(:#{#searchRequest.jobTitle} AS text) AS int)) "
-            + "and (:#{#searchRequest.skill} is NULL or cws.skillId = CAST(CAST(:#{#searchRequest.skill} AS text) "
-            + "AS int))"
+            + "and (:#{#searchRequest.skill} is NULL or "
+            + "cws.skillId = CAST(CAST(:#{#searchRequest.skill} AS text) AS int))"
             + "and (:#{#searchRequest.serviceCode} is NULL or cwa.serviceCode IN (:serviceCodes)) "
             + "and (:#{#searchRequest.location} is NULL or cwl.locationId IN (:locationId)) "
-            + "and (:taskSupervisor = false or cwp.taskSupervisor = true) "
-            + "and (:caseAllocator = false or cwp.caseAllocator = true) "
-            + "and (:staffAdmin = false or cwp.userAdmin = true) "
+            + "and ((:taskSupervisor = false or cwp.taskSupervisor = true) "
+            + "or (:caseAllocator = false or cwp.caseAllocator = true) "
+            + "or (:staffAdmin = false or cwp.userAdmin = true)) "
     )
     Page<CaseWorkerProfile> findByCaseWorkerProfiles(@Param("searchRequest") SearchRequest searchRequest,
                                                      List<String> serviceCodes, List<Integer> locationId,
