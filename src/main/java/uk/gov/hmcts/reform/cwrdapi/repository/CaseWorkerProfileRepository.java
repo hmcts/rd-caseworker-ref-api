@@ -51,9 +51,9 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
             + "cws.skillId = CAST(CAST(:#{#searchRequest.skill} AS text) AS int))"
             + "and (:#{#searchRequest.serviceCode} is NULL or cwa.serviceCode IN (:serviceCodes)) "
             + "and (:#{#searchRequest.location} is NULL or cwl.locationId IN (:locationId)) "
-            + "and ((:taskSupervisor = false or cwp.taskSupervisor = true) "
-            + "or (:caseAllocator = false or cwp.caseAllocator = true) "
-            + "or (:staffAdmin = false or cwp.userAdmin = true)) "
+            + "and ((:taskSupervisor = true and cwp.taskSupervisor = true) "
+            + "or (:caseAllocator = true and cwp.caseAllocator = true) "
+            + "or (:staffAdmin = true and cwp.userAdmin = true)) "
     )
     Page<CaseWorkerProfile> findByCaseWorkerProfiles(@Param("searchRequest") SearchRequest searchRequest,
                                                      List<String> serviceCodes, List<Integer> locationId,
