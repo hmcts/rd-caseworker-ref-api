@@ -238,7 +238,7 @@ public class RequestUtils {
         checkIfStringStartsAndEndsWithComma(role, ROLE_START_END_WITH_COMMA);
         List<String> actualRoles = convertToList(Objects.toString(role, "").toLowerCase());
 
-        if (Collections.indexOfSubList(supportedRoles, actualRoles) != 0) {
+        if (Collections.indexOfSubList(supportedRoles, actualRoles) < 0) {
             throw new InvalidRequestException("Invalid search string. Please input a valid string.");
         }
     }
