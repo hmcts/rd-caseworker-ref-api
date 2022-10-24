@@ -85,7 +85,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -846,8 +845,6 @@ class StaffRefDataServiceImplTest {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
-        when(caseWorkerProfileRepository.findByEmailIdIn(anySet()))
-                .thenReturn(caseWorkerProfiles);
         when(caseWorkerProfileRepository.saveAll(anyList())).thenReturn(caseWorkerProfiles);
 
 

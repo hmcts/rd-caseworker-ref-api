@@ -69,7 +69,6 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -312,8 +311,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
-        when(caseWorkerProfileRepository.findByEmailIdIn(anySet()))
-                .thenReturn(caseWorkerProfiles);
         when(caseWorkerProfileRepository.saveAll(anyList())).thenReturn(caseWorkerProfiles);
 
 
@@ -361,54 +358,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
     }
 
-    @Test
-    void test_updateStaffProfile_when_idam_profile_is_inactive() throws JsonProcessingException {
-
-
-        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setCaseWorkerId("CWID1");
-        caseWorkerProfile.setFirstName("CWFirstName");
-        caseWorkerProfile.setLastName("CWLastName");
-        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
-
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
-
-        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
-        when(caseWorkerProfileRepository.findByEmailIdIn(anySet()))
-                .thenReturn(caseWorkerProfiles);
-
-
-        UserProfileResponse userProfileResponse = new UserProfileResponse();
-        userProfileResponse.setIdamId("12345678");
-        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
-        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
-
-        userProfileResponse.setRoles(roles);
-        userProfileResponse.setFirstName("testFNChanged");
-        userProfileResponse.setLastName("testLNChanged");
-
-
-        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
-        userProfileCreationResponse.setIdamId("12345678");
-        userProfileCreationResponse.setIdamRegistrationResponse(1);
-
-        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
-        userProfileCreationResponse.setIdamId("12345678");
-        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
-        roleAdditionResponse.setIdamStatusCode("201");
-        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
-        roleAdditionResponse.setIdamMessage("success");
-
-
-
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
-
-        StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
-                .updateStaffProfile(staffProfileCreationRequest);
-
-
-        assertThat(staffProfileCreationResponse).isNull();
-    }
 
     @Test
     void test_updateStaffProfile_with_changed_values_with_exception() throws JsonProcessingException {
@@ -422,8 +371,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
-        when(caseWorkerProfileRepository.findByEmailIdIn(anySet()))
-                .thenReturn(caseWorkerProfiles);
 
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
@@ -473,7 +420,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             List<CaseWorkerProfile> updateCaseWorkerProfiles = staffRefDataServiceImpl
-                    .updateStaffProfiles(stafProfiles);
+                    .updateStaffProfiles(staffProfileCreationRequestEmpty,caseWorkerProfile);
 
 
         });
@@ -547,8 +494,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
         userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
-        when(caseWorkerProfileRepository.findByEmailIdIn(any()))
-                .thenReturn(Arrays.asList(profile));
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
                 .thenReturn(Response.builder()
@@ -559,11 +504,10 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         List<StaffProfileCreationRequest> requests = new ArrayList<>();
         requests.add(staffProfileCreationRequest);
-        staffRefDataServiceImpl.updateStaffProfiles(requests);
+        staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest,profile);
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
     }
 
     @Test
@@ -582,15 +526,14 @@ class StaffRefDataUpdateStaffServiceImplTest {
         attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
         userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
-        when(caseWorkerProfileRepository.findByEmailIdIn(any()))
-                .thenReturn(Arrays.asList(profile));
 
 
         List<StaffProfileCreationRequest> requests = new ArrayList<>();
         requests.add(staffProfileCreationRequest);
-        staffRefDataServiceImpl.updateStaffProfiles(requests);
+        List<CaseWorkerProfile> caseWorkerProfiles =
+                staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest, profile);
+        assertThat(caseWorkerProfiles).isNull();
 
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
     }
 
     @Test

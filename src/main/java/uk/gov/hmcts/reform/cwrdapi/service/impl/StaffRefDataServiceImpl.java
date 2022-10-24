@@ -592,18 +592,15 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @SuppressWarnings("unchecked")
     public StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest profileRequest) {
 
-        log.info("{}:: processStaffProfileCreation starts::",
+        log.info("{}:: processStaffProfileUpdation starts::",
                 loggingComponentName);
 
         jsrValidatorStaffProfile.validateStaffProfile(profileRequest,STAFF_PROFILE_UPDATE);
 
-        checkStaffProfileForUpdate(profileRequest);
-
-        List<StaffProfileCreationRequest> cwUiRequests = Collections.singletonList(profileRequest);
+        CaseWorkerProfile caseWorkerProfileToUpdate = checkStaffProfileForUpdate(profileRequest);
 
 
-
-        List<CaseWorkerProfile> caseWorkerProfiles =  updateStaffProfiles(cwUiRequests);
+        List<CaseWorkerProfile> caseWorkerProfiles =  updateStaffProfiles(profileRequest,caseWorkerProfileToUpdate);
         StaffProfileCreationResponse response = null;
         if (!ObjectUtils.isEmpty(caseWorkerProfiles)) {
 
@@ -623,7 +620,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return response;
     }
 
-    private void checkStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
+    private CaseWorkerProfile checkStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId());
@@ -632,22 +629,23 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
             throw new ResourceNotFoundException(PROFILE_NOT_PRESENT_IN_DB);
         }
+        return caseWorkerProfile;
+
     }
 
 
-    public List<CaseWorkerProfile> updateStaffProfiles(List<StaffProfileCreationRequest> cwUiRequests) {
+    public List<CaseWorkerProfile> updateStaffProfiles(StaffProfileCreationRequest cwUiRequest,
+                                                       CaseWorkerProfile caseWorkerProfile) {
 
         List<CaseWorkerProfile> processedCwProfiles;
         Map<String, StaffProfileCreationRequest> emailToRequestMap = new HashMap<>();
 
         //create map for input request to email
-        for (StaffProfileCreationRequest request : cwUiRequests) {
-            emailToRequestMap.put(request.getEmailId().toLowerCase(), request);
-        }
+        emailToRequestMap.put(cwUiRequest.getEmailId().toLowerCase(), cwUiRequest);
 
         try {
             // get all existing profiles from db (used IN clause)
-            List<CaseWorkerProfile> cwDbProfiles = caseWorkerProfileRepo.findByEmailIdIn(emailToRequestMap.keySet());
+            List<CaseWorkerProfile> cwDbProfiles = List.of(caseWorkerProfile);
 
             //process update and suspend CW profiles
             Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = processExistingCaseWorkers(
