@@ -179,8 +179,6 @@ public class StaffReferenceDataProviderTest {
 
                 new StaffRefDataController("RD-Caseworker-Ref-Api",20,1,
                         staffRefDataServiceImpl)
-
-
         );
         if (context != null) {
             context.setTarget(testTarget);
@@ -189,7 +187,7 @@ public class StaffReferenceDataProviderTest {
 
     @State({"A list of users for CRD request"})
     public void fetchListOfUsersById() {
-        List<CaseWorkerProfile> caseWorkerProfile = Collections.singletonList(getCaseWorkerProfile(USER_ID));
+        List<CaseWorkerProfile> caseWorkerProfile = singletonList(getCaseWorkerProfile(USER_ID));
         doReturn(caseWorkerProfile).when(caseWorkerProfileRepo).findByCaseWorkerIdIn(anyList());
     }
 
@@ -388,24 +386,33 @@ public class StaffReferenceDataProviderTest {
         caseWorkerProfile.setTaskSupervisor(false);
         caseWorkerProfile.setUserAdmin(true);
 
+        Skill skill = new Skill();
+        skill.setSkillId(1L);
+        skill.setSkillCode("1");
+        skill.setDescription("testSkill");
+
+        List<CaseWorkerSkill> cwSkills = new ArrayList<>();
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        cwSkills.add(caseWorkerSkill);
+        caseWorkerSkill.setCaseWorkerSkillId(1L);
+        caseWorkerSkill.setSkillId(1L);
+        caseWorkerSkill.setSkill(skill);
+
         LocalDateTime timeNow = LocalDateTime.now();
 
         caseWorkerProfile.setCreatedDate(timeNow);
         caseWorkerProfile.setLastUpdate(timeNow);
 
         List<CaseWorkerLocation> caseWorkerLocations =
-                Collections.singletonList(new CaseWorkerLocation(caseWorkerId, 1,
+                singletonList(new CaseWorkerLocation(caseWorkerId, 1,
                         "National", true));
 
         List<CaseWorkerWorkArea> caseWorkerWorkAreas =
-                Collections.singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
+                singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
 
         List<CaseWorkerRole> caseWorkerRoles =
-                Collections.singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
+                singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
         caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
-
-        List<CaseWorkerSkill> caseWorkerSkills =
-                Collections.singletonList(new CaseWorkerSkill(caseWorkerId, 1L));
 
         return new CaseWorkerProfile(caseWorkerId,
                 "firstName",
@@ -422,9 +429,7 @@ public class StaffReferenceDataProviderTest {
                 caseWorkerLocations,
                 caseWorkerWorkAreas,
                 caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false,false, caseWorkerSkills);
-
-
+                new UserType(1L, "HMCTS"), false,false, cwSkills);
     }
 
     @State({"A list of all staff reference data user-type"})

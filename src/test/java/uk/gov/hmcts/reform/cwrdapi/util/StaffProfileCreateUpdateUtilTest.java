@@ -84,7 +84,7 @@ class StaffProfileCreateUpdateUtilTest {
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
                 .skillId(1)
-                .description("training")
+                .description("testskill1")
                 .build();
 
 
@@ -129,7 +129,7 @@ class StaffProfileCreateUpdateUtilTest {
 
         skill = new Skill();
         skill.setSkillId(1L);
-        skill.setDescription("training");
+        skill.setDescription("testskill1");
     }
 
     @Test
