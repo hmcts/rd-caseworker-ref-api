@@ -26,6 +26,7 @@ import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class})
@@ -68,6 +69,9 @@ public class AuthorizationFunctionalTest {
 
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
+    public static final String STAFF_EMAIL_TEMPLATE = "staff-profile-func-test-user-%s@justice.gov.uk";
+    public static final String STAFF_EMAIL_PATTERN = "staff-profile-func-test-user";
+    public static final String CWR_EMAIL_PATTERN = "cwr-func-test-user";
 
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
@@ -110,8 +114,7 @@ public class AuthorizationFunctionalTest {
 
     @AfterAll
     public static void destroy() {
-        emailsTobeDeleted.forEach(email -> idamOpenIdClient.deleteSidamUser(email));
-        log.info("delete idam user called");
+
     }
 
     public static String getS2sToken() {
@@ -122,7 +125,7 @@ public class AuthorizationFunctionalTest {
         emailsTobeDeleted.add(emailTobeDeleted);
     }
 
-    public List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
+    public static List<CaseWorkersProfileCreationRequest> createNewActiveCaseWorkerProfile() {
         Map<String, String> userDetail = idamOpenIdClient.createUser(CASEWORKER_IAC_BULKSCAN);
         String userEmail = userDetail.get(EMAIL);
 
@@ -161,5 +164,11 @@ public class AuthorizationFunctionalTest {
 
     public static Map getIdamResponse(String idamId) {
         return idamOpenIdClient.getUser(idamId);
+    }
+
+    public static void deleteCaseWorkerProfileByEmailPattern(String emailPattern) {
+        //delete user by email pattern
+        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?emailPattern=" + emailPattern, NO_CONTENT);
     }
 }
