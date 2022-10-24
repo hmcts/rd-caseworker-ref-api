@@ -27,7 +27,6 @@ import java.util.List;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -185,8 +184,7 @@ public class StaffRefDataBasicSearchFunctionalTest extends AuthorizationFunction
     @AfterAll
     public static void cleanUpTestData() {
         try {
-            caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                    "/refdata/case-worker/users?emailPattern=" + CWR_EMAIL_PATTERN,NO_CONTENT);
+            deleteCaseWorkerProfileByEmailPattern(CWR_EMAIL_PATTERN);
         } catch (Exception e) {
             log.error("cleanUpTestData :: threw the following exception: " + e);
         }

@@ -19,13 +19,14 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.lib.client.response.S2sClient;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class})
@@ -163,5 +164,11 @@ public class AuthorizationFunctionalTest {
 
     public static Map getIdamResponse(String idamId) {
         return idamOpenIdClient.getUser(idamId);
+    }
+
+    public static void deleteCaseWorkerProfileByEmailPattern(String emailPattern) {
+        //delete user by email pattern
+        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?emailPattern=" + emailPattern, NO_CONTENT);
     }
 }

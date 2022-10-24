@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -439,19 +437,15 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {""})
+    @Test
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
-    public static void deleteCaseworkerByEmailPattern(String emailPattern) {
+    public static void deleteCaseworkerByEmailPattern() {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                 createNewActiveCaseWorkerProfile();
 
-        if (emailPattern.isEmpty()) {
-            emailPattern = caseWorkersProfileCreationRequests.get(0).getEmailId();
-        }
         // create user with email pattern
         Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
@@ -462,8 +456,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
 
         //delete user by email pattern
-        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?emailPattern=" + emailPattern, NO_CONTENT);
+        deleteCaseWorkerProfileByEmailPattern(caseWorkersProfileCreationRequests.get(0).getEmailId());
 
         //search for deleted user
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
@@ -739,7 +732,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @AfterAll
     public static void cleanUpTestData() {
         try {
-            deleteCaseworkerByEmailPattern(CWR_EMAIL_PATTERN);
+            deleteCaseWorkerProfileByEmailPattern(CWR_EMAIL_PATTERN);
         } catch (Exception e) {
             log.error("cleanUpTestData :: threw the following exception: " + e);
         }
