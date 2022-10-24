@@ -646,11 +646,11 @@ class StaffRefDataUpdateStaffServiceImplTest {
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
 
-
+        String caseWorkerId = caseWorkerProfile.getCaseWorkerId();
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId());
+                    .updateUserRolesInIdam(cwUiRequest,caseWorkerId);
 
         });
 
@@ -709,10 +709,10 @@ class StaffRefDataUpdateStaffServiceImplTest {
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
 
 
-
+        String caseWorkerId = caseWorkerProfile.getCaseWorkerId();
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId());
+                    .updateUserRolesInIdam(cwUiRequest,caseWorkerId);
 
         });
 
