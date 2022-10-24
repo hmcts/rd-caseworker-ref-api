@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import feign.Response;
+import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,8 +41,8 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
@@ -67,10 +68,16 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
 
+
+
+/**
+ * The type Staff ref data service.
+ */
 @Service
 @Slf4j
 @SuppressWarnings("AbbreviationAsWordInName")
@@ -82,6 +89,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Value("${crd.publisher.caseWorkerDataPerMessage}")
     private int caseWorkerDataPerMessage;
+
+    @Autowired
+    private TopicPublisher topicPublisher;
 
     @Autowired
     CaseWorkerProfileRepository caseWorkerProfileRepo;
@@ -96,29 +106,28 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     private UserProfileFeignClient userProfileFeignClient;
 
     @Autowired
-    private TopicPublisher topicPublisher;
-
-    @Autowired
-    IValidationService validationServiceFacade;
+    IStaffProfileAuditService staffProfileAuditService;
 
     @Autowired
     SkillRepository skillRepository;
 
     @Autowired
-    IJsrValidatorInitializer validateStaffProfile;
+    StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
 
     @Autowired
-    StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
+    IJsrValidatorStaffProfile jsrValidatorStaffProfile;
 
 
     @SuppressWarnings("unchecked")
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest staffProfileRequest) {
 
+        log.info("{}:: processStaffProfileCreation starts::", loggingComponentName);
+
         final CaseWorkerProfile newStaffProfiles;
         final CaseWorkerProfile processedStaffProfiles;
         final StaffProfileCreationResponse response;
 
-        validateStaffProfile.validateStaffProfile(staffProfileRequest);
+        jsrValidatorStaffProfile.validateStaffProfile(staffProfileRequest,STAFF_PROFILE_CREATE);
 
         checkStaffProfileEmailAndSuspendFlag(staffProfileRequest);
         newStaffProfiles = createCaseWorkerProfile(staffProfileRequest);
@@ -129,6 +138,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     .caseWorkerId(processedStaffProfiles.getCaseWorkerId())
                     .build();
 
+        log.info("{}:: processStaffProfileCreation ends::", loggingComponentName);
+
         return response;
     }
 
@@ -137,7 +148,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     private void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
-        CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId());
+        CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId().toLowerCase());
 
         if (isNotEmpty(dbCaseWorker)) {
             invalidRequestError(profileRequest, PROFILE_ALREADY_CREATED);
@@ -149,12 +160,18 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     private void invalidRequestError(StaffProfileCreationRequest profileRequest, String errorMessage) {
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,errorMessage,
+                StringUtil.EMPTY_STRING,profileRequest,STAFF_PROFILE_CREATE);
 
-        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE,NO_USER_TO_SUSPEND_PROFILE,
-                null,profileRequest);
         throw new InvalidRequestException(errorMessage);
     }
 
+    /**
+     * Create case worker profile case worker profile.
+     *
+     * @param profileRequest the profile request
+     * @return the case worker profile
+     */
     public CaseWorkerProfile createCaseWorkerProfile(StaffProfileCreationRequest profileRequest) {
         CaseWorkerProfile finalCaseWorkerProfile = null;
         log.info("{}:: createCaseWorkerProfile UserProfile call starts::",
@@ -172,6 +189,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return finalCaseWorkerProfile;
     }
 
+    /**
+     * Create user profile in idam up response entity.
+     *
+     * @param staffProfileRequest the staff profile request
+     * @return the response entity
+     */
     public ResponseEntity<Object> createUserProfileInIdamUP(StaffProfileCreationRequest staffProfileRequest) {
 
         ResponseEntity<Object> responseEntity;
@@ -194,8 +217,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 String errorMessage = error != null ? error.getErrorMessage() : null;
                 String errorDescription = error != null ? error.getErrorDescription() : null;
 
-                validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, errorMessage,
-                            null, staffProfileRequest);
+                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, errorMessage,
+                            null, staffProfileRequest,STAFF_PROFILE_CREATE);
+
                 throw new StaffReferenceException(responseEntity.getStatusCode(), errorMessage,
                         errorDescription);
             }
@@ -207,7 +231,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
-    // creating user profile request
+    /**
+     * Create user profile request user profile creation request.
+     *
+     * @param profileRequest the profile request
+     * @return the user profile creation request
+     */
     public UserProfileCreationRequest createUserProfileRequest(StaffProfileCreationRequest profileRequest) {
 
         Set<String> userRoles = new HashSet<>();
@@ -233,6 +262,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 false);
     }
 
+    /**
+     * Populate staff profile.
+     *
+     * @param staffProfileRequest    the staff profile request
+     * @param finalCaseWorkerProfile the final case worker profile
+     * @param idamId                 the idam id
+     */
     public void populateStaffProfile(StaffProfileCreationRequest staffProfileRequest,
                                                   CaseWorkerProfile finalCaseWorkerProfile, String idamId) {
         //case worker profile request mapping
@@ -264,6 +300,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
+    /**
+     * Persist staff profile case worker profile.
+     *
+     * @param caseWorkerProfile the case worker profile
+     * @param request           the request
+     * @return the case worker profile
+     */
     public CaseWorkerProfile persistStaffProfile(CaseWorkerProfile caseWorkerProfile,
                                                  StaffProfileCreationRequest request) {
 
@@ -275,13 +318,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             savedStaffProfiles = caseWorkerProfileRepo.save(caseWorkerProfile);
 
             if (isNotEmpty(savedStaffProfiles)) {
-                validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS, null,
-                        savedStaffProfiles.getCaseWorkerId(), request);
+                staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtil.EMPTY_STRING,
+                        savedStaffProfiles.getCaseWorkerId(), request,STAFF_PROFILE_CREATE);
                 log.info("{}::persistStaffProfile inserted {} ::",
                         loggingComponentName,caseWorkerProfile.getCaseWorkerId());
             } else {
-                validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
-                        caseWorkerProfile.getCaseWorkerId(), request);
+                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                        caseWorkerProfile.getCaseWorkerId(), request,STAFF_PROFILE_CREATE);
             }
         }
         return savedStaffProfiles;
@@ -289,6 +332,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public void publishStaffProfileToTopic(StaffProfileCreationResponse staffProfileCreationResponse) {
 
+        log.info("{}:: publishStaffProfileToTopic starts::", loggingComponentName);
         topicPublisher.sendMessage(List.of(staffProfileCreationResponse.getCaseWorkerId()));
 
         log.info("{}:: publishStaffProfileToTopic ends::", loggingComponentName);

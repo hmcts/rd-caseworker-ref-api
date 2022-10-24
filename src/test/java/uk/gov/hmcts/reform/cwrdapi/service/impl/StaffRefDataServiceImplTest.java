@@ -54,8 +54,8 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
-import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorInitializer;
-import uk.gov.hmcts.reform.cwrdapi.service.IValidationService;
+import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
@@ -82,8 +82,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.validateSearchUserProfileResponse;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
-
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"AbbreviationAsWordInName", "unchecked"})
@@ -111,9 +111,9 @@ class StaffRefDataServiceImplTest {
     @Mock
     private CaseWorkerStaticValueRepositoryAccessorImpl caseWorkerStaticValueRepositoryAccessorImpl;
     @Mock
-    IValidationService validationServiceFacade;
+    IStaffProfileAuditService staffProfileAuditService;
     @Mock
-    IJsrValidatorInitializer validateStaffProfile;
+    IJsrValidatorStaffProfile jsrValidatorStaffProfile;
     @Mock
     private StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
     @Mock
@@ -672,22 +672,22 @@ class StaffRefDataServiceImplTest {
         when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
         staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
         verify(caseWorkerProfileRepository, times(1)).save(any());
-        verify(validateStaffProfile, times(1)).validateStaffProfile(any());
+        verify(jsrValidatorStaffProfile, times(1)).validateStaffProfile(any(),any());
     }
 
     @Test
     void test_saveStaffProfileValidationAudit() {
 
-        validationServiceFacade.saveStaffAudit(AuditStatus.SUCCESS,null,
-                caseWorkerProfile.getCaseWorkerId(),staffProfileCreationRequest);
+        staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS,null,
+                caseWorkerProfile.getCaseWorkerId(),staffProfileCreationRequest,STAFF_PROFILE_CREATE);
         verify(staffAuditRepository, times(0)).save(any());
     }
 
     @Test
     void test_saveStaffProfileAlreadyPresent() {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
-        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
-                "1234", staffProfileCreationRequest);
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest,STAFF_PROFILE_CREATE);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
             staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);
         });
@@ -698,8 +698,8 @@ class StaffRefDataServiceImplTest {
     @Test
     void test_newStaffProfileSuspended() {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
-        validationServiceFacade.saveStaffAudit(AuditStatus.FAILURE, null,
-                "1234", staffProfileCreationRequest);
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest,STAFF_PROFILE_CREATE);
         staffProfileCreationRequest.setSuspended(true);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
             staffRefDataServiceImpl.processStaffProfileCreation(staffProfileCreationRequest);

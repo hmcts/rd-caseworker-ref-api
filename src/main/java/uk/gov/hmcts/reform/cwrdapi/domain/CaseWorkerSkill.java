@@ -38,7 +38,7 @@ public class CaseWorkerSkill implements Serializable {
     @Column(name = "case_worker_id")
     private String caseWorkerId;
 
-    @Column(name = "skill_id", unique = true)
+    @Column(name = "skill_id")
     private Long skillId;
 
     @CreationTimestamp
