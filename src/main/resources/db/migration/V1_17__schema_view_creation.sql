@@ -35,8 +35,3 @@ from dbrdcaseworker.role_type
 create view rdstaffreport.vw_skill as
 select skill_id, skill_code, description, service_id, user_type
 from dbrdcaseworker.skill
-
--- view creation for case worker skill
-create view rdstaffreport.vw_case_worker_skill as
-select case_worker_id, skill_id
-from dbrdcaseworker.case_worker_skill
