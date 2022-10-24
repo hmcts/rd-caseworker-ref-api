@@ -684,31 +684,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return Pair.of(filteredProfiles, suspendedProfiles);
     }
 
-    public CaseWorkerProfile persistCaseWorkerInBatch(
-            CaseWorkerProfile updateCaseWorkerProfile,
-            CaseWorkerProfile suspendedCaseWorkerProfiles,
-            Map<String, StaffProfileCreationRequest>
-                    emailToRequestMap) {
-        List<CaseWorkerProfile> processedCwProfiles = null;
-        List<CaseWorkerProfile> profilesToBePersisted = new ArrayList<>();
-
-        profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, emailToRequestMap));
-        profilesToBePersisted.add(suspendedCaseWorkerProfiles);
-        profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
-
-        if (isNotEmpty(profilesToBePersisted)) {
-            processedCwProfiles = caseWorkerProfileRepo.saveAll(profilesToBePersisted);
-            log.info("{}:: {} case worker profiles inserted ", loggingComponentName,
-                    processedCwProfiles.size());
-        }
-
-        CaseWorkerProfile caseWorkerProfile = null;
-
-        if (!ObjectUtils.isEmpty(processedCwProfiles)) {
-            caseWorkerProfile = processedCwProfiles.get(0);
-        }
-        return caseWorkerProfile;
-    }
 
     public CaseWorkerProfile persistCaseWorker(
             CaseWorkerProfile updateCaseWorkerProfile,
