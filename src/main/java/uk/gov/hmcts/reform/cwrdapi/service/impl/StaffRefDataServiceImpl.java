@@ -595,22 +595,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         CaseWorkerProfile caseWorkerProfileToUpdate = checkStaffProfileForUpdate(profileRequest);
 
 
-        List<CaseWorkerProfile> caseWorkerProfiles =  updateStaffProfiles(profileRequest,caseWorkerProfileToUpdate);
+        CaseWorkerProfile caseWorkerProfile = updateStaffProfiles(profileRequest, caseWorkerProfileToUpdate);
         StaffProfileCreationResponse response = null;
-        if (!ObjectUtils.isEmpty(caseWorkerProfiles)) {
 
-            CaseWorkerProfile caseWorkerProfile = caseWorkerProfiles.get(0);
+        if (null != caseWorkerProfile) {
 
+            staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtils.EMPTY,
+                    caseWorkerProfile.getCaseWorkerId(), profileRequest, STAFF_PROFILE_UPDATE);
 
-            if (null != caseWorkerProfile) {
-
-                staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtils.EMPTY,
-                        caseWorkerProfile.getCaseWorkerId(),profileRequest,STAFF_PROFILE_UPDATE);
-
-                response = StaffProfileCreationResponse.builder()
-                        .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
-                        .build();
-            }
+            response = StaffProfileCreationResponse.builder()
+                    .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
+                    .build();
         }
         return response;
     }
@@ -630,72 +625,75 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
 
-    public List<CaseWorkerProfile> updateStaffProfiles(StaffProfileCreationRequest cwUiRequest,
+    public CaseWorkerProfile updateStaffProfiles(StaffProfileCreationRequest cwUiRequest,
                                                        CaseWorkerProfile caseWorkerProfile) {
 
-        List<CaseWorkerProfile> processedCwProfiles;
+        CaseWorkerProfile processedCwProfile;
         Map<String, StaffProfileCreationRequest> emailToRequestMap = new HashMap<>();
 
         //create map for input request to email
         emailToRequestMap.put(cwUiRequest.getEmailId().toLowerCase(), cwUiRequest);
 
         try {
-            // get all existing profiles from db (used IN clause)
-            List<CaseWorkerProfile> cwDbProfiles = List.of(caseWorkerProfile);
 
             //process update and suspend CW profiles
             Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = processExistingCaseWorkers(
-                    emailToRequestMap, cwDbProfiles);
+                    cwUiRequest, caseWorkerProfile);
             // persist in db
-            processedCwProfiles = persistCaseWorkerInBatch(updateAndSuspendedLists.getLeft(),
-                    updateAndSuspendedLists.getRight(), emailToRequestMap);
+            CaseWorkerProfile cwProfileToPersist = null;
+            if (!ObjectUtils.isEmpty(updateAndSuspendedLists.getLeft())) {
+                cwProfileToPersist = updateAndSuspendedLists.getLeft().get(0);
+            }
+            if (!ObjectUtils.isEmpty(updateAndSuspendedLists.getRight())) {
+                cwProfileToPersist = updateAndSuspendedLists.getRight().get(0);
+            }
+
+            processedCwProfile = persistCaseWorker(cwProfileToPersist,
+                    emailToRequestMap);
         } catch (Exception exp) {
             log.error("{}:: createCaseWorkerUserProfiles failed  ::{}", loggingComponentName,
                     exp);
             throw exp;
         }
-        return processedCwProfiles;
+        return processedCwProfile;
     }
 
-    public Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> processExistingCaseWorkers(Map<String,
-            StaffProfileCreationRequest> emailToRequestMap, List<CaseWorkerProfile> caseWorkerProfiles) {
+    public Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> processExistingCaseWorkers
+            (StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
 
         List<CaseWorkerProfile> updateCaseWorkerProfiles = new ArrayList<>();
         List<CaseWorkerProfile> suspendedProfiles = new ArrayList<>();
 
-        for (CaseWorkerProfile dbProfile : caseWorkerProfiles) {
-            StaffProfileCreationRequest cwUiRequest = emailToRequestMap.get(dbProfile.getEmailId());
-            if (isTrue(dbProfile.getSuspended())) {
-                //when existing profile with delete flag is true then log exception add entry in exception table
-                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,ALREADY_SUSPENDED_ERROR_MESSAGE,
-                        StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
-            } else if (cwUiRequest.isSuspended()) {
-                //when existing profile with delete flag is true in request then suspend user
-                if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
-                        dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId())) {
-                    dbProfile.setSuspended(true);
-                    suspendedProfiles.add(dbProfile);
-                }
-            } else {
-                //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
-                updateCaseWorkerProfiles.add(dbProfile);
+        if (isTrue(caseWorkerProfiles.getSuspended())) {
+            //when existing profile with delete flag is true then log exception add entry in exception table
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
+                    StringUtils.EMPTY, cwUiRequest, STAFF_PROFILE_UPDATE);
+        } else if (cwUiRequest.isSuspended()) {
+            //when existing profile with delete flag is true in request then suspend user
+            if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId())) {
+                caseWorkerProfiles.setSuspended(true);
+                suspendedProfiles.add(caseWorkerProfiles);
             }
+        } else {
+            //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
+            updateCaseWorkerProfiles.add(caseWorkerProfiles);
         }
         //add user roles in user profile and filter out UP failed records
-        List<CaseWorkerProfile> filteredProfiles = updateSidamRoles(updateCaseWorkerProfiles, emailToRequestMap);
+        List<CaseWorkerProfile> filteredProfiles = updateSidamRoles(updateCaseWorkerProfiles, cwUiRequest);
         return Pair.of(filteredProfiles, suspendedProfiles);
     }
 
-    public List<CaseWorkerProfile> persistCaseWorkerInBatch(
-            List<CaseWorkerProfile> updateCaseWorkerProfiles,
-            List<CaseWorkerProfile> suspendedCaseWorkerProfiles,
+    public CaseWorkerProfile persistCaseWorkerInBatch(
+            CaseWorkerProfile updateCaseWorkerProfile,
+            CaseWorkerProfile suspendedCaseWorkerProfiles,
             Map<String, StaffProfileCreationRequest>
                     emailToRequestMap) {
         List<CaseWorkerProfile> processedCwProfiles = null;
         List<CaseWorkerProfile> profilesToBePersisted = new ArrayList<>();
 
-        profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfiles, emailToRequestMap));
-        profilesToBePersisted.addAll(suspendedCaseWorkerProfiles);
+        profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, emailToRequestMap));
+        profilesToBePersisted.add(suspendedCaseWorkerProfiles);
         profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
 
         if (isNotEmpty(profilesToBePersisted)) {
@@ -703,23 +701,53 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             log.info("{}:: {} case worker profiles inserted ", loggingComponentName,
                     processedCwProfiles.size());
         }
-        return processedCwProfiles;
+
+        CaseWorkerProfile caseWorkerProfile = null;
+
+        if (!ObjectUtils.isEmpty(processedCwProfiles)) {
+            caseWorkerProfile = processedCwProfiles.get(0);
+        }
+        return caseWorkerProfile;
+    }
+
+    public CaseWorkerProfile persistCaseWorker(
+            CaseWorkerProfile updateCaseWorkerProfile,
+            Map<String, StaffProfileCreationRequest>
+                    emailToRequestMap) {
+        List<CaseWorkerProfile> processedCwProfiles = null;
+        List<CaseWorkerProfile> profilesToBePersisted = new ArrayList<>();
+
+        profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, emailToRequestMap));
+        //profilesToBePersisted.add(suspendedCaseWorkerProfiles);
+        profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
+
+        if (isNotEmpty(profilesToBePersisted)) {
+            processedCwProfiles = caseWorkerProfileRepo.saveAll(profilesToBePersisted);
+            log.info("{}:: {} case worker profiles inserted ", loggingComponentName,
+                    processedCwProfiles.size());
+        }
+
+        CaseWorkerProfile caseWorkerProfile = null;
+
+        if (!ObjectUtils.isEmpty(processedCwProfiles)) {
+            caseWorkerProfile = processedCwProfiles.get(0);
+        }
+        return caseWorkerProfile;
     }
 
     // deletes children and updates caseworker profile
-    private List<CaseWorkerProfile> deleteChildrenAndUpdateCwProfiles(List<CaseWorkerProfile> updateCaseWorkerProfiles,
+    private List<CaseWorkerProfile> deleteChildrenAndUpdateCwProfiles(CaseWorkerProfile updateCaseWorkerProfiles,
                                                                       Map<String, StaffProfileCreationRequest>
                                                                               emailToRequestMap) {
         List<CaseWorkerProfile> updatedProfiles = new ArrayList<>();
         if (isNotEmpty(updateCaseWorkerProfiles)) {
-            caseWorkerLocationRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            caseWorkerWorkAreaRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            caseWorkerRoleRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
-            caseWorkerSkillRepository.deleteByCaseWorkerProfileIn(updateCaseWorkerProfiles);
+            caseWorkerLocationRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
+            caseWorkerWorkAreaRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
+            caseWorkerRoleRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
+            caseWorkerSkillRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
             cwrCommonRepository.flush();
-            for (CaseWorkerProfile dbProfile : updateCaseWorkerProfiles) {
-                updatedProfiles.add(updateUserProfile(emailToRequestMap.get(dbProfile.getEmailId()), dbProfile));
-            }
+            updatedProfiles.add(updateUserProfile(emailToRequestMap.get(updateCaseWorkerProfiles.getEmailId()),
+                    updateCaseWorkerProfiles));
         }
         return updatedProfiles;
     }
@@ -777,10 +805,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     // update roles in sidam and filter if failed in User profile
     public List<CaseWorkerProfile> updateSidamRoles(List<CaseWorkerProfile> updateCaseWorkerProfiles,
-                                                    Map<String, StaffProfileCreationRequest> requestMap) {
+                                                    StaffProfileCreationRequest cwUiRequest) {
         List<CaseWorkerProfile> filteredUpdateCwProfiles = new ArrayList<>();
         for (CaseWorkerProfile dbProfile : updateCaseWorkerProfiles) {
-            boolean isAddRoleSuccess = updateUserRolesInIdam(requestMap.get(dbProfile.getEmailId()),
+            boolean isAddRoleSuccess = updateUserRolesInIdam(cwUiRequest,
                     dbProfile.getCaseWorkerId());
             if (isAddRoleSuccess) {
                 filteredUpdateCwProfiles.add(dbProfile);

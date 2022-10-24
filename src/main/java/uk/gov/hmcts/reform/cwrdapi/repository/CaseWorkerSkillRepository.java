@@ -12,4 +12,6 @@ import java.util.List;
 public interface CaseWorkerSkillRepository extends JpaRepository<CaseWorkerSkill, Long> {
     void deleteByCaseWorkerProfileIn(List<CaseWorkerProfile> caseWorkerProfileList);
 
+    void deleteByCaseWorkerProfile(CaseWorkerProfile caseWorkerProfileList);
+
 }

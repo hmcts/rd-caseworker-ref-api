@@ -57,7 +57,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -419,9 +418,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
                 List.of(staffProfileCreationRequest, staffProfileCreationRequestEmpty);
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            List<CaseWorkerProfile> updateCaseWorkerProfiles = staffRefDataServiceImpl
-                    .updateStaffProfiles(staffProfileCreationRequestEmpty,caseWorkerProfile);
-
+            staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequestEmpty,caseWorkerProfile);
 
         });
 
@@ -527,12 +524,11 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
 
-
         List<StaffProfileCreationRequest> requests = new ArrayList<>();
         requests.add(staffProfileCreationRequest);
-        List<CaseWorkerProfile> caseWorkerProfiles =
+        CaseWorkerProfile caseWorkerProfile =
                 staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest, profile);
-        assertThat(caseWorkerProfiles).isNull();
+        assertThat(caseWorkerProfile).isNull();
 
     }
 
@@ -831,10 +827,9 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
-        List<CaseWorkerProfile> cwDbProfiles = Collections.singletonList(caseWorkerProfile);
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
-                    .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
+                    .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
 
         });
 
@@ -1002,10 +997,9 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
-        List<CaseWorkerProfile> cwDbProfiles = Collections.singletonList(caseWorkerProfile);
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
-                    .processExistingCaseWorkers(emailToRequestMap, cwDbProfiles);
+                    .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
 
         });
 
