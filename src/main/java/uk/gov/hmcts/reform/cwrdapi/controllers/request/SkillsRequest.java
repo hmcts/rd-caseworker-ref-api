@@ -17,10 +17,15 @@ public class SkillsRequest {
     private int skillId;
     private String description;
 
+    private String skillCode;
+
     @JsonCreator
     public SkillsRequest(@JsonProperty("skill_id") int skillId,
-                                     @JsonProperty("description") String description) {
+                         @JsonProperty("description") String description,
+                         @JsonProperty("skill_code") String skillCode) {
         this.skillId = skillId;
         this.description = description;
+        this.skillCode = skillCode;
+
     }
 }

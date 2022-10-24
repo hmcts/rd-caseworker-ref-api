@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
+import uk.gov.hmcts.reform.cwrdapi.util.ValidateEmail;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateStaffProfileChildren;
 
 import java.util.List;
@@ -32,11 +33,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
 public class StaffProfileCreationRequest {
 
     @JsonProperty("email_id")
-    @Pattern(regexp = CaseWorkerConstants.USER_NAME_PATTERN + "@"
-            + CaseWorkerConstants.DOMAIN_JUSTICE_GOV_UK,
-            message = CaseWorkerConstants.INVALID_EMAIL_PROFILE,
-            flags = Pattern.Flag.CASE_INSENSITIVE)
-    @NotEmpty(message = CaseWorkerConstants.INVALID_EMAIL_PROFILE)
+    @ValidateEmail(message = CaseWorkerConstants.INVALID_EMAIL)
+    @NotEmpty(message = CaseWorkerConstants.INVALID_EMAIL)
     private String emailId;
 
     @JsonProperty("first_name")
