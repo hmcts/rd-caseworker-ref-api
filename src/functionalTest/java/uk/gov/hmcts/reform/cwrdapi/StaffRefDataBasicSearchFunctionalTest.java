@@ -186,7 +186,7 @@ public class StaffRefDataBasicSearchFunctionalTest extends AuthorizationFunction
     public static void cleanUpTestData() {
         try {
             caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                    "/refdata/case-worker/users?emailPattern=" + "cwr-func-test-user",NO_CONTENT);
+                    "/refdata/case-worker/users?emailPattern=" + CWR_EMAIL_PATTERN,NO_CONTENT);
         } catch (Exception e) {
             log.error("cleanUpTestData :: threw the following exception: " + e);
         }
