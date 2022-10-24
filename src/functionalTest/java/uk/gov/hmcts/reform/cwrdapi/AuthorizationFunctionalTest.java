@@ -114,10 +114,7 @@ public class AuthorizationFunctionalTest {
 
     @AfterAll
     public static void destroy() {
-        emailsTobeDeleted.forEach(email -> idamOpenIdClient.deleteSidamUser(email));
-        log.info("delete idam user called");
-        emailsTobeDeleted.forEach(email -> caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?emailPattern=" + email, NO_CONTENT));
+
     }
 
     public static String getS2sToken() {
