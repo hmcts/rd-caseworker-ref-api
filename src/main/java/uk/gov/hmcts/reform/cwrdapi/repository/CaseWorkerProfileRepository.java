@@ -53,7 +53,8 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
             + "and (:#{#searchRequest.location} is NULL or cwl.locationId IN (:locationId)) "
             + "and ((:taskSupervisor = true and cwp.taskSupervisor = true) "
             + "or (:caseAllocator = true and cwp.caseAllocator = true) "
-            + "or (:staffAdmin = true and cwp.userAdmin = true)) "
+            + "or (:staffAdmin = true and cwp.userAdmin = true) "
+            + "or (:taskSupervisor = false and :caseAllocator = false and :staffAdmin = false)) "
     )
     Page<CaseWorkerProfile> findByCaseWorkerProfiles(@Param("searchRequest") SearchRequest searchRequest,
                                                      List<String> serviceCodes, List<Integer> locationId,
