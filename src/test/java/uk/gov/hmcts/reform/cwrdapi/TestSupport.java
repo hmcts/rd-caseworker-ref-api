@@ -1,13 +1,21 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class TestSupport {
 
@@ -77,5 +85,141 @@ public class TestSupport {
                 .locations(locations)
                 .roles(roles)
                 .build());
+    }
+
+    public static boolean validateSearchUserProfileResponse(ResponseEntity<List<SearchStaffUserResponse>> response,
+                                                            SearchRequest searchReq) {
+
+        SearchRequest finalSearchReq = searchReq;
+        List validResponse = new ArrayList<>();
+        List<SearchStaffUserResponse> body = response.getBody();
+        validResponse = body.stream()
+                .filter(Objects::nonNull)
+                .filter(searchStaffUserResponse -> {
+                    if (Optional.ofNullable(finalSearchReq.getServiceCode()).isEmpty()) {
+                        return true;
+                    }
+                    if (Optional.ofNullable(searchStaffUserResponse.getServices()).isEmpty()) {
+                        return false;
+                    }
+
+                    boolean valid = searchStaffUserResponse.getServices().stream()
+                            .anyMatch(service -> Optional.ofNullable(service).isPresent()
+                                    && finalSearchReq.getServiceCode().toLowerCase().contains(service.getServiceCode()
+                                    .toLowerCase())
+                            );
+                    return valid;
+                })
+                .filter(searchStaffUserResponse -> {
+                    if (Optional.ofNullable(finalSearchReq.getLocation()).isEmpty()) {
+                        return true;
+                    }
+                    if (Optional.ofNullable(searchStaffUserResponse.getBaseLocations()).isEmpty()) {
+                        return false;
+                    }
+
+                    boolean valid = searchStaffUserResponse.getBaseLocations().stream()
+
+                            .anyMatch(location -> Optional.ofNullable(location).isPresent()
+                                    && finalSearchReq.getLocation().toLowerCase().contains(location.getBaseLocationId()
+                                    .toString().toLowerCase())
+                            );
+                    return valid;
+                })
+                .filter(searchStaffUserResponse -> {
+                    if (Optional.ofNullable(finalSearchReq.getLocation()).isEmpty()) {
+                        return true;
+                    }
+                    if (Optional.ofNullable(searchStaffUserResponse.getBaseLocations()).isEmpty()) {
+                        return false;
+                    }
+
+                    boolean valid = searchStaffUserResponse.getBaseLocations().stream()
+
+                            .anyMatch(location -> Optional.ofNullable(location).isPresent()
+                                    && finalSearchReq.getLocation().toLowerCase().contains(String.valueOf(location
+                                    .getBaseLocationId()))
+                            );
+                    return valid;
+                })
+                .filter(searchStaffUserResponse -> {
+                    if (Optional.ofNullable(finalSearchReq.getUserType()).isEmpty()) {
+                        return true;
+                    }
+                    if (Optional.ofNullable(searchStaffUserResponse.getUserType()).isEmpty()) {
+                        return false;
+                    }
+                    return true;
+                })
+                .filter(searchStaffUserResponse -> {
+                    if (Optional.ofNullable(finalSearchReq.getJobTitle()).isEmpty()) {
+                        return true;
+                    }
+                    if (Optional.ofNullable(searchStaffUserResponse.getRoles()).isEmpty()) {
+                        return false;
+                    }
+                    boolean valid = searchStaffUserResponse.getRoles().stream()
+
+                            .anyMatch(roles -> Optional.ofNullable(roles).isPresent()
+                                    && roles.getRoleId().toLowerCase().contains(finalSearchReq.getJobTitle()
+                                    .toLowerCase())
+                            );
+                    return valid;
+                })
+                .filter(searchStaffUserResponse -> {
+                    if (Optional.ofNullable(finalSearchReq.getSkill()).isEmpty()) {
+                        return true;
+                    }
+                    if (Optional.ofNullable(searchStaffUserResponse.getSkills()).isEmpty()) {
+                        return false;
+                    }
+                    boolean valid = searchStaffUserResponse.getSkills().stream()
+
+                            .anyMatch(skill -> Optional.ofNullable(skill).isPresent()
+                                    && skill.getSkillId() == Integer.parseInt(finalSearchReq.getSkill())
+                            );
+                    return valid;
+                })
+                .filter(searchStaffUserResponse -> {
+                    if (Optional.ofNullable(finalSearchReq.getRole()).isEmpty()) {
+                        return true;
+                    }
+                    boolean valid = false;
+
+                    if (finalSearchReq.getRole().contains("task supervisor") && searchStaffUserResponse
+                            .isTaskSupervisor()) {
+                        valid = true;
+                    }
+                    if (finalSearchReq.getRole().contains("case allocator") && searchStaffUserResponse
+                            .isCaseAllocator()) {
+                        valid = true;
+                    }
+                    if (finalSearchReq.getRole().contains("Staff Administrator") && searchStaffUserResponse
+                            .isStaffAdmin()) {
+                        valid = true;
+                    }
+
+
+                    return valid;
+                })
+
+
+                .toList();
+
+        Comparator<SearchStaffUserResponse> comparator
+                = Comparator.comparing(SearchStaffUserResponse::getLastName);
+
+        List<SearchStaffUserResponse> sorted = new ArrayList<>();
+        sorted.addAll(body);
+        Collections.sort(sorted,comparator);
+        if (!body.equals(sorted)) {
+            return false;
+        }
+
+        if (validResponse.size() == body.size()) {
+            return true;
+        }
+        return false;
+
     }
 }
