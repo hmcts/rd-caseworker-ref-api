@@ -618,7 +618,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     private CaseWorkerProfile checkStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
-        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId().toLowerCase());
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
+                .findByEmailId(profileRequest.getEmailId().toLowerCase());
         if (caseWorkerProfile == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
                     StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
