@@ -26,7 +26,6 @@ import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @ContextConfiguration(classes = {TestConfigProperties.class, Oauth2.class, FuncTestRequestHandler.class})
