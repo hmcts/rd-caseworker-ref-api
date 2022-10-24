@@ -537,7 +537,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
     }
 
     @Test
-    void test_updateUserRolesInIdam_with_IdamRoles() throws JsonProcessingException {
+    void test_updateUserRolesInIdam_with_IdamRoles_Idam_Status_Active() throws JsonProcessingException {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setFirstName("CWFirstName");
@@ -594,6 +594,68 @@ class StaffRefDataUpdateStaffServiceImplTest {
         boolean updateUserRolesInIdam = staffRefDataServiceImpl
                 .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId());
         assertThat(updateUserRolesInIdam).isTrue();
+
+    }
+
+    @Test
+    void test_updateUserRolesInIdam_with_IdamRoles_Idam_Status_InActive() throws JsonProcessingException {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+
+        List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
+
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(IDAM_STATUS_SUSPENDED);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+
+
+        Set<String> idamRoles = new HashSet<>();
+        idamRoles.add("IdamRole1");
+        StaffProfileCreationRequest cwUiRequest =  getStaffProfileUpdateRequest();
+        cwUiRequest.setIdamRoles(idamRoles);
+
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
+                StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
+
+
+
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            boolean updateUserRolesInIdam = staffRefDataServiceImpl
+                    .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId());
+
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
 
     }
 
