@@ -4,6 +4,7 @@ import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefFunctionalTest.DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -272,6 +275,72 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
         assertThat(response.getBody().asString()).contains("Access is denied");
 
+    }
+
+    @Test
+    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    //this test verifies that a User Profile is deleted by ID
+    static void deleteStaffProfileById() {
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+
+        StaffProfileCreationResponse staffProfileCreationResponse =
+                response.getBody().as(StaffProfileCreationResponse.class);
+
+        String caseWorkerIds = staffProfileCreationResponse.getCaseWorkerId();
+        assertNotNull(caseWorkerIds);
+
+        //delete user
+        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
+                "/refdata/case-worker/users?userId=" + caseWorkerIds, NO_CONTENT);
+
+        //search for deleted user
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(caseWorkerIds)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+
+        //assert that delete user is not found
+        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    //this test verifies that a User Profile is deleted by Email Pattern
+    static void deleteStaffProfileByEmailPattern() {
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+
+        StaffProfileCreationResponse staffProfileCreationResponse =
+                response.getBody().as(StaffProfileCreationResponse.class);
+
+        String caseWorkerIds = staffProfileCreationResponse.getCaseWorkerId();
+        assertNotNull(caseWorkerIds);
+
+        //delete user by email pattern
+        deleteCaseWorkerProfileByEmailPattern(staffProfileCreationRequest.getEmailId());
+
+        //search for deleted user
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(caseWorkerIds)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+
+        //assert that delete user is not found
+        assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
+    }
+
+    @AfterAll
+    public static void cleanUpTestData() {
+        try {
+            deleteCaseWorkerProfileByEmailPattern(STAFF_EMAIL_PATTERN);
+        } catch (Exception e) {
+            log.error("cleanUpTestData :: threw the following exception: " + e);
+        }
     }
 
 }
