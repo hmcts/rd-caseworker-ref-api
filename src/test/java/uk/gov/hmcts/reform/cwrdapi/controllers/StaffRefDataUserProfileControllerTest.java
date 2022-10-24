@@ -44,4 +44,21 @@ class StaffRefDataUserProfileControllerTest {
         verify(staffRefDataService,times(1))
                 .updateStaffProfile(staffProfileCreationRequest);
     }
+
+    @Test
+    void shouldUpdateStaffUserProfileEmptyResponseTest() {
+        StaffProfileCreationRequest staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .build();
+
+        StaffProfileCreationResponse staffProfileCreationResponse = null;
+
+        when(staffRefDataService.updateStaffProfile(staffProfileCreationRequest))
+                .thenReturn(staffProfileCreationResponse);
+
+        staffRefDataController.updateStaffUserProfile(staffProfileCreationRequest);
+
+        verify(staffRefDataService,times(1))
+                .updateStaffProfile(staffProfileCreationRequest);
+    }
 }

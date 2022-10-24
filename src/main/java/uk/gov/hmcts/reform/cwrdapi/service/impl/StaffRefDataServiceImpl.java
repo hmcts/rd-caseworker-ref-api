@@ -509,21 +509,21 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Override
     public StaffWorkerSkillResponse getServiceSkills() {
         List<ServiceSkill> serviceSkills = new ArrayList<>();
-            List<SkillDTO> skillData = null;
-            List<Skill> skills = skillRepository.findAll();
-            if (!ObjectUtils.isEmpty(skills)) {
-                skillData = skills.stream().map(skill -> {
-                    SkillDTO skillDTO = new SkillDTO();
-                    skillDTO.setServiceId(skill.getServiceId());
-                    skillDTO.setSkillId(skill.getSkillId());
-                    skillDTO.setSkillCode(skill.getSkillCode());
-                    skillDTO.setUserType(skill.getUserType());
-                    skillDTO.setDescription(skill.getDescription());
-                    return skillDTO;
-                }).toList();
+        List<SkillDTO> skillData = null;
+        List<Skill> skills = skillRepository.findAll();
+        if (!ObjectUtils.isEmpty(skills)) {
+            skillData = skills.stream().map(skill -> {
+                SkillDTO skillDTO = new SkillDTO();
+                skillDTO.setServiceId(skill.getServiceId());
+                skillDTO.setSkillId(skill.getSkillId());
+                skillDTO.setSkillCode(skill.getSkillCode());
+                skillDTO.setUserType(skill.getUserType());
+                skillDTO.setDescription(skill.getDescription());
+                return skillDTO;
+            }).toList();
 
-                serviceSkills = mapSkillToServicesSkill(skillData);
-            }
+            serviceSkills = mapSkillToServicesSkill(skillData);
+        }
 
 
         StaffWorkerSkillResponse staffWorkerSkillResponse = new StaffWorkerSkillResponse();
