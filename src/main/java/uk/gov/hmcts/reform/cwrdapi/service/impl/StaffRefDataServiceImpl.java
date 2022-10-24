@@ -658,8 +658,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return processedCwProfile;
     }
 
-    public Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> processExistingCaseWorkers
-            (StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
+    public Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> processExistingCaseWorkers(
+            StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
 
         List<CaseWorkerProfile> updateCaseWorkerProfiles = new ArrayList<>();
         List<CaseWorkerProfile> suspendedProfiles = new ArrayList<>();
