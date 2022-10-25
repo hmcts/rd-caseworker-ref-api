@@ -620,6 +620,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
             throw new ResourceNotFoundException(PROFILE_NOT_PRESENT_IN_DB);
         }
+
+
         return caseWorkerProfile;
 
     }
@@ -668,6 +670,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             //when existing profile with delete flag is true then log exception add entry in exception table
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
                     StringUtils.EMPTY, cwUiRequest, STAFF_PROFILE_UPDATE);
+            throw new InvalidRequestException(ALREADY_SUSPENDED_ERROR_MESSAGE);
         } else if (cwUiRequest.isSuspended()) {
             //when existing profile with delete flag is true in request then suspend user
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),

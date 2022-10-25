@@ -72,6 +72,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ROLE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
@@ -526,9 +527,14 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         List<StaffProfileCreationRequest> requests = new ArrayList<>();
         requests.add(staffProfileCreationRequest);
-        CaseWorkerProfile caseWorkerProfile =
-                staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest, profile);
-        assertThat(caseWorkerProfile).isNull();
+
+        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+            CaseWorkerProfile caseWorkerProfile =
+                    staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest, profile);
+
+        });
+
+        assertThat(thrown.getMessage()).isEqualTo(ALREADY_SUSPENDED_ERROR_MESSAGE);
 
     }
 
