@@ -662,7 +662,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         } else if (cwUiRequest.isSuspended()) {
             //when existing profile with delete flag is true in request then suspend user
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
-                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId())) {
+                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
                 caseWorkerProfiles.setSuspended(true);
                 filteredProfile = caseWorkerProfiles;
                 return filteredProfile;
@@ -727,7 +727,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
     public boolean isUserSuspended(UserProfileUpdatedData userProfileUpdatedData, String userId,
-                                   String origin, long rowId) {
+                                   String origin) {
 
         boolean status = true;
         try {
@@ -744,8 +744,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             }
 
         } catch (Exception ex) {
-            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}::  {}",
-                    loggingComponentName, rowId, ex.getMessage(), UP_FAILURE_ROLES);
+            log.error("{}:: UserProfile modify api failed with error :: {}::  {}",
+                    loggingComponentName, ex.getMessage(), UP_FAILURE_ROLES);
             status = false;
         }
         return status;
@@ -861,12 +861,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     .idamStatus(STATUS_ACTIVE);
 
         }
-        return isEachRoleUpdated(builder.build(), idamId, "EXUI",
-                cwrProfileRequest.getRowId());
+        return isEachRoleUpdated(builder.build(), idamId, "EXUI");
     }
 
     public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
-                                     String origin, long rowId) {
+                                     String origin) {
         boolean isEachRoleUpdated;
         try {
             Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
@@ -889,8 +888,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             }
 
         } catch (Exception ex) {
-            log.error("{}:: UserProfile modify api failed for row ID {} with error :: {}::  {}",
-                    loggingComponentName, rowId, ex.getMessage(), UP_FAILURE_ROLES);
+            log.error("{}:: UserProfile modify api failed with error :: {}::  {}",
+                    loggingComponentName, ex.getMessage(), UP_FAILURE_ROLES);
 
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
                     UP_FAILURE_ROLES);

@@ -440,7 +440,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         boolean suspended = staffRefDataServiceImpl
                 .isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
-                dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId());
+                dbProfile.getCaseWorkerId(), ORIGIN_EXUI);
         assertThat(suspended).isFalse();
 
     }
@@ -470,7 +470,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         boolean suspended = staffRefDataServiceImpl
                 .isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
-                dbProfile.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId());
+                dbProfile.getCaseWorkerId(), ORIGIN_EXUI);
         assertThat(suspended).isFalse();
 
     }

@@ -91,7 +91,4 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("idam_roles")
     private Set<String> idamRoles;
-
-    @JsonProperty("rowId")
-    private long rowId;
 }
