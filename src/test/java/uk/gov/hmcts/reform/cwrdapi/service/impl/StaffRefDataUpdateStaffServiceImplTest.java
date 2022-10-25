@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -834,7 +833,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
+            staffRefDataServiceImpl
                     .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
 
         });
@@ -1004,7 +1003,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = staffRefDataServiceImpl
+            staffRefDataServiceImpl
                     .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
 
         });

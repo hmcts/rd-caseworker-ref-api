@@ -4,7 +4,6 @@ import feign.Response;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -639,16 +638,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         try {
 
             //process update and suspend CW profiles
-            Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> updateAndSuspendedLists = processExistingCaseWorkers(
+            CaseWorkerProfile cwProfileToPersist = null;
+            cwProfileToPersist = processExistingCaseWorkers(
                     cwUiRequest, caseWorkerProfile);
             // persist in db
-            CaseWorkerProfile cwProfileToPersist = null;
-            if (!ObjectUtils.isEmpty(updateAndSuspendedLists.getLeft())) {
-                cwProfileToPersist = updateAndSuspendedLists.getLeft().get(0);
-            }
-            if (!ObjectUtils.isEmpty(updateAndSuspendedLists.getRight())) {
-                cwProfileToPersist = updateAndSuspendedLists.getRight().get(0);
-            }
+
 
             processedCwProfile = persistCaseWorker(cwProfileToPersist,
                     emailToRequestMap);
@@ -660,11 +654,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return processedCwProfile;
     }
 
-    public Pair<List<CaseWorkerProfile>, List<CaseWorkerProfile>> processExistingCaseWorkers(
+    public CaseWorkerProfile processExistingCaseWorkers(
             StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
 
-        List<CaseWorkerProfile> updateCaseWorkerProfiles = new ArrayList<>();
-        List<CaseWorkerProfile> suspendedProfiles = new ArrayList<>();
+        CaseWorkerProfile filteredProfile = null;
 
         if (isTrue(caseWorkerProfiles.getSuspended())) {
             //when existing profile with delete flag is true then log exception add entry in exception table
@@ -676,15 +669,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                     caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI, cwUiRequest.getRowId())) {
                 caseWorkerProfiles.setSuspended(true);
-                suspendedProfiles.add(caseWorkerProfiles);
+                filteredProfile = caseWorkerProfiles;
+                return filteredProfile;
             }
         } else {
             //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
-            updateCaseWorkerProfiles.add(caseWorkerProfiles);
+            filteredProfile = updateSidamRoles(caseWorkerProfiles, cwUiRequest);
+            return filteredProfile;
         }
         //add user roles in user profile and filter out UP failed records
-        List<CaseWorkerProfile> filteredProfiles = updateSidamRoles(updateCaseWorkerProfiles, cwUiRequest);
-        return Pair.of(filteredProfiles, suspendedProfiles);
+
+        return null;
     }
 
 
@@ -782,17 +777,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     // update roles in sidam and filter if failed in User profile
-    public List<CaseWorkerProfile> updateSidamRoles(List<CaseWorkerProfile> updateCaseWorkerProfiles,
+    public CaseWorkerProfile updateSidamRoles(CaseWorkerProfile updateCaseWorkerProfiles,
                                                     StaffProfileCreationRequest cwUiRequest) {
         List<CaseWorkerProfile> filteredUpdateCwProfiles = new ArrayList<>();
-        for (CaseWorkerProfile dbProfile : updateCaseWorkerProfiles) {
-            boolean isAddRoleSuccess = updateUserRolesInIdam(cwUiRequest,
-                    dbProfile.getCaseWorkerId());
-            if (isAddRoleSuccess) {
-                filteredUpdateCwProfiles.add(dbProfile);
-            }
+        CaseWorkerProfile filteredUpdateCwProfile = null;
+        boolean isAddRoleSuccess = updateUserRolesInIdam(cwUiRequest,
+                updateCaseWorkerProfiles.getCaseWorkerId());
+        if (isAddRoleSuccess) {
+            filteredUpdateCwProfile = updateCaseWorkerProfiles;
+            filteredUpdateCwProfiles.add(updateCaseWorkerProfiles);
         }
-        return filteredUpdateCwProfiles;
+        return filteredUpdateCwProfile;
     }
 
     public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId) {
