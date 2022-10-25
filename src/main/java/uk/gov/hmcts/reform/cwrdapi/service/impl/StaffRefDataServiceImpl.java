@@ -67,7 +67,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -630,10 +629,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                                                        CaseWorkerProfile caseWorkerProfile) {
 
         CaseWorkerProfile processedCwProfile;
-        Map<String, StaffProfileCreationRequest> emailToRequestMap = new HashMap<>();
-
-        //create map for input request to email
-        emailToRequestMap.put(cwUiRequest.getEmailId().toLowerCase(), cwUiRequest);
 
         try {
 
@@ -645,7 +640,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
             processedCwProfile = persistCaseWorker(cwProfileToPersist,
-                    emailToRequestMap);
+                    cwUiRequest);
         } catch (Exception exp) {
             log.error("{}:: createCaseWorkerUserProfiles failed  ::{}", loggingComponentName,
                     exp);
@@ -685,12 +680,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public CaseWorkerProfile persistCaseWorker(
             CaseWorkerProfile updateCaseWorkerProfile,
-            Map<String, StaffProfileCreationRequest>
-                    emailToRequestMap) {
+            StaffProfileCreationRequest cwUiRequest) {
         List<CaseWorkerProfile> processedCwProfiles = null;
         List<CaseWorkerProfile> profilesToBePersisted = new ArrayList<>();
 
-        profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, emailToRequestMap));
+        profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, cwUiRequest));
         //profilesToBePersisted.add(suspendedCaseWorkerProfiles);
         profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
 
@@ -710,8 +704,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     // deletes children and updates caseworker profile
     private List<CaseWorkerProfile> deleteChildrenAndUpdateCwProfiles(CaseWorkerProfile updateCaseWorkerProfiles,
-                                                                      Map<String, StaffProfileCreationRequest>
-                                                                              emailToRequestMap) {
+                                                                      StaffProfileCreationRequest cwUiRequest) {
         List<CaseWorkerProfile> updatedProfiles = new ArrayList<>();
         if (isNotEmpty(updateCaseWorkerProfiles)) {
             caseWorkerLocationRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
@@ -719,7 +712,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             caseWorkerRoleRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
             caseWorkerSkillRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
             cwrCommonRepository.flush();
-            updatedProfiles.add(updateUserProfile(emailToRequestMap.get(updateCaseWorkerProfiles.getEmailId()),
+            updatedProfiles.add(updateUserProfile(cwUiRequest,
                     updateCaseWorkerProfiles));
         }
         return updatedProfiles;
