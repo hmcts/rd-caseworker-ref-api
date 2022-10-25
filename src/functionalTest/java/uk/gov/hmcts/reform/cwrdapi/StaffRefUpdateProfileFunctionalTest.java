@@ -4,6 +4,7 @@ import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -43,21 +44,12 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void should_update_staff_profile_and_returns_status_200() {
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        List<String> roles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
-        String firstName = "StaffProfilefirstName";
-        String lastName = "StaffProfilelastName";
-
-        Map<String, String> userDetail = idamOpenIdClient.createUser(roles,
-                email,firstName,lastName);
-        String userEmail = userDetail.get(EMAIL);
-
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
-                .createStaffProfileCreationRequest(userEmail,firstName,lastName);
-        //Created userprofile
+                .createStaffProfileCreationRequest();
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+
+
 
         String firstNameUpdated = "StaffProfilefirstNameChanged";
         String lastNameUpdated = "StaffProfilelastNameChanged";
@@ -112,6 +104,16 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(response.getBody().asString()).contains("Access is denied");
 
     }
+
+    @AfterAll
+    public static void cleanUpTestData() {
+        try {
+            deleteCaseWorkerProfileByEmailPattern(STAFF_EMAIL_PATTERN);
+        } catch (Exception e) {
+            log.error("cleanUpTestData :: threw the following exception: " + e);
+        }
+    }
+
 
 
 }
