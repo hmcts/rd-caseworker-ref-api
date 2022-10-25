@@ -66,7 +66,6 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -310,7 +309,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
-        when(caseWorkerProfileRepository.saveAll(anyList())).thenReturn(caseWorkerProfiles);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
 
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
@@ -503,7 +502,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         requests.add(staffProfileCreationRequest);
         staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest,profile);
 
-        verify(caseWorkerProfileRepository, times(1)).saveAll(any());
+        verify(caseWorkerProfileRepository, times(1)).save(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 

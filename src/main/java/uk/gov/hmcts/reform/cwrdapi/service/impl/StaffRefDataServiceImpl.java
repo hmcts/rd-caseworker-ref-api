@@ -70,7 +70,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -80,7 +79,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Set.copyOf;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
@@ -657,7 +655,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (isTrue(caseWorkerProfiles.getSuspended())) {
             //when existing profile with delete flag is true then log exception add entry in exception table
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
-                    StringUtils.EMPTY, cwUiRequest, STAFF_PROFILE_UPDATE);
+                    caseWorkerProfiles.getCaseWorkerId(), cwUiRequest, STAFF_PROFILE_UPDATE);
             throw new InvalidRequestException(ALREADY_SUSPENDED_ERROR_MESSAGE);
         } else if (cwUiRequest.isSuspended()) {
             //when existing profile with delete flag is true in request then suspend user
@@ -681,39 +679,31 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public CaseWorkerProfile persistCaseWorker(
             CaseWorkerProfile updateCaseWorkerProfile,
             StaffProfileCreationRequest cwUiRequest) {
-        List<CaseWorkerProfile> processedCwProfiles = null;
-        List<CaseWorkerProfile> profilesToBePersisted = new ArrayList<>();
+        CaseWorkerProfile processedCwProfiles = null;
+        CaseWorkerProfile profilesToBePersisted =
+                deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, cwUiRequest);
 
-        profilesToBePersisted.addAll(deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, cwUiRequest));
-        //profilesToBePersisted.add(suspendedCaseWorkerProfiles);
-        profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
 
         if (isNotEmpty(profilesToBePersisted)) {
-            processedCwProfiles = caseWorkerProfileRepo.saveAll(profilesToBePersisted);
-            log.info("{}:: {} case worker profiles inserted ", loggingComponentName,
-                    processedCwProfiles.size());
+            processedCwProfiles = caseWorkerProfileRepo.save(profilesToBePersisted);
+            log.info("{}::case worker profile inserted ", loggingComponentName);
         }
 
-        CaseWorkerProfile caseWorkerProfile = null;
-
-        if (!ObjectUtils.isEmpty(processedCwProfiles)) {
-            caseWorkerProfile = processedCwProfiles.get(0);
-        }
-        return caseWorkerProfile;
+        return processedCwProfiles;
     }
 
     // deletes children and updates caseworker profile
-    private List<CaseWorkerProfile> deleteChildrenAndUpdateCwProfiles(CaseWorkerProfile updateCaseWorkerProfiles,
+    private CaseWorkerProfile deleteChildrenAndUpdateCwProfiles(CaseWorkerProfile updateCaseWorkerProfiles,
                                                                       StaffProfileCreationRequest cwUiRequest) {
-        List<CaseWorkerProfile> updatedProfiles = new ArrayList<>();
+        CaseWorkerProfile updatedProfiles = null;
         if (isNotEmpty(updateCaseWorkerProfiles)) {
             caseWorkerLocationRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
             caseWorkerWorkAreaRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
             caseWorkerRoleRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
             caseWorkerSkillRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
             cwrCommonRepository.flush();
-            updatedProfiles.add(updateUserProfile(cwUiRequest,
-                    updateCaseWorkerProfiles));
+            updatedProfiles = updateUserProfile(cwUiRequest,
+                    updateCaseWorkerProfiles);
         }
         return updatedProfiles;
     }
@@ -795,9 +785,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
 
                     staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS_NOT_ACTIVE,
-                            StringUtils.EMPTY,cwrProfileRequest,STAFF_PROFILE_UPDATE);
+                            profileResponse.getIdamId(),cwrProfileRequest,STAFF_PROFILE_UPDATE);
 
-                    log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
+                    log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                             profileResponse.getIdamStatus());
 
                     throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
@@ -805,7 +795,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 }
 
             } else {
-                log.info("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
+                log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                         UP_FAILURE_ROLES);
                 throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
                         IDAM_STATUS_USER_PROFILE);
@@ -817,6 +807,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
                     new HashSet<>();
+
             idamRolesCwr.addAll(mappedRoles);
             Set<RoleName> mergedRoles = new HashSet<>();
             if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
