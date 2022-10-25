@@ -678,8 +678,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
             if (clazz == ErrorResponse.class) {
                 Object responseBody = responseEntity.getBody();
-                if (nonNull(responseBody) && responseBody instanceof ErrorResponse) {
-                    Optional<ErrorResponse> optional = Optional.ofNullable((ErrorResponse) responseBody);
+                if (nonNull(responseBody) && responseBody instanceof ErrorResponse errorResponse) {
+                    Optional<ErrorResponse> optional = Optional.ofNullable(errorResponse);
                     validationServiceFacade.logFailures(
                             optional.map(ErrorResponse::getErrorDescription).orElse(UP_CREATION_FAILED),
                             cwrdProfileRequest.getRowId());
