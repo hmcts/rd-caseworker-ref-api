@@ -325,7 +325,7 @@ public class StaffRefDataController {
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
+                    code = 200,
                     message = REQUEST_COMPLETED_SUCCESSFULLY
             ),
             @ApiResponse(

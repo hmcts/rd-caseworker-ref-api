@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SerenityTest
 @SpringBootTest
 @Slf4j
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String SEARCH_STAFF_USER = "StaffRefDataController.searchStaffProfile";

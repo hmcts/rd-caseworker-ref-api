@@ -40,7 +40,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/refdata/case-worker/job-title",
                         "/refdata/case-worker/profile",
                         "/refdata/case-worker/job-title",
-                        "/refdata/case-worker/profile/search-by-name");
+                        "/refdata/case-worker/profile/search-by-name",
+                        "/refdata/case-worker/profile/search");
 
 
         //Audit Interceptor
