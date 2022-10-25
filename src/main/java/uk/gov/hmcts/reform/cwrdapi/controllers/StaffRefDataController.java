@@ -353,9 +353,9 @@ public class StaffRefDataController {
             @RequestHeader(name = "page-number", required = false) Integer pageNumber,
             @RequestHeader(name = "page-size", required = false) Integer pageSize,
             SearchRequest searchRequest) {
+        validateSearchRequest(searchRequest);
         var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize,
                 configPageNumber);
-        validateSearchRequest(searchRequest);
         return staffRefDataService.retrieveStaffProfile(searchRequest, pageRequest);
     }
 }

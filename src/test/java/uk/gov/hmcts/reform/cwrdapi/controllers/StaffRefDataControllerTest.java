@@ -59,9 +59,6 @@ class StaffRefDataControllerTest {
     @Mock
     StaffRefDataService staffRefDataService;
 
-    @Mock
-    PageRequest pageRequest;
-
 
 
     SearchStaffUserResponse searchResponse;
@@ -248,10 +245,12 @@ class StaffRefDataControllerTest {
         searchReq = SearchRequest.builder()
                 .serviceCode(serviceId)
                 .build();
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,2, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("Invalid Service ids: " + serviceId, ex.getMessage());
     }
 
     @Test
@@ -319,10 +318,13 @@ class StaffRefDataControllerTest {
                 .location(location)
                 .build();
 
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,2, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("Invalid location type ids: " + location, ex.getMessage());
+
     }
 
 
@@ -348,17 +350,19 @@ class StaffRefDataControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"abc","*__","sdf sdf"})
+    @ValueSource(strings = {"ab..c","*__","sdf sdf"})
     void should_return_staffProfiles_search_with_invalid_input_usertype_status_code_400(String userType) {
 
         searchReq = SearchRequest.builder()
                 .userType(userType)
                 .build();
 
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,2, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("Param contains special characters. ", ex.getMessage());
     }
 
 
@@ -386,16 +390,18 @@ class StaffRefDataControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"avdx","_*kd"})
+    @ValueSource(strings = {"avd...x","_*kd"})
     void should_return_staffProfiles_search_with_invalid_input_jobTitle_status_code_400(String jobTitileId) {
         searchReq = SearchRequest.builder()
                 .jobTitle(jobTitileId)
                 .build();
 
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,2, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("Param contains special characters. ", ex.getMessage());
     }
 
 
@@ -423,16 +429,19 @@ class StaffRefDataControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"avdx","_*kd"})
+    @ValueSource(strings = {"av..dx","_*kd"})
     void should_return_staffProfiles_search_with_invalid_skillId_status_code_400(String skillId) {
         searchReq = SearchRequest.builder()
                 .skill(skillId)
                 .build();
 
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,2, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("Param contains special characters. ", ex.getMessage());
+
     }
 
 
@@ -469,10 +478,13 @@ class StaffRefDataControllerTest {
                 .role(roleId)
                 .build();
 
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,2, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("Invalid search string. Please input a valid string.", ex.getMessage());
+
     }
 
     @Test
@@ -545,8 +557,10 @@ class StaffRefDataControllerTest {
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(2);
         verify(staffRefDataService, times(1))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
@@ -555,19 +569,23 @@ class StaffRefDataControllerTest {
 
     @Test
     void should_return_staffProfiles_with_status_code_400_page_number_0() {
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(0,2, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("The field Page Number is invalid. Please provide a valid value.", ex.getMessage());
 
     }
 
     @Test
     void should_return_staffProfiles_with_status_code_400_page_size_lessThan1() {
-        assertThrows(InvalidRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,0, searchReq));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("The field Page Size is invalid. Please provide a valid value.", ex.getMessage());
 
     }
 
@@ -575,10 +593,12 @@ class StaffRefDataControllerTest {
     @Test
     void should_return_staffProfiles_with_status_code_400_at_least_one_param_required() {
         SearchRequest req = SearchRequest.builder().build();
-        assertThrows(EmptyRequestException.class, () -> staffRefDataController
+        Exception ex = assertThrows(EmptyRequestException.class, () -> staffRefDataController
                 .searchStaffProfile(2,1, req));
         verify(staffRefDataService, times(0))
                 .retrieveStaffProfile(eq(searchReq), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        assertEquals("Unexpected character", ex.getMessage());
 
     }
 

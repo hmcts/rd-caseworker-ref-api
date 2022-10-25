@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -98,135 +97,109 @@ public class TestSupport {
     public static boolean validateSearchUserProfileResponse(ResponseEntity<List<SearchStaffUserResponse>> response,
                                                             SearchRequest searchReq) {
 
-        SearchRequest finalSearchReq = searchReq;
-        List validResponse = new ArrayList<>();
+        List<SearchStaffUserResponse> validResponse;
         List<SearchStaffUserResponse> body = response.getBody();
-        validResponse = body.stream()
-                .filter(Objects::nonNull)
-                .filter(searchStaffUserResponse -> {
-                    if (Optional.ofNullable(finalSearchReq.getServiceCode()).isEmpty()) {
-                        return true;
-                    }
-                    if (Optional.ofNullable(searchStaffUserResponse.getServices()).isEmpty()) {
-                        return false;
-                    }
+        if (body != null) {
+            validResponse = body.stream()
+                    .filter(Objects::nonNull)
+                    .filter(searchStaffUserResponse -> {
+                        if (Optional.ofNullable(searchReq.getServiceCode()).isEmpty()) {
+                            return true;
+                        }
+                        if (Optional.ofNullable(searchStaffUserResponse.getServices()).isEmpty()) {
+                            return false;
+                        }
 
-                    boolean valid = searchStaffUserResponse.getServices().stream()
-                            .anyMatch(service -> Optional.ofNullable(service).isPresent()
-                                    && finalSearchReq.getServiceCode().toLowerCase().contains(service.getServiceCode()
-                                    .toLowerCase())
-                            );
-                    return valid;
-                })
-                .filter(searchStaffUserResponse -> {
-                    if (Optional.ofNullable(finalSearchReq.getLocation()).isEmpty()) {
-                        return true;
-                    }
-                    if (Optional.ofNullable(searchStaffUserResponse.getBaseLocations()).isEmpty()) {
-                        return false;
-                    }
+                        return searchStaffUserResponse.getServices().stream()
+                                .anyMatch(service -> Optional.ofNullable(service).isPresent()
+                                        && searchReq.getServiceCode().toLowerCase().contains(service.getServiceCode()
+                                        .toLowerCase())
+                                );
+                    })
+                    .filter(searchStaffUserResponse -> {
+                        if (Optional.ofNullable(searchReq.getLocation()).isEmpty()) {
+                            return true;
+                        }
+                        if (Optional.ofNullable(searchStaffUserResponse.getBaseLocations()).isEmpty()) {
+                            return false;
+                        }
 
-                    boolean valid = searchStaffUserResponse.getBaseLocations().stream()
+                        return searchStaffUserResponse.getBaseLocations().stream()
 
-                            .anyMatch(location -> Optional.ofNullable(location).isPresent()
-                                    && finalSearchReq.getLocation().toLowerCase().contains(location.getBaseLocationId()
-                                    .toString().toLowerCase())
-                            );
-                    return valid;
-                })
-                .filter(searchStaffUserResponse -> {
-                    if (Optional.ofNullable(finalSearchReq.getLocation()).isEmpty()) {
-                        return true;
-                    }
-                    if (Optional.ofNullable(searchStaffUserResponse.getBaseLocations()).isEmpty()) {
-                        return false;
-                    }
+                                .anyMatch(location -> Optional.ofNullable(location).isPresent()
+                                        && searchReq.getLocation().toLowerCase().contains(String.valueOf(location
+                                        .getBaseLocationId()))
+                                );
+                    })
+                    .filter(searchStaffUserResponse -> {
+                        if (Optional.ofNullable(searchReq.getUserType()).isEmpty()) {
+                            return true;
+                        }
+                        return Optional.ofNullable(searchStaffUserResponse.getUserType()).isPresent();
+                    })
+                    .filter(searchStaffUserResponse -> {
+                        if (Optional.ofNullable(searchReq.getJobTitle()).isEmpty()) {
+                            return true;
+                        }
+                        if (Optional.ofNullable(searchStaffUserResponse.getRoles()).isEmpty()) {
+                            return false;
+                        }
+                        return searchStaffUserResponse.getRoles().stream()
 
-                    boolean valid = searchStaffUserResponse.getBaseLocations().stream()
+                                .anyMatch(roles -> Optional.ofNullable(roles).isPresent()
+                                        && roles.getRoleId().toLowerCase().contains(searchReq.getJobTitle()
+                                        .toLowerCase())
+                                );
+                    })
+                    .filter(searchStaffUserResponse -> {
+                        if (Optional.ofNullable(searchReq.getSkill()).isEmpty()) {
+                            return true;
+                        }
+                        if (Optional.ofNullable(searchStaffUserResponse.getSkills()).isEmpty()) {
+                            return false;
+                        }
+                        return searchStaffUserResponse.getSkills().stream()
 
-                            .anyMatch(location -> Optional.ofNullable(location).isPresent()
-                                    && finalSearchReq.getLocation().toLowerCase().contains(String.valueOf(location
-                                    .getBaseLocationId()))
-                            );
-                    return valid;
-                })
-                .filter(searchStaffUserResponse -> {
-                    if (Optional.ofNullable(finalSearchReq.getUserType()).isEmpty()) {
-                        return true;
-                    }
-                    if (Optional.ofNullable(searchStaffUserResponse.getUserType()).isEmpty()) {
-                        return false;
-                    }
-                    return true;
-                })
-                .filter(searchStaffUserResponse -> {
-                    if (Optional.ofNullable(finalSearchReq.getJobTitle()).isEmpty()) {
-                        return true;
-                    }
-                    if (Optional.ofNullable(searchStaffUserResponse.getRoles()).isEmpty()) {
-                        return false;
-                    }
-                    boolean valid = searchStaffUserResponse.getRoles().stream()
+                                .anyMatch(skill -> Optional.ofNullable(skill).isPresent()
+                                        && skill.getSkillId() == Integer.parseInt(searchReq.getSkill())
+                                );
+                    })
+                    .filter(searchStaffUserResponse -> {
+                        if (Optional.ofNullable(searchReq.getRole()).isEmpty()) {
+                            return true;
+                        }
+                        boolean valid = searchReq.getRole().contains("task supervisor") && searchStaffUserResponse
+                                .isTaskSupervisor();
 
-                            .anyMatch(roles -> Optional.ofNullable(roles).isPresent()
-                                    && roles.getRoleId().toLowerCase().contains(finalSearchReq.getJobTitle()
-                                    .toLowerCase())
-                            );
-                    return valid;
-                })
-                .filter(searchStaffUserResponse -> {
-                    if (Optional.ofNullable(finalSearchReq.getSkill()).isEmpty()) {
-                        return true;
-                    }
-                    if (Optional.ofNullable(searchStaffUserResponse.getSkills()).isEmpty()) {
-                        return false;
-                    }
-                    boolean valid = searchStaffUserResponse.getSkills().stream()
-
-                            .anyMatch(skill -> Optional.ofNullable(skill).isPresent()
-                                    && skill.getSkillId() == Integer.parseInt(finalSearchReq.getSkill())
-                            );
-                    return valid;
-                })
-                .filter(searchStaffUserResponse -> {
-                    if (Optional.ofNullable(finalSearchReq.getRole()).isEmpty()) {
-                        return true;
-                    }
-                    boolean valid = false;
-
-                    if (finalSearchReq.getRole().contains("task supervisor") && searchStaffUserResponse
-                            .isTaskSupervisor()) {
-                        valid = true;
-                    }
-                    if (finalSearchReq.getRole().contains("case allocator") && searchStaffUserResponse
-                            .isCaseAllocator()) {
-                        valid = true;
-                    }
-                    if (finalSearchReq.getRole().contains("Staff Administrator") && searchStaffUserResponse
-                            .isStaffAdmin()) {
-                        valid = true;
-                    }
+                        if (searchReq.getRole().contains("case allocator") && searchStaffUserResponse
+                                .isCaseAllocator()) {
+                            valid = true;
+                        }
+                        if (searchReq.getRole().contains("Staff Administrator") && searchStaffUserResponse
+                                .isStaffAdmin()) {
+                            valid = true;
+                        }
 
 
-                    return valid;
-                })
+                        return valid;
+                    })
 
 
-                .toList();
+                    .toList();
+            Comparator<SearchStaffUserResponse> comparator
+                    = Comparator.comparing(SearchStaffUserResponse::getLastName);
 
-        Comparator<SearchStaffUserResponse> comparator
-                = Comparator.comparing(SearchStaffUserResponse::getLastName);
+            List<SearchStaffUserResponse> sorted = new ArrayList<>(body);
+            sorted.sort(comparator);
 
-        List<SearchStaffUserResponse> sorted = new ArrayList<>();
-        sorted.addAll(body);
-        Collections.sort(sorted,comparator);
-        if (!body.equals(sorted)) {
-            return false;
+            if (!body.equals(sorted)) {
+                return false;
+            }
+
+            return validResponse.size() == body.size();
+
         }
 
-        if (validResponse.size() == body.size()) {
-            return true;
-        }
         return false;
 
     }

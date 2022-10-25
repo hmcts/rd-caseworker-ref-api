@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
@@ -12,7 +11,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
@@ -33,7 +31,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 @SerenityTest
 @SpringBootTest
 @Slf4j
-public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunctionalTest {
+class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String SEARCH_STAFF_USER = "StaffRefDataController.searchStaffProfile";
     public static final String CASE_WORKER_PROFILE_URL = "/refdata/case-worker/profile";
@@ -56,11 +54,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .statusCode(200);
 
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .serviceCode("ABA1")
                     .location("2")
@@ -69,6 +67,7 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                     .build();
             assertTrue(validateSearchUserProfileResponse(new ResponseEntity<>(searchStaffUserResponse,HttpStatus.OK),
                     searchReq));
+
         }
     }
 
@@ -89,11 +88,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .serviceCode("ABA1")
                     .location("2")
@@ -120,11 +119,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .serviceCode("ABA1")
                     .build();
@@ -147,11 +146,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .serviceCode("ABA1,BBA9")
                     .build();
@@ -174,11 +173,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .location("817181")
                     .build();
@@ -200,11 +199,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .location("817181,271588")
                     .build();
@@ -227,11 +226,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .userType("1")
                     .build();
@@ -254,11 +253,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .jobTitle("2")
                     .build();
@@ -282,11 +281,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .role("case allocator")
                     .build();
@@ -309,11 +308,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .role("task supervisor,case allocator,staff administrator")
                     .build();
@@ -336,11 +335,11 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(200);
 
-        int totalRecords = Integer.valueOf(fetchResponse.getHeader("total-records"));
+        int totalRecords = Integer.parseInt(fetchResponse.getHeader("total-records"));
         if (totalRecords > 0) {
             List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
                     fetchResponse.getBody().as(SearchStaffUserResponse[].class));
-            assertThat(searchStaffUserResponse).isNotNull();
+            assertThat(searchStaffUserResponse).isNotNull().hasSizeGreaterThan(0);
             searchReq = SearchRequest.builder()
                     .skill("1")
                     .build();
@@ -388,7 +387,7 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
     @Test
     @ToggleEnable(mapKey = SEARCH_STAFF_USER, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void should_return_403_when_invalid_role() {
+    void should_return_403_when_invalid_role() {
         String searchString = "serviceCode=ABA1&location=2&userType=1&role=case allocators";
         Response response = caseWorkerApiClient
                 .getMultipleAuthHeadersWithoutContentType(ROLE_CWD_SYSTEM_USER)
@@ -403,8 +402,7 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
     @Test
     @ToggleEnable(mapKey = SEARCH_STAFF_USER, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void should_return_status_code_400_when_page_size_is_zero()
-            throws JsonProcessingException {
+    void should_return_status_code_400_when_page_size_is_zero() {
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2"
                 + "case allocators";
 
@@ -420,8 +418,7 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
     @Test
     @ToggleEnable(mapKey = SEARCH_STAFF_USER, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void should_return_status_code_400_when_page_num_is_zero()
-            throws JsonProcessingException {
+    void should_return_status_code_400_when_page_num_is_zero() {
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
                 + "case allocator";
         Response fetchResponse = caseWorkerApiClient
@@ -437,8 +434,7 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
     @Test
     @ToggleEnable(mapKey = SEARCH_STAFF_USER, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void should_return_status_code_400_when_no_params_in_search_string()
-            throws JsonProcessingException {
+    void should_return_status_code_400_when_no_params_in_search_string() {
         String searchString = "";
         Response fetchResponse = caseWorkerApiClient
                 .getMultipleAuthHeadersWithoutContentTypeWithPagination(ROLE_STAFF_ADMIN,"1","1")
@@ -448,15 +444,6 @@ public class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunct
                 .assertThat()
                 .statusCode(400);
 
-
-    }
-
-
-
-    static void createCaseWorkerTestData(String firstName, String lastName, String email) {
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
-                .createCaseWorkerProfiles(firstName, lastName, email);
-        Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
 
     }
 

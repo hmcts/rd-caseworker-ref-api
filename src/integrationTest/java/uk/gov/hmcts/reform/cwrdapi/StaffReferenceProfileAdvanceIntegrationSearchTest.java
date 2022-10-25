@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -40,7 +38,7 @@ import static uk.gov.hmcts.reform.cwrdapi.TestSupport.validateSearchUserProfileR
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 
-public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabledIntegrationTest {
+public class StaffReferenceProfileAdvanceIntegrationSearchTest extends AuthorizationEnabledIntegrationTest {
 
 
     public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@justice.gov.uk";
@@ -94,19 +92,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_flag_enabled_default_pagination() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
-
-
+        createCaseWorkerProfiles();
 
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
                 + "task supervisor,case allocator,staff administrator";
@@ -116,10 +102,14 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, null, null, ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(5);
+
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1")
                 .location("12345")
@@ -127,28 +117,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .jobTitle("2")
                 .role("task supervisor,case allocators,staff administrator")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
     void should_return_staff_user_with_status_code_200_when_flag_enabled_with_pagination() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
-
+        createCaseWorkerProfiles();
 
 
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
@@ -159,10 +134,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1")
                 .location("12345")
@@ -177,23 +155,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_serviceCode() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
-
-
+        createCaseWorkerProfiles();
 
         String searchString = "serviceCode=ABA1";
         String path = "/profile/search?";
@@ -202,10 +164,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1")
                 .build();
@@ -215,23 +180,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_list_of_serviceCodes() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
-
-
+        createCaseWorkerProfiles();
 
         String searchString = "serviceCode=ABA1,serviceCode2";
         String path = "/profile/search?";
@@ -240,10 +189,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1,serviceCode2")
                 .build();
@@ -253,15 +205,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_location() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("new", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("new1", "sbn-Smith", email);
-
-
-
+        createCaseWorkerProfiles();
         String searchString = "location=12345";
         String path = "/profile/search?";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
@@ -269,10 +213,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
-        assertThat(totalRecords).isEqualTo(2);
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
+        assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .location("12345")
                 .build();
@@ -283,22 +230,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_list_of_location() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
-
+        createCaseWorkerProfiles();
 
 
         String searchString = "location=12345,6789";
@@ -308,10 +240,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .location("12345,6789")
                 .build();
@@ -321,21 +256,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_userType() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
+        createCaseWorkerProfiles();
 
 
         String searchString = "userType=1";
@@ -345,10 +266,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .userType("1")
                 .build();
@@ -358,21 +282,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_Jobtitle() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
+        createCaseWorkerProfiles();
 
 
         String searchString = "jobTitle=2";
@@ -382,10 +292,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .userType("CTSC")
                 .jobTitle("2")
@@ -397,21 +310,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_role() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
+        createCaseWorkerProfiles();
 
 
         String searchString = "role=case allocator";
@@ -421,10 +320,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .userType("CTSC")
                 .role("task supervisor")
@@ -432,25 +334,53 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
         validateSearchUserProfileResponse(response,searchReq);
     }
 
+    @Test
+    void should_return_staff_user_with_status_code_200_when_skill_are_empty() {
+
+        createCaseWorkerProfiles();
+        String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
+                + "task supervisor,case allocator,staff administrator";
+
+        String path = "/profile/search?";
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
+                .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
+
+        assertThat(response).isNotNull();
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
+        assertThat(totalRecords).isEqualTo(5);
+        List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
+        assertThat(searchStaffUserResponse.get(0).getSkills()).isEmpty();
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {"serviceCode=sddd","location=127494","userType=12","jobTitle=4224",
+            "role=staff administrator","skill=132"})
+    void should_return_staff_user_with_status_code_200_with_empty_search_response(String searchString) {
+
+        createCaseWorkerProfiles();
+        String path = "/profile/search?";
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
+                .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
+
+        assertThat(response).isNotNull();
+        List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
+        assertThat(searchStaffUserResponse).isNotNull().isEmpty();
+
+    }
+
 
     @Test
     void should_return_staff_user_with_status_code_200_when_search_with_list_of_roles() {
 
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
+        createCaseWorkerProfiles();
 
 
         String searchString = "role=task supervisor,case allocator,staff administrator";
@@ -460,10 +390,13 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+        int totalRecords = 0;
+        if (response.getHeaders().get("total-records") != null) {
+            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
+        }
         assertThat(totalRecords).isEqualTo(5);
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
-        assertThat(searchStaffUserResponse).isNotNull();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
                 .userType("CTSC")
                 .role("task supervisor,case allocator,staff administrator")
@@ -472,11 +405,10 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     }
 
 
+
     @Test
-    void should_return_status_code_400_when_page_size_is_zero()
-            throws JsonProcessingException {
-        String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2"
-                + "case allocators";
+    void should_return_status_code_400_when_page_size_is_zero() {
+        String searchString = "serviceCode=ABA1";
         String path = "/profile/search?";
 
         Map<String, Object> response = caseworkerReferenceDataClient
@@ -488,10 +420,8 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     }
 
     @Test
-    void should_return_status_code_400_when_page_num_is_zero()
-            throws JsonProcessingException {
-        String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
-                + "case allocator";
+    void should_return_status_code_400_when_page_num_is_zero() {
+        String searchString = "serviceCode=ABA1";
         String path = "/profile/search?";
 
         Map<String, Object> response = caseworkerReferenceDataClient
@@ -504,8 +434,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
     @ParameterizedTest
     @ValueSource(strings = {"","serviceCode=*_sd","location=1adf*_","userType=1sdfs*__","jobTitle=asdfs",
             "role=task_supervisor","skill=asdfd"})
-    void should_return_status_code_400(String searchString)
-            throws JsonProcessingException {
+    void should_return_status_code_400(String searchString) {
         String path = "/profile/search?";
 
         Map<String, Object> response = caseworkerReferenceDataClient
@@ -526,6 +455,7 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
         assertThat(response).containsEntry("http_status", "201 CREATED");
 
     }
+
 
     public static List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String firstName,
                                                                                    String lastName, String email) {
@@ -557,11 +487,6 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
 
         Set<String> idamRoles = new HashSet<>();
 
-        SkillsRequest skillsRequest = SkillsRequest.skillsRequest().skillId(1)
-                .description("testskill1").build();
-
-        List<SkillsRequest> skills = ImmutableList.of(skillsRequest);
-
         String emailToUsed = nonNull(email) ? email : generateRandomEmail();
         return ImmutableList.of(
                 CaseWorkersProfileCreationRequest
@@ -579,6 +504,26 @@ public class StaffReferenceProfileAdvanceSearchTest extends AuthorizationEnabled
                         .baseLocations(locationRequestList)
                         .roles(roleRequests)
                         .workerWorkAreaRequests(areaRequests).build());
+    }
+
+
+    private void createCaseWorkerProfiles() {
+
+        String emailPattern = "sbnTest1234";
+        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
+                + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
+                + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
+                + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
+                + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
     }
 
 
