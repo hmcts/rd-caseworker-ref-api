@@ -21,10 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.List;
-import java.util.Map;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
