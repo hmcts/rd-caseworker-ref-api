@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
-import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
@@ -614,7 +613,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (caseWorkerProfile == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
                     StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
-            throw new ResourceNotFoundException(PROFILE_NOT_PRESENT_IN_DB);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST,StringUtils.EMPTY,
+                    PROFILE_NOT_PRESENT_IN_DB);
         }
 
 
