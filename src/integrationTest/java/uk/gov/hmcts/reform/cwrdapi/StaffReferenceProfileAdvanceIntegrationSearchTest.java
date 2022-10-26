@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
+import org.assertj.core.api.Condition;
+import org.assertj.core.data.Index;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -102,11 +104,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, null, null, ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(5);
 
@@ -134,11 +135,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -164,11 +164,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -189,11 +188,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -213,11 +211,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -240,11 +237,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -266,11 +262,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -292,11 +287,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -320,11 +314,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
@@ -347,11 +340,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         assertThat(searchStaffUserResponse.get(0).getSkills()).isEmpty();
@@ -390,11 +382,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        int totalRecords = 0;
-        if (response.getHeaders().get("total-records") != null) {
-            totalRecords = Integer.parseInt(response.getHeaders().get("total-records").get(0));
-        }
-        assertThat(totalRecords).isEqualTo(5);
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
