@@ -335,7 +335,7 @@ public class StaffRefDataController {
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
+                    code = 200,
                     message = "Successfully updated staff user profile",
                     response = StaffProfileCreationResponse.class,
                     responseContainer = "list"
@@ -364,7 +364,7 @@ public class StaffRefDataController {
     )
     @Secured("staff-admin")
     @ResponseBody
-    @ResponseStatus(value = HttpStatus.CREATED)
+    @ResponseStatus(value = HttpStatus.OK)
     @Transactional
     public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfile(@RequestBody StaffProfileCreationRequest
                                                                                        staffProfileCreationRequest) {

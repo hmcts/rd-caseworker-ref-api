@@ -526,13 +526,14 @@ class StaffRefDataUpdateStaffServiceImplTest {
         List<StaffProfileCreationRequest> requests = new ArrayList<>();
         requests.add(staffProfileCreationRequest);
 
-        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             CaseWorkerProfile caseWorkerProfile =
                     staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest, profile);
 
         });
 
-        assertThat(thrown.getMessage()).isEqualTo(ALREADY_SUSPENDED_ERROR_MESSAGE);
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(ALREADY_SUSPENDED_ERROR_MESSAGE);
 
     }
 

@@ -656,7 +656,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             //when existing profile with delete flag is true then log exception add entry in exception table
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
                     caseWorkerProfiles.getCaseWorkerId(), cwUiRequest, STAFF_PROFILE_UPDATE);
-            throw new InvalidRequestException(ALREADY_SUSPENDED_ERROR_MESSAGE);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                    ALREADY_SUSPENDED_ERROR_MESSAGE);
         } else if (cwUiRequest.isSuspended()) {
             //when existing profile with delete flag is true in request then suspend user
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
@@ -801,15 +802,25 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                         IDAM_STATUS_USER_PROFILE);
 
             }
-            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
             Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
 
-            Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
+
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
                     new HashSet<>();
 
+            Set<String> userRoles = new HashSet<>();
+            idamRolesCwr.add(ROLE_CWD_USER);
+
+            if (cwrProfileRequest.isStaffAdmin()) {
+                idamRolesCwr.add(ROLE_STAFF_ADMIN);
+            }
+
             idamRolesCwr.addAll(mappedRoles);
             Set<RoleName> mergedRoles = new HashSet<>();
+
+            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+
+            Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
             if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
                 mergedRoles = idamRolesCwr.stream()
                         .filter(s -> !(userProfileRoles.contains(s)))
