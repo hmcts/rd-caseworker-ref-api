@@ -376,7 +376,7 @@ public class StaffRefDataController {
 
             staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(staffProfileCreationResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(staffProfileCreationResponse);
     }
 
 
