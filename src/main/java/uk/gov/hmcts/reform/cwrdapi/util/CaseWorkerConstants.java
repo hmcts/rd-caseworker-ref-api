@@ -178,6 +178,7 @@ public final class CaseWorkerConstants {
     public static final String SEARCH_STRING_REGEX_PATTERN = "([a-zA-Z\\-\\s']){3,}+";
 
     public static final String PROFILE_NOT_PRESENT_IN_DB = "User does not exists in db";
+    public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UserProfile/Idam";
 
     public static final String IDAM_STATUS_NOT_ACTIVE = "The IDAM status of the user is not active";
     public static final String IDAM_STATUS_USER_PROFILE = "The IDAM  user is not valid";
