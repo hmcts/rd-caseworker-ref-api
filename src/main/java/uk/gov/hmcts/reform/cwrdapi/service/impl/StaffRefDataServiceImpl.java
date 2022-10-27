@@ -808,10 +808,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
                     new HashSet<>();
 
-            Set<String> userRoles = new HashSet<>();
-            idamRolesCwr.add(ROLE_CWD_USER);
 
             if (cwrProfileRequest.isStaffAdmin()) {
+                idamRolesCwr.add(ROLE_CWD_USER);
                 idamRolesCwr.add(ROLE_STAFF_ADMIN);
             }
 
