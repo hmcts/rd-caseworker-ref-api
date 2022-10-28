@@ -418,7 +418,7 @@ public class CaseWorkerApiClient {
 
         response.then()
                 .assertThat()
-                .statusCode(201);
+                .statusCode(200);
 
         return response;
     }

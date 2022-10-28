@@ -88,7 +88,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ROLE_UPDATE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
@@ -888,28 +887,7 @@ class StaffRefDataServiceImplTest {
         assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
     }
 
-    @Test
-    void test_check_staff_profile_for_update() throws JsonProcessingException {
 
-        //ValidateStaffProfile
-        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
-                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
-        CaseWorkerProfile caseWorkerProfile = null;
-
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
-
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
-
-
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
-        });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_DB);
-
-
-    }
 
     @Test
     void test_processExistingCaseWorkers() throws JsonProcessingException {
