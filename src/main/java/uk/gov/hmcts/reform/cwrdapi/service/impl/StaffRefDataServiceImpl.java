@@ -91,6 +91,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SU
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
@@ -594,7 +595,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         jsrValidatorStaffProfile.validateStaffProfile(profileRequest,STAFF_PROFILE_UPDATE);
 
-        CaseWorkerProfile caseWorkerProfileToUpdate = checkStaffProfileForUpdate(profileRequest);
+        CaseWorkerProfile caseWorkerProfileToUpdate = validateStaffProfileForUpdate(profileRequest);
 
 
         CaseWorkerProfile caseWorkerProfile = updateStaffProfiles(profileRequest, caseWorkerProfileToUpdate);
@@ -610,6 +611,48 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     .build();
         }
         return response;
+    }
+
+    private CaseWorkerProfile validateStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
+
+        // get all existing profile from db (used IN clause)
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
+                .findByEmailId(profileRequest.getEmailId().toLowerCase());
+        if (caseWorkerProfile == null) {
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
+                    StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND,StringUtils.EMPTY,
+                    PROFILE_NOT_PRESENT_IN_DB);
+        }
+
+        UserProfileResponse userProfileResponse = getUserProfileFromUP(caseWorkerProfile.getCaseWorkerId());
+        if (userProfileResponse == null) {
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
+                    StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND,StringUtils.EMPTY,
+                    PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
+        }
+
+        if (isTrue(caseWorkerProfile.getSuspended())) {
+            //when existing profile with delete flag is true then log exception add entry in exception table
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
+                    caseWorkerProfile.getCaseWorkerId(), profileRequest, STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                    ALREADY_SUSPENDED_ERROR_MESSAGE);
+        }
+        return caseWorkerProfile;
+
+    }
+
+    public UserProfileResponse getUserProfileFromUP(String idamId) {
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
+
+        Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
+            return profileResponse;
+        }
+        return null;
     }
 
     private CaseWorkerProfile checkStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
@@ -784,67 +827,63 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId,
                                          String operationType) {
 
-        boolean result = false;
-        try {
-            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
-            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
-            Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
+
+        Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
                 && nonNull(profileResponse.getIdamStatus())) {
-                if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+            if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
 
-                    staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS_NOT_ACTIVE,
-                            profileResponse.getIdamId(),cwrProfileRequest,operationType);
+                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, IDAM_STATUS_NOT_ACTIVE,
+                        profileResponse.getIdamId(), cwrProfileRequest, operationType);
 
-                    log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
-                            profileResponse.getIdamStatus());
-
-                    throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
-                            IDAM_STATUS_NOT_ACTIVE);
-                }
-
-            } else {
                 log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
-                        UP_FAILURE_ROLES);
+                        profileResponse.getIdamStatus());
+
                 throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
-                        IDAM_STATUS_USER_PROFILE);
-
-            }
-            Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
-
-
-            Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                    new HashSet<>();
-
-
-            if (cwrProfileRequest.isStaffAdmin()) {
-                idamRolesCwr.add(ROLE_CWD_USER);
-                idamRolesCwr.add(ROLE_STAFF_ADMIN);
+                        IDAM_STATUS_NOT_ACTIVE);
             }
 
-            idamRolesCwr.addAll(mappedRoles);
-            Set<RoleName> mergedRoles = new HashSet<>();
-
-            UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
-
-            Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
-            if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
-                mergedRoles = idamRolesCwr.stream()
-                        .filter(s -> !(userProfileRoles.contains(s)))
-                        .map(RoleName::new)
-                        .collect(toSet());
-            }
-            var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
-                    || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
-            if (isNotEmpty(mergedRoles) || hasNameChanged) {
-                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
-            }
-        } finally {
+        } else {
+            log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
+                    UP_FAILURE_ROLES);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                    IDAM_STATUS_USER_PROFILE);
 
         }
-        result = true;
-        return result;
+        Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
+
+
+        Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
+                new HashSet<>();
+
+
+        if (cwrProfileRequest.isStaffAdmin()) {
+            idamRolesCwr.add(ROLE_CWD_USER);
+            idamRolesCwr.add(ROLE_STAFF_ADMIN);
+        }
+
+        idamRolesCwr.addAll(mappedRoles);
+        Set<RoleName> mergedRoles = new HashSet<>();
+
+        UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+
+        Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
+        if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
+            mergedRoles = idamRolesCwr.stream()
+                    .filter(s -> !(userProfileRoles.contains(s)))
+                    .map(RoleName::new)
+                    .collect(toSet());
+        }
+        var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
+                || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
+        if (isNotEmpty(mergedRoles) || hasNameChanged) {
+            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
+        }
+
+        return true;
     }
 
     private boolean updateMismatchedDatatoUP(StaffProfileCreationRequest cwrProfileRequest, String idamId,
