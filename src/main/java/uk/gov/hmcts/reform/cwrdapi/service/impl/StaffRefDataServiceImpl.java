@@ -85,7 +85,6 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ROLE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
@@ -253,8 +252,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
-            if(response.status() == 409) {
-            //validate the request info with UserProfile response.
+            if (response.status() == 409) {
+                //validate the request info with UserProfile response.
                 UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
                 if (nonNull(upResponse)) {
                     updateUserRolesInIdam(staffProfileRequest, upResponse.getIdamId(),STAFF_PROFILE_CREATE);
@@ -792,7 +791,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
-              && nonNull(profileResponse.getIdamStatus())) {
+                && nonNull(profileResponse.getIdamStatus())) {
                 if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
 
                     staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS_NOT_ACTIVE,
