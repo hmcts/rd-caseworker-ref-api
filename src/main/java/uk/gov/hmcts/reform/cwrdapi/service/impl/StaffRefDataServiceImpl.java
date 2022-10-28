@@ -253,6 +253,14 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
 
+            if(response.status() == 409) {
+            //validate the request info with UserProfile response.
+                UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
+                if (nonNull(upResponse)) {
+                    updateUserRolesInIdam(staffProfileRequest, upResponse.getIdamId(),STAFF_PROFILE_CREATE);
+                }
+            }
+
             if ((response.status() != 409 && isNotEmpty(responseEntity.getBody()))
                     && (responseEntity.getStatusCode().is4xxClientError()
                     || responseEntity.getStatusCode().is5xxServerError())) {
@@ -766,7 +774,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<CaseWorkerProfile> filteredUpdateCwProfiles = new ArrayList<>();
         CaseWorkerProfile filteredUpdateCwProfile = null;
         boolean isAddRoleSuccess = updateUserRolesInIdam(cwUiRequest,
-                updateCaseWorkerProfiles.getCaseWorkerId());
+                updateCaseWorkerProfiles.getCaseWorkerId(),STAFF_PROFILE_UPDATE);
         if (isAddRoleSuccess) {
             filteredUpdateCwProfile = updateCaseWorkerProfiles;
             filteredUpdateCwProfiles.add(updateCaseWorkerProfiles);
@@ -774,7 +782,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return filteredUpdateCwProfile;
     }
 
-    public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId) {
+    public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId,
+                                         String operationType) {
 
         boolean result = false;
         try {
@@ -782,11 +791,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
+              && nonNull(profileResponse.getIdamStatus())) {
                 if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
 
                     staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS_NOT_ACTIVE,
-                            profileResponse.getIdamId(),cwrProfileRequest,STAFF_PROFILE_UPDATE);
+                            profileResponse.getIdamId(),cwrProfileRequest,operationType);
 
                     log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                             profileResponse.getIdamStatus());
@@ -831,14 +841,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (isNotEmpty(mergedRoles) || hasNameChanged) {
                 return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
             }
-        } catch (Exception exception) {
-            log.error("{}:: Update Users api failed:: message {}", loggingComponentName,
-                    exception.getMessage());
+        } finally {
 
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,UP_FAILURE_ROLES,
-                    StringUtils.EMPTY,cwrProfileRequest,STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
-                    IDAM_STATUS_ROLE_UPDATE);
         }
         result = true;
         return result;

@@ -592,7 +592,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
 
         boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId());
+                .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId(),STAFF_PROFILE_UPDATE);
         assertThat(updateUserRolesInIdam).isTrue();
 
     }
@@ -650,7 +650,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,caseWorkerId);
+                    .updateUserRolesInIdam(cwUiRequest,caseWorkerId,STAFF_PROFILE_UPDATE);
 
         });
 
@@ -712,7 +712,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         String caseWorkerId = caseWorkerProfile.getCaseWorkerId();
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,caseWorkerId);
+                    .updateUserRolesInIdam(cwUiRequest,caseWorkerId,STAFF_PROFILE_UPDATE);
 
         });
 
@@ -744,7 +744,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         String caserWorkerId = dbProfile.getCaseWorkerId();
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,caserWorkerId);
+                    .updateUserRolesInIdam(cwUiRequest,caserWorkerId,STAFF_PROFILE_UPDATE);
 
         });
 
@@ -779,7 +779,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         String caserWorkerId = dbProfile.getCaseWorkerId();
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             boolean updateUserRolesInIdam = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(cwUiRequest,caserWorkerId);
+                    .updateUserRolesInIdam(cwUiRequest,caserWorkerId,STAFF_PROFILE_UPDATE);
 
         });
 
