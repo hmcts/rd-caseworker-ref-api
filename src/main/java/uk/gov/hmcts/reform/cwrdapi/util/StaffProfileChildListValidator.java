@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 
+import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Objects.nonNull;

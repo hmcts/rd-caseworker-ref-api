@@ -70,7 +70,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -87,7 +86,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ROLE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
@@ -785,7 +783,7 @@ class StaffRefDataServiceImplTest {
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
         when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(409).build());
+                .request(mock(Request.class)).body(body, defaultCharset()).status(200).build());
         ResponseEntity<Object> response = staffRefDataServiceImpl
                 .createUserProfileInIdamUP(staffProfileCreationRequest);
         assertNotNull(response);
@@ -890,39 +888,6 @@ class StaffRefDataServiceImplTest {
 
 
     @Test
-    void test_processExistingCaseWorkers() throws JsonProcessingException {
-
-        //ValidateStaffProfile
-        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
-                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
-
-        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setCaseWorkerId("CWID1");
-        caseWorkerProfile.setFirstName("CWFirstName");
-        caseWorkerProfile.setLastName("CWLastName");
-        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
-
-
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
-
-        Map<String, StaffProfileCreationRequest> emailToRequestMap = new HashMap<>();
-
-        emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
-
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl
-                    .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
-
-        });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
-
-
-
-    }
-
-    @Test
     void test_populateStaffProfile() throws JsonProcessingException {
 
         //ValidateStaffProfile
@@ -992,39 +957,7 @@ class StaffRefDataServiceImplTest {
 
     }
 
-    @Test
-    void test_processExistingCaseWorkers_suspendedUsers() throws JsonProcessingException {
 
-        //ValidateStaffProfile
-        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
-                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
-
-        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setCaseWorkerId("CWID1");
-        caseWorkerProfile.setFirstName("CWFirstName");
-        caseWorkerProfile.setLastName("CWLastName");
-        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
-
-
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
-
-        Map<String, StaffProfileCreationRequest> emailToRequestMap = new HashMap<>();
-
-        emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
-
-
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl
-                    .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
-
-        });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_ROLE_UPDATE);
-
-
-
-    }
 
     private StaffProfileCreationRequest getStaffProfileUpdateRequest() {
 
