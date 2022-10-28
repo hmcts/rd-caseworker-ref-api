@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_R
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
@@ -293,6 +294,118 @@ class StaffRefDataUpdateStaffServiceImplTest {
     }
 
 
+    @Test
+    void test_updateStaffProfile_when_user_exists_in_idam_only() throws JsonProcessingException {
+        //a) user exists in idam only - user update request with same email id but different name and role,
+        // it should be 404 as user does not exist in SRD
+
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+
+        List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
+
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(null,
+                                defaultCharset())
+                        .status(200).build());
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+
+
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
+                    .updateStaffProfile(staffProfileCreationRequest);
+
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
+
+
+    }
+
+
+    @Test
+    void test_updateStaffProfile_user_exists_in_up_and_idam() throws JsonProcessingException {
+        //b) use exists in idam and up only - user update request with same email id but different name
+        // and role,it should be 404 as user does not exist in SRD
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+
+        List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
+
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
+                    .updateStaffProfile(staffProfileCreationRequest);
+
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_DB);
+
+    }
 
 
     @Test
@@ -791,27 +904,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
     }
 
 
-    @Test
-    void test_check_staff_profile_for_update() throws JsonProcessingException {
-
-        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
-                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
-        CaseWorkerProfile caseWorkerProfile = null;
-
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
-
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
-
-
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
-        });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_DB);
-
-
-    }
 
     @Test
     void test_processExistingCaseWorkers() throws JsonProcessingException {
