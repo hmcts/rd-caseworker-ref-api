@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 
-import java.util.stream.Collectors;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Objects.nonNull;
@@ -19,6 +18,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRI
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LOCATION_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT_PROFILE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_ROLE_PRESENT_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 
 public class StaffProfileChildListValidator implements ConstraintValidator<ValidateStaffProfileChildren,
@@ -64,10 +64,14 @@ public class StaffProfileChildListValidator implements ConstraintValidator<Valid
                     .addPropertyNode(LOCATION_FIELD)
                     .addConstraintViolation();
             }
-        } else if (isEmpty(staffProfileCreationRequest.getBaseLocations())
+
+
+        }
+        if (isEmpty(staffProfileCreationRequest.getBaseLocations())
                 || staffProfileCreationRequest.getBaseLocations()
                 .stream()
-                .noneMatch(CaseWorkerLocationRequest::isPrimaryFlag)) {
+                .filter(location -> Boolean.TRUE.equals(location.isPrimaryFlag()))
+                .findAny().isEmpty()) {
 
             isValidLocations = false;
             context.buildConstraintViolationWithTemplate(NO_PRIMARY_LOCATION_PRESENT_PROFILE)
@@ -90,6 +94,17 @@ public class StaffProfileChildListValidator implements ConstraintValidator<Valid
                     .addPropertyNode(ROLE_FIELD)
                     .addConstraintViolation();
             }
+        }
+        if (isEmpty(staffProfileCreationRequest.getRoles())
+                || staffProfileCreationRequest.getRoles()
+                .stream()
+                .filter(role -> Boolean.TRUE.equals(role.isPrimaryFlag()))
+                .findAny().isEmpty()) {
+
+            isValidRoles = false;
+            context.buildConstraintViolationWithTemplate(NO_PRIMARY_ROLE_PRESENT_PROFILE)
+                    .addPropertyNode(ROLE_FIELD)
+                    .addConstraintViolation();
         }
         return isValidRoles;
     }
