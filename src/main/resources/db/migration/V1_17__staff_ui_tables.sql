@@ -48,11 +48,33 @@ create sequence STAFF_AUDIT_ID_SEQ;
 ALTER TABLE staff_audit ALTER COLUMN id
 SET DEFAULT nextval('STAFF_AUDIT_ID_SEQ');
 
+-- Added skill data
+INSERT INTO skill (skill_id,skill_code,description,service_id,user_type,created_date,last_update) VALUES
+	 (1,'TEST1','testskill1','ABA5','',NULL,NULL),
+	 (2,'TEST2','testskill2','ABA5','',NULL,NULL),
+	 (3,'TEST3','testskill3','ABA5','',NULL,NULL),
+	 (4,'TEST4','testskill4','ABA5','',NULL,NULL),
+	 (5,'TEST1','testskill1','BFA1','',NULL,NULL),
+	 (6,'TEST2','testskill2','BFA1','',NULL,NULL),
+	 (7,'TEST3','testskill3','BFA1','',NULL,NULL),
+	 (8,'TEST4','testskill4','BFA1','',NULL,NULL),
+	 (9,'TEST1','testskill1','AAA7','',NULL,NULL),
+	 (10,'TEST2','testskill2','AAA7','',NULL,NULL),
+	 (11,'TEST3','testskill3','AAA7','',NULL,NULL),
+	 (12,'TEST4','testskill4','AAA7','',NULL,NULL),
+	 (13,'FRSUBMITTEDCASES','testskill5','ABA2','',NULL,NULL),
+	 (14,'FRHWFS','testskill6','ABA2','',NULL,NULL),
+	 (15,'PAPERCASESFORMA','testskill7','ABA2','',NULL,NULL),
+	 (16,'FREXCEPTIONS','testskill8','ABA2','',NULL,NULL),
+	 (17,'SUPPLEMENTARYEVIDENCE','testskill9','ABA2','',NULL,NULL),
+	 (18,'FRAPPROVEDORDERS','testskill10','ABA2','',NULL,NULL),
+	 (19,'FRREFUSEDORDERS','testskill11','ABA2','',NULL,NULL),
+	 (20,'RESPONSERECEIVED','testskill12','ABA2','',NULL,NULL),
+	 (21,'INFORECEIVED','testskill13','ABA2','',NULL,NULL),
+	 (22,'NEWPAPERCASES','testskill14','ABA2','',NULL,NULL),
+	 (23,'AWAITINGINFO','testskill15','ABA2','',NULL,NULL),
+	 (24,'AWATINGRESPONSE','testskill16','ABA2','',NULL,NULL),
+	 (25,'NEWDIVORCELAW','testskill17','ABA2','',NULL,NULL);
 
-INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(1, '1', 'testskill1', '1', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(2, '2', 'testskill2', '2', '2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(3, '3', 'testskill3', '3', '3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(4, '4', 'testskill4', '4', '4', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO skill (skill_id, skill_code, description, service_id, user_type, created_date, last_update) VALUES(5, '5', 'testskill5', '5', '5', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 COMMIT;
