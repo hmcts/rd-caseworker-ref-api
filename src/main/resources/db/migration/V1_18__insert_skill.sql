@@ -25,5 +25,4 @@ INSERT INTO SKILL(skill_id,skill_code,description,service_id,user_type,created_d
 	 (23,'SKILL:ABA2:AWAITINGINFO','testskill15','ABA2','CTSC',timezone('utc', now()),timezone('utc', now())),
 	 (24,'SKILL:ABA2:AWATINGRESPONSE','testskill16','ABA2','CTSC',timezone('utc', now()),timezone('utc', now())),
 	 (25,'SKILL:ABA2:NEWDIVORCELAW','testskill17','ABA2','CTSC',timezone('utc', now()),timezone('utc', now()));
-
 COMMIT;
