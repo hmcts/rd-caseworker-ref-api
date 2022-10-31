@@ -54,14 +54,14 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
-        assertThat(serviceSkill.getId()).isEqualTo("1");
+        assertThat(serviceSkill.getId()).isEqualTo("AAA7");
 
         SkillDTO skillDTO = serviceSkill.getSkills().get(0);
 
-        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
-        assertThat(skillDTO.getSkillCode()).isEqualTo("1");
+        assertThat(skillDTO.getSkillId()).isEqualTo(9L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
         assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
-        assertThat(skillDTO.getUserType()).isEqualTo("1");
+        assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
     }
 
 }
