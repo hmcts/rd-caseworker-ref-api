@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SearchRequest {
 
-    @ApiParam(name = "serviceCode", value = "Any Valid String is allowed")
+    @ApiParam(name = "serviceCode", value = "Any Valid String is allowed with comma seperated values")
     String serviceCode;
 
     @ApiParam(name = "location", value = "Any Valid String is allowed with comma seperated values")
@@ -27,7 +27,7 @@ public class SearchRequest {
     @ApiParam(name = "skill", value = "Any Valid String is allowed")
     String skill;
 
-    @ApiParam(name = "role", value = "Any Valid String is allowed")
+    @ApiParam(name = "role", value = "Any Valid String is allowed with comma seperated values")
     String role;
 
 }
