@@ -702,13 +702,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         CaseWorkerProfile filteredProfile = null;
 
-        if (isTrue(caseWorkerProfiles.getSuspended())) {
-            //when existing profile with delete flag is true then log exception add entry in exception table
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
-                    caseWorkerProfiles.getCaseWorkerId(), cwUiRequest, STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
-                    ALREADY_SUSPENDED_ERROR_MESSAGE);
-        } else if (cwUiRequest.isSuspended()) {
+        if (cwUiRequest.isSuspended()) {
             //when existing profile with delete flag is true in request then suspend user
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                     caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
@@ -813,13 +807,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     // update roles in sidam and filter if failed in User profile
     public CaseWorkerProfile updateSidamRoles(CaseWorkerProfile updateCaseWorkerProfiles,
                                                     StaffProfileCreationRequest cwUiRequest) {
-        List<CaseWorkerProfile> filteredUpdateCwProfiles = new ArrayList<>();
         CaseWorkerProfile filteredUpdateCwProfile = null;
         boolean isAddRoleSuccess = updateUserRolesInIdam(cwUiRequest,
                 updateCaseWorkerProfiles.getCaseWorkerId(),STAFF_PROFILE_UPDATE);
         if (isAddRoleSuccess) {
             filteredUpdateCwProfile = updateCaseWorkerProfiles;
-            filteredUpdateCwProfiles.add(updateCaseWorkerProfiles);
         }
         return filteredUpdateCwProfile;
     }

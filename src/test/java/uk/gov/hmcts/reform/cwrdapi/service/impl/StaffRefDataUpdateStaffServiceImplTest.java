@@ -69,7 +69,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
@@ -618,36 +617,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
-    @Test
-    void testSuspendCwUserProfile() throws JsonProcessingException {
-
-        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
-        staffProfileCreationRequest.setSuspended(true);
-        CaseWorkerProfile profile = new CaseWorkerProfile();
-        profile.setCaseWorkerId("1");
-        profile.setSuspended(true);
-        profile.setEmailId(staffProfileCreationRequest.getEmailId());
-
-
-        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
-        AttributeResponse attributeResponse = new AttributeResponse();
-        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
-        userProfileRolesResponse.setAttributeResponse(attributeResponse);
-
-
-        List<StaffProfileCreationRequest> requests = new ArrayList<>();
-        requests.add(staffProfileCreationRequest);
-
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            CaseWorkerProfile caseWorkerProfile =
-                    staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest, profile);
-
-        });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(ALREADY_SUSPENDED_ERROR_MESSAGE);
-
-    }
 
     @Test
     void test_updateUserRolesInIdam_with_IdamRoles_Idam_Status_Active() throws JsonProcessingException {
