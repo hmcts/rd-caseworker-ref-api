@@ -179,7 +179,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(staffProfileCreationRequest.getRoles().size(), caseWorkerProfile.getRoles().size());
         assertEquals(staffProfileCreationRequest.getRoles().get(0).getRole(),
                 caseWorkerProfile.getRoles().get(0).getRoleName());
-        assertEquals(staffProfileCreationRequest.getSkills().size(), 3);
+        assertEquals(3, caseWorkerProfile.getSkills().size());
         assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillId(),
                 caseWorkerProfile.getSkills().get(0).getSkillId());
         assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillCode(),
