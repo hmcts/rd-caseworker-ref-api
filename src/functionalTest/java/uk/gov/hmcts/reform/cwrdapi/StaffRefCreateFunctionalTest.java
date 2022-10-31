@@ -366,8 +366,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
     }
 
-
-
     @Test
     @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
@@ -384,7 +382,9 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         createUserProfileFromUp(userProfileRequest);
         //Step 3: create user in SRD
         Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
-
+        response.then()
+                .assertThat()
+                .statusCode(201);
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
 
@@ -405,17 +405,15 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 Arrays.asList(fetchResponse.getBody().as(
                         uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
-        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
-                fetchedList.get(0);
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
 
-
-        // validate SRD user and IDM user are same
+        // validate SRD user and IDM user is same
         var idamResponse = getIdamResponse(cwId);
         assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
         assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
         assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
         assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
-        // validate SRD user and UserProfile are same
+        // validate SRD user and UserProfile is same
         UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
         assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
         assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
@@ -423,7 +421,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertEquals("ACTIVE",upResponse.getIdamStatus());
         assertEquals("200",upResponse.getIdamStatusCode());
-
     }
 
     @Test
@@ -444,7 +441,9 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         staffRequest.setFirstName(staffRequest.getFirstName() + "updated");
         staffRequest.setLastName(staffRequest.getLastName() + "updated");
         Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
-
+        response.then()
+                .assertThat()
+                .statusCode(201);
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
 
@@ -465,17 +464,15 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 Arrays.asList(fetchResponse.getBody().as(
                         uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
-        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
-                fetchedList.get(0);
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
 
-
-        // validate SRD user and IDM user are same
+        // validate SRD user and IDM user is same
         var idamResponse = getIdamResponse(cwId);
         assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
         assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
         assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
         assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
-        // validate SRD user and UserProfile are same
+        // validate SRD user and UserProfile is same
         UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
         assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
         assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
@@ -483,7 +480,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertEquals("ACTIVE",upResponse.getIdamStatus());
         assertEquals("200",upResponse.getIdamStatusCode());
-
     }
 
 
@@ -502,7 +498,9 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         staffRequest.setFirstName(staffRequest.getFirstName() + "updated");
         staffRequest.setLastName(staffRequest.getLastName() + "updated");
         Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
-
+        response.then()
+                .assertThat()
+                .statusCode(201);
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
 
@@ -523,17 +521,15 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 Arrays.asList(fetchResponse.getBody().as(
                         uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
         assertEquals(1, fetchedList.size());
-        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
-                fetchedList.get(0);
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
 
-
-        // validate SRD user and IDM user are same
+        // validate SRD user and IDM user is same
         var idamResponse = getIdamResponse(cwId);
         assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
         assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
         assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
         assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
-        // validate SRD user and UserProfile are same
+        // validate SRD user and UserProfile is same
         UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
         assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
         assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
@@ -541,7 +537,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertEquals("ACTIVE",upResponse.getIdamStatus());
         assertEquals("200",upResponse.getIdamStatusCode());
-
     }
 
     @AfterAll
