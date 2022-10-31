@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -66,10 +65,10 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         StaffProfileCreationResponse staffProfileResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
 
-        Assertions.assertNotNull(staffProfileResponse);
-        Assertions.assertNotNull(staffProfileResponse.getCaseWorkerId());
-
-
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(staffProfileResponse).isNotNull();
+        assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
 
     }
 
@@ -131,6 +130,9 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         staffRequest.setLastName(staffRequest.getLastName() + "updated");
         response = caseWorkerApiClient.updateStaffUserProfile(staffRequest);
 
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
 
@@ -191,7 +193,11 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         //Step 3: create user in SRD with updated first name and last name
         staffRequest.setFirstName(staffRequest.getFirstName() + "updated");
         staffRequest.setLastName(staffRequest.getLastName() + "updated");
+
         response = caseWorkerApiClient.updateStaffUserProfile(staffRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
 
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
@@ -253,7 +259,11 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
 
         staffRequest.setFirstName(staffRequest.getFirstName() + "updated");
         staffRequest.setLastName(staffRequest.getLastName() + "updated");
+
         response = caseWorkerApiClient.updateStaffUserProfile(staffRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
 
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
