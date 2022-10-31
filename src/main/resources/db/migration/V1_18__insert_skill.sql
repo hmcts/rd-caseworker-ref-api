@@ -1,5 +1,5 @@
 -- Staff: Insert Default Skills in SKILL table
-INSERT INTO dbrdcaseworker.skill (skill_id,skill_code,description,service_id,user_type,created_date,last_update) VALUES
+INSERT INTO SKILL(skill_id,skill_code,description,service_id,user_type,created_date,last_update) VALUES
 	 (1,'SKILL:ABA5:TEST1','testskill1','ABA5','CTSC',timezone('utc', now()),timezone('utc', now())),
 	 (2,'SKILL:ABA5:TEST2','testskill2','ABA5','CTSC',timezone('utc', now()),timezone('utc', now())),
 	 (3,'SKILL:ABA5:TEST3','testskill3','ABA5','CTSC',timezone('utc', now()),timezone('utc', now())),
