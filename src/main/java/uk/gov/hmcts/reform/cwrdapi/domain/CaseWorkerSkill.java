@@ -64,4 +64,8 @@ public class CaseWorkerSkill implements Serializable {
         this.skillId = skillId;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "skill_id",insertable = false, updatable = false, nullable = false)
+    private CaseWorkerSkill caseWorkerSkill;
+
 }
