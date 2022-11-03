@@ -90,7 +90,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_U
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
@@ -619,17 +619,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                 .findByEmailId(profileRequest.getEmailId().toLowerCase());
         if (caseWorkerProfile == null) {
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
-                    StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.NOT_FOUND,StringUtils.EMPTY,
-                    PROFILE_NOT_PRESENT_IN_DB);
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD,profileRequest,STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD);
         }
 
         UserProfileResponse userProfileResponse = getUserProfileFromUP(caseWorkerProfile.getCaseWorkerId());
         if (userProfileResponse == null) {
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
-                    StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.NOT_FOUND,StringUtils.EMPTY,
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
+                    PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,profileRequest,STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
                     PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
         }
 
@@ -637,7 +637,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             //when existing profile with delete flag is true then log exception add entry in exception table
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
                     caseWorkerProfile.getCaseWorkerId(), profileRequest, STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, ALREADY_SUSPENDED_ERROR_MESSAGE,
                     ALREADY_SUSPENDED_ERROR_MESSAGE);
         }
         return caseWorkerProfile;
@@ -661,10 +661,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                 .findByEmailId(profileRequest.getEmailId().toLowerCase());
         if (caseWorkerProfile == null) {
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_DB,
-                    StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST,StringUtils.EMPTY,
-                    PROFILE_NOT_PRESENT_IN_DB);
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD,profileRequest,STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD);
         }
 
 
@@ -834,14 +834,14 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                         profileResponse.getIdamStatus());
 
-                throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_NOT_ACTIVE,
                         IDAM_STATUS_NOT_ACTIVE);
             }
 
         } else {
             log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                     UP_FAILURE_ROLES);
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_USER_PROFILE,
                     IDAM_STATUS_USER_PROFILE);
 
         }

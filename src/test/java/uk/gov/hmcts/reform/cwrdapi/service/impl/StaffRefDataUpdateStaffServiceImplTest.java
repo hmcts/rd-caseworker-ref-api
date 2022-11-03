@@ -74,7 +74,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_N
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_DB;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
@@ -402,7 +402,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         });
 
         assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_DB);
+        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_SRD);
 
     }
 
@@ -920,7 +920,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         });
 
         assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_DB);
+        assertThat(thrown.getErrorDescription()).isEqualTo(PROFILE_NOT_PRESENT_IN_SRD);
 
 
     }
