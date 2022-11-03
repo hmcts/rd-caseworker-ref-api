@@ -85,8 +85,8 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
@@ -100,15 +100,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_AD
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
-
-
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
 
 /**
  * The type Staff ref data service.
@@ -637,10 +635,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
 
-    @Override
-    public List<RoleType> getJobTitles() {
-        return roleTypeRepository.findAll();
-    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -711,22 +705,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return null;
     }
 
-    private CaseWorkerProfile checkStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
-
-        // get all existing profile from db (used IN clause)
-        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
-                .findByEmailId(profileRequest.getEmailId().toLowerCase());
-        if (caseWorkerProfile == null) {
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_SRD,
-                    PROFILE_NOT_PRESENT_IN_SRD,profileRequest,STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
-                    PROFILE_NOT_PRESENT_IN_SRD);
-        }
-
-
-        return caseWorkerProfile;
-
-    }
 
 
     public CaseWorkerProfile updateStaffProfiles(StaffProfileCreationRequest cwUiRequest,
