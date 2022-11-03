@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
@@ -79,6 +80,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -86,6 +88,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.cwrdapi.TestSupport.validateSearchUserProfileResponse;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
@@ -135,6 +138,9 @@ class StaffRefDataServiceImplTest {
     private CaseWorkerProfile caseWorkerProfile;
 
     ObjectMapper mapper = new ObjectMapper();
+
+
+    SearchRequest searchReq;
 
     @Mock
     CaseWorkerSkillRepository caseWorkerSkillRepository;
@@ -390,6 +396,68 @@ class StaffRefDataServiceImplTest {
         assertThat(searchResponse).isEmpty();
     }
 
+    @Test
+    void should_return_case_worker_profileSearch_with_status_code_200() {
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
+        caseWorkerProfiles.add(caseWorkerProfile);
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+        searchReq = SearchRequest.builder()
+                .role(String.valueOf(1L))
+                .jobTitle(String.valueOf(1L))
+                .location("11112")
+                .serviceCode("SvcCode1")
+                .skill(String.valueOf(1L))
+                .userType("1")
+                .role("task supervisor,Staff Administrator")
+                .build();
+
+        when(caseWorkerProfileRepository.findByCaseWorkerProfiles(any(), any(), any(),
+                any(), any(), any(),any()))
+                .thenReturn(pages);
+        var pageRequest = validateAndBuildPagination(20, 1,
+                20, 1);
+
+        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
+                staffRefDataServiceImpl.retrieveStaffProfile(searchReq, pageRequest);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        if (responseEntity.getHeaders().get("total-records") != null
+                && !responseEntity.getHeaders().get("total-records").isEmpty()) {
+            assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
+        }
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertTrue(validateSearchUserProfileResponse(responseEntity,searchReq));
+    }
+
+
+    @Test
+    void should_return_empty_list_case_worker_profileSearch_with_status_code_200() {
+
+        var pageRequest =
+                validateAndBuildPagination(20, 1,
+                        20, 1);
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+        searchReq = SearchRequest.builder()
+                .build();
+
+        when(caseWorkerProfileRepository.findByCaseWorkerProfiles(any(), any(), any(),
+                any(), any(), any(),any()))
+                .thenReturn(pages);
+        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
+                staffRefDataServiceImpl.retrieveStaffProfile(searchReq, pageRequest);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        if (responseEntity.getHeaders().get("total-records") != null
+                && !responseEntity.getHeaders().get("total-records").isEmpty()) {
+            assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("0");
+        }
+
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody()).isEmpty();
+    }
+
+
 
     void validateSearchStaffUserResponses(List<SearchStaffUserResponse> searchResponses) {
         assertThat(searchResponses).hasSize(1);
@@ -495,6 +563,7 @@ class StaffRefDataServiceImplTest {
         caseWorkerLocation.setPrimaryFlag(true);
 
         UserType userType = new UserType();
+        userType.setUserTypeId(1L);
         userType.setDescription("userTypeId");
 
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();

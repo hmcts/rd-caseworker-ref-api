@@ -71,4 +71,5 @@ module "db-rd-caseworker-ref-api" {
   database_name       = "dbrdcaseworker"
   common_tags         = var.common_tags
   postgresql_version  = var.postgresql_version
+  replicas            = var.db_replicas
 }

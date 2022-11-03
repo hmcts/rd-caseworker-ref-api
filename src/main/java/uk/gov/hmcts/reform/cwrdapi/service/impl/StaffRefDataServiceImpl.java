@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
@@ -69,6 +70,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,6 +85,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
@@ -95,7 +98,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_P
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
+
+
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
@@ -108,6 +117,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseE
 @Slf4j
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataServiceImpl implements StaffRefDataService {
+
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
@@ -180,14 +190,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         checkStaffProfileEmailAndSuspendFlag(staffProfileRequest);
         newStaffProfiles = createCaseWorkerProfile(staffProfileRequest);
 
-        processedStaffProfiles = persistStaffProfile(newStaffProfiles, staffProfileRequest);
+        processedStaffProfiles = persistStaffProfile(newStaffProfiles,staffProfileRequest);
 
         response = StaffProfileCreationResponse.builder()
-                .caseWorkerId(processedStaffProfiles.getCaseWorkerId())
-                .build();
+                    .caseWorkerId(processedStaffProfiles.getCaseWorkerId())
+                    .build();
+
         log.info("{}:: processStaffProfileCreation ends::", loggingComponentName);
+
         return response;
     }
+
 
 
     private void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
@@ -205,9 +218,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     private void invalidRequestError(StaffProfileCreationRequest profileRequest, String errorMessage) {
-
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,errorMessage,
                 StringUtil.EMPTY_STRING,profileRequest,STAFF_PROFILE_CREATE);
+
         throw new InvalidRequestException(errorMessage);
     }
 
@@ -223,12 +236,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 loggingComponentName);
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
         log.info("{}:: createCaseWorkerProfile UserProfile Received  response status {}::",
-                loggingComponentName, responseEntity.getStatusCode());
+                loggingComponentName,responseEntity.getStatusCode());
 
         UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
         if (nonNull(upResponse)) {
             finalCaseWorkerProfile = new CaseWorkerProfile();
-            populateStaffProfile(profileRequest, finalCaseWorkerProfile, upResponse.getIdamId());
+            populateStaffProfile(profileRequest,finalCaseWorkerProfile, upResponse.getIdamId());
         }
 
         return finalCaseWorkerProfile;
@@ -272,6 +285,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
                 staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, errorMessage,
                             null, staffProfileRequest,STAFF_PROFILE_CREATE);
+
                 throw new StaffReferenceException(responseEntity.getStatusCode(), errorMessage,
                         errorDescription);
             }
@@ -322,7 +336,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
      * @param idamId                 the idam id
      */
     public void populateStaffProfile(StaffProfileCreationRequest staffProfileRequest,
-                                     CaseWorkerProfile finalCaseWorkerProfile, String idamId) {
+                                                  CaseWorkerProfile finalCaseWorkerProfile, String idamId) {
         //case worker profile request mapping
 
         finalCaseWorkerProfile.setCaseWorkerId(idamId);
@@ -373,7 +387,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtil.EMPTY_STRING,
                         savedStaffProfiles.getCaseWorkerId(), request,STAFF_PROFILE_CREATE);
                 log.info("{}::persistStaffProfile inserted {} ::",
-                        loggingComponentName, caseWorkerProfile.getCaseWorkerId());
+                        loggingComponentName,caseWorkerProfile.getCaseWorkerId());
             } else {
                 staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                         caseWorkerProfile.getCaseWorkerId(), request,STAFF_PROFILE_CREATE);
@@ -389,6 +403,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         log.info("{}:: publishStaffProfileToTopic ends::", loggingComponentName);
     }
+
 
 
     @Override
@@ -410,6 +425,40 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return ResponseEntity
                 .status(200)
                 .header("total-records", String.valueOf(totalRecords))
+                .body(searchResponse);
+    }
+
+    @Override
+    public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest,
+                                                                              PageRequest pageRequest) {
+        List<String> serviceCodes = null;
+        List<Integer> locationId = null;
+
+        if (searchRequest.getServiceCode() != null) {
+            serviceCodes = convertToList(searchRequest.getServiceCode().toUpperCase());
+        }
+        if (searchRequest.getLocation() != null) {
+            locationId = getAsIntegerList(searchRequest);
+        }
+
+        List<String> roles = convertToList(Objects.toString(searchRequest.getRole(), "").toLowerCase());
+
+        Page<CaseWorkerProfile> pageable =
+                caseWorkerProfileRepo.findByCaseWorkerProfiles(searchRequest, serviceCodes, locationId,
+                        roles.contains(TASK_SUPERVISOR), roles.contains(CASE_ALLOCATOR), roles.contains(STAFF_ADMIN),
+                        pageRequest);
+        long totalRecords = pageable.getTotalElements();
+        List<CaseWorkerProfile> caseWorkerProfiles = pageable.getContent();
+
+        List<SearchStaffUserResponse> searchResponse = new ArrayList<>();
+
+        if (!caseWorkerProfiles.isEmpty()) {
+            searchResponse = mapCaseWorkerProfilesToSearchResponse(caseWorkerProfiles);
+        }
+
+        return ResponseEntity
+                .status(200)
+                .header("total-records",String.valueOf(totalRecords))
                 .body(searchResponse);
     }
 
@@ -455,6 +504,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<Role> rolesDto = new ArrayList<>();
         for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
             var roleDto = Role.builder()
+                    .createdTime(caseWorkerRole.getCreatedDate())
+                    .lastUpdatedTime(caseWorkerRole.getLastUpdate())
                     .roleId(caseWorkerRole.getRoleId().toString())
                     .roleName(caseWorkerRole.getRoleType().getDescription())
                     .isPrimary(caseWorkerRole.getPrimaryFlag())
@@ -469,6 +520,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         List<Location> locations = new ArrayList<>();
         for (CaseWorkerLocation caseWorkerLocation : caseWorkerLocations) {
             var location = Location.builder()
+                    .createdTime(caseWorkerLocation.getCreatedDate())
+                    .lastUpdatedTime(caseWorkerLocation.getLastUpdate())
                     .baseLocationId(caseWorkerLocation.getLocationId())
                     .locationName(caseWorkerLocation.getLocation())
                     .isPrimary(caseWorkerLocation.getPrimaryFlag())
@@ -536,7 +589,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     /**
      * To convert skills data to ServiceSkills.
-     *
      * @param skillData List of skills
      * @return List of ServiceSkill
      */
@@ -573,6 +625,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return mergedResults;
     }
 
+    @Override
+    public List<RoleType> getJobTitles() {
+        return roleTypeRepository.findAll();
+    }
 
     @Override
     public List<UserType> fetchUserTypes() {
@@ -990,5 +1046,3 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
 }
-
-

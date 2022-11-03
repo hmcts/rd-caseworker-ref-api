@@ -57,6 +57,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 CWD_FETCH_STAFF_BY_CCD_SERVICE_NAMES);
         launchDarklyMap.put("StaffRefDataController.searchStaffUserByName",
                 SRD_RD_STAFF_UI);
+        launchDarklyMap.put("StaffRefDataController.searchStaffProfile",
+                SRD_RD_STAFF_UI);
         launchDarklyMap.put("StaffRefDataController.retrieveAllServiceSkills",
                 STAFF_REF_DATA_RD_STAFF_UI);
 

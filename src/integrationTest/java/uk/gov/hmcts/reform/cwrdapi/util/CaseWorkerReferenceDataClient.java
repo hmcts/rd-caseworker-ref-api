@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -255,6 +256,71 @@ public class CaseWorkerReferenceDataClient {
         return responseEntity;
     }
 
+    public ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserExchange(
+            String path,String searchString, String pageSize, String pageNumber,  String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(path);
+
+        if (StringUtils.isNotBlank(searchString)) {
+            stringBuilder.append(searchString);
+        }
+
+        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+
+        ResponseEntity<List<SearchStaffUserResponse>> responseEntity = null;
+        HttpEntity<String> request =
+                new HttpEntity<>(headers);
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    new ParameterizedTypeReference<List<SearchStaffUserResponse>>() {
+                    }
+            );
+
+        } catch (RestClientResponseException ex) {
+            log.error(ex.getResponseBodyAsString());
+        }
+
+        return responseEntity;
+    }
+
+    public Map<String, Object> searchStaffUser(
+            String path,String searchString, String pageSize, String pageNumber,  String role) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(path);
+
+        if (StringUtils.isNotBlank(searchString)) {
+            stringBuilder.append(searchString);
+        }
+
+        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+
+        ResponseEntity<Map> responseEntity;
+        HttpEntity<String> request =
+                new HttpEntity<>(headers);
+
+        try {
+
+            responseEntity = restTemplate.exchange(
+                    baseUrl  + stringBuilder.toString(),
+                    HttpMethod.GET, request,
+                    Map.class
+            );
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
 
     private <T> Map<String, Object> postRequest(String uriPath, T requestBody, String role, String userId) {
 

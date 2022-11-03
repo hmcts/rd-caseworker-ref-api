@@ -35,6 +35,7 @@ public class Location implements Serializable {
     private boolean isPrimary;
 
     private LocalDateTime createdTime;
+
     private LocalDateTime lastUpdatedTime;
 }
 

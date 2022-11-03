@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPL
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UNAUTHORIZED_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.removeEmptySpaces;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchRequest;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
 
 
@@ -134,8 +135,6 @@ public class StaffRefDataController {
                     @Authorization(value = "Authorization")
             }
     )
-
-
     @ApiResponses({
             @ApiResponse(
                     code = 200,
@@ -167,7 +166,6 @@ public class StaffRefDataController {
 
         return ResponseEntity.ok().body(staffWorkerSkillResponse);
     }
-
 
     @ApiOperation(
             value = "This API gets the user types from staff reference data",
@@ -217,7 +215,6 @@ public class StaffRefDataController {
 
     @ApiOperation(
             value = "This API is used to retrieve the Job Title's ",
-
             notes = "This API will be invoked by user having idam role of staff-admin",
             authorizations = {
                     @Authorization(value = "ServiceAuthorization"),
@@ -227,10 +224,8 @@ public class StaffRefDataController {
     @ApiResponses({
             @ApiResponse(
                     code = 200,
-
                     message = "Successfully retrieved list of Job Titles for the request provided",
                     response = StaffRefJobTitleResponse.class
-
             ),
             @ApiResponse(
                     code = 400,
@@ -245,11 +240,9 @@ public class StaffRefDataController {
                     message = "Internal Server Error"
             )
     })
-
-
     @GetMapping(
-            path = {"/job-title"},
-            produces = APPLICATION_JSON_VALUE
+            produces = APPLICATION_JSON_VALUE,
+            path = {"/job-title"}
     )
     @Secured("staff-admin")
     public ResponseEntity<Object> retrieveJobTitles() {
@@ -324,6 +317,48 @@ public class StaffRefDataController {
         return ResponseEntity.status(HttpStatus.CREATED).body(staffProfileCreationResponse);
     }
 
+    @ApiOperation(
+            value = "This API allows the Advance search of staff",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 200,
+                    message = REQUEST_COMPLETED_SUCCESSFULLY
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = BAD_REQUEST
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @Validated
+    @GetMapping(path = "/profile/search",
+            produces = APPLICATION_JSON_VALUE)
+    @Secured("staff-admin")
+    public ResponseEntity<List<SearchStaffUserResponse>> searchStaffProfile(
+            @RequestHeader(name = "page-number", required = false) Integer pageNumber,
+            @RequestHeader(name = "page-size", required = false) Integer pageSize,
+            SearchRequest searchRequest) {
+        validateSearchRequest(searchRequest);
+        var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize,
+                configPageNumber);
+        return staffRefDataService.retrieveStaffProfile(searchRequest, pageRequest);
+    }
 
     @ApiOperation(
             value = "This API updates staff user profile",

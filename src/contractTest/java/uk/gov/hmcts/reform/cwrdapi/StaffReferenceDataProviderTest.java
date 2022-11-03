@@ -248,6 +248,13 @@ public class StaffReferenceDataProviderTest {
 
     }
 
+    @State({"A list of caseworker profiles search"})
+    public void searchCaseWorkerProfile() throws JsonProcessingException {
+        Page<CaseWorkerProfile> pages = new PageImpl<>(List.of(buildCaseWorkerProfile()));
+        doReturn(pages).when(caseWorkerProfileRepo).findByCaseWorkerProfiles(any(), any(),any(),any(),any(),
+                any(),any());
+    }
+
     CaseWorkerProfile buildCaseWorkerProfile() {
 
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();

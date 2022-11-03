@@ -163,7 +163,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 .skillsRequest()
                 .skillId(1)
                 .description("testskill1")
-                .skillCode("1")
+                .skillCode("SKILL:ABA5:TEST1")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
@@ -211,7 +211,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(staffProfileCreationRequest.getRoles().size(), caseWorkerProfile.getRoles().size());
         assertEquals(staffProfileCreationRequest.getRoles().get(0).getRole(),
                 caseWorkerProfile.getRoles().get(0).getRoleName());
-        assertEquals(staffProfileCreationRequest.getSkills().size(), caseWorkerProfile.getSkills().size());
+        assertEquals(3, caseWorkerProfile.getSkills().size());
         assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillId(),
                 caseWorkerProfile.getSkills().get(0).getSkillId());
         assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillCode(),

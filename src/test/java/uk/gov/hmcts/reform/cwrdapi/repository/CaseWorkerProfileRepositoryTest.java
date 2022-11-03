@@ -55,6 +55,21 @@ class CaseWorkerProfileRepositoryTest {
     }
 
     @Test
+    void findByCaseWorkerProfiles() {
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        caseWorkerProfiles.add(new CaseWorkerProfile());
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+
+        when(cwProfileRepository.findByCaseWorkerProfiles(any(),any(),any(),any(),any(),any(),any()))
+                .thenReturn(pages);
+        assertNotNull(cwProfileRepository.findByCaseWorkerProfiles(any(),any(),any(),any(),any(),any(),any()));
+        verify(cwProfileRepository, times(1)).findByCaseWorkerProfiles(any(),any(),any(),
+                any(),any(),any(),any());
+    }
+
+
+
+    @Test
     void findByCaseWorkerIds() {
         List<CaseWorkerProfile> caseworkerProfiles = Collections.singletonList(new CaseWorkerProfile());
         List<String> workerIds = Collections.singletonList("id_abcd");
