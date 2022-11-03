@@ -177,12 +177,12 @@ public final class CaseWorkerConstants {
 
     public static final String SEARCH_STRING_REGEX_PATTERN = "([a-zA-Z\\-\\s']){3,}+";
 
-    public static final String PROFILE_NOT_PRESENT_IN_DB = "User does not exists in db";
+    public static final String PROFILE_NOT_PRESENT_IN_SRD = "User does not exist in SRD";
+
     public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UserProfile/Idam";
 
     public static final String IDAM_STATUS_NOT_ACTIVE = "User is in pending status or does not exist in IDAM";
     public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
-    public static final String IDAM_STATUS_ROLE_UPDATE = "The IDAM status,Issue while update IdamRoles";
     public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
             + TRY_AGAIN;
 
