@@ -62,7 +62,7 @@ public class AuthorizationFunctionalTest {
 
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@justice.gov.uk";
+    public static final String EMAIL_TEMPLATE = "CWR-rd-func-test-user-only-%s@justice.gov.uk";
     public static final String CWD_USER = "cwd-user";
     public static final String CASEWORKER_IAC_BULKSCAN = "caseworker-iac-bulkscan";
     public static final String CASEWORKER_IAC = "caseworker-iac";
@@ -72,9 +72,9 @@ public class AuthorizationFunctionalTest {
 
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
-    public static final String STAFF_EMAIL_TEMPLATE = "staff-profile-func-test-user-%s@justice.gov.uk";
-    public static final String STAFF_EMAIL_PATTERN = "staff-profile-func-test-user";
-    public static final String CWR_EMAIL_PATTERN = "cwr-func-test-user";
+    public static final String STAFF_EMAIL_TEMPLATE = "staff-rd-profile-func-test-user-only-%s@justice.gov.uk";
+    public static final String STAFF_EMAIL_PATTERN = "staff-rd-profile-func-test-user-only";
+    public static final String CWR_EMAIL_PATTERN = "cwr-rd-func-test-user-only";
 
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
