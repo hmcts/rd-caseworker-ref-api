@@ -703,11 +703,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
             if (nonNull(profileResponse.getIdamId())) {
                 return profileResponse;
-
-            } else {
-                return null;
             }
-
         }
         return null;
     }

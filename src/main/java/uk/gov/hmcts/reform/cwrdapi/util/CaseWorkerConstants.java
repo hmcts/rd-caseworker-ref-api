@@ -211,7 +211,7 @@ public final class CaseWorkerConstants {
 
     public static final String PROFILE_NOT_PRESENT_IN_SRD = "User does not exist in SRD";
 
-    public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UserProfile/Idam";
+    public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UP/IDAM";
 
     public static final String IDAM_STATUS_NOT_ACTIVE = "User is in pending status or does not exist in IDAM";
     public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
