@@ -319,12 +319,14 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
+        UserProfileResponse userProfileResponseEmpty = new UserProfileResponse();
+
         when(userProfileFeignClient.getUserProfileWithRolesById(any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
-                                null)).body(null,
+                                null)).body(mapper.writeValueAsString(userProfileResponseEmpty),
                                 defaultCharset())
-                        .status(200).build());
+                        .status(404).build());
 
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("12345678");

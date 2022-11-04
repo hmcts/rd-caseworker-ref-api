@@ -698,9 +698,16 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
+
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
         if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
-            return profileResponse;
+            if (nonNull(profileResponse.getIdamId())) {
+                return profileResponse;
+
+            } else {
+                return null;
+            }
+
         }
         return null;
     }
