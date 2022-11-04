@@ -256,12 +256,12 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         UserProfileCreationRequest userProfileRequest = caseWorkerApiClient.createUserProfileRequest(staffRequest);
         createUserProfileFromUp(userProfileRequest);
 
-        Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
+
         //Step 3: create user in SRD with updated first name and last name
         staffRequest.setFirstName(staffRequest.getFirstName() + "updated");
         staffRequest.setLastName(staffRequest.getLastName() + "updated");
         staffRequest.setSuspended(true);
-
+        Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
         response = caseWorkerApiClient.updateStaffUserProfile(staffRequest);
 
         assertThat(response).isNotNull();
