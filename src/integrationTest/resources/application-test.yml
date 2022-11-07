@@ -14,7 +14,7 @@ management:
 
 spring:
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     properties:
       hibernate:
@@ -45,11 +45,9 @@ spring:
 
   ### database configuration
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:dbrdcaseworker
-    platform: h2
-    username: ${POSTGRES_USERNAME:dbrdcaseworker}
-    password: ${POSTGRES_PASSWORD:dbrdcaseworker}
+    url: ${DB_URL:jdbc:tc:postgresql:11.1:///dbrdcaseworker}
+    username: ${DB_USERNAME:dbrdcaseworker}
+    password: ${DB_PASSWORD:dbrdcaseworker}
     min-idle: 1
     properties:
       charSet: UTF-8
