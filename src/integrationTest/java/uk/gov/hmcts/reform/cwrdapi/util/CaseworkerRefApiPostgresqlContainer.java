@@ -5,14 +5,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-public class LocationRefApiPostgresqlContainer extends PostgreSQLContainer<LocationRefApiPostgresqlContainer> {
+public class CaseworkerRefApiPostgresqlContainer extends PostgreSQLContainer<CaseworkerRefApiPostgresqlContainer> {
     private static final String IMAGE_VERSION = "postgres:11.1";
 
-    private LocationRefApiPostgresqlContainer() {
+    private CaseworkerRefApiPostgresqlContainer() {
         super(IMAGE_VERSION);
     }
 
     @Container
-    private static final LocationRefApiPostgresqlContainer container = new LocationRefApiPostgresqlContainer();
+    private static final CaseworkerRefApiPostgresqlContainer container = new CaseworkerRefApiPostgresqlContainer();
 
 }
