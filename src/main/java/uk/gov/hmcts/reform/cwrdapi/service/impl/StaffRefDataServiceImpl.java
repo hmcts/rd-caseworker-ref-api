@@ -676,10 +676,15 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
 
         UserProfileResponse userProfileResponse = getUserProfileFromUP(caseWorkerProfile.getCaseWorkerId());
-        if (userProfileResponse == null) {
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
-                    PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,profileRequest,STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
+
+        if (nonNull(userProfileResponse) && isNotTrue(STATUS_ACTIVE.equals(userProfileResponse.getIdamStatus()))) {
+
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_NOT_ACTIVE,
+                    IDAM_STATUS_NOT_ACTIVE);
+        } else if (userProfileResponse == null) {
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
+                    PROFILE_NOT_PRESENT_IN_UP_OR_IDAM, profileRequest, STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
                     PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
         }
 

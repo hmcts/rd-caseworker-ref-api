@@ -71,6 +71,9 @@ public final class CaseWorkerConstants {
 
     public static final String IDAM_STATUS_SUSPENDED = "SUSPENDED";
 
+    public static final String IDAM_STATUS_PENDING = "PENDING";
+    public static final String UP_STATUS_PENDING = "PENDING";
+
     public static final String ORIGIN_EXUI = "EXUI";
 
     public static final String UP_FAILURE_ROLES = "An update to the user is not possible at this moment."
