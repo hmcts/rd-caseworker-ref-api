@@ -70,6 +70,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @BeforeAll

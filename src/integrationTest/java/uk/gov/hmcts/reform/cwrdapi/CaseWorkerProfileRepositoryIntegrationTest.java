@@ -73,6 +73,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
 
