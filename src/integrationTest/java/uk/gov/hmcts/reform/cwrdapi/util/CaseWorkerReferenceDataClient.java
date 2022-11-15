@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,12 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 
 import java.util.Date;
@@ -35,6 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static java.lang.String.format;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
@@ -45,6 +52,10 @@ public class CaseWorkerReferenceDataClient {
 
     private static final String APP_BASE_PATH = "/refdata/case-worker";
     private static final String APP_INTERNAL_BASE_PATH = "/refdata/internal/staff";
+
+    public static final String ROLE_STAFF_ADMIN = "staff-admin";
+
+    public static final String STAFF_EMAIL_TEMPLATE = "staff-profile-func-test-user-%s@justice.gov.uk";
     private static String JWT_TOKEN = null;
     @Autowired
     private ObjectMapper objectMapper;
@@ -502,6 +513,60 @@ public class CaseWorkerReferenceDataClient {
 
     public Map<String, Object> createStaffProfile(StaffProfileCreationRequest request, String role) {
         return postRequest(baseUrl + "/profile", request, role, null);
+    }
+
+
+    public StaffProfileCreationRequest createStaffProfileCreationRequest() {
+
+        String emailPattern = "deleteTest1234";
+        String email = format(STAFF_EMAIL_TEMPLATE, RandomStringUtils.randomAlphanumeric(10)
+                + emailPattern).toLowerCase();
+
+        List<StaffProfileRoleRequest> caseWorkerRoleRequests =
+                ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest()
+                        .roleId(2)
+                        .role("Legal Caseworker")
+                        .isPrimaryFlag(true).build());
+
+        List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(12345)
+                .location("test location").build(),CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(6789)
+                .location("test location2").build());
+
+        List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .service("Immigration and Asylum Appeals").serviceCode("serviceCode2")
+                .build(),CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .service("Divorce").serviceCode("ABA1")
+                .build());
+
+        List<SkillsRequest> skillsRequest = ImmutableList.of(SkillsRequest
+                .skillsRequest()
+                .skillId(1)
+                .skillCode("1")
+                .description("testskill1")
+                .build());
+
+        return   StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .firstName("StaffProfilefirstName")
+                .lastName("StaffProfilelastName")
+                .emailId(email)
+                .regionId(1).userType("CTSC")
+                .region("National")
+                .suspended(false)
+                .taskSupervisor(true)
+                .caseAllocator(true)
+                .staffAdmin(false)
+                .roles(caseWorkerRoleRequests)
+                .baseLocations(caseWorkerLocationRequests)
+                .services(caseWorkerServicesRequests)
+                .skills(skillsRequest)
+                .build();
     }
 
     public Map<String, Object> updateStaffProfile(StaffProfileCreationRequest request, String role) {
