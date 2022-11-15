@@ -7,6 +7,7 @@ import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,33 @@ public class FuncTestRequestHandler {
         return response.then()
                 .log().all(true)
                 .statusCode(httpStatus.value()).extract().response();
+    }
+
+    public  <T> T  sendPost(Object data, HttpStatus expectedStatus, String path,String baseUrl, Class<T> clazz,
+                            String token) throws JsonProcessingException {
+        return sendPost(objectMapper.writeValueAsString(data),
+                expectedStatus,
+                baseUrl,path,token).as(clazz);
+    }
+
+    public Response sendPost(String request,HttpStatus httpStatus,String baseUrl,String urlPath, String token) {
+
+        return SerenityRest
+                .given()
+                .headers(getHttpHeaders(token))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .post(baseUrl + urlPath)
+                .then()
+                .log().all(true)
+                .statusCode(httpStatus.value()).extract().response();
+    }
+
+    private HttpHeaders getHttpHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("ServiceAuthorization", getS2sToken());
+        headers.add("Authorization", BEARER + token);
+        return headers;
     }
 
 }

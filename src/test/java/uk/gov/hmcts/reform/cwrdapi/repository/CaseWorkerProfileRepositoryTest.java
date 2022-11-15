@@ -6,6 +6,8 @@ import org.springframework.data.domain.PageImpl;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -66,4 +68,20 @@ class CaseWorkerProfileRepositoryTest {
     }
 
 
+
+    @Test
+    void findByCaseWorkerIds() {
+        List<CaseWorkerProfile> caseworkerProfiles = Collections.singletonList(new CaseWorkerProfile());
+        List<String> workerIds = Collections.singletonList("id_abcd");
+        when(cwProfileRepository.findByCaseWorkerIdIn(workerIds)).thenReturn(caseworkerProfiles);
+        assertNotNull(cwProfileRepository.findByCaseWorkerIdIn(workerIds));
+        verify(cwProfileRepository, times(1)).findByCaseWorkerIdIn(any());
+    }
+
+    @Test
+    void findByEmailId() {
+        when(cwProfileRepository.findByEmailId(any())).thenReturn(new CaseWorkerProfile());
+        assertNotNull(cwProfileRepository.findByEmailId(any()));
+        verify(cwProfileRepository, times(1)).findByEmailId(any());
+    }
 }

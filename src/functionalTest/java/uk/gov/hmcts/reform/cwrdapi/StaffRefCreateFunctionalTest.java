@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.thucydides.core.annotations.WithTag;
 import net.thucydides.core.annotations.WithTags;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -14,8 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
@@ -26,10 +30,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefFunctionalTest.DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
@@ -56,12 +62,13 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        assertEquals(201,response.statusCode());
 
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
 
-        Assertions.assertNotNull(staffProfileCreationResponse);
-        Assertions.assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
+        assertNotNull(staffProfileCreationResponse);
+        assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
     }
 
     @Test
@@ -73,12 +80,37 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 .createStaffProfileCreationRequest();
         staffProfileCreationRequest.setStaffAdmin(true);
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        response.then()
+                .assertThat()
+                .statusCode(201);
 
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
 
         Assertions.assertNotNull(staffProfileCreationResponse);
         Assertions.assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
+
+        String cwId = staffProfileCreationResponse.getCaseWorkerId();
+
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(cwId)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile =
+                fetchedList.get(0);
+        assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getStaffAdmin()));
+
+        var idamResponse = getIdamResponse(cwId);
+        String roles = idamResponse.get("roles").toString();
+        assertTrue(roles.contains("staff-admin"));
     }
 
     @Test
@@ -332,6 +364,179 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
         //assert that delete user is not found
         assertThat(fetchResponse.getStatusCode()).isEqualTo(404);
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void createStaffProfileForUserPresentInUserProfileAndIdam() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        //Step 1: create user in IDM for active status
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,staffRequest.getEmailId(),
+                staffRequest.getFirstName(),staffRequest.getFirstName());
+        //Step 2: create user in UP
+        UserProfileCreationRequest userProfileRequest = caseWorkerApiClient.createUserProfileRequest(staffRequest);
+        createUserProfileFromUp(userProfileRequest);
+        //Step 3: create user in SRD
+        Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
+        response.then()
+                .assertThat()
+                .statusCode(201);
+        StaffProfileCreationResponse staffProfileCreationResponse =
+                response.getBody().as(StaffProfileCreationResponse.class);
+
+        String caseWorkerIds = staffProfileCreationResponse.getCaseWorkerId();
+        assertNotNull(caseWorkerIds);
+
+        String cwId = staffProfileCreationResponse.getCaseWorkerId();
+        //Step 4: Retrieve the user in SRD
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(cwId)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+
+        // validate SRD user and IDM user is same
+        var idamResponse = getIdamResponse(cwId);
+        assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
+        // validate SRD user and UserProfile is same
+        UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
+        assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
+        assertEquals("ACTIVE",upResponse.getIdamStatus());
+        assertEquals("200",upResponse.getIdamStatusCode());
+    }
+
+    @Test
+    @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void createStaffProfileDifferentThanUserPresentInUserProfileAndIdam() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        //Step 1: create user in IDM for active status
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,staffRequest.getEmailId(),
+                staffRequest.getFirstName(),staffRequest.getFirstName());
+        //Step 2: create user in UP
+        UserProfileCreationRequest userProfileRequest = caseWorkerApiClient.createUserProfileRequest(staffRequest);
+        createUserProfileFromUp(userProfileRequest);
+        //Step 3: create user in SRD with updated first name and last name
+        staffRequest.setFirstName(staffRequest.getFirstName() + "updated");
+        staffRequest.setLastName(staffRequest.getLastName() + "updated");
+        Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
+        response.then()
+                .assertThat()
+                .statusCode(201);
+        StaffProfileCreationResponse staffProfileCreationResponse =
+                response.getBody().as(StaffProfileCreationResponse.class);
+
+        String caseWorkerIds = staffProfileCreationResponse.getCaseWorkerId();
+        assertNotNull(caseWorkerIds);
+
+        String cwId = staffProfileCreationResponse.getCaseWorkerId();
+        //Step 4: Retrieve the user in SRD
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(cwId)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+
+        // validate SRD user and IDM user is same
+        var idamResponse = getIdamResponse(cwId);
+        assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
+        // validate SRD user and UserProfile is same
+        UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
+        assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
+        assertEquals("ACTIVE",upResponse.getIdamStatus());
+        assertEquals("200",upResponse.getIdamStatusCode());
+    }
+
+
+    @Test
+    @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void createStaffProfileDifferentThanUserPresentInIdam() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        //Step 1: create user in IDM for active status
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,staffRequest.getEmailId(),
+                staffRequest.getFirstName(),staffRequest.getFirstName());
+        //Step 2: create user in SRD with updated first name and last name
+        staffRequest.setFirstName(staffRequest.getFirstName() + "updated");
+        staffRequest.setLastName(staffRequest.getLastName() + "updated");
+        Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
+        response.then()
+                .assertThat()
+                .statusCode(201);
+        StaffProfileCreationResponse staffProfileCreationResponse =
+                response.getBody().as(StaffProfileCreationResponse.class);
+
+        String caseWorkerIds = staffProfileCreationResponse.getCaseWorkerId();
+        assertNotNull(caseWorkerIds);
+
+        String cwId = staffProfileCreationResponse.getCaseWorkerId();
+        //Step 4: Retrieve the user in SRD
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(cwId)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+
+        // validate SRD user and IDM user is same
+        var idamResponse = getIdamResponse(cwId);
+        assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
+        // validate SRD user and UserProfile is same
+        UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
+        assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
+        assertEquals("ACTIVE",upResponse.getIdamStatus());
+        assertEquals("200",upResponse.getIdamStatusCode());
     }
 
     @AfterAll
