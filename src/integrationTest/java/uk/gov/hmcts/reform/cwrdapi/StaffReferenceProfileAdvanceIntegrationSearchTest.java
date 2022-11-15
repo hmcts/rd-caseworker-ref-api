@@ -89,7 +89,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         createCaseWorkerProfiles();
 
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
-                + "task supervisor,case allocator,staff administrator";
+                + "task supervisor,case allocator,staff administrator&skill=1";
         String path = "/profile/search?";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
@@ -121,7 +121,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
 
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
-                + "task supervisor,case allocator,staff administrator";
+                + "task supervisor,case allocator,staff administrator&skill=1";
         String path = "/profile/search?";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
