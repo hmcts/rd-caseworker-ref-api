@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import com.google.common.collect.ImmutableList;
 import org.assertj.core.api.Condition;
 import org.assertj.core.data.Index;
 import org.junit.jupiter.api.AfterAll;
@@ -11,12 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -25,14 +22,10 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.IntStream;
 
-import static java.lang.String.format;
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,10 +36,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 public class StaffReferenceProfileAdvanceIntegrationSearchTest extends AuthorizationEnabledIntegrationTest {
 
 
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@justice.gov.uk";
-    public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
-    public static final String ROLE_CWD_ADMIN = "cwd-admin";
+    public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
 
     @Autowired
@@ -79,6 +70,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @BeforeAll
@@ -117,6 +109,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .userType("1")
                 .jobTitle("2")
                 .role("task supervisor,case allocators,staff administrator")
+                .skill("1")
                 .build();
         assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
@@ -147,8 +140,9 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .userType("1")
                 .jobTitle("2")
                 .role("task supervisor,case allocator,staff administrator")
+                .skill("1")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
 
@@ -173,7 +167,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
     @Test
@@ -197,7 +191,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1,serviceCode2")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
     @Test
@@ -220,7 +214,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .location("12345")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
 
@@ -246,7 +240,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .location("12345,6789")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
     @Test
@@ -271,7 +265,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .userType("1")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
     @Test
@@ -294,10 +288,9 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
-                .userType("CTSC")
                 .jobTitle("2")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
 
@@ -321,19 +314,18 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
-                .userType("CTSC")
                 .role("task supervisor")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
     @Test
-    void should_return_staff_user_with_status_code_200_when_skill_are_empty() {
+    void should_return_staff_user_with_status_code_200_when_search_with_skill() {
 
         createCaseWorkerProfiles();
-        String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
-                + "task supervisor,case allocator,staff administrator";
 
+
+        String searchString = "skill=1";
         String path = "/profile/search?";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
@@ -344,6 +336,42 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         Condition<String> five = new Condition<>(records -> records.equals("5"), "total %s check",
                 "records");
         assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(five, Index.atIndex(0));
+        List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
+        assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
+        searchReq = SearchRequest.builder()
+                .skill("1")
+                .build();
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+    }
+
+
+
+
+    @Test
+    void should_return_staff_user_with_status_code_200_when_skill_are_empty() {
+
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
+                .createStaffProfileCreationRequest();
+        staffProfileCreationRequest.setSkills(null);
+        Map<String, Object> staffProfileResponse = caseworkerReferenceDataClient
+                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
+        assertThat(staffProfileResponse).containsEntry("http_status", "201 CREATED");
+
+
+        String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
+                + "task supervisor,case allocator,staff administrator";
+
+        String path = "/profile/search?";
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
+                .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
+
+        assertThat(response).isNotNull();
+        final List<String> totalRecords = response.getHeaders().get("total-records");
+        Condition<String> one = new Condition<>(records -> records.equals("1"), "total %s check",
+                "records");
+        assertThat(totalRecords).isNotNull().isNotEmpty().hasSize(1).has(one, Index.atIndex(0));
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         assertThat(searchStaffUserResponse.get(0).getSkills()).isEmpty();
@@ -389,10 +417,9 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
-                .userType("CTSC")
                 .role("task supervisor,case allocator,staff administrator")
                 .build();
-        validateSearchUserProfileResponse(response,searchReq);
+        assertTrue(validateSearchUserProfileResponse(response,searchReq));
     }
 
 
@@ -436,89 +463,19 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
     }
 
-
-
-    void createCaseWorkerTestData(String firstName, String lastName, String email) {
-        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                createCaseWorkerProfiles(firstName, lastName, email);
+    public void createCaseWorkerTestData() {
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
+                .createStaffProfileCreationRequest();
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createCaseWorkerProfile(caseWorkersProfileCreationRequests, ROLE_CWD_ADMIN);
+                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
         assertThat(response).containsEntry("http_status", "201 CREATED");
 
     }
 
 
-    public static List<CaseWorkersProfileCreationRequest> createCaseWorkerProfiles(String firstName,
-                                                                                   String lastName, String email) {
-        List<CaseWorkerLocationRequest> locationRequestList = ImmutableList.of(CaseWorkerLocationRequest
-                .caseWorkersLocationRequest()
-                .location("test location")
-                .locationId(12345).isPrimaryFlag(true).build(),
-                CaseWorkerLocationRequest
-                        .caseWorkersLocationRequest()
-                        .location("test location")
-                        .locationId(6789).isPrimaryFlag(true).build());
-
-
-        List<CaseWorkerRoleRequest> roleRequests = ImmutableList.of(CaseWorkerRoleRequest
-                .caseWorkerRoleRequest()
-                .role("Legal Caseworker").isPrimaryFlag(true).build());
-
-
-        CaseWorkerWorkAreaRequest workerWorkAreaRequest1 = CaseWorkerWorkAreaRequest
-                .caseWorkerWorkAreaRequest()
-                .serviceCode("serviceCode2").areaOfWork("Immigration and Asylum Appeals").build();
-
-        CaseWorkerWorkAreaRequest workerWorkAreaRequest2 = CaseWorkerWorkAreaRequest
-                .caseWorkerWorkAreaRequest()
-                .serviceCode("ABA1").areaOfWork("Divorce").build();
-
-        List<CaseWorkerWorkAreaRequest> areaRequests = ImmutableList
-                .of(workerWorkAreaRequest1, workerWorkAreaRequest2);
-
-        Set<String> idamRoles = new HashSet<>();
-
-        String emailToUsed = nonNull(email) ? email : generateRandomEmail();
-        return ImmutableList.of(
-                CaseWorkersProfileCreationRequest
-                        .caseWorkersProfileCreationRequest()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .emailId(emailToUsed.toLowerCase())
-                        .regionId(1)
-                        .region("National")
-                        .userType("CTSC")
-                        .suspended(false)
-                        .caseAllocator(true)
-                        .taskSupervisor(true)
-                        .idamRoles(idamRoles)
-                        .baseLocations(locationRequestList)
-                        .roles(roleRequests)
-                        .workerWorkAreaRequests(areaRequests).build());
-    }
-
-
     private void createCaseWorkerProfiles() {
-
-        String emailPattern = "sbnTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Michael", "sbn-Smith", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Maria", "sbn-Garcia", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
-        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10)
-                + emailPattern).toLowerCase();
-        createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
+        IntStream.range(0,5).forEach(i -> createCaseWorkerTestData());
     }
 
-
-    public static String generateRandomEmail() {
-        return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10)).toLowerCase();
-    }
 }
