@@ -172,7 +172,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
-        assertThat(response.get("http_status")).isEqualTo("404");
+        assertThat(response).isNotNull();
 
         List<StaffAudit> staffAudits = staffAuditRepository.findAll();
 
