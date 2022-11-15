@@ -152,56 +152,6 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
     }
 
-    @Test
-    void should_return_update_staff_user_with_status_code_404_child_tables_size() throws Exception {
-
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
-        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
-        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
-
-        Map<String, Object> createResponse = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
-
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
-        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
-
-
-        request.setFirstName("StaffProfilefirstNameCN");
-        request.setLastName("StaffProfilelastNameCN");
-
-        Map<String, Object> response = caseworkerReferenceDataClient
-                .updateStaffProfile(request,ROLE_STAFF_ADMIN);
-
-        assertThat(response).isNotNull();
-
-        List<StaffAudit> staffAudits = staffAuditRepository.findAll();
-
-        assertThat(staffAudits.size()).isEqualTo(2);
-        assertThat(staffAudits.get(0).getStatus()).isEqualTo("SUCCESS");
-        assertThat(staffAudits.get(0).getOperationType()).isEqualTo("CREATE");
-        assertThat(staffAudits.get(0).getErrorDescription()).isBlank();
-
-        assertThat(staffAudits.get(1).getStatus()).isEqualTo("FAILURE");
-        assertThat(staffAudits.get(1).getOperationType()).isEqualTo("UPDATE");
-        assertThat(staffAudits.get(1).getErrorDescription()).isNotBlank();
-
-        assertThat(staffAudits.get(1).getRequestLog().contains(request.getFirstName())).isTrue();
-        assertThat(staffAudits.get(1).getRequestLog().contains(request.getLastName())).isTrue();
-
-        ObjectMapper mapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String expectedData = mapper.writeValueAsString(request);
-
-        JSONAssert.assertEquals(staffAudits.get(1).getRequestLog(), expectedData, JSONCompareMode.LENIENT);
-
-
-        assertThat(caseWorkerProfileRepository.findAll().size()).isEqualTo(1);
-        assertThat(caseWorkerLocationRepository.findAll().size()).isEqualTo(2);
-        assertThat(caseWorkerRoleRepository.findAll().size()).isEqualTo(1);
-        assertThat(caseWorkerWorkAreaRepository.findAll().size()).isEqualTo(2);
-        assertThat(caseWorkerSkillRepository.findAll().size()).isEqualTo(3);
-
-    }
 
     @Test
     void should_return_update_staff_user_with_status_code_400_invalid_email_id() throws Exception {
