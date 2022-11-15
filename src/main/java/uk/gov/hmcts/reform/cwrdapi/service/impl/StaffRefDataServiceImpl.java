@@ -3,20 +3,26 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 import feign.Response;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
@@ -27,20 +33,30 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.UserProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
+import uk.gov.hmcts.reform.cwrdapi.domain.RoleName;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerSkillRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
+import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
@@ -59,21 +75,38 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.String.valueOf;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
+import static java.util.Set.copyOf;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_SRD;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
-
-
 
 /**
  * The type Staff ref data service.
@@ -116,6 +149,29 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Autowired
     IJsrValidatorStaffProfile jsrValidatorStaffProfile;
+
+    @Autowired
+    CaseWorkerLocationRepository caseWorkerLocationRepository;
+
+    @Autowired
+    CaseWorkerRoleRepository caseWorkerRoleRepository;
+
+
+    @Autowired
+    CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
+
+    @Autowired
+    CaseWorkerSkillRepository caseWorkerSkillRepository;
+    //Added Extra
+    @Autowired
+    CaseWorkerStaticValueRepositoryAccessor caseWorkerStaticValueRepositoryAccessor;
+    @Autowired
+    CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
+
+
+    @Autowired
+    ICwrdCommonRepository cwrCommonRepository;
+
 
 
     @SuppressWarnings("unchecked")
@@ -207,6 +263,14 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     ? UserProfileCreationResponse.class : ErrorResponse.class;
 
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
+
+            if (response.status() == 409) {
+                //validate the request info with UserProfile response.
+                UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
+                if (nonNull(upResponse)) {
+                    updateUserRolesInIdam(staffProfileRequest, upResponse.getIdamId(),STAFF_PROFILE_CREATE);
+                }
+            }
 
             if ((response.status() != 409 && isNotEmpty(responseEntity.getBody()))
                     && (responseEntity.getStatusCode().is4xxClientError()
@@ -499,29 +563,23 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Override
     public StaffWorkerSkillResponse getServiceSkills() {
         List<ServiceSkill> serviceSkills = new ArrayList<>();
-        try {
-            List<SkillDTO> skillData = new ArrayList<>();
-            List<Skill> skills = skillRepository.findAll();
-            Optional<List<Skill>> skillsOptional = Optional.ofNullable(skills);
-            if (skillsOptional.isPresent()) {
-                skillData = skills.stream().map(skill -> {
-                    SkillDTO skillDTO = new SkillDTO();
-                    skillDTO.setServiceId(skill.getServiceId());
-                    skillDTO.setSkillId(skill.getSkillId());
-                    skillDTO.setSkillCode(skill.getSkillCode());
-                    skillDTO.setUserType(skill.getUserType());
-                    skillDTO.setDescription(skill.getDescription());
-                    return skillDTO;
-                }).toList();
+        List<SkillDTO> skillData = null;
+        List<Skill> skills = skillRepository.findAll();
+        if (!ObjectUtils.isEmpty(skills)) {
+            skillData = skills.stream().map(skill -> {
+                SkillDTO skillDTO = new SkillDTO();
+                skillDTO.setServiceId(skill.getServiceId());
+                skillDTO.setSkillId(skill.getSkillId());
+                skillDTO.setSkillCode(skill.getSkillCode());
+                skillDTO.setUserType(skill.getUserType());
+                skillDTO.setDescription(skill.getDescription());
+                return skillDTO;
+            }).toList();
 
-                serviceSkills = mapSkillToServicesSkill(skillData);
-            }
-
-        } catch (Exception exp) {
-            log.error("{}:: StaffRefDataService getServiceSkills failed :: {}", loggingComponentName,
-                    exp);
-            throw exp;
+            serviceSkills = mapSkillToServicesSkill(skillData);
         }
+
+
         StaffWorkerSkillResponse staffWorkerSkillResponse = new StaffWorkerSkillResponse();
         staffWorkerSkillResponse.setServiceSkills(serviceSkills);
         return staffWorkerSkillResponse;
@@ -537,8 +595,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         Map<String, List<SkillDTO>> result = skillData.stream()
                 .collect(
                         Collectors.toMap(
-                                skill -> skill.getServiceId(),
-                                skill -> Collections.singletonList(skill),
+                                SkillDTO::getServiceId,
+                                Collections::singletonList,
                                 this::mergeSkillsWithDuplicateServiceIds
                         )
                 );
@@ -574,6 +632,403 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public List<UserType> fetchUserTypes() {
         return userTypeRepository
                 .findAll();
+    }
+
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest profileRequest) {
+
+        log.info("{}:: processStaffProfileUpdation starts::",
+                loggingComponentName);
+
+        jsrValidatorStaffProfile.validateStaffProfile(profileRequest,STAFF_PROFILE_UPDATE);
+
+        CaseWorkerProfile caseWorkerProfileToUpdate = validateStaffProfileForUpdate(profileRequest);
+
+
+        CaseWorkerProfile caseWorkerProfile = updateStaffProfiles(profileRequest, caseWorkerProfileToUpdate);
+        StaffProfileCreationResponse response = null;
+
+        if (null != caseWorkerProfile) {
+
+            staffProfileAuditService.saveStaffAudit(AuditStatus.SUCCESS, StringUtils.EMPTY,
+                    caseWorkerProfile.getCaseWorkerId(), profileRequest, STAFF_PROFILE_UPDATE);
+
+            response = StaffProfileCreationResponse.builder()
+                    .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
+                    .build();
+        }
+        return response;
+    }
+
+    private CaseWorkerProfile validateStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
+
+        // get all existing profile from db (used IN clause)
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
+                .findByEmailId(profileRequest.getEmailId().toLowerCase());
+        if (caseWorkerProfile == null) {
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD,profileRequest,STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD);
+        }
+
+        UserProfileResponse userProfileResponse = getUserProfileFromUP(caseWorkerProfile.getCaseWorkerId());
+
+        if (nonNull(userProfileResponse) && isNotTrue(STATUS_ACTIVE.equals(userProfileResponse.getIdamStatus()))) {
+
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_NOT_ACTIVE,
+                    IDAM_STATUS_NOT_ACTIVE);
+        } else if (userProfileResponse == null) {
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
+                    PROFILE_NOT_PRESENT_IN_UP_OR_IDAM, profileRequest, STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
+                    PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
+        }
+
+        if (isTrue(caseWorkerProfile.getSuspended())) {
+            //when existing profile with delete flag is true then log exception add entry in exception table
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
+                    caseWorkerProfile.getCaseWorkerId(), profileRequest, STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, ALREADY_SUSPENDED_ERROR_MESSAGE,
+                    ALREADY_SUSPENDED_ERROR_MESSAGE);
+        }
+        return caseWorkerProfile;
+
+    }
+
+    public UserProfileResponse getUserProfileFromUP(String idamId) {
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
+
+
+        Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
+            if (nonNull(profileResponse.getIdamId())) {
+                return profileResponse;
+            }
+        }
+        return null;
+    }
+
+
+
+    public CaseWorkerProfile updateStaffProfiles(StaffProfileCreationRequest cwUiRequest,
+                                                       CaseWorkerProfile caseWorkerProfile) {
+
+        CaseWorkerProfile processedCwProfile;
+
+        try {
+
+            //process update and suspend CW profiles
+            CaseWorkerProfile cwProfileToPersist = null;
+            cwProfileToPersist = processExistingCaseWorkers(
+                    cwUiRequest, caseWorkerProfile);
+            // persist in db
+
+
+            processedCwProfile = persistCaseWorker(cwProfileToPersist,
+                    cwUiRequest);
+        } catch (Exception exp) {
+            log.error("{}:: createCaseWorkerUserProfiles failed  ::{}", loggingComponentName,
+                    exp);
+            throw exp;
+        }
+        return processedCwProfile;
+    }
+
+    public CaseWorkerProfile processExistingCaseWorkers(
+            StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
+
+        CaseWorkerProfile filteredProfile = null;
+
+        if (cwUiRequest.isSuspended()) {
+            //when existing profile with delete flag is true in request then suspend user
+            if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
+                caseWorkerProfiles.setSuspended(true);
+                filteredProfile = caseWorkerProfiles;
+                return filteredProfile;
+            }
+        } else {
+            //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
+            filteredProfile = updateSidamRoles(caseWorkerProfiles, cwUiRequest);
+            return filteredProfile;
+        }
+        //add user roles in user profile and filter out UP failed records
+
+        return null;
+    }
+
+
+    public CaseWorkerProfile persistCaseWorker(
+            CaseWorkerProfile updateCaseWorkerProfile,
+            StaffProfileCreationRequest cwUiRequest) {
+        CaseWorkerProfile processedCwProfiles = null;
+        CaseWorkerProfile profilesToBePersisted =
+                deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, cwUiRequest);
+
+
+        if (isNotEmpty(profilesToBePersisted)) {
+            processedCwProfiles = caseWorkerProfileRepo.save(profilesToBePersisted);
+            log.info("{}::case worker profile inserted ", loggingComponentName);
+        }
+
+        return processedCwProfiles;
+    }
+
+    // deletes children and updates caseworker profile
+    private CaseWorkerProfile deleteChildrenAndUpdateCwProfiles(CaseWorkerProfile updateCaseWorkerProfiles,
+                                                                      StaffProfileCreationRequest cwUiRequest) {
+        CaseWorkerProfile updatedProfiles = null;
+        if (isNotEmpty(updateCaseWorkerProfiles)) {
+            caseWorkerLocationRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
+            caseWorkerWorkAreaRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
+            caseWorkerRoleRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
+            caseWorkerSkillRepository.deleteByCaseWorkerProfile(updateCaseWorkerProfiles);
+            cwrCommonRepository.flush();
+            updatedProfiles = updateUserProfile(cwUiRequest,
+                    updateCaseWorkerProfiles);
+        }
+        return updatedProfiles;
+    }
+
+    public CaseWorkerProfile updateUserProfile(StaffProfileCreationRequest cwrdProfileRequest,
+                                               CaseWorkerProfile caseWorkerProfile) {
+        //update existing profile with file StaffProfileCreationRequest
+        populateStaffProfile(cwrdProfileRequest, caseWorkerProfile, caseWorkerProfile.getCaseWorkerId());
+        return caseWorkerProfile;
+    }
+
+
+    public boolean isUserSuspended(UserProfileUpdatedData userProfileUpdatedData, String userId,
+                                   String origin) {
+
+        boolean status = true;
+        try {
+            Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
+
+            if (!resultResponse.isPresent()
+                    || (isNull(((UserProfileRolesResponse) resultResponse.get())
+                    .getAttributeResponse()))
+                    || (!(((UserProfileRolesResponse) resultResponse.get())
+                    .getAttributeResponse().getIdamStatusCode().equals(HttpStatus.OK.value())))) {
+                log.info("{}:: {} case worker profiles isUserSuspended ", loggingComponentName,
+                        UP_FAILURE_ROLES);
+                status = false;
+            }
+
+        } catch (Exception ex) {
+            log.error("{}:: UserProfile modify api failed with error :: {}::  {}",
+                    loggingComponentName, ex.getMessage(), UP_FAILURE_ROLES);
+            status = false;
+        }
+        return status;
+    }
+
+    private Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
+                                                          String userId, String origin) {
+        Response response = userProfileFeignClient.modifyUserRoles(userProfileUpdatedData, userId, origin);
+        log.info("{}:: UserProfile update roles :: status code {}", loggingComponentName,
+                response.status());
+
+        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileRolesResponse.class);
+
+        return validateAndGetResponseEntity(responseEntity);
+    }
+
+    private Optional<Object> validateAndGetResponseEntity(ResponseEntity<Object> responseEntity) {
+        if (nonNull(responseEntity)) {
+            return Optional.ofNullable(responseEntity.getBody());
+        }
+        return Optional.empty();
+    }
+
+    // update roles in sidam and filter if failed in User profile
+    public CaseWorkerProfile updateSidamRoles(CaseWorkerProfile updateCaseWorkerProfiles,
+                                                    StaffProfileCreationRequest cwUiRequest) {
+        CaseWorkerProfile filteredUpdateCwProfile = null;
+        boolean isAddRoleSuccess = updateUserRolesInIdam(cwUiRequest,
+                updateCaseWorkerProfiles.getCaseWorkerId(),STAFF_PROFILE_UPDATE);
+        if (isAddRoleSuccess) {
+            filteredUpdateCwProfile = updateCaseWorkerProfiles;
+        }
+        return filteredUpdateCwProfile;
+    }
+
+    public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId,
+                                         String operationType) {
+
+
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
+
+        Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
+                && nonNull(profileResponse.getIdamStatus())) {
+            if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+
+                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, IDAM_STATUS_NOT_ACTIVE,
+                        profileResponse.getIdamId(), cwrProfileRequest, operationType);
+
+                log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
+                        profileResponse.getIdamStatus());
+
+                throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_NOT_ACTIVE,
+                        IDAM_STATUS_NOT_ACTIVE);
+            }
+
+        } else {
+            log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
+                    UP_FAILURE_ROLES);
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_USER_PROFILE,
+                    IDAM_STATUS_USER_PROFILE);
+
+        }
+        Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
+
+
+        Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
+                new HashSet<>();
+
+
+        if (cwrProfileRequest.isStaffAdmin()) {
+            idamRolesCwr.add(ROLE_CWD_USER);
+            idamRolesCwr.add(ROLE_STAFF_ADMIN);
+        }
+
+        idamRolesCwr.addAll(mappedRoles);
+        Set<RoleName> mergedRoles = new HashSet<>();
+
+        UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+
+        Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
+        if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
+            mergedRoles = idamRolesCwr.stream()
+                    .filter(s -> !(userProfileRoles.contains(s)))
+                    .map(RoleName::new)
+                    .collect(toSet());
+        }
+        var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
+                || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
+        if (isNotEmpty(mergedRoles) || hasNameChanged) {
+            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
+        }
+
+        return true;
+    }
+
+    private boolean updateMismatchedDatatoUP(StaffProfileCreationRequest cwrProfileRequest, String idamId,
+                                             Set<RoleName> mergedRoles,
+                                             boolean hasNameChanged) {
+        UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
+
+        if (isNotEmpty(mergedRoles)) {
+            builder
+                    .rolesAdd(mergedRoles);
+        }
+
+        if (hasNameChanged) {
+
+            builder
+                    .firstName(cwrProfileRequest.getFirstName())
+                    .lastName(cwrProfileRequest.getLastName())
+                    .idamStatus(STATUS_ACTIVE);
+
+        }
+        return isEachRoleUpdated(builder.build(), idamId, "EXUI");
+    }
+
+    public boolean isEachRoleUpdated(UserProfileUpdatedData userProfileUpdatedData, String userId,
+                                     String origin) {
+        boolean isEachRoleUpdated;
+        try {
+            Optional<Object> resultResponse = getUserProfileUpdateResponse(userProfileUpdatedData, userId, origin);
+
+            if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse
+                    userProfileRolesResponse) {
+                if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
+                        || nonNull(userProfileRolesResponse.getAttributeResponse())) {
+                    isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse);
+
+                } else {
+                    log.info("{}:: isEachRoleUpdated  failed:: message {}", loggingComponentName,
+                            UP_FAILURE_ROLES);
+                    isEachRoleUpdated = false;
+                }
+            } else {
+                log.info("{}:: isEachRoleUpdated  failed:: message {}", loggingComponentName,
+                        UP_FAILURE_ROLES);
+                isEachRoleUpdated = false;
+            }
+
+        } catch (Exception ex) {
+            log.error("{}:: UserProfile modify api failed with error :: {}::  {}",
+                    loggingComponentName, ex.getMessage(), UP_FAILURE_ROLES);
+
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, StringUtils.EMPTY,
+                    UP_FAILURE_ROLES);
+        }
+        return isEachRoleUpdated;
+    }
+
+    private boolean isRecordupdatedinUP(UserProfileRolesResponse userProfileRolesResponse) {
+
+        boolean isRecordUpdate = true;
+        if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
+                && isNotTrue(userProfileRolesResponse.getRoleAdditionResponse().getIdamStatusCode()
+                .equals(valueOf(HttpStatus.CREATED.value())))) {
+
+            log.info("{}:: isRecordupdatedinUP  failed:: message {}", loggingComponentName,
+                    userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage());
+            isRecordUpdate = false;
+        }
+        if (nonNull(userProfileRolesResponse.getAttributeResponse())
+                && !(userProfileRolesResponse.getAttributeResponse().getIdamStatusCode()
+                .equals(Integer.valueOf(HttpStatus.OK.value())))) {
+
+            log.info("{}:: isRecordupdatedinUP  failed:: message {}", loggingComponentName,
+                    userProfileRolesResponse.getRoleAdditionResponse().getIdamMessage());
+            isRecordUpdate = false;
+        }
+        return isRecordUpdate;
+    }
+
+    // get the roles that needs to send to idam based on the roleType in the request.
+    Set<String> getUserRolesByRoleId(StaffProfileCreationRequest cwProfileRequest) {
+
+        // get Roles Types
+        List<RoleType> roleTypeList = new ArrayList<>();
+        cwProfileRequest.getRoles().forEach(role -> roleTypeList.addAll(
+                caseWorkerStaticValueRepositoryAccessor
+                        .getRoleTypes()
+                        .stream()
+                        .filter(roleType -> role.getRole().equalsIgnoreCase(roleType.getDescription().trim()))
+                        .toList())
+        );
+
+
+        List<String> serviceCodes = cwProfileRequest.getServices()
+                .stream()
+                .map(CaseWorkerServicesRequest::getServiceCode)
+                .toList();
+
+
+        // get all assoc records matching role id and service code, finally return idam roles associated
+        Set<String> matchedRoles = roleAssocRepository.findByRoleTypeInAndServiceCodeIn(roleTypeList, serviceCodes)
+                .stream()
+                .map(CaseWorkerIdamRoleAssociation::getIdamRole)
+                .collect(Collectors.toSet());
+        log.info("{}:: roles matched from assoc :: {}", loggingComponentName, matchedRoles);
+        return matchedRoles;
+    }
+
+    public void setNewCaseWorkerProfileFlag(CaseWorkerProfile caseWorkerProfile) {
+        if (nonNull(caseWorkerProfile)) {
+            caseWorkerProfile.setNew(true);
+        }
     }
 
 }

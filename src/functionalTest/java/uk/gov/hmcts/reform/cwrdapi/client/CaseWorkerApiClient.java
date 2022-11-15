@@ -14,8 +14,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
@@ -305,6 +309,41 @@ public class CaseWorkerApiClient {
                  .build();
     }
 
+    public StaffProfileCreationRequest createStaffProfileCreationRequest(
+            String emailId, String firstName, String lastName) {
+
+        Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
+        List<StaffProfileRoleRequest> caseWorkerRoleRequests =
+                ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest().roleId(1).role(" role ")
+                        .isPrimaryFlag(true).build());
+
+        List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(1)
+                .location(" location ").build());
+
+        List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .service(" areaOfWork ").serviceCode(" serviceCode ")
+                .build());
+
+        return   StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .emailId(emailId)
+                .regionId(1).userType("CTSC")
+                .region("region")
+                .suspended(false)
+                .taskSupervisor(true)
+                .caseAllocator(false)
+                .staffAdmin(false)
+                .roles(caseWorkerRoleRequests)
+                .baseLocations(caseWorkerLocationRequests)
+                .services(caseWorkerServicesRequests)
+                .build();
+    }
+
     public Response createUserProfiles(List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests) {
         Response response = getMultipleAuthHeadersInternal()
                 .body(caseWorkersProfileCreationRequests)
@@ -372,4 +411,50 @@ public class CaseWorkerApiClient {
 
         return response;
     }
+
+    public Response updateStaffUserProfile(StaffProfileCreationRequest staffProfileCreationRequest) {
+
+        Response response = getMultipleAuthHeadersInternal(List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN))
+                .body(staffProfileCreationRequest)
+                .put("/refdata/case-worker/profile")
+                .andReturn();
+        log.info(":: Create staff profile response status code :: " + response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(200);
+
+        return response;
+    }
+
+    public UserProfileCreationRequest createUserProfileRequest(StaffProfileCreationRequest request) {
+
+        return new UserProfileCreationRequest(
+                request.getEmailId(),
+                request.getFirstName(),
+                request.getLastName(),
+                LanguagePreference.EN,
+                UserCategory.CASEWORKER,
+                UserTypeRequest.INTERNAL,
+                Set.of("staff-admin"),
+                false);
+    }
+
+    public Response createStaffUserProfileWithOutIdm(StaffProfileCreationRequest request) {
+
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+
+        Response response = getMultipleAuthHeadersInternal(userRoles)
+                .body(request)
+                .post("/refdata/case-worker/profile")
+                .andReturn();
+        log.info(":: Create staff profile response status code :: " + response.statusCode());
+
+        response.then()
+                .assertThat()
+                .statusCode(201);
+
+        return response;
+    }
+
 }
