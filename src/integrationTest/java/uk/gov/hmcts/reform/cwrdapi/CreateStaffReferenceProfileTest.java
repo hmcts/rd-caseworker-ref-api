@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,13 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
@@ -25,20 +17,10 @@ import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static java.lang.String.format;
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 
 public class CreateStaffReferenceProfileTest extends AuthorizationEnabledIntegrationTest {
 
@@ -68,6 +50,7 @@ public class CreateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
     CaseWorkerSkillRepository caseWorkerSkillRepository;
     @Autowired
     StaffAuditRepository staffAuditRepository;
+
     @BeforeEach
     public void setUpClient() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);

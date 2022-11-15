@@ -59,6 +59,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
     CaseWorkerSkillRepository caseWorkerSkillRepository;
     @Autowired
     StaffAuditRepository staffAuditRepository;
+
     @BeforeEach
     public void setUpClient() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
@@ -115,6 +116,10 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
+        assertThat(response).isNotNull();
+        assertThat(response.get("case_worker_id")).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+
 
         List<StaffAudit> staffAudits = staffAuditRepository.findAll();
 
@@ -139,9 +144,6 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         JSONAssert.assertEquals(staffAudits.get(1).getRequestLog(), expectedData, JSONCompareMode.LENIENT);
 
 
-        assertThat(response).isNotNull();
-        assertThat(response.get("case_worker_id")).isNotNull();
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
         assertThat(caseWorkerProfileRepository.findAll().size()).isEqualTo(1);
         assertThat(caseWorkerLocationRepository.findAll().size()).isEqualTo(2);
         assertThat(caseWorkerRoleRepository.findAll().size()).isEqualTo(1);
@@ -170,6 +172,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
+        assertThat(response.get("http_status")).isEqualTo("404");
 
         List<StaffAudit> staffAudits = staffAuditRepository.findAll();
 
@@ -191,9 +194,6 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
         JSONAssert.assertEquals(staffAudits.get(1).getRequestLog(), expectedData, JSONCompareMode.LENIENT);
 
-
-
-        assertThat(response.get("http_status")).isEqualTo("404");
 
         assertThat(caseWorkerProfileRepository.findAll().size()).isEqualTo(1);
         assertThat(caseWorkerLocationRepository.findAll().size()).isEqualTo(2);
