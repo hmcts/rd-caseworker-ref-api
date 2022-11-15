@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.Oauth2;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfigProperties;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.lib.client.response.S2sClient;
@@ -26,6 +28,7 @@ import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -59,7 +62,7 @@ public class AuthorizationFunctionalTest {
 
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
-    public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@justice.gov.uk";
+    public static final String EMAIL_TEMPLATE = "CWR-rd-func-test-user-only-%s@justice.gov.uk";
     public static final String CWD_USER = "cwd-user";
     public static final String CASEWORKER_IAC_BULKSCAN = "caseworker-iac-bulkscan";
     public static final String CASEWORKER_IAC = "caseworker-iac";
@@ -69,9 +72,9 @@ public class AuthorizationFunctionalTest {
 
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
-    public static final String STAFF_EMAIL_TEMPLATE = "staff-profile-func-test-user-%s@justice.gov.uk";
-    public static final String STAFF_EMAIL_PATTERN = "staff-profile-func-test-user";
-    public static final String CWR_EMAIL_PATTERN = "cwr-func-test-user";
+    public static final String STAFF_EMAIL_TEMPLATE = "staff-rd-profile-func-test-user-only-%s@justice.gov.uk";
+    public static final String STAFF_EMAIL_PATTERN = "staff-rd-profile-func-test-user-only";
+    public static final String CWR_EMAIL_PATTERN = "cwr-rd-func-test-user-only";
 
     @Autowired
     public FuncTestRequestHandler funcTestRequestHandler;
@@ -163,6 +166,7 @@ public class AuthorizationFunctionalTest {
     }
 
     public static Map getIdamResponse(String idamId) {
+        idamOpenIdClient.getcwdAdminOpenIdToken("cwd-admin");
         return idamOpenIdClient.getUser(idamId);
     }
 
@@ -170,5 +174,11 @@ public class AuthorizationFunctionalTest {
         //delete user by email pattern
         caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
                 "/refdata/case-worker/users?emailPattern=" + emailPattern, NO_CONTENT);
+    }
+
+    public UserProfileResponse createUserProfileFromUp(UserProfileCreationRequest request)
+            throws JsonProcessingException {
+        return funcTestRequestHandler.sendPost(request,CREATED, "/v1/userprofile",baseUrlUserProfile,
+                UserProfileResponse.class,idamOpenIdClient.getToken("cwd-admin"));
     }
 }

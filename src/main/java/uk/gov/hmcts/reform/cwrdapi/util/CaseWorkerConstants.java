@@ -71,6 +71,9 @@ public final class CaseWorkerConstants {
 
     public static final String IDAM_STATUS_SUSPENDED = "SUSPENDED";
 
+    public static final String IDAM_STATUS_PENDING = "PENDING";
+    public static final String UP_STATUS_PENDING = "PENDING";
+
     public static final String ORIGIN_EXUI = "EXUI";
 
     public static final String UP_FAILURE_ROLES = "An update to the user is not possible at this moment."
@@ -168,6 +171,7 @@ public final class CaseWorkerConstants {
     public static final String NO_USER_TO_SUSPEND_PROFILE = "There is no user present to suspend. "
             + "Please try again or check with HMCTS Support Team";
     public static final String STAFF_PROFILE_CREATE = "CREATE";
+    public static final String STAFF_PROFILE_UPDATE = "UPDATE";
 
     public static final String CW_FIRST_NAME = "firstName";
 
@@ -207,5 +211,15 @@ public final class CaseWorkerConstants {
     public static final String SERVICE_ID_START_END_WITH_COMMA = "Invalid Service ids: %s";
 
     public static final String ROLE_START_END_WITH_COMMA = "Invalid Service ids: %s";
+
+    public static final String PROFILE_NOT_PRESENT_IN_SRD = "User does not exist in SRD";
+
+    public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UP/IDAM";
+
+    public static final String IDAM_STATUS_NOT_ACTIVE = "User is in pending status or does not exist in IDAM";
+    public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
+    public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
+            + TRY_AGAIN;
+
 
 }

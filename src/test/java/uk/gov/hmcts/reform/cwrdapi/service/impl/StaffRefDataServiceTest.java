@@ -175,6 +175,7 @@ class StaffRefDataServiceTest {
         skill.setDescription("training");
     }
 
+
     @Test
     @SuppressWarnings("unchecked")
     void testFetchUserType_All() {

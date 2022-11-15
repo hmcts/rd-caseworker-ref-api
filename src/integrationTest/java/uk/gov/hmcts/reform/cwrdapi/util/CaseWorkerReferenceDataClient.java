@@ -86,7 +86,6 @@ public class CaseWorkerReferenceDataClient {
         return postRequest(baseUrl + "/users/", request, role, null);
     }
 
-
     public Map<String, Object> deleteCaseWorker(String path) {
         return deleteRequest(baseUrl + path, null);
     }
@@ -341,6 +340,25 @@ public class CaseWorkerReferenceDataClient {
         return sendRequest(uriPath, request);
     }
 
+    private <T> Map<String, Object> putRequest(String uriPath, T requestBody, String role, String userId) {
+
+        HttpEntity<T> request = new HttpEntity<>(requestBody, getMultipleAuthHeaders(role, userId));
+
+        ResponseEntity<Map> responseEntity;
+
+        try {
+            responseEntity = restTemplate.exchange(uriPath, HttpMethod.PUT, request, Map.class);
+
+        } catch (RestClientResponseException ex) {
+            HashMap<String, Object> statusAndBody = new HashMap<>(2);
+            statusAndBody.put("http_status", String.valueOf(ex.getRawStatusCode()));
+            statusAndBody.put("response_body", ex.getResponseBodyAsString());
+            return statusAndBody;
+        }
+
+        return getResponse(responseEntity);
+    }
+
     private <T> Map<String, Object> deleteRequest(String uriPath, String role) {
 
         HttpEntity<T> request = new HttpEntity<>(null, getMultipleAuthHeaders(role, null));
@@ -549,5 +567,9 @@ public class CaseWorkerReferenceDataClient {
                 .services(caseWorkerServicesRequests)
                 .skills(skillsRequest)
                 .build();
+    }
+
+    public Map<String, Object> updateStaffProfile(StaffProfileCreationRequest request, String role) {
+        return putRequest(baseUrl + "/profile", request, role, null);
     }
 }

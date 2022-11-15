@@ -19,8 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -51,9 +54,11 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepos
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
+import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerSkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
@@ -62,6 +67,8 @@ import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,7 +89,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.validateSearchUserProfileResponse;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 
 @ExtendWith(MockitoExtension.class)
@@ -131,9 +142,15 @@ class StaffRefDataServiceImplTest {
 
     SearchRequest searchReq;
 
+    @Mock
+    CaseWorkerSkillRepository caseWorkerSkillRepository;
+
+    @Mock
+    ICwrdCommonRepository cwrCommonRepository;
+
+
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         MockitoAnnotations.openMocks(this);
 
         Set<String> idamRoles = new HashSet<>();
@@ -203,6 +220,46 @@ class StaffRefDataServiceImplTest {
         skill = new Skill();
         skill.setSkillId(1L);
         skill.setDescription("training");
+        MockitoAnnotations.openMocks(this);
+
+
+        staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .suspended(false)
+                .caseAllocator(false)
+                .taskSupervisor(true)
+                .staffAdmin(true)
+                .emailId("test@test.com")
+                .firstName("testFN")
+                .lastName("testLN")
+                .regionId(1)
+                .region("testRegion")
+                .userType("testUser1")
+                .services(singletonList(caseWorkerServicesRequest))
+                .baseLocations(singletonList(caseWorkerLocationRequest))
+                .roles(singletonList(staffProfileRoleRequest))
+                .skills(singletonList(skillsRequest))
+                .build();
+
+
+
+        caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("CWR-func-test-user@test.com");
+
+        roleType = new RoleType();
+        roleType.setRoleId(1L);
+        roleType.setDescription("testRole1");
+
+        userType = new UserType();
+        userType.setUserTypeId(1L);
+        userType.setDescription("testUser1");
+
+        skill = new Skill();
+        skill.setSkillId(1L);
+        skill.setDescription("training");
 
     }
 
@@ -241,8 +298,6 @@ class StaffRefDataServiceImplTest {
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills).isNotNull();
-
         assertThat(serviceSkills).isEmpty();
     }
 
@@ -255,7 +310,6 @@ class StaffRefDataServiceImplTest {
         assertThat(staffWorkerSkillResponse).isNotNull();
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-        assertThat(serviceSkills).isNotNull();
 
         assertThat(serviceSkills).isEmpty();
     }
@@ -800,7 +854,7 @@ class StaffRefDataServiceImplTest {
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
         when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(409).build());
+                .request(mock(Request.class)).body(body, defaultCharset()).status(200).build());
         ResponseEntity<Object> response = staffRefDataServiceImpl
                 .createUserProfileInIdamUP(staffProfileCreationRequest);
         assertNotNull(response);
@@ -834,5 +888,362 @@ class StaffRefDataServiceImplTest {
             staffRefDataServiceImpl.createUserProfileInIdamUP(staffProfileCreationRequest);
         });
         assertEquals(HttpStatus.METHOD_NOT_ALLOWED,thrown.getStatus());
+    }
+
+
+
+
+
+    @Test
+    void test_update_staff_profile_with_changed_values() throws JsonProcessingException {
+
+        //ValidateStaffProfile
+        //doNothing().when(validateStaffProfile).validateStaffProfile(any());
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+
+        List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
+                .updateStaffProfile(staffProfileCreationRequest);
+
+
+        assertThat(staffProfileCreationResponse).isNotNull();
+        assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
+    }
+
+
+
+    @Test
+    void test_populateStaffProfile() throws JsonProcessingException {
+
+        //ValidateStaffProfile
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        staffRefDataServiceImpl.populateStaffProfile(staffProfileCreationRequest,caseWorkerProfile,"CWID1");
+
+        assertThat(caseWorkerProfile).isNotNull();
+        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
+        assertThat(caseWorkerProfile.getSuspended()).isFalse();
+        assertThat(caseWorkerProfile.getCaseAllocator()).isFalse();
+        assertThat(caseWorkerProfile.getTaskSupervisor()).isTrue();
+        assertThat(caseWorkerProfile.getUserAdmin()).isTrue();
+        assertThat(caseWorkerProfile.getEmailId()).isEqualTo("cwr-func-test-user@test.com");
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("testFN");
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo("testLN");
+        assertThat(caseWorkerProfile.getRegionId()).isEqualTo(1);
+        assertThat(caseWorkerProfile.getRegion()).isEqualTo("testRegion");
+
+    }
+
+
+    @Test
+    void test_updateUserProfile() throws JsonProcessingException {
+
+        //ValidateStaffProfile
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
+
+        CaseWorkerProfile caseWorkerProfileInput = new CaseWorkerProfile();
+        caseWorkerProfileInput.setCaseWorkerId("CWID1");
+        caseWorkerProfileInput.setCaseWorkerLocations(new ArrayList<>());
+        caseWorkerProfileInput.setCaseWorkerWorkAreas(new ArrayList<>());
+        caseWorkerProfileInput.setCaseWorkerRoles(new ArrayList<>());
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        CaseWorkerProfile caseWorkerProfile = staffRefDataServiceImpl
+                .updateUserProfile(staffProfileCreationRequest,caseWorkerProfileInput);
+
+
+        assertThat(caseWorkerProfile).isNotNull();
+        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
+        assertThat(caseWorkerProfile.getSuspended()).isFalse();
+        assertThat(caseWorkerProfile.getCaseAllocator()).isFalse();
+        assertThat(caseWorkerProfile.getTaskSupervisor()).isTrue();
+        assertThat(caseWorkerProfile.getUserAdmin()).isTrue();
+        assertThat(caseWorkerProfile.getEmailId()).isEqualTo("cwr-func-test-user@test.com");
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("testFN");
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo("testLN");
+        assertThat(caseWorkerProfile.getRegionId()).isEqualTo(1);
+        assertThat(caseWorkerProfile.getRegion()).isEqualTo("testRegion");
+        assertThat(caseWorkerProfile.getCaseWorkerLocations()).isEmpty();
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas()).isEmpty();
+        assertThat(caseWorkerProfile.getCaseWorkerRoles()).isEmpty();
+
+    }
+
+
+    @Test
+    void test_create_staff_profile_with_changed_values() throws JsonProcessingException {
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+
+        List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+        when(userProfileFeignClient.createUserProfile(any(),anyString()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(201).build());
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
+                .processStaffProfileCreation(staffProfileCreationRequest);
+
+
+        assertThat(staffProfileCreationResponse).isNotNull();
+        assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
+    }
+
+
+    @Test
+    void test_create_staff_profile_with_changed_values_PresentInUP() throws JsonProcessingException {
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID3");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+
+        List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+        when(userProfileFeignClient.createUserProfile(any(),anyString()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(409).build());
+
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
+
+        StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
+                .processStaffProfileCreation(staffProfileCreationRequest);
+
+
+        assertThat(staffProfileCreationResponse).isNotNull();
+        assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID3");
+    }
+
+
+    @Test
+    void staffProfilePendingStatusInUP() throws JsonProcessingException {
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(IDAM_STATUS_NOT_ACTIVE);
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            staffRefDataServiceImpl
+                    .updateUserRolesInIdam(staffProfileCreationRequest,"1234",STAFF_PROFILE_CREATE);
+
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
+    }
+
+    @Test
+    void staffProfileDoesNotExitInIdam() throws JsonProcessingException {
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            staffRefDataServiceImpl
+                    .updateUserRolesInIdam(staffProfileCreationRequest,"1234",STAFF_PROFILE_CREATE);
+
+        });
+
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_USER_PROFILE);
+    }
+
+    private StaffProfileCreationRequest getStaffProfileUpdateRequest() {
+
+        Set<String> idamRoles = new HashSet<>();
+        idamRoles.add("IdamRole1");
+        idamRoles.add("IdamRole2");
+
+        StaffProfileRoleRequest staffProfileRoleRequest =
+                new StaffProfileRoleRequest(1, "testRole1", true);
+
+        CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true)
+                .location("testLocation")
+                .locationId(1)
+                .build();
+
+        CaseWorkerServicesRequest caseWorkerServicesRequest = CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .serviceCode("ABCA4")
+                .service("service")
+                .build();
+
+        SkillsRequest skillsRequest = SkillsRequest
+                .skillsRequest()
+                .skillId(1)
+                .description("training")
+                .build();
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .suspended(false)
+                .caseAllocator(false)
+                .taskSupervisor(true)
+                .staffAdmin(true)
+                .emailId("cwr-func-test-user@test.com")
+                .firstName("testFN")
+                .lastName("testLN")
+                .regionId(1)
+                .region("testRegion")
+                .userType("testUser1")
+                .services(singletonList(caseWorkerServicesRequest))
+                .baseLocations(singletonList(caseWorkerLocationRequest))
+                .roles(singletonList(staffProfileRoleRequest))
+                .skills(singletonList(skillsRequest))
+                .build();
+
+        return staffProfileCreationRequest;
+
     }
 }
