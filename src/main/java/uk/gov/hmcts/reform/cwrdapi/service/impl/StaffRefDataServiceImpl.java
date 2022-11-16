@@ -670,7 +670,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 .findByEmailId(profileRequest.getEmailId().toLowerCase());
         if (caseWorkerProfile == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_SRD,
-                    PROFILE_NOT_PRESENT_IN_SRD,profileRequest,STAFF_PROFILE_UPDATE);
+                    StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);
             throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
                     PROFILE_NOT_PRESENT_IN_SRD);
         }
@@ -683,7 +683,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     IDAM_STATUS_NOT_ACTIVE);
         } else if (userProfileResponse == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
-                    PROFILE_NOT_PRESENT_IN_UP_OR_IDAM, profileRequest, STAFF_PROFILE_UPDATE);
+                    StringUtils.EMPTY, profileRequest, STAFF_PROFILE_UPDATE);
             throw new StaffReferenceException(HttpStatus.NOT_FOUND, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
                     PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
         }

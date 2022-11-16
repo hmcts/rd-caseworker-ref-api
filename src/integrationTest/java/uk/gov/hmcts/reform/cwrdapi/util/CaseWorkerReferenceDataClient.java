@@ -86,6 +86,7 @@ public class CaseWorkerReferenceDataClient {
         return postRequest(baseUrl + "/users/", request, role, null);
     }
 
+
     public Map<String, Object> deleteCaseWorker(String path) {
         return deleteRequest(baseUrl + path, null);
     }
