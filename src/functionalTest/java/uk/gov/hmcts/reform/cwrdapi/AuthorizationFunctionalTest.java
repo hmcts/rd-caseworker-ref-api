@@ -114,12 +114,6 @@ public class AuthorizationFunctionalTest {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10)).toLowerCase();
     }
 
-
-    @AfterAll
-    public static void destroy() {
-
-    }
-
     public static String getS2sToken() {
         return s2sToken;
     }
