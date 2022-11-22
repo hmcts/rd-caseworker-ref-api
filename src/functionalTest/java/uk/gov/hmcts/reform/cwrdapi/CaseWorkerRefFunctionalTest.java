@@ -13,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -89,8 +89,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     //this test verifies new User profile is created
     public void createCwProfileWhenUserNotExistsInCrdAndSidamAndUp_Ac1() {
         List<CaseWorkerRoleRequest> roleRequests = new ArrayList<CaseWorkerRoleRequest>();
-        roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader",true));
-        roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader",false));
+        roleRequests.add(new CaseWorkerRoleRequest("National Business Centre Team Leader", true));
+        roleRequests.add(new CaseWorkerRoleRequest("Regional Centre Team Leader", false));
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
                 .createCaseWorkerProfiles();
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
@@ -161,7 +161,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         UserProfileResponse upResponseUpdated =
                 getUserProfileFromUp(caseWorkersProfileCreationRequests.get(0).getEmailId());
-        assertEquals("cwr-test-one",upResponseUpdated.getFirstName());
+        assertEquals("cwr-test-one", upResponseUpdated.getFirstName());
     }
 
     @Test
@@ -173,7 +173,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         caseWorkersProfileCreationRequests.get(0).setFirstName("cwr-test-one");
         caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
         var idamResponse = getIdamResponse(upResponse.getIdamId());
-        assertEquals(idamResponse.get("forename"),caseWorkersProfileCreationRequests.get(0).getFirstName());
+        assertEquals(idamResponse.get("forename"), caseWorkersProfileCreationRequests.get(0).getFirstName());
     }
 
     @Test
@@ -265,7 +265,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getFirstName()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getLastName()));
         assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getOfficialEmail()));
-
+        assertTrue(StringUtils.isNotEmpty(caseWorkerProfile.getStaffAdmin()));
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getLocations()));
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getRoles()));
         assertTrue(CollectionUtils.isNotEmpty(caseWorkerProfile.getWorkAreas()));
@@ -412,7 +412,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     //this test verifies that a User Profile is deleted by ID
     public void deleteCaseworkerById() {
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                caseWorkerApiClient.createCaseWorkerProfiles();
+                createNewActiveCaseWorkerProfile();
 
         // create user
         Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
@@ -441,12 +441,10 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     //this test verifies that a User Profile is deleted by Email Pattern
-    public void deleteCaseworkerByEmailPattern() {
-        String emailPattern = "deleteTest1234";
-        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+    public static void deleteCaseworkerByEmailPattern() {
 
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
-                caseWorkerApiClient.createCaseWorkerProfiles(email);
+                createNewActiveCaseWorkerProfile();
 
         // create user with email pattern
         Response createResponse = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
@@ -458,8 +456,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(caseWorkersProfileCreationRequests.size(), caseWorkerIds.size());
 
         //delete user by email pattern
-        caseWorkerApiClient.deleteCaseworkerByIdOrEmailPattern(
-                "/refdata/case-worker/users?emailPattern=" + emailPattern, NO_CONTENT);
+        deleteCaseWorkerProfileByEmailPattern(caseWorkersProfileCreationRequests.get(0).getEmailId());
 
         //search for deleted user
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
@@ -730,5 +727,14 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+    }
+
+    @AfterAll
+    public static void cleanUpTestData() {
+        try {
+            deleteCaseWorkerProfileByEmailPattern(CWR_EMAIL_PATTERN);
+        } catch (Exception e) {
+            log.error("cleanUpTestData :: threw the following exception: " + e);
+        }
     }
 }
