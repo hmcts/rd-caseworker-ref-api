@@ -15,8 +15,11 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.removeEmptySpaces;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPaginationObject;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
 
 class RequestUtilsTest {
 
@@ -82,5 +85,57 @@ class RequestUtilsTest {
             validateAndBuildPaginationObject(0, 1,
                     "invalid", "ASC",
                     20, "invalid", CaseWorkerProfile.class));
+    }
+
+    @Test
+    void testRemoveEmptySpaces() {
+        String emptySpaces = "   TestData   ";
+
+        String result = removeEmptySpaces(emptySpaces);
+        assertEquals("TestData",result);
+    }
+
+    @Test
+    void testValidateAndBuildPagination() {
+
+        PageRequest pageRequest =
+                validateAndBuildPagination(20,1,10,1);
+        assertEquals(0, pageRequest.first().getPageNumber());
+        assertEquals(20, pageRequest.first().getPageSize());
+    }
+
+    @Test
+    void testInvalidRequestExceptionForValidateAndBuildPaginationPageNumberZero() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+                validateAndBuildPagination(20,0,10,1)
+        );
+    }
+
+    @Test
+    void testInvalidRequestExceptionForValidateAndBuildPaginationPageSizeZero() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+                validateAndBuildPagination(0,1,10,1)
+        );
+    }
+
+    @Test
+    void testInvalidRequestExceptionForValidateSearchStringLenLessthan3() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+                validateSearchString("ab")
+        );
+    }
+
+    @Test
+    void testInvalidRequestExceptionForValidateSearchStringEmpty() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+                validateSearchString(" ")
+        );
+    }
+
+    @Test
+    void testInvalidRequestExceptionForValidateSearchStringNotValid() {
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+                validateSearchString("abcd123")
+        );
     }
 }
