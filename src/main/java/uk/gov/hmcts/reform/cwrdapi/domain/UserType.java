@@ -27,7 +27,7 @@ public class UserType implements Serializable {
 
     @Id
     @Column(name = "user_type_id")
-    private  Long userTypeId;
+    private Long userTypeId;
 
     @Column(name = "description")
     @Size(max = 512)
