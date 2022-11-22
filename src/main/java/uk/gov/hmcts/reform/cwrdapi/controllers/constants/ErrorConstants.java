@@ -24,6 +24,9 @@ public enum ErrorConstants {
 
     NO_USER_ID_OR_EMAIL_PATTERN_PROVIDED_TO_DELETE("No User ID or Email Pattern provided to delete the User(s)");
 
+    public static final String EXCEPTION_MSG_SPCL_CHAR = "Param contains special characters. ";
+
+    public static final String NUMERIC_VALUE_ERROR_MESSAGE = "Please Enter only the numeric values";
 
     private final String errorMessage;
 
