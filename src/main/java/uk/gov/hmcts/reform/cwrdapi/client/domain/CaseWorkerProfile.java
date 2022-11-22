@@ -79,6 +79,9 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @JsonProperty("role")
     private List<Role> roles;
 
+    @JsonProperty("skills")
+    private List<Skill> skills;
+
     @MappingField(clazz = WorkArea.class, objectCount = 8)
     @NotEmpty(message = CaseWorkerConstants.NO_WORK_AREA_PRESENT)
     @JsonProperty("work_area")
@@ -98,6 +101,8 @@ public class CaseWorkerProfile extends CaseWorkerDomain implements Serializable 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @MappingField(columnName = "Task Supervisor")
     private String taskSupervisor;
+
+    private String staffAdmin;
 
     private LocalDateTime createdTime;
     private LocalDateTime lastUpdatedTime;

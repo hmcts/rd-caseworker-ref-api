@@ -51,4 +51,9 @@ public class RoleType implements Serializable {
     public RoleType(String description) {
         this.description = description;
     }
+
+    public RoleType(Long roleId, String description) {
+        this.roleId = roleId;
+        this.description = description;
+    }
 }
