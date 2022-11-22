@@ -1,0 +1,1 @@
+ALTER TABLE case_worker_exception ALTER COLUMN key TYPE VARCHAR(256);
