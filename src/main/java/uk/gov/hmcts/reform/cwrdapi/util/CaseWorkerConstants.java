@@ -71,6 +71,9 @@ public final class CaseWorkerConstants {
 
     public static final String IDAM_STATUS_SUSPENDED = "SUSPENDED";
 
+    public static final String IDAM_STATUS_PENDING = "PENDING";
+    public static final String UP_STATUS_PENDING = "PENDING";
+
     public static final String ORIGIN_EXUI = "EXUI";
 
     public static final String UP_FAILURE_ROLES = "An update to the user is not possible at this moment."
@@ -120,6 +123,7 @@ public final class CaseWorkerConstants {
     public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
             + "Please try again or check with HMCTS Support Team";
     public static final String ROLE_CWD_USER = "cwd-user";
+    public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
     public static final String DUPLICATE_PRIMARY_AND_SECONDARY_ROLES = "Primary and Secondary Roles Should "
             + "not be same.";
@@ -149,4 +153,73 @@ public final class CaseWorkerConstants {
 
     public static final String LRD_ERROR = "An error occurred while retrieving data from Location Reference Data";
     public static final String SRD = "SRD";
+    public static final String TRY_AGAIN =   " and try again";
+    public static final String INVALID_EMAIL_PROFILE = "You must add a valid justice.gov.uk email"
+            + " address and try again";
+    public static final String NO_PRIMARY_LOCATION_PRESENT_PROFILE = "You must add Primary Base Location Name"
+            + TRY_AGAIN;
+    public static final String NO_ROLE_PRESENT_PROFILE = "You must add details of at least one role"
+            + TRY_AGAIN;
+    public static final String NO_WORK_AREA_PRESENT_PROFILE = "You must add details of at least one Service"
+            + TRY_AGAIN;
+    public static final String NO_USER_TYPE_PRESENT_PROFILE = "You must add a user type and try again";
+
+    public static final String FIRST_NAME_MISSING_PROFILE = "You must add a first name and try again";
+    public static final String LAST_NAME_MISSING_PROFILE = "You must add a last name and try again";
+    public static final String MISSING_REGION_PROFILE = "You must add a region and try again";
+    public static final String PROFILE_ALREADY_CREATED = "The profile is already created for the given email Id";
+    public static final String NO_USER_TO_SUSPEND_PROFILE = "There is no user present to suspend. "
+            + "Please try again or check with HMCTS Support Team";
+    public static final String STAFF_PROFILE_CREATE = "CREATE";
+    public static final String STAFF_PROFILE_UPDATE = "UPDATE";
+
+    public static final String CW_FIRST_NAME = "firstName";
+
+    public static final String CW_LAST_NAME = "lastName";
+
+
+    public static final String SEARCH_STRING_REGEX_PATTERN = "([a-zA-Z\\-\\s']){3,}+";
+
+
+    public static final String REG_EXP_SPCL_CHAR = "^[^<>{}\"/|;:.~!?@#$%^=&*\\]\\\\()\\[¿§«»ω⊙¤°℃℉€¥£¢¡®©+]*$";
+
+    public static final String REG_EXP_WHITE_SPACE = "\\s";
+
+    public static final String NUMERIC_REGEX = "[0-9]+";
+
+    public static final String COMMA = ",";
+
+    public static final String REG_EXP_COMMA_DILIMETER = ",(?!\\\\s)";
+
+    public static final String ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX = "^(?![-_.@,'&()])(?!.*[-_.@,'&()]{2})"
+            + "[A-Za-z0-9_@.,'&() -]{3,}$";
+
+    public static final String TASK_SUPERVISOR = "task supervisor";
+
+    public static final String CASE_ALLOCATOR = "case allocator";
+
+    public static final String STAFF_ADMIN = "staff administrator";
+
+    public static final String LOCATION_ID_START_END_WITH_COMMA = "Invalid location type ids: %s";
+
+    public static final String JOB_TITLE_ID_START_END_WITH_COMMA = "Invalid job title ids: %s";
+
+    public static final String USER_TYPE_ID_START_END_WITH_COMMA = "Invalid user type ids: %s";
+
+    public static final String SKILL_ID_START_END_WITH_COMMA = "Invalid skill ids: %s";
+
+    public static final String SERVICE_ID_START_END_WITH_COMMA = "Invalid Service ids: %s";
+
+    public static final String ROLE_START_END_WITH_COMMA = "Invalid Service ids: %s";
+
+    public static final String PROFILE_NOT_PRESENT_IN_SRD = "User does not exist in SRD";
+
+    public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UP/IDAM";
+
+    public static final String IDAM_STATUS_NOT_ACTIVE = "User is in pending status or does not exist in IDAM";
+    public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
+    public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
+            + TRY_AGAIN;
+
+
 }
