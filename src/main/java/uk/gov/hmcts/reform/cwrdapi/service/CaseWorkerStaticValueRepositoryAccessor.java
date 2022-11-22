@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 
 import java.util.List;
@@ -17,4 +18,10 @@ public interface CaseWorkerStaticValueRepositoryAccessor {
      * @return user types
      */
     List<UserType> getUserTypes();
+
+    /**
+     * Get the skill from the static skill table.
+     * @return skills
+     */
+    List<Skill> getSkills();
 }
