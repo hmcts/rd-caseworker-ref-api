@@ -52,6 +52,12 @@ public class ExceptionMapper {
         return errorDetailsResponseEntity(ex, BAD_REQUEST, INVALID_REQUEST_EXCEPTION.getErrorMessage());
     }
 
+    @ExceptionHandler(EmptyRequestException.class)
+    public ResponseEntity<Object> emptyRequestParams(EmptyRequestException ex) {
+        return errorDetailsResponseEntity(ex, BAD_REQUEST, ErrorConstants.MALFORMED_JSON.getErrorMessage());
+
+    }
+
     @ExceptionHandler(ExcelValidationException.class)
     public ResponseEntity<Object> excelValidationExceptionHandler(
             ExcelValidationException ex) {
