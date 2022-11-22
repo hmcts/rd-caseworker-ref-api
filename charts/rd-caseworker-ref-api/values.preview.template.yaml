@@ -24,7 +24,7 @@ java:
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
     ENVIRONMENT_NAME: "preview"
-    EMAIL_DOMAIN_LIST: "justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk"
+    EMAIL_DOMAIN_LIST: "justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk"
   postgresql:
     enabled: true
     auth:
