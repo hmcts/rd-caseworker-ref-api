@@ -242,6 +242,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "}")));
     }
 
+    public void userProfilePostUserWireMockForStaffProfile(HttpStatus status) {
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(201)
+                        .withBody("{"
+                                + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
+                                + "}")));
+    }
+
     public static class CaseWorkerTransformer extends ResponseTransformer {
         @Override
         public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
