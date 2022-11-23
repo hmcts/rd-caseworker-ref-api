@@ -73,5 +73,12 @@
   "100000_A Client Error response code was returned by the server_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile_POST" : "ignore",
   "100000_A Client Error response code was returned by the server_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile_PUT" : "ignore",
   "10024_Information Disclosure - Sensitive Information in URL_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search?jobTitle=jobTitle&location=location&role=role&serviceCode=serviceCode&skill=skill&userType=userType_GET" : "ignore",
-  "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/skill_GET" : "ignore"
+  "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/skill_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search?jobTitle=jobTitle&location=location&role=role&serviceCode=serviceCode&skill=skill&userType=userType_GET" : "ignore",
+  "10010_Cookie No HttpOnly Flag_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/user-type_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search?jobTitle=jobTitle&location=location&role=role&serviceCode=serviceCode&skill=skill&userType=userType_GET" : "ignore",
+  "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/user-type_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/user-type_GET" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search?jobTitle=jobTitle&location=location&role=role&serviceCode=serviceCode&skill=skill&userType=userType_GET" : "ignore",
+  "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/user-type_GET" : "ignore"
 }
