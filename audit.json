@@ -86,5 +86,7 @@
   "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/job-title_GET" : "ignore",
   "10054_Cookie without SameSite Attribute_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search-by-name?search=search_GET" : "ignore",
   "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/job-title_GET" : "ignore",
-  "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search-by-name?search=search_GET" : "ignore"
+  "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search-by-name?search=search_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/job-title_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search-by-name?search=search_GET" : "ignore"
 }
