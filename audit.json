@@ -88,5 +88,7 @@
   "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/job-title_GET" : "ignore",
   "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search-by-name?search=search_GET" : "ignore",
   "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/job-title_GET" : "ignore",
-  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search-by-name?search=search_GET" : "ignore"
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search-by-name?search=search_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/profile/search?jobTitle=jobTitle&location=location&role=role&serviceCode=serviceCode&skill=skill&userType=userType_GET" : "ignore",
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/refdata/case-worker/skill_GET" : "ignore"
 }
