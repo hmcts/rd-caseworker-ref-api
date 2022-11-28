@@ -436,8 +436,8 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             TYPE_XLSX, "200 OK", cwdAdmin);
 
         assertThat(response).contains(entry("message", REQUEST_FAILED_FILE_UPLOAD_JSR))
-            .contains(entry("message_details", format(RECORDS_FAILED, 4))).hasSize(6);
-        assertThat((List) response.get("error_details")).hasSize(4);
+            .contains(entry("message_details", format(RECORDS_FAILED, 3))).hasSize(6);
+        assertThat((List) response.get("error_details")).hasSize(7);
     }
 
     @Test
