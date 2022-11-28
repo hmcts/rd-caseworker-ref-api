@@ -44,7 +44,7 @@ def versions = [
   jackson            : '2.14.0-rc1',
   log4j              : '2.17.1',
   springVersion      : '5.3.20',
-  poi                : '4.1.2',
+  poi                : '5.2.3',
   logback            : '1.2.11',
   testContainer_postgresql: '1.17.2'
 ]
@@ -481,7 +481,6 @@ dependencies {
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
 
-  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
 
