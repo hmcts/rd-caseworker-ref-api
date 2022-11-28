@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,13 +26,14 @@ public interface WorkBookCustomFactory  {
      */
     public static Workbook validateAndGetWorkBook(MultipartFile file) throws IOException {
 
-        InputStream initialStream = file.getInputStream();
-        Workbook workbook = null;
-        try {
-            workbook = WorkbookFactory.create(initialStream);
-            return workbook;
-        } catch (IOException exception) {
-            throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
+        InputStream is = FileMagic.prepareToCheckMagic(file.getInputStream());
+        FileMagic fm = FileMagic.valueOf(is);
+        switch (fm) {
+            case OLE2:
+            case OOXML:
+                return WorkbookFactory.create(is);
+            default:
+                throw new ExcelValidationException(BAD_REQUEST, INVALID_EXCEL_FILE_ERROR_MESSAGE);
         }
 
     }
