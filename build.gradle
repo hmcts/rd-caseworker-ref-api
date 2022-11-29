@@ -479,6 +479,8 @@ dependencies {
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.17'
   testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
+  testImplementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
+
 
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
