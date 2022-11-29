@@ -378,7 +378,8 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.20'
 
-  implementation 'org.springframework.boot:spring-boot-starter-validation'
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.0.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core', version: '6.5.5'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.4.1'
