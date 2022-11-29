@@ -483,6 +483,8 @@ dependencies {
 // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-tomcat
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '3.0.0'
 
+// https://mvnrepository.com/artifact/org.glassfish/jakarta.el
+  testImplementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
 
 
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
