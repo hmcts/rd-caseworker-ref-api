@@ -553,7 +553,7 @@ configurations.all {
   resolutionStrategy.eachDependency { details ->
     if (details.requested.group == 'io.netty'
             && details.requested.name != 'netty-tcnative-boringssl-static' ) {
-      details.useVersion "4.1.86.Final"
+      details.useVersion "4.1.77.Final"
     }
   }
 }
