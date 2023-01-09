@@ -409,6 +409,7 @@ dependencies {
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.19.2'
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.4'
   implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
+  
 
   testImplementation ('com.github.hmcts:rd-commons-lib:0.0.14'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
