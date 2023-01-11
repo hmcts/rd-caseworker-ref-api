@@ -469,6 +469,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                             .firstName(caseWorkerProfile.getFirstName())
                             .lastName(caseWorkerProfile.getLastName())
                             .emailId(caseWorkerProfile.getEmailId())
+                            .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
                             .services(mapServicesToDto(caseWorkerProfile.getCaseWorkerWorkAreas()))
                             .region(caseWorkerProfile.getRegion())
                             .regionId(caseWorkerProfile.getRegionId())
