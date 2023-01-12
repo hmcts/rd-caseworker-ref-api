@@ -891,8 +891,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
 
 
-        Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                new HashSet<>();
+        Set<String> idamRolesCwr = new HashSet<>();
 
 
         if (cwrProfileRequest.isStaffAdmin()) {

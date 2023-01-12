@@ -88,7 +88,4 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("skills")
     private List<SkillsRequest> skills;
-
-    @JsonProperty("idam_roles")
-    private Set<String> idamRoles;
 }
