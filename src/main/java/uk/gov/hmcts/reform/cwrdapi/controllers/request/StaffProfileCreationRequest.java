@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.cwrdapi.util.ValidateEmail;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateStaffProfileChildren;
 
 import java.util.List;
-import java.util.Set;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
