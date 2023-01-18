@@ -26,6 +26,8 @@ public class SearchStaffUserResponse {
     private String lastName;
     @JsonProperty("email_id")
     private String emailId;
+    @JsonProperty("case_worker_id")
+    private String caseWorkerId;
     @JsonProperty("services")
     private List<ServiceResponse> services;
     @JsonProperty("region")

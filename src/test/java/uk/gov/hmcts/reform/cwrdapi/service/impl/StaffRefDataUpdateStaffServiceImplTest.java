@@ -774,10 +774,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
                                 defaultCharset())
                         .status(200).build());
 
-        Set<String> idamRoles = new HashSet<>();
-        idamRoles.add("IdamRole1");
         StaffProfileCreationRequest cwUiRequest =  getStaffProfileUpdateRequest();
-        cwUiRequest.setIdamRoles(idamRoles);
 
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
@@ -828,12 +825,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
-
-
-        Set<String> idamRoles = new HashSet<>();
-        idamRoles.add("IdamRole1");
         StaffProfileCreationRequest cwUiRequest =  getStaffProfileUpdateRequest();
-        cwUiRequest.setIdamRoles(idamRoles);
 
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
@@ -890,12 +882,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
-
-
-        Set<String> idamRoles = new HashSet<>();
-        idamRoles.add("IdamRole1");
         StaffProfileCreationRequest cwUiRequest =  getStaffProfileUpdateRequest();
-        cwUiRequest.setIdamRoles(idamRoles);
 
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
@@ -992,10 +979,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         roleAdditionResponse.setIdamMessage("success");
 
         StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
-        Set<String> idamRoles = new HashSet<>();
-        idamRoles.add("IdamRole1");
-        idamRoles.add("IdamRole2");
-        cwUiRequest.setIdamRoles(idamRoles);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
         String caserWorkerId = dbProfile.getCaseWorkerId();
