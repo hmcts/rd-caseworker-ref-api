@@ -469,6 +469,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                             .firstName(caseWorkerProfile.getFirstName())
                             .lastName(caseWorkerProfile.getLastName())
                             .emailId(caseWorkerProfile.getEmailId())
+                            .caseWorkerId(caseWorkerProfile.getCaseWorkerId())
                             .services(mapServicesToDto(caseWorkerProfile.getCaseWorkerWorkAreas()))
                             .region(caseWorkerProfile.getRegion())
                             .regionId(caseWorkerProfile.getRegionId())
@@ -890,8 +891,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         Set<String> mappedRoles = getUserRolesByRoleId(cwrProfileRequest);
 
 
-        Set<String> idamRolesCwr = isNotEmpty(cwrProfileRequest.getIdamRoles()) ? cwrProfileRequest.getIdamRoles() :
-                new HashSet<>();
+        Set<String> idamRolesCwr = new HashSet<>();
 
 
         if (cwrProfileRequest.isStaffAdmin()) {
