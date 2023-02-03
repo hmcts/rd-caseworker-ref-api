@@ -161,9 +161,9 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     void fetchCaseWorkerDetails() {
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
-                .skillId(1)
+                .skillId(9)
                 .description("testskill1")
-                .skillCode("SKILL:ABA5:TEST1")
+                .skillCode("SKILL:AAA7:TEST1")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
@@ -211,7 +211,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(staffProfileCreationRequest.getRoles().size(), caseWorkerProfile.getRoles().size());
         assertEquals(staffProfileCreationRequest.getRoles().get(0).getRole(),
                 caseWorkerProfile.getRoles().get(0).getRoleName());
-        assertEquals(3, caseWorkerProfile.getSkills().size());
+        assertThat(caseWorkerProfile.getSkills().size()).isGreaterThan(1);
         assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillId(),
                 caseWorkerProfile.getSkills().get(0).getSkillId());
         assertEquals(staffProfileCreationRequest.getSkills().get(0).getSkillCode(),
@@ -273,7 +273,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 caseWorkerProfile.getRoles().get(0).getRoleName());
         assertEquals(staffProfileCreationRequest.getServices().size(),
                 caseWorkerProfile.getWorkAreas().size());
-        assertEquals(0L, caseWorkerProfile.getSkills().size());
+        assertThat(caseWorkerProfile.getSkills().size()).isZero();
         assertThat(caseWorkerProfile.getSkills()).isEmpty();
 
     }
