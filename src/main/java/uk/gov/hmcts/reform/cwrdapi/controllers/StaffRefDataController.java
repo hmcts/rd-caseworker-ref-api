@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
@@ -36,7 +34,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
@@ -460,10 +457,9 @@ public class StaffRefDataController {
     public ResponseEntity<Object> reInviteCaseWorkerUser(@RequestBody StaffProfileCreationRequest
                                                                  staffProfileCreationRequest) {
         // verify if the user exists in case worker or not if not throw the error
-        if(staffProfileCreationRequest.isResendInvite()) {
+        if (staffProfileCreationRequest.isResendInvite()) {
             staffRefDataService.reinviteStaffProfile(staffProfileCreationRequest);
-        }
-        else {
+        } else {
             throw new InvalidRequestException("Resend Invite field is not set TRUE");
         }
         return ResponseEntity
