@@ -217,6 +217,9 @@ public final class CaseWorkerConstants {
     public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UP/IDAM";
 
     public static final String IDAM_STATUS_NOT_ACTIVE = "User is in pending status or does not exist in IDAM";
+
+    public static final String IDAM_STATUS_ACTIVE = "User is already ACTIVE in IDAM";
+
     public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
     public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
             + TRY_AGAIN;

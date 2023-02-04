@@ -323,7 +323,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 UserCategory.CASEWORKER,
                 UserTypeRequest.INTERNAL,
                 userRoles,
-                false);
+                profileRequest.isResendInvite());
     }
 
     /**
@@ -663,6 +663,27 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         return response;
     }
+
+    @Override
+    public void reinviteStaffProfile(StaffProfileCreationRequest profileRequest) {
+
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
+                .findByEmailId(profileRequest.getEmailId().toLowerCase());
+        //if caseworker profile does not have the input emailid throw error
+        if (caseWorkerProfile == null) {
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_SRD,
+                    StringUtils.EMPTY, profileRequest, STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND, PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD);
+        }
+        ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            System.out.println("Idam Registration Successfull");
+        } else {
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, "invalid response", "invalid");
+        }
+    }
+
 
     private CaseWorkerProfile validateStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
 

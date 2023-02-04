@@ -87,4 +87,7 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("skills")
     private List<SkillsRequest> skills;
+
+    private boolean resendInvite;
+
 }
