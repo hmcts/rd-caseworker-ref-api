@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -9,6 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserIdamStatusWithEmail;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserIdamStatusWithEmailResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileIdamStatus;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -28,6 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
@@ -35,6 +46,7 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 
 public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEnabledIntegrationTest {
 
@@ -174,7 +186,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
 
     @Test
-    void should_return_staff_user_with_up_status_and_status_code_200() {
+    void should_return_staff_user_with_up_status_and_status_code_200() throws Exception {
 
         String emailPattern = "sbnTest1234";
         String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
@@ -187,6 +199,8 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         String path = "/profile/search-by-name";
 
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+
+        getUserProfileIdamStatus(email);
 
         ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
                 .searchStaffUserByNameExchange(path, searchString, null, null, ROLE_STAFF_ADMIN);
@@ -206,6 +220,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
         assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-James");
         assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-Smith");
+        assertThat(searchStaffUserResponse.get(0).getUpIdamStatus()).isEqualTo(STATUS_ACTIVE);
 
     }
 
@@ -362,5 +377,31 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
     public static String generateRandomEmail() {
         return String.format(EMAIL_TEMPLATE, randomAlphanumeric(10)).toLowerCase();
+    }
+
+    public void getUserProfileIdamStatus(String emailId) throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+
+        UserIdamStatusWithEmailResponse userIdamStatusWithEmailResponse =
+                new UserIdamStatusWithEmailResponse();
+
+
+        UserIdamStatusWithEmail userIdamStatusWithEmail = new UserIdamStatusWithEmail();
+        userIdamStatusWithEmail.setEmail(emailId);
+        userIdamStatusWithEmail.setIdamStatus(STATUS_ACTIVE);
+
+        userIdamStatusWithEmailResponse.setUserProfiles(List.of(userIdamStatusWithEmail));
+
+
+
+
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile/idamStatus"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withStatus(200)
+                        .withBody(objectMapper.writeValueAsString(userIdamStatusWithEmailResponse))));
     }
 }
