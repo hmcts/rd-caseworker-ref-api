@@ -172,6 +172,43 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
     }
 
+
+    @Test
+    void should_return_staff_user_with_up_status_and_status_code_200() {
+
+        String emailPattern = "sbnTest1234";
+        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+
+        createCaseWorkerTestData("sbn-James", "sbn-Smith", email);
+
+
+        String searchString = "sbn";
+
+        String path = "/profile/search-by-name";
+
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+
+        ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
+                .searchStaffUserByNameExchange(path, searchString, null, null, ROLE_STAFF_ADMIN);
+
+
+        assertThat(response).isNotNull();
+
+
+        int totalRecords = Integer.valueOf(response.getHeaders().get("total-records").get(0));
+
+        assertThat(totalRecords).isEqualTo(1);
+
+        List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
+                response.getBody());
+
+        assertThat(searchStaffUserResponse).isNotNull();
+
+        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-James");
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-Smith");
+
+    }
+
     @Test
     void should_return_status_code_400_when_page_size_is_zero()
             throws JsonProcessingException {

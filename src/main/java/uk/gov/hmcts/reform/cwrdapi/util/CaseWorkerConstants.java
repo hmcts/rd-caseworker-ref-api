@@ -221,5 +221,6 @@ public final class CaseWorkerConstants {
     public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
             + TRY_AGAIN;
 
+    public static final String USER_PROFILE_CATEGORY_CASEWORKER = "caseworker";
 
 }

@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserIdamStatusWithEmail;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.UserIdamStatusWithEmailResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
@@ -104,6 +106,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.USER_PROFILE_CATEGORY_CASEWORKER;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
@@ -463,7 +466,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     private List<SearchStaffUserResponse> mapCaseWorkerProfilesToSearchResponse(List<CaseWorkerProfile>
                                                                                         caseWorkerProfiles) {
         List<SearchStaffUserResponse> searchStaffUserResponse = new ArrayList<>();
+        UserIdamStatusWithEmailResponse userIdamStatusWithEmailResponse =
+                getUserProfileIdamStatus(USER_PROFILE_CATEGORY_CASEWORKER);
+
+
         caseWorkerProfiles.forEach(caseWorkerProfile -> {
+
             SearchStaffUserResponse searchStaffUserResponseValue =
                     SearchStaffUserResponse.builder()
                             .firstName(caseWorkerProfile.getFirstName())
@@ -477,6 +485,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                             .baseLocations(mapBaseLocationsToDto(caseWorkerProfile.getCaseWorkerLocations()))
                             .userType(caseWorkerProfile.getUserType().getDescription())
                             .skills(mapSkillsToDto(caseWorkerProfile.getCaseWorkerSkills()))
+                            .upIdamStatus(
+                                    getUserProfileStatus(userIdamStatusWithEmailResponse, caseWorkerProfile))
                             .build();
 
             if (caseWorkerProfile.getTaskSupervisor() != null) {
@@ -499,6 +509,31 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return searchStaffUserResponse;
     }
 
+    public String getUserProfileStatus(UserIdamStatusWithEmailResponse userIdamStatusWithEmailResponse,
+                                       CaseWorkerProfile caseWorkerProfile){
+
+        String userProfileStatus = StringUtils.EMPTY;
+
+        if(nonNull(userIdamStatusWithEmailResponse)&&
+                !userIdamStatusWithEmailResponse.getUserProfiles().isEmpty()){
+
+            List<UserIdamStatusWithEmail> userProfiles = userIdamStatusWithEmailResponse.getUserProfiles();
+
+            Optional<UserIdamStatusWithEmail> serIdamStatusWithEmailOptional =
+                    userProfiles.stream()
+                    .filter(
+                            userProfile->userProfile.getEmail()
+                                    .equalsIgnoreCase(caseWorkerProfile.getEmailId())
+                    ).findFirst();
+
+           if (serIdamStatusWithEmailOptional.isPresent()){
+               userProfileStatus =  serIdamStatusWithEmailOptional.get().getIdamStatus();
+           }
+
+        }
+
+        return userProfileStatus;
+    }
     private List<Role> mapRolesToDto(List<CaseWorkerRole> caseWorkerRoles) {
         List<Role> rolesDto = new ArrayList<>();
         for (CaseWorkerRole caseWorkerRole : caseWorkerRoles) {
@@ -1029,6 +1064,25 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (nonNull(caseWorkerProfile)) {
             caseWorkerProfile.setNew(true);
         }
+    }
+
+    public UserIdamStatusWithEmailResponse getUserProfileIdamStatus(String category) {
+
+        UserIdamStatusWithEmailResponse userIdamStatusWithEmailResponse = null;
+        try {
+            Response response = userProfileFeignClient.getUserProfileIdamStatus(category);
+            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserIdamStatusWithEmailResponse.class);
+
+
+            userIdamStatusWithEmailResponse = (UserIdamStatusWithEmailResponse) requireNonNull(responseEntity.getBody());
+
+
+        } catch (Exception exception) {
+            log.error("{}:: get  User profile idam status api failed::{}", loggingComponentName,
+                    exception.getMessage());
+        }
+
+        return userIdamStatusWithEmailResponse;
     }
 
 }

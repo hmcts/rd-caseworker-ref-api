@@ -50,6 +50,8 @@ public class SearchStaffUserResponse {
     private String userType;
     @JsonProperty("skills")
     private List<SkillResponse> skills;
+    @JsonProperty("up_idam_status")
+    private String upIdamStatus;
 
 
 }
