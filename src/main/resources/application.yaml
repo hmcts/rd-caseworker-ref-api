@@ -156,3 +156,5 @@ search:
 ### Email domain list
 email:
   domainList: ${EMAIL_DOMAIN_LIST:justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk}
+userProfile:
+  cacheExpireValue: 1

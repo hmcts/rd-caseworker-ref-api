@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -1066,6 +1067,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
+    @Cacheable(value = "userProfileCacheManager")
     public UserIdamStatusWithEmailResponse getUserProfileIdamStatus(String category) {
 
         UserIdamStatusWithEmailResponse userIdamStatusWithEmailResponse = null;
