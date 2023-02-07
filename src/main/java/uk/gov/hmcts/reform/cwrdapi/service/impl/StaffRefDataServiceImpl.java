@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -176,7 +175,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Autowired
     ICwrdCommonRepository cwrCommonRepository;
 
-
+    @Autowired
+    public StaffRefDataCache staffRefDataCache;
 
     @SuppressWarnings("unchecked")
     public StaffProfileCreationResponse processStaffProfileCreation(StaffProfileCreationRequest staffProfileRequest) {
@@ -468,7 +468,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                                                                                         caseWorkerProfiles) {
         List<SearchStaffUserResponse> searchStaffUserResponse = new ArrayList<>();
         UserIdamStatusWithEmailResponse userIdamStatusWithEmailResponse =
-                getUserProfileIdamStatus(USER_PROFILE_CATEGORY_CASEWORKER);
+                staffRefDataCache.getUserProfileIdamStatus(USER_PROFILE_CATEGORY_CASEWORKER);
 
 
         caseWorkerProfiles.forEach(caseWorkerProfile -> {
@@ -1067,24 +1067,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
-    @Cacheable(value = "userProfileCacheManager")
-    public UserIdamStatusWithEmailResponse getUserProfileIdamStatus(String category) {
 
-        UserIdamStatusWithEmailResponse userIdamStatusWithEmailResponse = null;
-        try {
-            Response response = userProfileFeignClient.getUserProfileIdamStatus(category);
-            ResponseEntity<Object> responseEntity = toResponseEntity(response, UserIdamStatusWithEmailResponse.class);
-
-
-            userIdamStatusWithEmailResponse = (UserIdamStatusWithEmailResponse) requireNonNull(responseEntity.getBody());
-
-
-        } catch (Exception exception) {
-            log.error("{}:: get  User profile idam status api failed::{}", loggingComponentName,
-                    exception.getMessage());
-        }
-
-        return userIdamStatusWithEmailResponse;
-    }
 
 }

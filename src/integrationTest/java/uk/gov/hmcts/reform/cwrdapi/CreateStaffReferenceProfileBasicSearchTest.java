@@ -7,14 +7,14 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserIdamStatusWithEmail;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserIdamStatusWithEmailResponse;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileIdamStatus;
-import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataCache;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
@@ -35,9 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -48,6 +47,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEnabledIntegrationTest {
 
     public static final String SEARCH_STAFF_USER_BY_NAME_KEY = "StaffRefDataController.searchStaffUserByName";
@@ -69,6 +69,10 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
     @Autowired
     CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
+
+    @Autowired
+    StaffRefDataCache staffRefDataCache;
+
 
     @BeforeEach
     public void setUpClient() {
@@ -186,6 +190,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
 
     @Test
+    @Order(1)
     void should_return_staff_user_with_up_status_and_status_code_200() throws Exception {
 
         String emailPattern = "sbnTest1234";
