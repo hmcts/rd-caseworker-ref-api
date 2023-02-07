@@ -80,6 +80,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -1246,4 +1247,49 @@ class StaffRefDataServiceImplTest {
         return staffProfileCreationRequest;
 
     }
+
+    @Test
+    void test_reInviteStaffProfile_when_no_emailId_found() throws JsonProcessingException {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+        Exception ex = assertThrows(StaffReferenceException.class, () -> staffRefDataServiceImpl.reinviteStaffProfile(
+                staffProfileCreationRequest));
+        assertNotNull(ex);
+        assertEquals("User does not exist in SRD", ex.getMessage());
+        //verify(staffRefDataServiceImpl, times(0))
+        // .createUserProfileInIdamUP(staffProfileCreationRequest);
+    }
+
+    @Test
+    void test_reInviteStaffProfile_success() throws JsonProcessingException {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(200).build());
+        staffRefDataServiceImpl.reinviteStaffProfile(staffProfileCreationRequest);
+        verify(staffAuditRepository, times(0)).save(any());
+        verify(caseWorkerProfileRepository, times(1))
+                .findByEmailId(any());
+    }
+
+    @Test
+    void test_reInviteStaffProfile_Bad_Request() throws JsonProcessingException {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        String body = mapper.writeValueAsString(userProfileCreationResponse);
+        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(400).build());
+        StaffReferenceException ex = assertThrows(StaffReferenceException.class, () -> staffRefDataServiceImpl
+                .reinviteStaffProfile(
+                        staffProfileCreationRequest));
+        assertNotNull(ex);
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+    }
+
 }
