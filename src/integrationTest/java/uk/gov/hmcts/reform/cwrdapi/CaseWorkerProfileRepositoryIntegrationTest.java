@@ -65,6 +65,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+        mockJwtToken(ROLE_STAFF_ADMIN);
     }
 
     @AfterEach
@@ -143,7 +144,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @Test
     void should_return_staff_user_with_status_code_200_when_skill_are_empty() {
-
+        mockJwtToken(ROLE_STAFF_ADMIN);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
                 .createStaffProfileCreationRequest();

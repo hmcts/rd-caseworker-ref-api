@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 public class StaffReferenceProfileAdvanceIntegrationSearchTest extends AuthorizationEnabledIntegrationTest {
 
 
-
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
 
@@ -62,6 +61,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+
     }
 
     @AfterEach
@@ -70,6 +70,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
@@ -91,6 +92,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
                 + "task supervisor,case allocator,staff administrator&skill=1";
         String path = "/profile/search?";
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, null, null, ROLE_STAFF_ADMIN);
@@ -142,7 +144,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .role("task supervisor,case allocator,staff administrator")
                 .skill("1")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -153,6 +155,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
         String searchString = "serviceCode=ABA1";
         String path = "/profile/search?";
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
@@ -167,7 +170,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -178,6 +181,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         String searchString = "serviceCode=ABA1,serviceCode2";
         String path = "/profile/search?";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        mockJwtToken(ROLE_STAFF_ADMIN);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
 
@@ -191,7 +195,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1,serviceCode2")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -200,6 +204,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         createCaseWorkerProfiles();
         String searchString = "location=12345";
         String path = "/profile/search?";
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
@@ -214,7 +219,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .location("12345")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -226,6 +231,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
         String searchString = "location=12345,6789";
         String path = "/profile/search?";
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
@@ -240,7 +246,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .location("12345,6789")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -265,7 +271,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .userType("1")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -290,7 +296,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .jobTitle("2")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -302,6 +308,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
         String searchString = "role=case allocator";
         String path = "/profile/search?";
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
@@ -316,7 +323,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .role("task supervisor")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -341,10 +348,8 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .skill("1")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
-
-
 
 
     @Test
@@ -353,9 +358,10 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
                 .createStaffProfileCreationRequest();
+        mockJwtToken(ROLE_STAFF_ADMIN);
         staffProfileCreationRequest.setSkills(null);
         Map<String, Object> staffProfileResponse = caseworkerReferenceDataClient
-                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
+                .createStaffProfile(staffProfileCreationRequest, ROLE_STAFF_ADMIN);
         assertThat(staffProfileResponse).containsEntry("http_status", "201 CREATED");
 
 
@@ -363,6 +369,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 + "task supervisor,case allocator,staff administrator";
 
         String path = "/profile/search?";
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
@@ -380,8 +387,8 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
 
     @ParameterizedTest
-    @ValueSource(strings = {"serviceCode=sddd","location=127494","userType=12","jobTitle=4224",
-            "role=staff administrator","skill=132"})
+    @ValueSource(strings = {"serviceCode=sddd", "location=127494", "userType=12", "jobTitle=4224",
+            "role=staff administrator", "skill=132"})
     void should_return_staff_user_with_status_code_200_with_empty_search_response(String searchString) {
 
         createCaseWorkerProfiles();
@@ -405,6 +412,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
         String searchString = "role=task supervisor,case allocator,staff administrator";
         String path = "/profile/search?";
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
                 .searchStaffUserExchange(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
@@ -419,16 +427,15 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .role("task supervisor,case allocator,staff administrator")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
-
 
 
     @Test
     void should_return_status_code_400_when_page_size_is_zero() {
         String searchString = "serviceCode=ABA1";
         String path = "/profile/search?";
-
+        mockJwtToken(ROLE_STAFF_ADMIN);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .searchStaffUser(path, searchString, "0", "1", ROLE_STAFF_ADMIN);
 
@@ -441,7 +448,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
     void should_return_status_code_400_when_page_num_is_zero() {
         String searchString = "serviceCode=ABA1";
         String path = "/profile/search?";
-
+        mockJwtToken(ROLE_STAFF_ADMIN);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .searchStaffUser(path, searchString, "1", "0", ROLE_STAFF_ADMIN);
         assertThat(response).containsEntry("http_status", "400");
@@ -450,11 +457,11 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"","serviceCode=*_sd","location=1adf*_","userType=1sdfs*__","jobTitle=asdfs",
-            "role=task_supervisor","skill=asdfd"})
+    @ValueSource(strings = {"", "serviceCode=*_sd", "location=1adf*_", "userType=1sdfs*__", "jobTitle=asdfs",
+            "role=task_supervisor", "skill=asdfd"})
     void should_return_status_code_400(String searchString) {
         String path = "/profile/search?";
-
+        mockJwtToken(ROLE_STAFF_ADMIN);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .searchStaffUser(path, searchString, "1", "1", ROLE_STAFF_ADMIN);
         assertThat(response).containsEntry("http_status", "400");
@@ -465,17 +472,18 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
     public void createCaseWorkerTestData() {
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        mockJwtToken(ROLE_STAFF_ADMIN);
         StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
                 .createStaffProfileCreationRequest();
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
+                .createStaffProfile(staffProfileCreationRequest, ROLE_STAFF_ADMIN);
         assertThat(response).containsEntry("http_status", "201 CREATED");
 
     }
 
 
     private void createCaseWorkerProfiles() {
-        IntStream.range(0,5).forEach(i -> createCaseWorkerTestData());
+        IntStream.range(0, 5).forEach(i -> createCaseWorkerTestData());
     }
 
 }

@@ -29,7 +29,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
-
+        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
         modifyUserStatus(200);
         response = uploadCaseWorkerFile("StaffData Upload Suspended.xlsx",
@@ -44,6 +44,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditFailureWithWrongStatus() throws Exception {
+        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
         modifyUserStatus(400);
         response = uploadCaseWorkerFile("StaffData Upload Suspended.xlsx",
@@ -58,6 +59,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditExceptionFailure() throws Exception {
+        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
@@ -73,6 +75,7 @@ public class CaseWorkerSuspendUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditFailureForSuspendingNewUser() throws IOException {
+        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("StaffData Upload Suspended.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();

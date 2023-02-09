@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class DeleteCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
                 .regionId(1).userType("CTSC")
                 .region("region").suspended(false).roles(caseWorkerRoleRequests).idamRoles(roles)
                 .baseLocations(caseWorkerLocationRequests).workerWorkAreaRequests(caseWorkerAreaRequests).build());
+        mockJwtToken(CaseWorkerConstants.ROLE_CWD_ADMIN);
     }
 
     @Test

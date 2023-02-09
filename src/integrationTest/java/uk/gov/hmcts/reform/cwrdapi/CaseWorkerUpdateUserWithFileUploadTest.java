@@ -23,6 +23,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerUpdateAuditSuccess() throws Exception {
+        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
 
         String roles = "[\"Senior Legal Caseworker\"]";
@@ -42,6 +43,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateStaleUser() throws Exception {
+        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
         String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("STALE", roles);
@@ -65,6 +67,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateFailedExceptionInFetchingUser() throws Exception {
+        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
             .willReturn(null));
@@ -87,6 +90,7 @@ public class CaseWorkerUpdateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerFailedToUpdateFailedExceptionInModifyingUser() throws Exception {
+        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
         String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);

@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,72 +55,81 @@ public class CaseWorkerRefController {
     CaseWorkerServiceFacade caseWorkerServiceFacade;
 
 
-    @ApiOperation(
-            value = "This API allows uploading of excel files that contain caseworker information "
+    @Operation(
+            description = "This API allows uploading of excel files that contain caseworker information "
                     + "and mappings between caseworker and IDAM roles",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
-                    message = REQUEST_COMPLETED_SUCCESSFULLY
+                    responseCode = "201",
+                    description = REQUEST_COMPLETED_SUCCESSFULLY,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @PostMapping(value = "/upload-file",
             consumes = "multipart/form-data")
     @Secured("cwd-admin")
-    public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam(FILE)  MultipartFile file) {
+    public ResponseEntity<Object> caseWorkerFileUpload(@RequestParam(FILE) MultipartFile file) {
         return caseWorkerServiceFacade.processFile(file);
     }
 
-    @ApiOperation(
+    @Operation(
             hidden = true,
-            value = "This API builds the idam role mappings for case worker roles",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+            description = "This API builds the idam role mappings for case worker roles",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
-                    message = "Successfully built idam role mappings for case worker roles",
-                    response = IdamRolesMappingResponse.class
+                    responseCode = "201",
+                    description = "Successfully built idam role mappings for case worker roles",
+                    content = @Content(schema = @Schema(implementation = IdamRolesMappingResponse.class))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @PostMapping(

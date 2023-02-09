@@ -78,6 +78,9 @@ public class CaseWorkerReferenceDataClient {
         this.baseInternalUrl = "http://localhost:" + port + APP_INTERNAL_BASE_PATH;
     }
 
+    public CaseWorkerReferenceDataClient() {
+    }
+
     public Map<String, Object> createCaseWorkerProfile(CaseWorkersProfileCreationRequest request, String role) {
         return postRequest(baseUrl + "/users/", request, role, null);
     }
@@ -149,7 +152,6 @@ public class CaseWorkerReferenceDataClient {
     }
 
 
-
     public Map<String, Object> fetchStaffProfileByCcdServiceName(String ccdServiceNames, Integer pageSize,
                                                                  Integer pageNumber, String sortDirection,
                                                                  String sortColumn, String role) {
@@ -184,7 +186,7 @@ public class CaseWorkerReferenceDataClient {
         try {
 
             responseEntity = restTemplate.exchange(
-                    baseInternalUrl  + stringBuilder.toString(),
+                    baseInternalUrl + stringBuilder.toString(),
                     HttpMethod.GET, request,
                     Map.class
             );
@@ -199,9 +201,9 @@ public class CaseWorkerReferenceDataClient {
         return getResponse(responseEntity);
     }
 
-    public Map<String, Object> searchStaffUserByName(String path,String searchString, String pageSize,
+    public Map<String, Object> searchStaffUserByName(String path, String searchString, String pageSize,
 
-                                                                 String pageNumber,  String role) {
+                                                     String pageNumber, String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(path);
@@ -211,7 +213,7 @@ public class CaseWorkerReferenceDataClient {
             stringBuilder.append(searchString);
         }
 
-        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+        HttpHeaders headers = getMultipleAuthHeadersWithPagination(role, null, pageNumber, pageSize);
 
         ResponseEntity<Map> responseEntity;
         HttpEntity<String> request =
@@ -221,7 +223,7 @@ public class CaseWorkerReferenceDataClient {
         try {
 
             responseEntity = restTemplate.exchange(
-                    baseUrl  + stringBuilder.toString(),
+                    baseUrl + stringBuilder.toString(),
                     HttpMethod.GET, request,
                     Map.class
             );
@@ -237,7 +239,7 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public ResponseEntity<SearchStaffUserResponse[]> searchStaffUserByNameExchange(
-            String path,String searchString, String pageSize, String pageNumber,  String role) {
+            String path, String searchString, String pageSize, String pageNumber, String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(path);
@@ -247,7 +249,7 @@ public class CaseWorkerReferenceDataClient {
             stringBuilder.append(searchString);
         }
 
-        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+        HttpHeaders headers = getMultipleAuthHeadersWithPagination(role, null, pageNumber, pageSize);
 
         ResponseEntity<SearchStaffUserResponse[]> responseEntity = null;
         HttpEntity<String> request =
@@ -256,7 +258,7 @@ public class CaseWorkerReferenceDataClient {
         try {
 
             responseEntity = restTemplate.exchange(
-                    baseUrl  + stringBuilder.toString(),
+                    baseUrl + stringBuilder.toString(),
                     HttpMethod.GET, request,
                     SearchStaffUserResponse[].class
             );
@@ -269,7 +271,7 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserExchange(
-            String path,String searchString, String pageSize, String pageNumber,  String role) {
+            String path, String searchString, String pageSize, String pageNumber, String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(path);
@@ -278,7 +280,7 @@ public class CaseWorkerReferenceDataClient {
             stringBuilder.append(searchString);
         }
 
-        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+        HttpHeaders headers = getMultipleAuthHeadersWithPagination(role, null, pageNumber, pageSize);
 
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity = null;
         HttpEntity<String> request =
@@ -301,7 +303,7 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public Map<String, Object> searchStaffUser(
-            String path,String searchString, String pageSize, String pageNumber,  String role) {
+            String path, String searchString, String pageSize, String pageNumber, String role) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(path);
@@ -310,7 +312,7 @@ public class CaseWorkerReferenceDataClient {
             stringBuilder.append(searchString);
         }
 
-        HttpHeaders headers =  getMultipleAuthHeadersWithPagination(role, null,pageNumber,pageSize);
+        HttpHeaders headers = getMultipleAuthHeadersWithPagination(role, null, pageNumber, pageSize);
 
         ResponseEntity<Map> responseEntity;
         HttpEntity<String> request =
@@ -319,7 +321,7 @@ public class CaseWorkerReferenceDataClient {
         try {
 
             responseEntity = restTemplate.exchange(
-                    baseUrl  + stringBuilder.toString(),
+                    baseUrl + stringBuilder.toString(),
                     HttpMethod.GET, request,
                     Map.class
             );
@@ -441,7 +443,27 @@ public class CaseWorkerReferenceDataClient {
     }
 
 
+    public String setAndReturnJwtToken() {
+        if (StringUtils.isBlank(JWT_TOKEN)) {
+            JWT_TOKEN = generateS2SToken("rd_caseworker_ref_api");
+        }
+        return JWT_TOKEN;
+    }
 
+
+    public void clearTokens() {
+        JWT_TOKEN = null;
+        bearerToken = null;
+    }
+
+    public String getAndReturnBearerToken(String userId, String role) {
+        setAndReturnJwtToken();
+        if (StringUtils.isBlank(bearerToken)) {
+            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
+                    : userId, role));
+        }
+        return bearerToken;
+    }
 
     @NotNull
     private HttpHeaders getMultipleAuthHeadersWithoutContentType(String role, String userId) {
@@ -532,7 +554,7 @@ public class CaseWorkerReferenceDataClient {
         List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
                 .isPrimaryFlag(true).locationId(12345)
-                .location("test location").build(),CaseWorkerLocationRequest
+                .location("test location").build(), CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
                 .isPrimaryFlag(true).locationId(6789)
                 .location("test location2").build());
@@ -540,7 +562,7 @@ public class CaseWorkerReferenceDataClient {
         List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
                 .caseWorkerServicesRequest()
                 .service("Immigration and Asylum Appeals").serviceCode("serviceCode2")
-                .build(),CaseWorkerServicesRequest
+                .build(), CaseWorkerServicesRequest
                 .caseWorkerServicesRequest()
                 .service("Divorce").serviceCode("ABA1")
                 .build());
@@ -552,7 +574,7 @@ public class CaseWorkerReferenceDataClient {
                 .description("testskill1")
                 .build());
 
-        return   StaffProfileCreationRequest
+        return StaffProfileCreationRequest
                 .staffProfileCreationRequest()
                 .firstName("StaffProfilefirstName")
                 .lastName("StaffProfilelastName")
