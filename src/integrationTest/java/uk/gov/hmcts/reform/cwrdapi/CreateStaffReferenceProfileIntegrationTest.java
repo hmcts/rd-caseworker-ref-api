@@ -124,7 +124,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         assertThat(caseWorkerLocationRepository.count()).isEqualTo(2);
         assertThat(caseWorkerRoleRepository.count()).isEqualTo(1);
         assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(2);
-        assertThat(caseWorkerSkillRepository.count()).isEqualTo(3);
+        assertThat(caseWorkerSkillRepository.count()).isEqualTo(1);
         assertThat(staffAuditRepository.count()).isEqualTo(1);
     }
 
@@ -161,7 +161,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         assertThat(caseWorkerLocationRepository.count()).isEqualTo(2);
         assertThat(caseWorkerRoleRepository.count()).isEqualTo(1);
         assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(2);
-        assertThat(caseWorkerSkillRepository.count()).isEqualTo(3);
+        assertThat(caseWorkerSkillRepository.count()).isEqualTo(1);
         assertThat(staffAuditRepository.count()).isEqualTo(1);
     }
 

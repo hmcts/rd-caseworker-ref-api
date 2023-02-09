@@ -149,7 +149,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         assertThat(caseWorkerLocationRepository.findAll().size()).isEqualTo(2);
         assertThat(caseWorkerRoleRepository.findAll().size()).isEqualTo(1);
         assertThat(caseWorkerWorkAreaRepository.findAll().size()).isEqualTo(2);
-        assertThat(caseWorkerSkillRepository.findAll().size()).isEqualTo(3);
+        assertThat(caseWorkerSkillRepository.findAll().size()).isEqualTo(1);
 
     }
 

@@ -90,7 +90,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         createCaseWorkerProfiles();
 
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
-                + "task supervisor,case allocator,staff administrator&skill=1";
+                + "task supervisor,case allocator,staff administrator&skill=9";
         String path = "/profile/search?";
         mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
@@ -111,7 +111,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .userType("1")
                 .jobTitle("2")
                 .role("task supervisor,case allocators,staff administrator")
-                .skill("1")
+                .skill("9")
                 .build();
         assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
@@ -123,7 +123,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
 
         String searchString = "serviceCode=ABA1&location=12345&userType=1&jobTitle=2&role="
-                + "task supervisor,case allocator,staff administrator&skill=1";
+                + "task supervisor,case allocator,staff administrator&skill=9";
         String path = "/profile/search?";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
@@ -142,7 +142,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .userType("1")
                 .jobTitle("2")
                 .role("task supervisor,case allocator,staff administrator")
-                .skill("1")
+                .skill("9")
                 .build();
         assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
@@ -332,7 +332,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         createCaseWorkerProfiles();
 
 
-        String searchString = "skill=1";
+        String searchString = "skill=9";
         String path = "/profile/search?";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<List<SearchStaffUserResponse>> response = caseworkerReferenceDataClient
@@ -346,7 +346,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         List<SearchStaffUserResponse> searchStaffUserResponse = response.getBody();
         assertThat(searchStaffUserResponse).isNotNull().hasSize(1);
         searchReq = SearchRequest.builder()
-                .skill("1")
+                .skill("9")
                 .build();
         assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }

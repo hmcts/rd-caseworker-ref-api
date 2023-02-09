@@ -569,7 +569,7 @@ public class CaseWorkerReferenceDataClient {
 
         List<SkillsRequest> skillsRequest = ImmutableList.of(SkillsRequest
                 .skillsRequest()
-                .skillId(1)
+                .skillId(9)
                 .skillCode("1")
                 .description("testskill1")
                 .build());
