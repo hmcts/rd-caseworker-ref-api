@@ -95,7 +95,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
                 .userType("1")
                 .jobTitle("2")
                 .role("task supervisor,case allocator,staff administrator")
-                .skill("1")
+                .skill("9")
                 .build();
         createCaseWorkerProfiles();
 
