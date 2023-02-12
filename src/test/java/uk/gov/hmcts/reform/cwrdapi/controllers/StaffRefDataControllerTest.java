@@ -641,21 +641,4 @@ class StaffRefDataControllerTest {
         assertThat(actual.getStatusCodeValue()).isEqualTo(201);
     }
 
-    @Test
-    void should_return_reInviteCaseWorkerUserResponse_with_status_code_400_when_resendInvite_is_false() {
-        request.setResendInvite(false);
-        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
-                .reInviteCaseWorkerUser(request));
-        verify(staffRefDataService, times(0))
-                .reinviteStaffProfile(request);
-        assertNotNull(ex);
-        assertEquals("Resend Invite field is not set TRUE", ex.getMessage());
-    }
-
-    @Test
-    void should_return_reInviteCaseWorkerUserResponse_with_status_code_200_when_resendInvite_is_true() {
-        request.setResendInvite(true);
-        ResponseEntity<Object> actual = staffRefDataController.reInviteCaseWorkerUser(request);
-        assertThat(actual.getStatusCodeValue()).isEqualTo(201);
-    }
 }

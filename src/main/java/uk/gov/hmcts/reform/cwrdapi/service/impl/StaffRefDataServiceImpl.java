@@ -677,10 +677,18 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     PROFILE_NOT_PRESENT_IN_SRD);
         }
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Idam Registration Successfull");
-        } else {
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, "invalid response", "invalid");
+        UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
+
+        // update idamid in case its different in idam
+        if (!upResponse.getIdamId().equals(caseWorkerProfile.getCaseWorkerId())) {
+            caseWorkerProfileRepo.delete(caseWorkerProfile);
+            cwrCommonRepository.flush();
+            caseWorkerProfile.setCaseWorkerId(upResponse.getIdamId());
+            caseWorkerProfile.getCaseWorkerLocations().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfile.getCaseWorkerRoles().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfile.getCaseWorkerWorkAreas().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfile.getCaseWorkerSkills().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfileRepo.save(caseWorkerProfile);
         }
     }
 

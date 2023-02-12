@@ -1264,11 +1264,11 @@ class StaffRefDataServiceImplTest {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("12345678");
-        userProfileCreationResponse.setIdamRegistrationResponse(1);
+        userProfileCreationResponse.setIdamRegistrationResponse(201);
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
         when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(200).build());
+                .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
         staffRefDataServiceImpl.reinviteStaffProfile(staffProfileCreationRequest);
         verify(staffAuditRepository, times(0)).save(any());
         verify(caseWorkerProfileRepository, times(1))
