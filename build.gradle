@@ -354,7 +354,7 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-tx', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-web', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-webmvc', version: versions.springVersion
-  
+
   implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
@@ -524,6 +524,10 @@ dependencyManagement {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
+    }
+    //CVE-2022-40152
+    dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
+      entry 'woodstox-core'
     }
   }
 }
