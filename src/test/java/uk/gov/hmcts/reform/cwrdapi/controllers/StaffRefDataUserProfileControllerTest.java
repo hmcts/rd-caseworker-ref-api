@@ -69,7 +69,7 @@ class StaffRefDataUserProfileControllerTest {
                 .build();
 
         staffProfileCreationRequest.setResendInvite(true);
-       staffRefDataController.updateStaffUserProfile(staffProfileCreationRequest);
+        staffRefDataController.updateStaffUserProfile(staffProfileCreationRequest);
 
         verify(staffRefDataService,times(1))
                 .reinviteStaffProfile(staffProfileCreationRequest);
