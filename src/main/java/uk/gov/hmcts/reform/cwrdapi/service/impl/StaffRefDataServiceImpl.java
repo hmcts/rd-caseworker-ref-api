@@ -680,7 +680,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
 
         // update idamid in case its different in idam
-        if (!upResponse.getIdamId().equals(caseWorkerProfile.getCaseWorkerId())) {
+        if (upResponse != null && !upResponse.getIdamId().equals(caseWorkerProfile.getCaseWorkerId())) {
             caseWorkerProfileRepo.delete(caseWorkerProfile);
             cwrCommonRepository.flush();
             caseWorkerProfile.setCaseWorkerId(upResponse.getIdamId());

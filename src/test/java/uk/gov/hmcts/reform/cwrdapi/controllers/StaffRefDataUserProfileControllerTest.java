@@ -61,4 +61,17 @@ class StaffRefDataUserProfileControllerTest {
         verify(staffRefDataService,times(1))
                 .updateStaffProfile(staffProfileCreationRequest);
     }
+
+    @Test
+    void shouldUpdateStaffUserProfileResendInviteTest() {
+        StaffProfileCreationRequest staffProfileCreationRequest = StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .build();
+
+        staffProfileCreationRequest.setResendInvite(true);
+       staffRefDataController.updateStaffUserProfile(staffProfileCreationRequest);
+
+        verify(staffRefDataService,times(1))
+                .reinviteStaffProfile(staffProfileCreationRequest);
+    }
 }
