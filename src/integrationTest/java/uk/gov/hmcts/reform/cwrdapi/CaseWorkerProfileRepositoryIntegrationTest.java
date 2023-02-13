@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
-import javax.transaction.Transactional;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,6 +65,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+        mockJwtToken(ROLE_STAFF_ADMIN);
     }
 
     @AfterEach
@@ -143,7 +144,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @Test
     void should_return_staff_user_with_status_code_200_when_skill_are_empty() {
-
+        mockJwtToken(ROLE_STAFF_ADMIN);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
                 .createStaffProfileCreationRequest();

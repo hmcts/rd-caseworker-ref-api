@@ -35,6 +35,7 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_ADMIN;
 
 public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEnabledIntegrationTest {
 
@@ -42,7 +43,6 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
     public static final String CASE_WORKER_PROFILE_URL = "/refdata/case-worker/profile";
 
     public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@justice.gov.uk";
-    public static final String ROLE_CWD_ADMIN = "cwd-admin";
 
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
@@ -66,6 +66,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
+        mockJwtToken(ROLE_STAFF_ADMIN);
     }
 
     @AfterEach
@@ -106,7 +107,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         String searchString = "sbn";
 
         String path = "/profile/search-by-name";
-
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
 
         ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
@@ -148,7 +149,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         String searchString = "sbn";
 
         String path = "/profile/search-by-name";
-
+        mockJwtToken(ROLE_STAFF_ADMIN);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
 
         ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
@@ -271,7 +272,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                 createCaseWorkerProfiles(firstName, lastName, email);
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
-
+        mockJwtToken(ROLE_CWD_ADMIN);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, ROLE_CWD_ADMIN);
         assertThat(response).containsEntry("http_status", "201 CREATED");

@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +40,9 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
-import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -52,7 +55,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.removeEmptySpaces;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchRequest;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
-
 
 
 @RequestMapping(
@@ -75,43 +77,42 @@ public class StaffRefDataController {
     private int configPageNumber;
 
 
-
     @Autowired
     StaffRefDataService staffRefDataService;
 
-    @ApiOperation(
-
-        value = "This API allows the search of staff user by their name or surname.",
-        authorizations = {
-            @Authorization(value = "ServiceAuthorization"),
-            @Authorization(value = "Authorization")
-        }
+    @Operation(
+            summary = "This API allows the search of staff user by their name or surname.",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
+            }
     )
     @ApiResponses({
-        @ApiResponse(
-            code = 201,
-            message = REQUEST_COMPLETED_SUCCESSFULLY
-        ),
-        @ApiResponse(
-            code = 400,
-            message = BAD_REQUEST
-        ),
-        @ApiResponse(
-            code = 401,
-            message = UNAUTHORIZED_ERROR
-        ),
-        @ApiResponse(
-            code = 403,
-            message = FORBIDDEN_ERROR
-        ),
-        @ApiResponse(
-            code = 500,
-            message = INTERNAL_SERVER_ERROR
-        )
+            @ApiResponse(
+                    responseCode = "201",
+                    description = REQUEST_COMPLETED_SUCCESSFULLY,
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = BAD_REQUEST
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR
+            )
     })
     @Validated
     @GetMapping(path = "/profile/search-by-name",
-                produces = APPLICATION_JSON_VALUE)
+            produces = APPLICATION_JSON_VALUE)
     @Secured("staff-admin")
     public ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserByName(
         @RequestHeader(name = "page-number", required = false) Integer pageNumber,
@@ -126,32 +127,32 @@ public class StaffRefDataController {
     }
 
 
-    @ApiOperation(
+    @Operation(
 
-            value = "This API is used to retrieve the service specific skills ",
-            notes = "This API will be invoked by user having idam role of staff-admin",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+            summary = "This API is used to retrieve the service specific skills ",
+            description = "This API will be invoked by user having idam role of staff-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "Successfully retrieved list of ServiceSkills for the request provided",
-                    response = StaffWorkerSkillResponse.class
+                    responseCode = "200",
+                    description = "Successfully retrieved list of ServiceSkills for the request provided",
+                    content = @Content(schema = @Schema(implementation = StaffWorkerSkillResponse.class))
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR
             )
     })
     @GetMapping(
@@ -167,29 +168,32 @@ public class StaffRefDataController {
         return ResponseEntity.ok().body(staffWorkerSkillResponse);
     }
 
-    @ApiOperation(
-            value = "This API gets the user types from staff reference data",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            description = "This API gets the user types from staff reference data",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             })
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "Successfully fetched the user types",
-                    response = StaffRefDataUserTypesResponse.class
+                    responseCode = "200",
+                    description = "Successfully fetched the user types",
+                    content = @Content(schema = @Schema(implementation = StaffRefDataUserTypesResponse.class))
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @GetMapping(
@@ -213,31 +217,34 @@ public class StaffRefDataController {
     }
 
 
-    @ApiOperation(
-            value = "This API is used to retrieve the Job Title's ",
-            notes = "This API will be invoked by user having idam role of staff-admin",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "This API is used to retrieve the Job Title's ",
+            description = "This API will be invoked by user having idam role of staff-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "Successfully retrieved list of Job Titles for the request provided",
-                    response = StaffRefJobTitleResponse.class
+                    responseCode = "200",
+                    description = "Successfully retrieved list of Job Titles for the request provided",
+                    content = @Content(schema = @Schema(implementation = StaffRefJobTitleResponse.class))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "Bad Request"
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = "Forbidden Error: Access denied"
+                    responseCode = "401",
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
     @GetMapping(
@@ -262,36 +269,40 @@ public class StaffRefDataController {
 
     }
 
-    @ApiOperation(
-            value = "This API creates staff user profile",
-            notes = "This API will be invoked by user having idam role with cwd-admin and staff-admin",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "This API creates staff user profile",
+            description = "This API will be invoked by user having idam role with cwd-admin and staff-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
-                    message = "Successfully created staff user profile",
-                    response = StaffProfileCreationResponse.class,
-                    responseContainer = "list"
+                    responseCode = "201",
+                    description = "Successfully created staff user profile",
+                    content = @Content(array =
+                            @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @PostMapping(
@@ -317,33 +328,33 @@ public class StaffRefDataController {
         return ResponseEntity.status(HttpStatus.CREATED).body(staffProfileCreationResponse);
     }
 
-    @ApiOperation(
-            value = "This API allows the Advance search of staff",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "This API allows the Advance search of staff",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = REQUEST_COMPLETED_SUCCESSFULLY
+                    responseCode = "200",
+                    description = REQUEST_COMPLETED_SUCCESSFULLY
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR
             )
     })
     @Validated
@@ -360,36 +371,40 @@ public class StaffRefDataController {
         return staffRefDataService.retrieveStaffProfile(searchRequest, pageRequest);
     }
 
-    @ApiOperation(
-            value = "This API updates staff user profile",
-            notes = "This API will be invoked by user having idam role with staff-admin",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "This API updates staff user profile",
+            description = "This API will be invoked by user having idam role with staff-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "Successfully updated staff user profile",
-                    response = StaffProfileCreationResponse.class,
-                    responseContainer = "list"
+                    responseCode = "200",
+                    description = "Successfully updated staff user profile",
+                    content = @Content(array =
+                            @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @PutMapping(
