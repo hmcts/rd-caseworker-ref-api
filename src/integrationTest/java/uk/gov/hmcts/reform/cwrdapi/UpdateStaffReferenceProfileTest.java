@@ -31,6 +31,7 @@ import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
@@ -113,7 +114,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
         request.setFirstName("StaffProfilefirstNameCN");
         request.setLastName("StaffProfilelastNameCN");
-
+        request.setResendInvite(false);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
@@ -427,14 +428,14 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         request.setResendInvite(true);
 
-        caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
-        Map<String, Object> response = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map createBody = (Map)createResponse.get("body");
+        Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
-        assertThat(response).isNotNull();
-        assertThat(response.get("http_status")).isEqualTo("200 OK");
-        Map responseBody = (Map) response.get("body");
-        assertThat(responseBody.get("case_worker_id")).isNotNull();
-
+        assertThat(resendResponse).isNotNull();
+        assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
+        Map resendResponseBody = (Map) resendResponse.get("body");
+        assertEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
     }
 
 
