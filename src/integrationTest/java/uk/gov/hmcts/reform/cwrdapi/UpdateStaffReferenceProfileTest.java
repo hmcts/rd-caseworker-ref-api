@@ -424,14 +424,16 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
     void should_return_reinvite_staff_user_with_status_code_200_profile() throws Exception {
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         request.setResendInvite(true);
 
-        Map<String, Object> response = caseworkerReferenceDataClient
-                .updateStaffProfile(request,ROLE_STAFF_ADMIN);
+        caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map<String, Object> response = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
         assertThat(response).isNotNull();
-        assertThat(response.get("http_status")).isEqualTo("200");
-        String responseBody = (String) response.get("response_body");
+        assertThat(response.get("http_status")).isEqualTo("200 OK");
+        Map responseBody = (Map) response.get("body");
+        assertThat(responseBody.get("case_worker_id")).isNotNull();
 
     }
 

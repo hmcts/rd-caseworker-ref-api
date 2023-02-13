@@ -404,10 +404,10 @@ public class StaffRefDataController {
     public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfile(@RequestBody StaffProfileCreationRequest
                                                                                        staffProfileCreationRequest) {
         log.info("Inside updateStaffUserProfile Controller");
-        StaffProfileCreationResponse staffProfileCreationResponse = null;
+        StaffProfileCreationResponse staffProfileCreationResponse;
 
         if (staffProfileCreationRequest.isResendInvite()) {
-            staffRefDataService.reinviteStaffProfile(staffProfileCreationRequest);
+            staffProfileCreationResponse = staffRefDataService.reinviteStaffProfile(staffProfileCreationRequest);
         } else {
             staffProfileCreationResponse = staffRefDataService.updateStaffProfile(staffProfileCreationRequest);
         }

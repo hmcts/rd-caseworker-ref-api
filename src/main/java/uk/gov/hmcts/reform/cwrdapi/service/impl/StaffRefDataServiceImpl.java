@@ -665,7 +665,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     @Override
-    public void reinviteStaffProfile(StaffProfileCreationRequest profileRequest) {
+    public StaffProfileCreationResponse reinviteStaffProfile(StaffProfileCreationRequest profileRequest) {
 
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
                 .findByEmailId(profileRequest.getEmailId().toLowerCase());
@@ -690,6 +690,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             caseWorkerProfile.getCaseWorkerSkills().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfileRepo.save(caseWorkerProfile);
         }
+        return new StaffProfileCreationResponse(caseWorkerProfile.getCaseWorkerId());
     }
 
 
