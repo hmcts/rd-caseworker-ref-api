@@ -11,11 +11,13 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -438,6 +440,28 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         assertEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
     }
 
+    @Test
+    void should_update_IdamId_when_reinvite_staff_user_true_in_crd() throws Exception {
+
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        request.setResendInvite(true);
+
+        Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map createBody = (Map)createResponse.get("body");
+        Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
+
+        assertThat(resendResponse).isNotNull();
+        assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
+        Map resendResponseBody = (Map) resendResponse.get("body");
+        assertEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
+
+        String path = "/profile/search-by-name";
+        ResponseEntity<SearchStaffUserResponse[]> fetchstaff = caseworkerReferenceDataClient
+                .searchStaffUserByNameExchange(path, request.getFirstName(), "1", "1",
+                        ROLE_STAFF_ADMIN);
+        assertEquals(resendResponseBody.get("case_worker_id"), fetchstaff.getBody()[0].getCaseWorkerId());
+    }
 
     public StaffProfileCreationRequest getStaffProfileCreationRequest() {
 
