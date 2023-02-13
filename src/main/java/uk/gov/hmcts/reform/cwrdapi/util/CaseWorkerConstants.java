@@ -98,6 +98,7 @@ public final class CaseWorkerConstants {
     public static final String USER_NAME_PATTERN = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+"
         + "(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
     public static final String INVALID_EMAIL = "You must add a valid email address";
+    public static final String INVALID_PROFILE = "User does not exist in SRD";
 
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the file uploaded."
             + " Upload a valid file in xlsx or xls format";

@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_ROLE_PRESENT_PROFILE;
 
@@ -403,6 +404,38 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
     }
 
+    @Test
+    void should_return_reinvite_staff_user_with_status_code_404_profile_doesnot_exist() throws Exception {
+
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        request.setEmailId("test@test.com");
+        request.setResendInvite(true);
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+                .updateStaffProfile(request,ROLE_STAFF_ADMIN);
+
+        assertThat(response.get("http_status")).isEqualTo("404");
+        String responseBody = (String) response.get("response_body");
+        assertThat(responseBody.contains(INVALID_PROFILE)).isTrue();
+
+    }
+
+    @Test
+    void should_return_reinvite_staff_user_with_status_code_200_profile() throws Exception {
+
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        request.setResendInvite(true);
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+                .updateStaffProfile(request,ROLE_STAFF_ADMIN);
+
+        assertThat(response).isNotNull();
+        assertThat(response.get("http_status")).isEqualTo("200");
+        String responseBody = (String) response.get("response_body");
+
+    }
+
+
     public StaffProfileCreationRequest getStaffProfileCreationRequest() {
 
         StaffProfileRoleRequest staffProfileRoleRequest1 =
@@ -469,5 +502,8 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         return staffProfileCreationRequest;
 
     }
+
+
+
 
 }
