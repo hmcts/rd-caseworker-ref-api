@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
+import static java.lang.System.getenv;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 
@@ -78,9 +79,9 @@ public class FeatureToggleConditionExtension implements ExecutionCondition {
 
     @SuppressWarnings("checkstyle:CommentsIndentation")
     private static void initialize() {
-        LDClient ldClient = new LDClient("sdk-b1310c4a-e522-4512-9e68-d75d23b04c5d");
+        LDClient ldClient = new LDClient(getenv("LD_SDK_KEY"));
         featureToggleService = new FeatureToggleServiceImpl(ldClient, "rd");
-        String executionEnvironment = "preview";
+        String executionEnvironment = getenv("execution_environment");
         ReflectionTestUtils.setField(featureToggleService, "environment", executionEnvironment);
         isInitialized = true;
     }
