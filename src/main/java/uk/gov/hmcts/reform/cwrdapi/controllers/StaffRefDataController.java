@@ -40,9 +40,9 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
