@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,11 +41,13 @@ public class StaffProfileCreationRequest {
     @JsonProperty("first_name")
     @Pattern(regexp = NAME_REGEX, message = FIRST_NAME_INVALID)
     @NotEmpty(message = FIRST_NAME_MISSING_PROFILE)
+    @Schema(name = "firstName",  example = "string")
     private String firstName;
 
     @JsonProperty("last_name")
     @Pattern(regexp = NAME_REGEX, message = LAST_NAME_INVALID)
     @NotEmpty(message = LAST_NAME_MISSING_PROFILE)
+    @Schema(name = "lastName",  example = "string")
     private String lastName;
 
     @JsonProperty("services")

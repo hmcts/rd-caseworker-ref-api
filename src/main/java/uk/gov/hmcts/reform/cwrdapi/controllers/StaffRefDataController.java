@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -364,7 +365,7 @@ public class StaffRefDataController {
     public ResponseEntity<List<SearchStaffUserResponse>> searchStaffProfile(
             @RequestHeader(name = "page-number", required = false) Integer pageNumber,
             @RequestHeader(name = "page-size", required = false) Integer pageSize,
-            SearchRequest searchRequest) {
+            @ParameterObject SearchRequest searchRequest) {
         validateSearchRequest(searchRequest);
         var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize,
                 configPageNumber);
