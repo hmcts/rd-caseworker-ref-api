@@ -34,6 +34,7 @@ import java.util.Map;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
@@ -461,6 +462,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
                 .searchStaffUserByNameExchange(path, request.getFirstName(), "1", "1",
                         ROLE_STAFF_ADMIN);
         assertEquals(resendResponseBody.get("case_worker_id"), fetchstaff.getBody()[0].getCaseWorkerId());
+        assertNotEquals(fetchstaff.getBody()[0].getCaseWorkerId(),createBody.get("case_worker_id"));
     }
 
     public StaffProfileCreationRequest getStaffProfileCreationRequest() {
