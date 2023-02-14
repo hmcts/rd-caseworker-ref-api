@@ -22,7 +22,7 @@ public class SwaggerConfiguration {
     @Bean
     public GroupedOpenApi publicApi(OperationCustomizer customGlobalHeaders) {
         return GroupedOpenApi.builder()
-                .group("rd-location-ref-api")
+                .group("rd-caseworker-ref-api")
                 .pathsToMatch("/**")
                 .build();
     }
