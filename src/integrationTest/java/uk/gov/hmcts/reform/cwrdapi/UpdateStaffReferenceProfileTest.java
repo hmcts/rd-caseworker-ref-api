@@ -445,24 +445,25 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
     void should_update_IdamId_when_reinvite_staff_user_true_in_crd() throws Exception {
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
-        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
-        request.setResendInvite(true);
+        userProfilePostUserWireMockForStaffProfile(false);
+        userProfilePostUserWireMockForStaffProfile(true);
 
         Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
         Map createBody = (Map)createResponse.get("body");
-        Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
+        request.setResendInvite(true);
+        Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
         assertThat(resendResponse).isNotNull();
         assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
         Map resendResponseBody = (Map) resendResponse.get("body");
-        assertEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
+        assertNotEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
 
         String path = "/profile/search-by-name";
-        ResponseEntity<SearchStaffUserResponse[]> fetchstaff = caseworkerReferenceDataClient
+        ResponseEntity<SearchStaffUserResponse[]> fetchStaff = caseworkerReferenceDataClient
                 .searchStaffUserByNameExchange(path, request.getFirstName(), "1", "1",
                         ROLE_STAFF_ADMIN);
-        assertEquals(resendResponseBody.get("case_worker_id"), fetchstaff.getBody()[0].getCaseWorkerId());
-        assertNotEquals(fetchstaff.getBody()[0].getCaseWorkerId(),createBody.get("case_worker_id"));
+        assertEquals(resendResponseBody.get("case_worker_id"), fetchStaff.getBody()[0].getCaseWorkerId());
+        assertNotEquals(fetchStaff.getBody()[0].getCaseWorkerId(), createBody.get("case_worker_id"));
     }
 
     public StaffProfileCreationRequest getStaffProfileCreationRequest() {
