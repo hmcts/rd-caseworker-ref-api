@@ -562,7 +562,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
     @Override
-    public StaffWorkerSkillResponse getServiceSkills() {
+    public StaffWorkerSkillResponse getServiceSkills(String serviceCodes) {
+        //StringUtils
         List<ServiceSkill> serviceSkills = new ArrayList<>();
         List<SkillDTO> skillData = null;
         List<Skill> skills = skillRepository.findAll();
