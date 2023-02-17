@@ -252,6 +252,18 @@ public class RequestUtils {
                 .splitToList(searchRequest.getLocation()).stream().map(Integer::parseInt)
                 .collect(Collectors.toList());
     }
+
+    public static boolean validateServiceCode(String serviceCode){
+
+        boolean result = true;
+
+        if(null == serviceCode || "null".equalsIgnoreCase(serviceCode)
+                ||StringUtils.isEmpty(serviceCode.trim())){
+            result = false;
+        }
+
+        return result;
+    }
 }
 
 

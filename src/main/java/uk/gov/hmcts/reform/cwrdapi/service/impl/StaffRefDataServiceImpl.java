@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
@@ -74,6 +75,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
@@ -107,6 +109,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_RO
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateServiceCode;
 
 /**
  * The type Staff ref data service.
@@ -563,10 +566,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     @Override
     public StaffWorkerSkillResponse getServiceSkills(String serviceCodes) {
-        //StringUtils
+
+
         List<ServiceSkill> serviceSkills = new ArrayList<>();
         List<SkillDTO> skillData = null;
-        List<Skill> skills = skillRepository.findAll();
+        List<Skill> skills = getServiceSkillsData(serviceCodes);
+
         if (!ObjectUtils.isEmpty(skills)) {
             skillData = skills.stream().map(skill -> {
                 SkillDTO skillDTO = new SkillDTO();
@@ -1032,4 +1037,20 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
+    public List<Skill> getServiceSkillsData(String serviceCodeData) {
+
+        List<String> convertToList = convertToList(serviceCodeData);
+
+        List<String> serviceCodes = convertToList.stream()
+                .filter(serviceCode -> validateServiceCode(serviceCode))
+                .collect(Collectors.toList());
+        List<Skill> skills = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(serviceCodes)) {
+            skills = skillRepository.getSkillsByServiceCodes(serviceCodes);
+        } else {
+            skills = skillRepository.findAll();
+        }
+        return skills;
+
+    }
 }
