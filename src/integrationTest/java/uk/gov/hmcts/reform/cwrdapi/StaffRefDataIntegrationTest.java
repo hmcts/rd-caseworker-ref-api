@@ -92,6 +92,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
         assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
     }
+
     @Test
     void should_retrieveAllServiceSkills_return_status_code_200_when_provide_servicecode()
             throws JsonProcessingException {
