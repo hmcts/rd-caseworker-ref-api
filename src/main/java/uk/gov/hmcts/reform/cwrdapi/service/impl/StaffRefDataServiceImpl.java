@@ -1038,12 +1038,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public List<Skill> getServiceSkillsData(String serviceCodeData) {
 
-        List<String> convertToList = convertToList(serviceCodeData);
-
-        List<String> serviceCodes = convertToList.stream()
-                .filter(serviceCode -> validateServiceCode(serviceCode))
-                .collect(Collectors.toList());
         List<Skill> skills = new ArrayList<>();
+        List<String> serviceCodes = getValidServiceCodes(serviceCodeData);
+
         if (!CollectionUtils.isEmpty(serviceCodes)) {
             skills = skillRepository.getSkillsByServiceCodes(serviceCodes);
         } else {
@@ -1051,5 +1048,19 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         return skills;
 
+    }
+
+    List<String> getValidServiceCodes(String serviceCodeData) {
+        List<String> serviceCodes = new ArrayList<>();
+
+        if (serviceCodeData != null) {
+            List<String> convertToList = convertToList(serviceCodeData);
+
+            serviceCodes = convertToList.stream()
+                    .filter(serviceCode -> validateServiceCode(serviceCode))
+                    .collect(Collectors.toList());
+        }
+
+        return serviceCodes;
     }
 }

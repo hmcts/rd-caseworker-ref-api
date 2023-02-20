@@ -345,6 +345,33 @@ class StaffRefDataServiceImplTest {
     }
 
     @Test
+    void should_return_multiple_skills_for_null_service_codes() {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.findAll()).thenReturn(skills);
+        String serviceCodes = null;
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+
+        assertThat(serviceSkills.size()).isEqualTo(2);
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
+        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
+        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
+
+    }
+
+    @Test
     void should_return_multiple_skills_for_list_of_service_codes_with_invalid_codes() {
         List<Skill> skills = getSkillsData();
         when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);

@@ -64,4 +64,61 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
     }
 
+    @Test
+    void should_retrieveAllServiceSkills_return_status_code_200_when_empty_servicecode()
+            throws JsonProcessingException {
+        String path = "/skill?service_codes=";
+
+        String role = "staff-admin";
+
+
+        final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
+                .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+        assertThat(serviceSkills).isNotNull();
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("AAA7");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(9L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
+        assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
+        assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
+    }
+    @Test
+    void should_retrieveAllServiceSkills_return_status_code_200_when_provide_servicecode()
+            throws JsonProcessingException {
+        String path = "/skill?service_codes=AAA7";
+
+        String role = "staff-admin";
+
+
+        final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
+                .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+        assertThat(serviceSkills).isNotNull();
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("AAA7");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(9L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
+        assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
+        assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
+    }
+
 }

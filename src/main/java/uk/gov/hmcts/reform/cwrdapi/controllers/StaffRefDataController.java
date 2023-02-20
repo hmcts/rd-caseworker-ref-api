@@ -160,7 +160,7 @@ public class StaffRefDataController {
     )
     @Secured("staff-admin")
     public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills(
-            @RequestParam(value = "service_codes")  String serviceCodes
+            @RequestParam(value = "service_codes", required = false)  String serviceCodes
     ) {
         log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
 
