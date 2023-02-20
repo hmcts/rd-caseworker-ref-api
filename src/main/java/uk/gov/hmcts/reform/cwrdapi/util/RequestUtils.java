@@ -253,12 +253,12 @@ public class RequestUtils {
                 .collect(Collectors.toList());
     }
 
-    public static boolean validateServiceCode(String serviceCode){
+    public static boolean validateServiceCode(String serviceCode) {
 
         boolean result = true;
 
-        if(null == serviceCode || "null".equalsIgnoreCase(serviceCode)
-                ||StringUtils.isEmpty(serviceCode.trim())){
+        if (null == serviceCode || "null".equalsIgnoreCase(serviceCode)
+                || StringUtils.isEmpty(serviceCode.trim())) {
             result = false;
         }
 
