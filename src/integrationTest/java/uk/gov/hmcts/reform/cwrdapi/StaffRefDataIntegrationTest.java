@@ -96,7 +96,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     @Test
     void should_retrieveAllServiceSkills_return_status_code_200_when_provide_servicecode()
             throws JsonProcessingException {
-        String path = "/skill?service_codes=AAA7";
+        String path = "/skill?service_codes=ABA5,AAA7";
 
         String role = "staff-admin";
 
@@ -108,7 +108,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills).isNotNull();
+        assertThat(serviceSkills.size()).isEqualTo(2);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
@@ -120,6 +120,21 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
         assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
         assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
+
+
+        serviceSkill = serviceSkills.get(1);
+
+        assertThat(serviceSkill.getId()).isEqualTo("ABA5");
+
+        skillDTO = serviceSkill.getSkills().get(0);
+
+
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(26L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:ABA5:CHECKAPPLICATIONC100");
+        assertThat(skillDTO.getDescription()).isEqualTo("Check application C100");
+        assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
+
     }
 
 }
