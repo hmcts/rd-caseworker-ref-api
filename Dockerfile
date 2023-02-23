@@ -4,7 +4,7 @@ ARG PLATFORM=""
 
 FROM hmctspublic.azurecr.io/base/java${PLATFORM}:17-distroless
 
-COPY lib/AI-Agent.xml /opt/app/
+COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/rd-caseworker-ref-api.jar /opt/app/
 
 EXPOSE 8095

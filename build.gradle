@@ -34,7 +34,7 @@ def versions = [
   gradlePitest       : '1.5.1',
   pitest             : '1.7.0',
   reformHealthStarter: '0.0.5',
-  reformLogging      : '5.1.9',
+  reformLogging      : '6.0.1',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
   springBoot         : '2.7.7',
@@ -406,7 +406,7 @@ dependencies {
   implementation "io.github.openfeign:feign-httpclient:11.0"
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.log4j
   implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
-  implementation "com.github.hmcts.java-logging:logging-appinsights:${versions.reformLogging}"
+  implementation "com.github.hmcts.java-logging:logging-appinsights:5.1.9"
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.19.2'
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.4'
   implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
