@@ -1049,9 +1049,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         // to fetch the upidam status and populating in cwp response
         Response response = userProfileFeignClient.getUserProfile(caseWorkerId);
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
-        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
-            UserProfileResponse userProfileResponse
-                    = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+        Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
+        if (responseEntity.getStatusCode().is2xxSuccessful() && resultResponse.isPresent()
+                && resultResponse.get() instanceof UserProfileResponse userProfileResponse) {
             searchStaffUserByIdResponse.setIdamStatus(userProfileResponse.getIdamStatus());
         } else {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);

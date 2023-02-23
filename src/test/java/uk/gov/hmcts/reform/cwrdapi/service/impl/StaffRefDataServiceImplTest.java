@@ -1267,6 +1267,23 @@ class StaffRefDataServiceImplTest {
         SearchStaffUserByIdResponse searchStaffUserByIdResponse = response.getBody();
 
         Contracts.assertNotNull(searchStaffUserByIdResponse);
+        assertEquals("firstName", searchStaffUserByIdResponse.getFirstName());
+        assertEquals("Last`name", searchStaffUserByIdResponse.getLastName());
+        assertEquals("a@b.com", searchStaffUserByIdResponse.getEmailId());
+        assertEquals("27fbd198-552e-4c32-9caf-37be1545caaf", searchStaffUserByIdResponse.getCaseWorkerId());
+        assertEquals("region", searchStaffUserByIdResponse.getRegion());
+        assertEquals("userTypeId", searchStaffUserByIdResponse.getUserType());
+        assertEquals(1L, searchStaffUserByIdResponse.getRoles().size());
+
+        assertEquals("testRole1", searchStaffUserByIdResponse.getRoles().get(0).getRoleName());
+        assertEquals(111122222, searchStaffUserByIdResponse.getRegionId());
+        assertEquals(false, searchStaffUserByIdResponse.isCaseAllocator());
+        assertEquals(true, searchStaffUserByIdResponse.isTaskSupervisor());
+        assertEquals(true, searchStaffUserByIdResponse.isStaffAdmin());
+        assertEquals(true, searchStaffUserByIdResponse.isSuspended());
+
+
+
         assertEquals(1L, searchStaffUserByIdResponse.getSkills().size());
         assertEquals(1L, searchStaffUserByIdResponse.getSkills().get(0).getSkillId());
         assertEquals("desc1", searchStaffUserByIdResponse.getSkills().get(0).getDescription());
@@ -1275,15 +1292,13 @@ class StaffRefDataServiceImplTest {
     }
 
     @Test
-    void should_return_fetchStaffProfileById_with_status_code_404_not_found_in_cwp() throws JsonProcessingException {
+    void should_Throw_status_code_404_When_fetchStaffProfileById_not_found_in_cwp() throws JsonProcessingException {
         doReturn(Optional.of(buildCaseWorkerProfile()))
                 .when(caseWorkerProfileRepository).findByCaseWorkerId(
                         "27fbd198-552e-4c32-9caf-37be1545caaf");
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         when(userProfileFeignClient.getUserProfile(any()))
-                .thenReturn(Response.builder().request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(),
-                                Request.Body.empty(),
-                                null))
+                .thenReturn(Response.builder().request(mock(Request.class))
                         .body(mapper.writeValueAsString(userProfileResponse),
                                 defaultCharset())
                         .status(404).build());
