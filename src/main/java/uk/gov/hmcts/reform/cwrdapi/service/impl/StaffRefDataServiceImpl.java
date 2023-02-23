@@ -1050,8 +1050,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         Response response = userProfileFeignClient.getUserProfile(caseWorkerId);
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-        if (responseEntity.getStatusCode().is2xxSuccessful() && resultResponse.isPresent()
-                && resultResponse.get() instanceof UserProfileResponse userProfileResponse) {
+        if (resultResponse.isPresent()
+                && resultResponse.get() instanceof UserProfileResponse userProfileResponse && responseEntity
+                .getStatusCode().is2xxSuccessful()) {
             searchStaffUserByIdResponse.setIdamStatus(userProfileResponse.getIdamStatus());
         } else {
             throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
