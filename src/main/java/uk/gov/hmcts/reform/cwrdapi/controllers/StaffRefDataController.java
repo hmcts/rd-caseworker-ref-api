@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
@@ -414,5 +416,44 @@ public class StaffRefDataController {
         return ResponseEntity.status(HttpStatus.OK).body(staffProfileCreationResponse);
     }
 
+    @ApiOperation(
+            value = "This API search a staff user by Id",
+            authorizations = {
+                    @Authorization(value = "ServiceAuthorization"),
+                    @Authorization(value = "Authorization")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    code = 201,
+                    message = "Successfully search a staff user by Id",
+                    response = IdamRolesMappingResponse.class
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = BAD_REQUEST
+            ),
+            @ApiResponse(
+                    code = 401,
+                    message = UNAUTHORIZED_ERROR
+            ),
+            @ApiResponse(
+                    code = 403,
+                    message = FORBIDDEN_ERROR
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = INTERNAL_SERVER_ERROR
+            )
+    })
+    @GetMapping(
+            path = "/profile/search-by-id",
+            produces = APPLICATION_JSON_VALUE
+    )
+    @Secured("staff-admin")
+    public ResponseEntity<SearchStaffUserByIdResponse> fetchStaffProfileById(
+            @RequestParam(value = "id") String caseWorkerId) {
+        return staffRefDataService.fetchStaffProfileById(caseWorkerId.trim());
+    }
 
 }

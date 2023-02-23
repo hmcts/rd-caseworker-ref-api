@@ -4,6 +4,7 @@ import feign.Response;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationReque
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserCategory;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserTypeRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
@@ -62,6 +65,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
@@ -1031,4 +1035,29 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
+    public ResponseEntity<SearchStaffUserByIdResponse> fetchStaffProfileById(String caseWorkerId) {
+
+        Optional<CaseWorkerProfile> caseWorkerProfile = caseWorkerProfileRepo.findByCaseWorkerId(caseWorkerId);
+        //Throw error when cwp does not exist in cw db
+        if (!caseWorkerProfile.isPresent()) {
+            throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+        }
+        SearchStaffUserResponse searchStaffUserResponse =  mapCaseWorkerProfilesToSearchResponse(
+                Collections.singletonList(caseWorkerProfile.get())).get(0);
+        SearchStaffUserByIdResponse searchStaffUserByIdResponse = SearchStaffUserByIdResponse.builder().build();
+        BeanUtils.copyProperties(searchStaffUserResponse,searchStaffUserByIdResponse);
+        // to fetch the upidam status and populating in cwp response
+        Response response = userProfileFeignClient.getUserProfile(caseWorkerId);
+        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
+        if (responseEntity.getStatusCode().is2xxSuccessful() && null != responseEntity.getBody()) {
+            UserProfileResponse userProfileResponse
+                    = (UserProfileResponse) requireNonNull(responseEntity.getBody());
+            searchStaffUserByIdResponse.setIdamStatus(userProfileResponse.getIdamStatus());
+        } else {
+            throw new ResourceNotFoundException(CaseWorkerConstants.NO_DATA_FOUND);
+        }
+        return ResponseEntity
+                .status(200)
+                .body(searchStaffUserByIdResponse);
+    }
 }
