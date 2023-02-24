@@ -1306,4 +1306,16 @@ class StaffRefDataServiceImplTest {
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 staffRefDataServiceImpl.fetchStaffProfileById("27fbd198-552e-4c32-9caf-37be1545caaf"));
     }
+
+    @Test
+    void should_Throw_Null_Pointer_Exception_When_ProfileById_not_found() throws JsonProcessingException {
+        doReturn(Optional.of(buildCaseWorkerProfile()))
+                .when(caseWorkerProfileRepository).findByCaseWorkerId(
+                        "27fbd198-552e-4c32-9caf-37be1545caaf");
+        when(userProfileFeignClient.getUserProfile(any()))
+                .thenReturn(null);
+
+        Assertions.assertThrows(NullPointerException.class, () ->
+                staffRefDataServiceImpl.fetchStaffProfileById("27fbd198-552e-4c32-9caf-37be1545caaf"));
+    }
 }
