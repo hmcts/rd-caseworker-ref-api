@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
@@ -13,10 +12,8 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
 
 import java.util.List;
 
-
-@Data
-@EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 public class SearchStaffUserByIdResponse extends SearchStaffUserResponse {
 
