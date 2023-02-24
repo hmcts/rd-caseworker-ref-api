@@ -1312,7 +1312,7 @@ class StaffRefDataServiceImplTest {
         doReturn(Optional.of(buildCaseWorkerProfile()))
                 .when(caseWorkerProfileRepository).findByCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
 
-          when(userProfileFeignClient.getUserProfile(any())).thenReturn(Response.builder().request(mock(Request.class))
+        when(userProfileFeignClient.getUserProfile(any())).thenReturn(Response.builder().request(mock(Request.class))
                         .body(mapper.writeValueAsString(null), defaultCharset()).status(200).build());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
