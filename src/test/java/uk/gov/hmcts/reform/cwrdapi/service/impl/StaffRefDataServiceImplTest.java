@@ -1318,7 +1318,4 @@ class StaffRefDataServiceImplTest {
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 staffRefDataServiceImpl.fetchStaffProfileById("27fbd198-552e-4c32-9caf-37be1545caaf"));
     }
-
-
-
 }
