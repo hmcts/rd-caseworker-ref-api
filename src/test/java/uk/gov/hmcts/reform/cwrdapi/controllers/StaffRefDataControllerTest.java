@@ -129,7 +129,7 @@ class StaffRefDataControllerTest {
                 .baseLocations(baseLocations)
                 .skills(skills).build();
 
-        searchStaffUserByIdResponse = SearchStaffUserByIdResponse.builder()
+        searchStaffUserByIdResponse = SearchStaffUserByIdResponse.withIdBuilder()
                 .firstName("firstName")
                 .lastName("lastName")
                 .emailId("emailId")

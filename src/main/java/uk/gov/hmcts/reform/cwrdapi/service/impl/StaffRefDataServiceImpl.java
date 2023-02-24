@@ -1044,7 +1044,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         SearchStaffUserResponse searchStaffUserResponse =  mapCaseWorkerProfilesToSearchResponse(
                 Collections.singletonList(caseWorkerProfile.get())).get(0);
-        SearchStaffUserByIdResponse searchStaffUserByIdResponse = SearchStaffUserByIdResponse.builder().build();
+        SearchStaffUserByIdResponse searchStaffUserByIdResponse = new SearchStaffUserByIdResponse();
         BeanUtils.copyProperties(searchStaffUserResponse,searchStaffUserByIdResponse);
         // to fetch the upidam status and populating in cwp response
         Response response = userProfileFeignClient.getUserProfile(caseWorkerId);
