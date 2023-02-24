@@ -1310,12 +1310,15 @@ class StaffRefDataServiceImplTest {
     @Test
     void should_Throw_Null_Pointer_Exception_When_ProfileById_not_found() throws JsonProcessingException {
         doReturn(Optional.of(buildCaseWorkerProfile()))
-                .when(caseWorkerProfileRepository).findByCaseWorkerId(
-                        "27fbd198-552e-4c32-9caf-37be1545caaf");
-        when(userProfileFeignClient.getUserProfile(any()))
-                .thenReturn(null);
+                .when(caseWorkerProfileRepository).findByCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
 
-        Assertions.assertThrows(NullPointerException.class, () ->
+          when(userProfileFeignClient.getUserProfile(any())).thenReturn(Response.builder().request(mock(Request.class))
+                        .body(mapper.writeValueAsString(null), defaultCharset()).status(200).build());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 staffRefDataServiceImpl.fetchStaffProfileById("27fbd198-552e-4c32-9caf-37be1545caaf"));
     }
+
+
+
 }
