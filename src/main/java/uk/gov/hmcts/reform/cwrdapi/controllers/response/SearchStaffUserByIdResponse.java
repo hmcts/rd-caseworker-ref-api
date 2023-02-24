@@ -15,7 +15,7 @@ import java.util.List;
 
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchStaffUserByIdResponse extends SearchStaffUserResponse {
@@ -25,11 +25,12 @@ public class SearchStaffUserByIdResponse extends SearchStaffUserResponse {
                                        List<ServiceResponse> services, String region, Integer regionId,
                                        List<Role> roles, boolean taskSupervisor, boolean caseAllocator,
                                        boolean suspended, boolean staffAdmin, List<Location> baseLocations,
-                                       String userType, List<SkillResponse> skills, String idamStatus){
+                                       String userType, List<SkillResponse> skills, String idamStatus) {
         super(firstName, lastName, emailId, caseWorkerId, services, region, regionId, roles, taskSupervisor,
                 caseAllocator, suspended, staffAdmin, baseLocations, userType, skills);
         this.idamStatus = idamStatus;
     }
+
     @JsonProperty("up_idam_status")
     private String idamStatus;
 
