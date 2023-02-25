@@ -573,4 +573,10 @@ public class CaseWorkerReferenceDataClient {
     public Map<String, Object> updateStaffProfile(StaffProfileCreationRequest request, String role) {
         return putRequest(baseUrl + "/profile", request, role, null);
     }
+
+    public Object fetchStaffUserById(Class<?> clazz,
+                                                          String userId, String role) throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequest(userId, clazz, role);
+        return  mapServiceSkillsIdResponse(responseEntity, clazz);
+    }
 }
