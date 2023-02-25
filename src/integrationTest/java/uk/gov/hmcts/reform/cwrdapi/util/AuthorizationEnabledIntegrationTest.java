@@ -165,6 +165,25 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "}")));
     }
 
+    public void userProfileGetUserByIdWireMock(String idamId) {
+        userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withStatus(200)
+                        .withBody("{"
+                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"firstName\": \"prashanth\","
+                                + "  \"lastName\": \"rao\","
+                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"idamStatus\": \"pending\","
+                                + "  \"roles\": ["
+                                + "  \"%s\""
+                                + "  ]"
+                                + "}")));
+    }
+
+
     public void userProfileDeleteUserWireMock() {
         userProfileService.stubFor(delete(urlPathMatching("/v1/userprofile/users.*"))
                 .willReturn(aResponse()
