@@ -1,4 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -7,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
-
 
 import java.util.Map;
 
@@ -39,8 +39,8 @@ public class FetchStaffProfileByIdIntegrationTest extends AuthorizationEnabledIn
 
         Map<String, Object> response = (Map<String, Object>) caseworkerReferenceDataClient
             .fetchStaffUserById(SearchStaffUserByIdResponse.class, path + searchString, ROLE_STAFF_ADMIN);
-         assertThat(response).containsEntry("http_status", "404");
-         assertThat(response.get("response_body").toString()).contains(" is invalid");
+        assertThat(response).containsEntry("http_status", "404");
+        assertThat(response.get("response_body").toString()).contains(" is invalid");
     }
 
 
