@@ -93,6 +93,7 @@ public class FetchStaffProfileByIdIntegrationTest extends AuthorizationEnabledIn
 
     @Test
     void should_return_status_code_404_when_profile_not_found_in_up() throws JsonProcessingException {
+        caseworkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, Object> createResponse = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, ROLE_CWD_ADMIN);
         assertThat(createResponse).containsEntry("http_status", "201 CREATED");
@@ -102,6 +103,7 @@ public class FetchStaffProfileByIdIntegrationTest extends AuthorizationEnabledIn
         String path = "/profile/search-by-id";
         String searchString = "?id=" + caseWorkerId;
         caseworkerReferenceDataClient.setBearerToken(null);
+        userProfileGetUserByIdWireMock(caseWorkerId, 404);
         Map<String, Object> getResponse = (Map<String, Object>) caseworkerReferenceDataClient
                 .fetchStaffUserById(SearchStaffUserByIdResponse.class, path + searchString, ROLE_STAFF_ADMIN);
         assertThat(getResponse).containsEntry("http_status", HttpStatus.NOT_FOUND);
@@ -120,8 +122,7 @@ public class FetchStaffProfileByIdIntegrationTest extends AuthorizationEnabledIn
         String searchString = "?id=" + caseWorkerId;
         caseworkerReferenceDataClient.setBearerToken(null);
 
-        userProfileGetUserByIdWireMock(caseWorkerId);
-
+        userProfileGetUserByIdWireMock(caseWorkerId, 200);
         SearchStaffUserByIdResponse getResponse =  (SearchStaffUserByIdResponse)caseworkerReferenceDataClient
                 .fetchStaffUserById(SearchStaffUserByIdResponse.class, path + searchString, ROLE_STAFF_ADMIN);
         Assertions.assertNotNull(getResponse);

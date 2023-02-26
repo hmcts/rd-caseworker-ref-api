@@ -165,12 +165,12 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                     + "}")));
     }
 
-    public void userProfileGetUserByIdWireMock(String idamId) {
+    public void userProfileGetUserByIdWireMock(String idamId, Integer status) {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withHeader("Connection", "close")
-                        .withStatus(200)
+                        .withStatus(status)
                         .withBody("{"
                                 + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
                                 + "  \"firstName\": \"prashanth\","
