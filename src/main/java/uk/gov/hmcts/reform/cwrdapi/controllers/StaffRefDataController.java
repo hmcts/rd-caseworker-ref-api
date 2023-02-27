@@ -425,9 +425,9 @@ public class StaffRefDataController {
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
-                    message = "Successfully search a staff user by Id",
-                    response = IdamRolesMappingResponse.class
+                    code = 200,
+                    message = "Request is successful",
+                    response = SearchStaffUserByIdResponse.class
             ),
             @ApiResponse(
                     code = 400,
