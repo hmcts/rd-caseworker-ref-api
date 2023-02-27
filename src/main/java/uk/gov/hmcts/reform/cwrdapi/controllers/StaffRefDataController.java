@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
