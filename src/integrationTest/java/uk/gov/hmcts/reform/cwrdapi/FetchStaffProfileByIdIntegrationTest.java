@@ -128,6 +128,8 @@ public class FetchStaffProfileByIdIntegrationTest extends AuthorizationEnabledIn
         Assertions.assertNotNull(getResponse);
         Assertions.assertEquals(caseWorkerId, getResponse.getCaseWorkerId());
         Assertions.assertNotNull(getResponse.getIdamStatus());
+        Assertions.assertEquals("pending", getResponse.getIdamStatus());
+
     }
 
 }
