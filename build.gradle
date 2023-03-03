@@ -5,7 +5,7 @@ buildscript {
     maven { url 'https://jitpack.io' }
   }
   dependencies {
-    classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.4")
+    classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.34")
   }
 }
 
@@ -516,6 +516,8 @@ dependencies {
   pactTestImplementation sourceSets.test.runtimeClasspath
 }
 
+
+
 dependencyManagement {
 
   dependencies {
@@ -528,6 +530,10 @@ dependencyManagement {
     //CVE-2022-40152
     dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
       entry 'woodstox-core'
+    }
+    //CVE-2023-24998
+    dependencySet(group: 'commons-fileupload', version: '1.5') {
+      entry 'commons-fileupload'
     }
   }
 }
