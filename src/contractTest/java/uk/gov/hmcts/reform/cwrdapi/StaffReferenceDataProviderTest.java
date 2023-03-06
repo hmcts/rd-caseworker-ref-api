@@ -229,6 +229,13 @@ public class StaffReferenceDataProviderTest {
 
     }
 
+    @State({"A list of staff ref data Service skills with serviceCodes"})
+    public void fetchListOfServiceSkillsWithServiceCodes() throws JsonProcessingException {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);
+
+    }
+
 
     @State({"A list of caseworker profiles by name"})
     public void searchCaseWorkerProfileByName() throws JsonProcessingException {
