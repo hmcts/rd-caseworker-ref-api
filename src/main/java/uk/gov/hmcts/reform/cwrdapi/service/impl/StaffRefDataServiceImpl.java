@@ -1064,6 +1064,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 .status(200)
                 .body(searchStaffUserByIdResponse);
     }
+
     public List<Skill> getServiceSkillsData(String serviceCodeData) {
 
         List<Skill> skills = new ArrayList<>();
