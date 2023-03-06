@@ -24,9 +24,10 @@ public interface StaffRefDataService {
 
     /**
      * Get List of Service skills.
+     * @param serviceCodes List of service codes
      * @return StaffWorkerSkillResponse
      */
-    StaffWorkerSkillResponse getServiceSkills();
+    StaffWorkerSkillResponse getServiceSkills(String serviceCodes);
 
     List<UserType> fetchUserTypes();
 

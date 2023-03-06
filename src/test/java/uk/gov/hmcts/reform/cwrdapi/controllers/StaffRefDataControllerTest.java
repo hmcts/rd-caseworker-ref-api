@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -163,9 +164,11 @@ class StaffRefDataControllerTest {
     void should_return_service_skills_with_status_code_200() {
         StaffWorkerSkillResponse staffWorkerSkillResponse =
                 new StaffWorkerSkillResponse();
-        when(staffRefDataService.getServiceSkills()).thenReturn(staffWorkerSkillResponse);
+        String serviceCodes = "BBA3";
+        when(staffRefDataService.getServiceSkills(anyString()))
+                .thenReturn(staffWorkerSkillResponse);
         ResponseEntity<StaffWorkerSkillResponse> responseEntity =
-                staffRefDataController.retrieveAllServiceSkills();
+                staffRefDataController.retrieveAllServiceSkills(serviceCodes);
 
         assertNotNull(responseEntity);
 
@@ -174,7 +177,7 @@ class StaffRefDataControllerTest {
 
 
         verify(staffRefDataService, times(1))
-                .getServiceSkills();
+                .getServiceSkills(serviceCodes);
     }
 
     @Test
@@ -183,9 +186,10 @@ class StaffRefDataControllerTest {
                 new StaffWorkerSkillResponse();
         List<ServiceSkill> serviceSkills = new ArrayList<>();
         staffWorkerSkillResponse.setServiceSkills(serviceSkills);
-        when(staffRefDataService.getServiceSkills()).thenReturn(staffWorkerSkillResponse);
+        String serviceCodes = "BBA3";
+        when(staffRefDataService.getServiceSkills(anyString())).thenReturn(staffWorkerSkillResponse);
         ResponseEntity<StaffWorkerSkillResponse> responseEntity =
-                staffRefDataController.retrieveAllServiceSkills();
+                staffRefDataController.retrieveAllServiceSkills(serviceCodes);
 
         assertNotNull(responseEntity);
 
