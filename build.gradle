@@ -5,7 +5,7 @@ buildscript {
     maven { url 'https://jitpack.io' }
   }
   dependencies {
-    classpath("net.serenity-bdd:serenity-gradle-plugin:2.3.6")
+    classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.34")
   }
 }
 
@@ -20,7 +20,7 @@ plugins {
     id 'org.sonarqube' version '3.3'
     id 'org.springframework.boot' version '2.7.7'
     id "org.flywaydb.flyway" version '8.5.4'
-    id 'au.com.dius.pact' version '4.1.7' //do not change, otherwise serenity report fails
+    id 'au.com.dius.pact' version '4.1.7' // do not change, otherwise serenity report fails
     id 'org.owasp.dependencycheck' version '8.0.1'
 }
 
@@ -513,6 +513,8 @@ dependencies {
   pactTestImplementation sourceSets.test.runtimeClasspath
 }
 
+
+
 dependencyManagement {
 
   dependencies {
@@ -525,6 +527,10 @@ dependencyManagement {
     //CVE-2022-40152
     dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
       entry 'woodstox-core'
+    }
+    //CVE-2023-24998
+    dependencySet(group: 'commons-fileupload', version: '1.5') {
+      entry 'commons-fileupload'
     }
   }
 }
