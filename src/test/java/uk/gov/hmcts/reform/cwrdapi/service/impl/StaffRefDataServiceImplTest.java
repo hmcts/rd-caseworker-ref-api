@@ -83,6 +83,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -267,8 +268,9 @@ class StaffRefDataServiceImplTest {
     @Test
     void should_return_non_empty_list_of_service_skills() {
         List<Skill> skills = getSkillsData();
-        when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
+        when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);
+        String serviceCodes = "BBA3";
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
 
         assertThat(staffWorkerSkillResponse).isNotNull();
 
@@ -290,10 +292,146 @@ class StaffRefDataServiceImplTest {
     }
 
     @Test
+    void should_return_multiple_skills_for_list_of_service_codes() {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);
+        String serviceCodes = "BBA3,ABA1";
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+
+        assertThat(serviceSkills.size()).isEqualTo(2);
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
+        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
+        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
+
+    }
+
+    @Test
+    void should_return_multiple_skills_for_empty_list_of_service_codes() {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.findAll()).thenReturn(skills);
+        String serviceCodes = "";
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+
+        assertThat(serviceSkills.size()).isEqualTo(2);
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
+        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
+        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
+
+    }
+
+    @Test
+    void should_return_multiple_skills_for_null_service_codes() {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.findAll()).thenReturn(skills);
+        String serviceCodes = null;
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+
+        assertThat(serviceSkills.size()).isEqualTo(2);
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
+        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
+        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
+
+    }
+
+    @Test
+    void should_return_multiple_skills_for_list_of_service_codes_with_invalid_codes() {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);
+        String serviceCodes = "BBA3".concat(", ").concat(",ABA1").concat(",null");
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+
+        assertThat(serviceSkills.size()).isEqualTo(2);
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
+        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
+        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
+
+    }
+
+    @Test
+    void should_return_multiple_skills_for_list_of_service_codes_with_empty_codes() {
+        List<Skill> skills = getSkillsData();
+        when(skillRepository.findAll()).thenReturn(skills);
+        String serviceCodes = "";
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+
+        assertThat(serviceSkills.size()).isEqualTo(2);
+
+        ServiceSkill serviceSkill = serviceSkills.get(0);
+
+        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
+        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
+        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
+        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
+
+    }
+
+    @Test
     void should_return_empty_list_of_service_skills() {
         List<Skill> skills = new ArrayList<>();
-        when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
+        when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);
+        String serviceCodes = "BBA3";
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
 
         assertThat(staffWorkerSkillResponse).isNotNull();
 
@@ -305,8 +443,10 @@ class StaffRefDataServiceImplTest {
     @Test
     void should_return_null_list_of_service_skills() {
         List<Skill> skills = null;
-        when(skillRepository.findAll()).thenReturn(skills);
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills();
+        when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);
+        String serviceCodes = "BBA3";
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl
+                .getServiceSkills(serviceCodes);
 
         assertThat(staffWorkerSkillResponse).isNotNull();
 
