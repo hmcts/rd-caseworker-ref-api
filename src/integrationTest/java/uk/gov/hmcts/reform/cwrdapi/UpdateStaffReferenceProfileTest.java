@@ -70,7 +70,6 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         caseWorkerWorkAreaRepository.deleteAll();
         caseWorkerSkillRepository.deleteAll();
         staffAuditRepository.deleteAll();
-        mockJwtToken(ROLE_STAFF_ADMIN);
     }
 
     @AfterEach
@@ -113,7 +112,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
         request.setFirstName("StaffProfilefirstNameCN");
         request.setLastName("StaffProfilelastNameCN");
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
@@ -161,7 +160,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
         request.setEmailId("test@test.com");
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
 
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
@@ -217,7 +216,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
 
         request.setBaseLocations(List.of(caseWorkerLocationRequest,caseWorkerLocationRequest2));
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
@@ -273,7 +272,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
         request.setServices(List.of(caseWorkerServicesRequest,caseWorkerServicesRequest2));
 
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
@@ -321,7 +320,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
         request.setRoles(List.of(staffProfileRoleRequest1,staffProfileRoleRequest2));
 
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
@@ -368,7 +367,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
         request.setRoles(List.of(staffProfileRoleRequest1,staffProfileRoleRequest2));
 
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 

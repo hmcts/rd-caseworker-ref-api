@@ -30,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_ADMIN;
 
 public class CreateUpdateStaffRefDataProfilesIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -89,7 +88,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
-        mockJwtToken(ROLE_CWD_ADMIN);
+
     }
 
     @Test

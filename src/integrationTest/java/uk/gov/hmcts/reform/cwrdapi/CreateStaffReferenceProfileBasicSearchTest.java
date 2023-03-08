@@ -66,7 +66,6 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
-        mockJwtToken(ROLE_STAFF_ADMIN);
     }
 
     @AfterEach
@@ -107,7 +106,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         String searchString = "sbn";
 
         String path = "/profile/search-by-name";
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
 
         ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
@@ -149,7 +148,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         String searchString = "sbn";
 
         String path = "/profile/search-by-name";
-        mockJwtToken(ROLE_STAFF_ADMIN);
+
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
 
         ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
@@ -272,7 +271,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests =
                 createCaseWorkerProfiles(firstName, lastName, email);
         caseWorkersProfileCreationRequests.get(0).setRoles(roleRequests);
-        mockJwtToken(ROLE_CWD_ADMIN);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, ROLE_CWD_ADMIN);
         assertThat(response).containsEntry("http_status", "201 CREATED");

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_SYSTEM_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
 
 public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -37,7 +36,6 @@ public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends Authoriza
 
     @Test
     public void shouldReturn400ForEmptyServiceName() {
-        mockJwtToken(ROLE_CWD_SYSTEM_USER);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .fetchStaffProfileByCcdServiceName("", null, null,
                         "", "", "cwd-system-user");
@@ -49,7 +47,6 @@ public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends Authoriza
 
     @Test
     public void shouldReturn400ForInvalidPageSize() {
-        mockJwtToken(ROLE_CWD_SYSTEM_USER);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .fetchStaffProfileByCcdServiceName("cmc", -1, null,
                         "", "", "cwd-system-user");
@@ -60,7 +57,6 @@ public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends Authoriza
 
     @Test
     public void shouldReturn400ForInvalidPageNumber() {
-        mockJwtToken(ROLE_CWD_SYSTEM_USER);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .fetchStaffProfileByCcdServiceName("cmc", 1, -1,
                         "", "", "cwd-system-user");
@@ -71,7 +67,6 @@ public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends Authoriza
 
     @Test
     public void shouldReturn400ForInvalidSortDirection() {
-        mockJwtToken(ROLE_CWD_SYSTEM_USER);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .fetchStaffProfileByCcdServiceName("cmc", 1, 1,
                         "Invalid", "", "cwd-system-user");

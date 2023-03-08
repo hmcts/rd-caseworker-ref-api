@@ -96,7 +96,7 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         assertThat(caseWorkerProfileRepository.count()).isZero();
         assertThat(caseWorkerLocationRepository.count()).isZero();
         assertThat(caseWorkerWorkAreaRepository.count()).isZero();
-        mockJwtToken(cwdAdmin);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "201 CREATED");
@@ -131,7 +131,7 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         Mockito.doThrow(new RuntimeException("jms exception"))
                 .when(topicPublisher).sendMessage(Mockito.any());
         assertThat(caseWorkerProfileRepository.count()).isZero();
-        mockJwtToken(cwdAdmin);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "500");
@@ -152,18 +152,18 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
 
 
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
-                .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3);
+            .of(cwRoleRequest,cwRoleRequest1,cwRoleRequest2,cwRoleRequest3);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
-        mockJwtToken(cwdAdmin);
+
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+            .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "201 CREATED");
         List<CaseWorkerRole> caseWorkerRoles = caseWorkerRoleRepository.findAll();
         assertEquals(13, (long) caseWorkerRoles.get(0).getRoleId());
-        assertEquals(14, (long) caseWorkerRoles.get(2).getRoleId());
-        assertEquals(16, (long) caseWorkerRoles.get(3).getRoleId());
+        assertEquals(14,(long)caseWorkerRoles.get(2).getRoleId());
+        assertEquals(16,(long)caseWorkerRoles.get(3).getRoleId());
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
-        assertEquals(5, caseWorkerProfile.get(0).getUserTypeId());
+        assertEquals(5,caseWorkerProfile.get(0).getUserTypeId());
     }
 }

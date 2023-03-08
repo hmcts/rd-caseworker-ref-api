@@ -15,7 +15,6 @@ import java.util.List;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 
 
 @SuppressWarnings("AbbreviationAsWordInName")
@@ -24,7 +23,6 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     @BeforeEach
     public void setUpClient() {
         super.setUpClient();
-        mockJwtToken(ROLE_STAFF_ADMIN);
     }
 
     @BeforeAll

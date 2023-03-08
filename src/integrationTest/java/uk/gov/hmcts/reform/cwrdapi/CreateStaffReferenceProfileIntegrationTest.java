@@ -67,7 +67,6 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         caseWorkerWorkAreaRepository.deleteAll();
         caseWorkerSkillRepository.deleteAll();
         staffAuditRepository.deleteAll();
-        mockJwtToken(ROLE_STAFF_ADMIN);
     }
 
     @AfterEach

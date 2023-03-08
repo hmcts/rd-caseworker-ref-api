@@ -74,7 +74,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileSuccessfully() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -101,7 +100,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileSuccessfully() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload Xls.xls",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -120,7 +118,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully() throws IOException {
-        mockJwtToken(cwdAdmin);
+
         Map<String, Object> response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -137,7 +135,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfully_with_extra_spaces() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("ServiceRoleMapping_BBA9_extra_spaces.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
@@ -148,7 +145,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileSuccessfullyWithExtraRoles() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("ServiceToIDAMRoleMapping_newRoles.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
         List<CaseWorkerIdamRoleAssociation> associations = roleAssocRepository.findAll();
@@ -160,7 +156,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldReturn200PartialSuccessWhenNameIsLongerThan128AndNameHasInvalidCharacter() throws IOException {
-        mockJwtToken(cwdAdmin);
         Map<String, Object> response = uploadCaseWorkerFile(
             "Staff Data Upload With Name Longer Than 128 and Name With Invalid Character.xlsx",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
@@ -178,49 +173,42 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldReturn400WhenFileFormatIsInvalid() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("test.txt",
             TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsFileIsPasswordProtected() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload With Password.xls",
             CaseWorkerConstants.TYPE_XLS, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenXlsxFileIsPasswordProtected() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload With Password.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasNoData() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenFileHasAllEmptyRows() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload With All Empty Rows.xlsx",
             TYPE_XLSX, "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn400WhenContentTypeIsInvalid() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             "application/octet-stream", "400", cwdAdmin);
     }
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        mockJwtToken("invalid");
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             TYPE_XLSX, "403", "invalid");
@@ -230,7 +218,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldReturn403WhenLdFeatureIsDisabled() throws IOException {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
-        mockJwtToken(cwdAdmin);
         Map<String, String> launchDarklyMap = new HashMap<>();
         launchDarklyMap.put("CaseWorkerRefController.caseWorkerFileUpload",
             "test-flag-1");
@@ -244,13 +231,11 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditSuccess() throws IOException {
-        mockJwtToken(cwdAdmin);
         validateAuditCaseWorkerCreate();
     }
 
     @Test
     public void shouldCreateCaseWorkerAuditSuccessWitUpConflict() throws Exception {
-        mockJwtToken(cwdAdmin);
         String roles = "[\"Senior Legal Caseworker\"]";
         userProfileGetUserWireMock("ACTIVE", roles);
         modifyUserRoles();
@@ -259,7 +244,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditPartialSuccess() throws IOException {
-        mockJwtToken(cwdAdmin);
+
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         response = uploadCaseWorkerFile("Staff Data Upload With Jsr.xlsx",
             CaseWorkerConstants.TYPE_XLS, "200 OK", cwdAdmin);
@@ -322,7 +307,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditFailure() throws IOException {
-        mockJwtToken(cwdAdmin);
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
@@ -338,7 +322,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditFailureForBadIdamRoles() throws IOException {
-        mockJwtToken(cwdAdmin);
         //create invalid stub of UP for Exception validation
         String errorMessageFromIdam = "The role to be assigned does not exist.";
         ErrorResponse errorResponse = ErrorResponse.builder()
@@ -363,7 +346,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditFailureOnConflict() throws IOException {
-        mockJwtToken(cwdAdmin);
         //create invalid stub of UP for Exception validation
         userProfileService.resetAll();
         userProfileService.stubFor(post(urlEqualTo("/v1/userprofile?origin=SRD")));
@@ -379,7 +361,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAuditUpFailure() throws IOException {
-        mockJwtToken(cwdAdmin);
         userProfileService.resetAll();
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
             + "Some records failed during validation and were ignored.\","
@@ -401,7 +382,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
     @Test
     public void shouldUploadServiceRoleMappingsXlsxFileWithJsr() throws IOException {
 
-        mockJwtToken(cwdAdmin);
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 
         String exceptedResponse = "{\"message\":\"Request completed with partial success. "
@@ -411,6 +391,7 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "\"must not be empty\"},{\"row_id\":\"3\",\"field_in_error\":\"idamRoles\","
             + "\"error_description\":\"must not be empty\"},"
             + "{\"row_id\":\"3\",\"field_in_error\":\"roleId\",\"error_description\":\"must not be null\"}]}";
+
         response = uploadCaseWorkerFile("ServiceRoleMapping_BBA9WithJSR.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -433,7 +414,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldFailCaseWorkerUsersXlsxFileUploadIfPreviousUploadInProgress() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
             CaseWorkerConstants.TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -451,7 +431,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldHandlePartialSuccessWhenFileHasBadFormulaRecord() throws IOException {
-        mockJwtToken(cwdAdmin);
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Test incorrect function.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -462,7 +441,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadStaffDataXlsxFileSuccessfully_whenEmptyRowsInBetween() throws IOException {
-        mockJwtToken(cwdAdmin);
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With Some Empty Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -473,7 +451,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadStaffDataXlsxFileSuccessfully_whenNoEmptyRowsInBetween() throws IOException {
-        mockJwtToken(cwdAdmin);
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload With All Valid Rows.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -484,7 +461,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldCreateCaseWorkerAudit_when_email_in_capital_letters() throws IOException {
-        mockJwtToken(cwdAdmin);
         Map<String, Object> response = uploadCaseWorkerFile("Staff Data Upload "
             + "With Case Insensitive Email.xlsx", TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -500,7 +476,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldHandleDuplicateEmailProfiles() throws IOException {
-        mockJwtToken(cwdAdmin);
         Map<String, Object> response =
             uploadCaseWorkerFile("Staff Data Upload With Duplicate Email Profiles.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
@@ -527,7 +502,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldFailToCreateAuditForInvalidRole() throws IOException {
-        mockJwtToken("invalid");
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
                         TYPE_XLSX, "403", "invalid");
@@ -539,7 +513,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsxFileWithNonIdamRolesSuccessfully() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload with non idam roles.xlsx",
                 TYPE_XLSX, "200 OK", cwdAdmin);
 
@@ -559,7 +532,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldUploadCaseWorkerUsersXlsFileWithNonIdamRolesSuccessfully() throws IOException {
-        mockJwtToken(cwdAdmin);
         uploadCaseWorkerFile("Staff Data Upload with non idam roles.xls",
                 TYPE_XLSX, "200 OK", cwdAdmin);
 

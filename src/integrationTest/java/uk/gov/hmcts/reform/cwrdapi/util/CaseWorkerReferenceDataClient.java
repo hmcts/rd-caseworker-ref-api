@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
@@ -21,6 +23,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
@@ -34,14 +37,18 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationReque
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
@@ -456,13 +463,60 @@ public class CaseWorkerReferenceDataClient {
         bearerToken = null;
     }
 
+    public Map<String, String> bearerTokenMap = new HashMap<>();
+
     public String getAndReturnBearerToken(String userId, String role) {
-        setAndReturnJwtToken();
-        if (StringUtils.isBlank(bearerToken)) {
+        String bearerToken;
+        if (bearerTokenMap.get(role) == null && userId != null) {
             bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
                     : userId, role));
+            bearerTokenMap.put(role, bearerToken);
+        } else if (bearerTokenMap.get(role + userId) == null) {
+            bearerToken = "Bearer ".concat(getBearerToken(userId, role));
+            bearerTokenMap.put(role + userId, bearerToken);
+            return bearerToken;
         }
-        return bearerToken;
+        if (userId == null) {
+            return bearerTokenMap.get(role + userId);
+        }
+        return bearerTokenMap.get(role);
+    }
+
+    public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
+        String[] bearerTokenArray = bearerToken.split(" ");
+        when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
+    }
+
+    private Jwt createJwt(String token, JWT parsedJwt) {
+        Jwt jwt = null;
+        try {
+            Map<String, Object> headers = new LinkedHashMap<>(parsedJwt.getHeader().toJSONObject());
+            Map<String, Object> claims = new HashMap<>();
+            for (String key : parsedJwt.getJWTClaimsSet().getClaims().keySet()) {
+                Object value = parsedJwt.getJWTClaimsSet().getClaims().get(key);
+                if (key.equals("exp") || key.equals("iat")) {
+                    value = ((Date) value).toInstant();
+                }
+                claims.put(key, value);
+            }
+            jwt = Jwt.withTokenValue(token)
+                    .headers(h -> h.putAll(headers))
+                    .claims(c -> c.putAll(claims))
+                    .build();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        return jwt;
+    }
+
+    public Jwt decode(String token) {
+        JWT jwt = null;
+        try {
+            jwt = JWTParser.parse(token);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return createJwt(token, jwt);
     }
 
     @NotNull
@@ -475,10 +529,8 @@ public class CaseWorkerReferenceDataClient {
 
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
-        if (StringUtils.isBlank(bearerToken)) {
-            bearerToken = "Bearer ".concat(getBearerToken(Objects.isNull(userId) ? UUID.randomUUID().toString()
-                    : userId, role));
-        }
+        String bearerToken = getAndReturnBearerToken(userId, role);
+        mockJwtToken(role, userId, bearerToken);
         headers.add("Authorization", bearerToken);
         return headers;
     }

@@ -22,7 +22,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
             .idamRoles("testRole")
             .serviceId("BBAA1")
             .build();
-        mockJwtToken(cwdAdmin);
         Map<String, Object> response = caseworkerReferenceDataClient
             .createIdamRolesAssoc(Collections.singletonList(serviceRoleMapping), cwdAdmin);
 
@@ -33,7 +32,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
     public void returns_403_for_invalid_role() {
 
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
-        mockJwtToken("invalid role");
         Map<String, Object> response = caseworkerReferenceDataClient
             .createIdamRolesAssoc(Collections.emptyList(), "invalid role");
 
@@ -43,7 +41,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
 
     @Test
     void returns_400_when_request_invalid() {
-        mockJwtToken(cwdAdmin);
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, Object> response = caseworkerReferenceDataClient
             .createIdamRolesAssoc(Collections.emptyList(), cwdAdmin);
@@ -54,7 +51,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
 
     @Test
     public void returns_500_when_exception_occurs() {
-        mockJwtToken(cwdAdmin);
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
             .roleId(0)
             .build();
@@ -66,7 +62,6 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
 
     @Test
     public void returns_200_when_idam_roles_mapping_created_successfully_with_trim() {
-        mockJwtToken(cwdAdmin);
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping.builder()
                 .roleId(1)
                 .idamRoles(" test Role ")

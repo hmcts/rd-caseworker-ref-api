@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
-import java.time.Instant;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -109,7 +107,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     Flyway flyway;
 
     @MockBean
-    protected JwtDecoder jwtDecoder;
+    protected static JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
@@ -231,6 +229,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @AfterEach
     public void cleanupTestData() {
+        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
 
@@ -257,27 +256,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
                                 + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
                                 + "}")));
-    }
-
-    public synchronized void mockJwtToken(String role) {
-        CaseWorkerReferenceDataClient caseWorkerReferenceDataClient = new CaseWorkerReferenceDataClient();
-        caseWorkerReferenceDataClient.clearTokens();
-        String bearerToken = caseWorkerReferenceDataClient.getAndReturnBearerToken(null, role);
-        String[] bearerTokenArray = bearerToken.split(" ");
-        when(jwtDecoder.decode(anyString())).thenReturn(getJwt(role, bearerTokenArray[1]));
-    }
-
-    public Jwt getJwt(String role, String bearerToken) {
-        return Jwt.withTokenValue(bearerToken)
-                .claim("exp", Instant.ofEpochSecond(1985763216))
-                .claim("iat", Instant.ofEpochSecond(1985734416))
-                .claim("token_type", "Bearer")
-                .claim("tokenName", "access_token")
-                .claim("expires_in", 28800)
-                .header("kid", "b/O6OvVv1+y+WgrH5Ui9WTioLt0=")
-                .header("typ", "RS256")
-                .header("alg", "RS256")
-                .build();
     }
 
     public static class CaseWorkerTransformer extends ResponseTransformer {
