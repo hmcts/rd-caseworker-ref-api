@@ -161,10 +161,12 @@ public class StaffRefDataController {
             path = {"/skill"}
     )
     @Secured("staff-admin")
-    public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills() {
+    public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills(
+            @RequestParam(value = "service_codes", required = false)  String serviceCodes
+    ) {
         log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
 
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataService.getServiceSkills();
+        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataService.getServiceSkills(serviceCodes);
 
         return ResponseEntity.ok().body(staffWorkerSkillResponse);
     }
