@@ -325,7 +325,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 UserCategory.CASEWORKER,
                 UserTypeRequest.INTERNAL,
                 userRoles,
-                false);
+                profileRequest.isResendInvite());
     }
 
     /**
@@ -668,6 +668,36 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         return response;
     }
+
+    @Override
+    public StaffProfileCreationResponse reinviteStaffProfile(StaffProfileCreationRequest profileRequest) {
+
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
+                .findByEmailId(profileRequest.getEmailId().toLowerCase());
+        //if caseworker profile does not have the input emailid throw error
+        if (caseWorkerProfile == null) {
+            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_SRD,
+                    StringUtils.EMPTY, profileRequest, STAFF_PROFILE_UPDATE);
+            throw new StaffReferenceException(HttpStatus.NOT_FOUND, PROFILE_NOT_PRESENT_IN_SRD,
+                    PROFILE_NOT_PRESENT_IN_SRD);
+        }
+        ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
+        UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
+
+        // update idamid in case its different in idam
+        if (upResponse != null && !upResponse.getIdamId().equals(caseWorkerProfile.getCaseWorkerId())) {
+            caseWorkerProfileRepo.delete(caseWorkerProfile);
+            cwrCommonRepository.flush();
+            caseWorkerProfile.setCaseWorkerId(upResponse.getIdamId());
+            caseWorkerProfile.getCaseWorkerLocations().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfile.getCaseWorkerRoles().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfile.getCaseWorkerWorkAreas().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfile.getCaseWorkerSkills().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
+            caseWorkerProfileRepo.save(caseWorkerProfile);
+        }
+        return new StaffProfileCreationResponse(caseWorkerProfile.getCaseWorkerId());
+    }
+
 
     private CaseWorkerProfile validateStaffProfileForUpdate(StaffProfileCreationRequest profileRequest) {
 
