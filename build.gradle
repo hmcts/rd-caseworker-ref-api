@@ -516,8 +516,6 @@ dependencies {
   pactTestImplementation sourceSets.test.runtimeClasspath
 }
 
-
-
 dependencyManagement {
 
   dependencies {
