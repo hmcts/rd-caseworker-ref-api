@@ -11,11 +11,13 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -31,9 +33,12 @@ import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_ROLE_PRESENT_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
@@ -112,7 +117,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
         request.setFirstName("StaffProfilefirstNameCN");
         request.setLastName("StaffProfilelastNameCN");
-
+        request.setResendInvite(false);
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
@@ -403,6 +408,63 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
     }
 
+    @Test
+    void should_return_reinvite_staff_user_with_status_code_404_profile_doesnot_exist() throws Exception {
+
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        request.setEmailId("test@test.com");
+        request.setResendInvite(true);
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+                .updateStaffProfile(request,ROLE_STAFF_ADMIN);
+
+        assertThat(response.get("http_status")).isEqualTo("404");
+        String responseBody = (String) response.get("response_body");
+        assertThat(responseBody.contains(INVALID_PROFILE)).isTrue();
+
+    }
+
+    @Test
+    void should_return_reinvite_staff_user_with_status_code_200_profile() throws Exception {
+
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        request.setResendInvite(true);
+
+        Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map createBody = (Map)createResponse.get("body");
+        Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
+
+        assertThat(resendResponse).isNotNull();
+        assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
+        Map resendResponseBody = (Map) resendResponse.get("body");
+        assertEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
+    }
+
+    @Test
+    void should_update_IdamId_when_reinvite_staff_user_true_in_crd() throws Exception {
+
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        userProfilePostUserWireMockForStaffProfile(false);
+        userProfilePostUserWireMockForStaffProfile(true);
+
+        Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
+        request.setResendInvite(true);
+        Map createBody = (Map)createResponse.get("body");
+        Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
+        assertThat(resendResponse).isNotNull();
+        assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
+        Map resendResponseBody = (Map) resendResponse.get("body");
+        assertNotEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
+
+        String path = "/profile/search-by-name";
+        ResponseEntity<SearchStaffUserResponse[]> fetchStaff = caseworkerReferenceDataClient
+                .searchStaffUserByNameExchange(path, request.getFirstName(), "1", "1",
+                        ROLE_STAFF_ADMIN);
+        assertEquals(resendResponseBody.get("case_worker_id"), fetchStaff.getBody()[0].getCaseWorkerId());
+        assertNotEquals(fetchStaff.getBody()[0].getCaseWorkerId(), createBody.get("case_worker_id"));
+    }
+
     public StaffProfileCreationRequest getStaffProfileCreationRequest() {
 
         StaffProfileRoleRequest staffProfileRoleRequest1 =
@@ -469,5 +531,8 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         return staffProfileCreationRequest;
 
     }
+
+
+
 
 }

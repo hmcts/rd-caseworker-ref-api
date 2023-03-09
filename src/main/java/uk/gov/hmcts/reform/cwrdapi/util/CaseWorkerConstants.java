@@ -98,6 +98,7 @@ public final class CaseWorkerConstants {
     public static final String USER_NAME_PATTERN = "^[A-Za-z0-9]+[\\w!#$%&'’.*+/=?`{|}~^-]+"
         + "(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*";
     public static final String INVALID_EMAIL = "You must add a valid email address";
+    public static final String INVALID_PROFILE = "User does not exist in SRD";
 
     public static final String FILE_NO_DATA_ERROR_MESSAGE = "There is no data in the file uploaded."
             + " Upload a valid file in xlsx or xls format";
@@ -219,6 +220,9 @@ public final class CaseWorkerConstants {
     public static final String PROFILE_NOT_PRESENT_IN_UP_OR_IDAM = "User does not exists in UP/IDAM";
 
     public static final String IDAM_STATUS_NOT_ACTIVE = "User is in pending status or does not exist in IDAM";
+
+    public static final String IDAM_STATUS_ACTIVE = "User is already ACTIVE in IDAM";
+
     public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
     public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
             + TRY_AGAIN;

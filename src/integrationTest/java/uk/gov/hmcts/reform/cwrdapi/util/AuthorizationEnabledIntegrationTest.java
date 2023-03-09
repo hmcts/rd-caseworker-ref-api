@@ -38,6 +38,7 @@ import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -255,6 +256,19 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody("{"
                                 + "  \"idamId\":\"" + UUID.randomUUID().toString() + "\","
                                 + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
+                                + "}")));
+    }
+
+    public void userProfilePostUserWireMockForStaffProfile(boolean resend) {
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+                .withRequestBody(equalToJson("{ \"resendInvite\": " + resend + "}", true,
+                        true))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(201)
+                        .withBody("{"
+                                + "  \"idamId\":\"" + UUID.randomUUID() + "\","
+                                + "  \"idamRegistrationResponse\":\"" + 201 + "\""
                                 + "}")));
     }
 
