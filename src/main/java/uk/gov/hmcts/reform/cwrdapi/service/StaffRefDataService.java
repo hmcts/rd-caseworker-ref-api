@@ -46,7 +46,7 @@ public interface StaffRefDataService {
     ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffProfile(SearchRequest searchRequest,
                                                                        PageRequest pageRequest);
 
-
+    StaffProfileCreationResponse reinviteStaffProfile(StaffProfileCreationRequest profileRequest);
 
     StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest staffProfileRequest);
 
