@@ -640,9 +640,9 @@ class StaffRefDataControllerTest {
 
     @Test
     void should_return_staffCreateResponse_with_status_code_200() {
-
         ResponseEntity<StaffProfileCreationResponse> actual = staffRefDataController
                 .createStaffUserProfile(request);
         assertThat(actual.getStatusCodeValue()).isEqualTo(201);
     }
+
 }

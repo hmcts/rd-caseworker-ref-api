@@ -406,15 +406,17 @@ public class StaffRefDataController {
     public ResponseEntity<StaffProfileCreationResponse> updateStaffUserProfile(@RequestBody StaffProfileCreationRequest
                                                                                        staffProfileCreationRequest) {
         log.info("Inside updateStaffUserProfile Controller");
-        StaffProfileCreationResponse staffProfileCreationResponse = null;
+        StaffProfileCreationResponse staffProfileCreationResponse;
 
-        staffProfileCreationResponse = staffRefDataService.updateStaffProfile(staffProfileCreationRequest);
+        if (staffProfileCreationRequest.isResendInvite()) {
+            staffProfileCreationResponse = staffRefDataService.reinviteStaffProfile(staffProfileCreationRequest);
+        } else {
+            staffProfileCreationResponse = staffRefDataService.updateStaffProfile(staffProfileCreationRequest);
+        }
         if (isNotEmpty(staffProfileCreationResponse)) {
 
             staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
         }
         return ResponseEntity.status(HttpStatus.OK).body(staffProfileCreationResponse);
     }
-
-
 }
