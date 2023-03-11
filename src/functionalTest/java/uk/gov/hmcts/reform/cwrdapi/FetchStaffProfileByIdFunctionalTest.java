@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class FetchStaffProfileByIdFunctionalTest extends AuthorizationFunctional
 
         String firstCaseworkerId = staffProfileCreationResponse.getCaseWorkerId();
 
-
+        IdamOpenIdClient.cwdStaffAdminUserToken = null;
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
                 .get(STAFF_PROFILE_URL + "/profile/search-by-id?id=" + firstCaseworkerId)
                 .andReturn();
