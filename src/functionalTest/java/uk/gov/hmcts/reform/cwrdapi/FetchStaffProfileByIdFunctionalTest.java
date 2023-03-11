@@ -7,7 +7,6 @@ import net.thucydides.core.annotations.WithTags;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,8 +14,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
-import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
-import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.List;
@@ -38,8 +35,8 @@ public class FetchStaffProfileByIdFunctionalTest extends AuthorizationFunctional
     public static final String STAFF_PROFILE_URL = "/refdata/case-worker";
 
     @Test
-    @ToggleEnable(mapKey = FETCH_STAFF_PROFILE_BY_ID, withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+    // @ToggleEnable(mapKey = FETCH_STAFF_PROFILE_BY_ID, withFeature = true)
+    //@ExtendWith(FeatureToggleConditionExtension.class)
     void should_fetchStaffProfile_By_ID_200() {
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
