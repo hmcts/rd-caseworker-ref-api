@@ -61,7 +61,7 @@ public class FetchStaffProfileByIdFunctionalTest extends AuthorizationFunctional
 
 
         Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
-                .get(STAFF_PROFILE_URL + "/fetchStaffProfileById?id=" + firstCaseworkerId)
+                .get(STAFF_PROFILE_URL + "/profile/search-by-id?id=" + firstCaseworkerId)
                 .andReturn();
         fetchResponse.then()
                 .assertThat()
