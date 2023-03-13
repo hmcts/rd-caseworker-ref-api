@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
@@ -48,4 +49,8 @@ public interface StaffRefDataService {
     StaffProfileCreationResponse reinviteStaffProfile(StaffProfileCreationRequest profileRequest);
 
     StaffProfileCreationResponse updateStaffProfile(StaffProfileCreationRequest staffProfileRequest);
+
+    ResponseEntity<SearchStaffUserByIdResponse> fetchStaffProfileById(String caseWorkerId);
+
+
 }
