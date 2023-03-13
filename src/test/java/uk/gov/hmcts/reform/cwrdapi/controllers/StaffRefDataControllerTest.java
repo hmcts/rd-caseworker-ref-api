@@ -23,8 +23,10 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.SkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.EmptyRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
@@ -60,13 +62,14 @@ class StaffRefDataControllerTest {
     @Mock
     StaffRefDataService staffRefDataService;
 
-
-
     SearchStaffUserResponse searchResponse;
+
+    SearchStaffUserByIdResponse searchStaffUserByIdResponse;
 
     StaffRefDataUserTypesResponse srResponse;
     ResponseEntity<Object> responseEntity;
 
+    ResponseEntity<SearchStaffUserByIdResponse> fetchStaffById;
 
     ResponseEntity<List<SearchStaffUserResponse>> advancedSearchResponse;
 
@@ -127,7 +130,22 @@ class StaffRefDataControllerTest {
                 .baseLocations(baseLocations)
                 .skills(skills).build();
 
-
+        searchStaffUserByIdResponse = SearchStaffUserByIdResponse.withIdBuilder()
+                .firstName("firstName")
+                .lastName("lastName")
+                .emailId("emailId")
+                .services(services)
+                .region("region")
+                .regionId(123)
+                .roles(roles)
+                .taskSupervisor(true)
+                .caseAllocator(true)
+                .suspended(false)
+                .staffAdmin(true)
+                .baseLocations(baseLocations)
+                .skills(skills)
+                .idamStatus("Pending")
+                .build();
 
         searchReq = SearchRequest.builder()
                 .role("case allocator")
@@ -645,4 +663,30 @@ class StaffRefDataControllerTest {
         assertThat(actual.getStatusCodeValue()).isEqualTo(201);
     }
 
+
+    @Test
+    void shouldFetchCaseworkerDetails() {
+        fetchStaffById = new ResponseEntity<>(searchStaffUserByIdResponse, null, HttpStatus.OK);
+        when(staffRefDataService.fetchStaffProfileById("185a0254-ff80-458b-8f62-2a759788afd2"))
+                .thenReturn(fetchStaffById);
+        ResponseEntity<SearchStaffUserByIdResponse> actual = staffRefDataController.fetchStaffProfileById(
+                "185a0254-ff80-458b-8f62-2a759788afd2");
+        assertNotNull(actual);
+        verify(staffRefDataService, times(1))
+                .fetchStaffProfileById("185a0254-ff80-458b-8f62-2a759788afd2");
+    }
+
+    @Test
+    void fetchCaseworkersByIdShouldThrowNullPointerException() {
+        Assertions.assertThrows(NullPointerException.class, () ->
+                staffRefDataController.fetchStaffProfileById(null));
+    }
+
+    @Test
+    void fetchCaseworkersByIdShouldThrow400() {
+        when(staffRefDataService.fetchStaffProfileById("185a0254-ff80-458b-8f62-2a759788afd2")).thenThrow(
+                ResourceNotFoundException.class);
+        Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                staffRefDataController.fetchStaffProfileById("185a0254-ff80-458b-8f62-2a759788afd2"));
+    }
 }
