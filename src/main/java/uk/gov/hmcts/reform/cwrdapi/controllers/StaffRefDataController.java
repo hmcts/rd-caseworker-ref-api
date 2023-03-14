@@ -353,7 +353,8 @@ public class StaffRefDataController {
             @ApiResponse(
                     responseCode = "200",
                     description = REQUEST_COMPLETED_SUCCESSFULLY,
-                    content = @Content
+                    content = @Content(array =
+                    @ArraySchema(schema = @Schema(implementation = SearchStaffUserResponse.class)))
             ),
             @ApiResponse(
                     responseCode = "400",
