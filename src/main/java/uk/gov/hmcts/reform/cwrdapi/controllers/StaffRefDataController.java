@@ -98,19 +98,23 @@ public class StaffRefDataController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = BAD_REQUEST
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = UNAUTHORIZED_ERROR
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = FORBIDDEN_ERROR
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @Validated
