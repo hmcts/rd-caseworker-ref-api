@@ -56,8 +56,9 @@ public class CaseWorkerRefController {
 
 
     @Operation(
-            description = "This API allows uploading of excel files that contain caseworker information "
+            summary = "This API allows uploading of excel files that contain caseworker information "
                     + "and mappings between caseworker and IDAM roles",
+            description = "This API will be invoked by user having idam role of cwd-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
@@ -99,7 +100,8 @@ public class CaseWorkerRefController {
 
     @Operation(
             hidden = true,
-            description = "This API builds the idam role mappings for case worker roles",
+            summary = "This API builds the idam role mappings for case worker roles",
+            description = "This API will be invoked by user having idam role of cwd-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")

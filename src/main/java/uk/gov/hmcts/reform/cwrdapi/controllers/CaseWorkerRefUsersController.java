@@ -82,6 +82,7 @@ public class CaseWorkerRefUsersController {
     @Operation(
             hidden = true,
             summary = "This API creates caseworker profiles",
+            description = "This API will be invoked by user having idam role of cwd-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
@@ -155,6 +156,7 @@ public class CaseWorkerRefUsersController {
 
     @Operation(
             summary = "This API gets the User details from Caseworker Profile",
+            description = "This API will be invoked by user having idam role of cwd-system-user",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")

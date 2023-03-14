@@ -84,6 +84,7 @@ public class StaffRefDataController {
 
     @Operation(
             summary = "This API allows the search of staff user by their name or surname.",
+            description = "This API will be invoked by user having idam role of staff-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
@@ -173,7 +174,8 @@ public class StaffRefDataController {
     }
 
     @Operation(
-            description = "This API gets the user types from staff reference data",
+            summary = "This API gets the user types from staff reference data",
+            description = "This API will be invoked by user having idam role of staff-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
@@ -275,7 +277,7 @@ public class StaffRefDataController {
 
     @Operation(
             summary = "This API creates staff user profile",
-            description = "This API will be invoked by user having idam role with cwd-admin and staff-admin",
+            description = "This API will be invoked by user having idam role of staff-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
@@ -439,6 +441,7 @@ public class StaffRefDataController {
 
     @Operation(
             summary = "This API search a staff user by Id",
+            description = "This API will be invoked by user having idam role of staff-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
