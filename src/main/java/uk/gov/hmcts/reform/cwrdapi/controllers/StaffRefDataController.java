@@ -42,9 +42,9 @@ import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
-import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -117,9 +117,9 @@ public class StaffRefDataController {
             produces = APPLICATION_JSON_VALUE)
     @Secured("staff-admin")
     public ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserByName(
-        @RequestHeader(name = "page-number", required = false) Integer pageNumber,
-        @RequestHeader(name = "page-size", required = false) Integer pageSize,
-        @RequestParam(value = "search") @NotEmpty @NotNull String searchString) {
+            @RequestHeader(name = "page-number", required = false) Integer pageNumber,
+            @RequestHeader(name = "page-size", required = false) Integer pageSize,
+            @RequestParam(value = "search") @NotEmpty @NotNull String searchString) {
 
         validateSearchString(removeEmptySpaces(searchString));
         var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize, configPageNumber);
@@ -163,7 +163,7 @@ public class StaffRefDataController {
     )
     @Secured("staff-admin")
     public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills(
-            @RequestParam(value = "service_codes", required = false)  String serviceCodes
+            @RequestParam(value = "service_codes", required = false) String serviceCodes
     ) {
         log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
 
@@ -286,7 +286,7 @@ public class StaffRefDataController {
                     responseCode = "201",
                     description = "Successfully created staff user profile",
                     content = @Content(array =
-                            @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
+                    @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -388,7 +388,7 @@ public class StaffRefDataController {
                     responseCode = "200",
                     description = "Successfully updated staff user profile",
                     content = @Content(array =
-                            @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
+                    @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -437,34 +437,38 @@ public class StaffRefDataController {
         return ResponseEntity.status(HttpStatus.OK).body(staffProfileCreationResponse);
     }
 
-    @ApiOperation(
-            value = "This API search a staff user by Id",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "This API search a staff user by Id",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "Request is successful",
-                    response = SearchStaffUserByIdResponse.class
+                    responseCode = "200",
+                    description = "Request is successful",
+                    content = @Content(schema = @Schema(implementation = SearchStaffUserByIdResponse.class))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @GetMapping(
