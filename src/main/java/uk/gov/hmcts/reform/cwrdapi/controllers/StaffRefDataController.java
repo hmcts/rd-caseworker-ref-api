@@ -336,6 +336,7 @@ public class StaffRefDataController {
 
     @Operation(
             summary = "This API allows the Advance search of staff",
+            description = "This API will be invoked by user having idam role of staff-admin",
             security = {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
