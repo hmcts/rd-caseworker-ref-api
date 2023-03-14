@@ -29,6 +29,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
@@ -131,7 +132,7 @@ public class CaseWorkerReferenceDataClient {
             Map<String, Object> errorResponseMap = new HashMap<>();
             errorResponseMap.put(
                     "response_body",
-                    objectMapper.readValue(responseEntity.getBody().toString(), clazz)
+                    objectMapper.readValue(responseEntity.getBody().toString(), ErrorResponse.class)
             );
             errorResponseMap.put("http_status", status);
             return errorResponseMap;
@@ -646,5 +647,11 @@ public class CaseWorkerReferenceDataClient {
 
     public Map<String, Object> updateStaffProfile(StaffProfileCreationRequest request, String role) {
         return putRequest(baseUrl + "/profile", request, role, null);
+    }
+
+    public Object fetchStaffUserById(Class<?> clazz,
+                                                          String userId, String role) throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequest(userId, clazz, role);
+        return  mapServiceSkillsIdResponse(responseEntity, clazz);
     }
 }

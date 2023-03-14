@@ -23,6 +23,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
 
 
     public static final String RD_STAFF_UI = "rd-staff-ui";
+    public static final String FETCH_STAFF_BY_ID = "rd-staff-fetch-by-id";
+
 
     @Autowired
     private final LDClient ldClient;
@@ -71,7 +73,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_STAFF_UI);
         launchDarklyMap.put("StaffRefDataController.updateStaffUserProfile",
                 RD_STAFF_UI);
-
+        launchDarklyMap.put("StaffRefDataController.fetchStaffProfileById",
+                RD_STAFF_UI);
     }
 
     @Override
