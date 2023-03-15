@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
@@ -53,7 +54,8 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
     }
 
     private List<GrantedAuthority> extractAuthorityFromClaims(List<String> roles) {
-        return roles.stream()
+        return Optional.ofNullable(roles).orElse(new ArrayList<>())
+                .stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
