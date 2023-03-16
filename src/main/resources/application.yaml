@@ -29,6 +29,7 @@ spring:
     name: RD Caseworker Ref API
   main:
     allow-bean-definition-overriding: true
+    allow-circular-references: true
   security:
     oauth2:
       client:
@@ -91,8 +92,10 @@ security:
     - "/actuator/**"
     - "/loggers/**"
     - "/swagger-ui.html"
+    - "/swagger-ui/**"
     - "/swagger-resources/**"
-    - "/v2/api-docs"
+    - "/v3/api-docs"
+    - "/v3/**"
     - "/webjars/springfox-swagger-ui/**"
     - "/csrf"
     - "/error"

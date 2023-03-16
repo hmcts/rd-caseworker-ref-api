@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,36 +79,40 @@ public class CaseWorkerRefUsersController {
     @Autowired
     CaseWorkerDeleteService caseWorkerDeleteService;
 
-    @ApiOperation(
+    @Operation(
             hidden = true,
-            value = "This API creates caseworker profiles",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+            summary = "This API creates caseworker profiles",
+            description = "This API will be invoked by user having idam role of cwd-admin",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 201,
-                    message = "Successfully created caseworker user profiles",
-                    response = String.class,
-                    responseContainer = "list"
+                    responseCode = "201",
+                    description = "Successfully created caseworker user profiles",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @PostMapping(
@@ -147,38 +154,44 @@ public class CaseWorkerRefUsersController {
     }
 
 
-    @ApiOperation(
-            value = "This API gets the User details from Caseworker Profile",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "This API gets the User details from Caseworker Profile",
+            description = "This API will be invoked by user having idam role of cwd-system-user",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "Successfully fetched the Caseworker profile(s)",
-                    response = CaseWorkerProfile.class
+                    responseCode = "200",
+                    description = "Successfully fetched the Caseworker profile(s)",
+                    content = @Content(schema = @Schema(implementation = CaseWorkerProfile.class))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 404,
-                    message = NO_DATA_FOUND
+                    responseCode = "404",
+                    description = NO_DATA_FOUND,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @PostMapping(
@@ -198,33 +211,38 @@ public class CaseWorkerRefUsersController {
 
     }
 
-    @ApiOperation(value = "Delete Case Worker Profiles by User ID or Email Pattern",
-            notes = "This API is only for use in non Prod environments",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(summary = "Delete Case Worker Profiles by User ID or Email Pattern",
+            description = "This API is only for use in non Prod environments",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             })
     @ApiResponses({
             @ApiResponse(
-                    code = 204,
-                    message = "Case Worker Profiles deleted successfully",
-                    response = CaseWorkerProfilesDeletionResponse.class
+                    responseCode = "204",
+                    description = "Case Worker Profiles deleted successfully",
+                    content = @Content(schema = @Schema(implementation = CaseWorkerProfilesDeletionResponse.class))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = "An invalid request has been provided"
+                    responseCode = "400",
+                    description = "An invalid request has been provided",
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = "Unauthorized Error : The requested resource is restricted and requires authentication"
+                    responseCode = "401",
+                    description = "Unauthorized Error : "
+                            + "The requested resource is restricted and requires authentication",
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = "Forbidden Error: Access denied"
+                    responseCode = "403",
+                    description = "Forbidden Error: Access denied",
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error"
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content
             )
     })
 
