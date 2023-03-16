@@ -368,7 +368,6 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
             + "\"error_details\":[{\"row_id\":\"2\","
             + "\"error_description\":\"User creation is not possible at this moment. "
             + "Please try again later or check with administrator.\"}]}";
-
         response = uploadCaseWorkerFile("Staff Data Upload.xlsx",
             TYPE_XLSX, "200 OK", cwdAdmin);
         String json = getJsonResponse(response);
