@@ -125,6 +125,8 @@ public final class CaseWorkerConstants {
             + "Please try again or check with HMCTS Support Team";
     public static final String ROLE_CWD_USER = "cwd-user";
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
+    public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
+    public static final String ROLE_CWD_ADMIN = "cwd-admin";
 
     public static final String DUPLICATE_PRIMARY_AND_SECONDARY_ROLES = "Primary and Secondary Roles Should "
             + "not be same.";
