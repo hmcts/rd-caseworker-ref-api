@@ -56,17 +56,18 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         //Set up Case worker data
         Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests =
-            ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest().role(" role ").isPrimaryFlag(true).build());
+                ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest()
+                        .role(" role ").isPrimaryFlag(true).build());
 
         List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
-            .caseWorkersLocationRequest()
-            .isPrimaryFlag(true).locationId(1)
-            .location(" location ").build());
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(1)
+                .location(" location ").build());
 
         List<CaseWorkerWorkAreaRequest> caseWorkerAreaRequests = ImmutableList.of(CaseWorkerWorkAreaRequest
-            .caseWorkerWorkAreaRequest()
-            .areaOfWork(" areaOfWork ").serviceCode(" serviceCode ")
-            .build());
+                .caseWorkerWorkAreaRequest()
+                .areaOfWork(" areaOfWork ").serviceCode(" serviceCode ")
+                .build());
 
         caseWorkersProfileCreationRequests = ImmutableList.of(CaseWorkersProfileCreationRequest
                 .caseWorkersProfileCreationRequest()
@@ -153,18 +154,18 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
 
 
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
-            .of(cwRoleRequest,cwRoleRequest1,cwRoleRequest2,cwRoleRequest3);
+                .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
 
         Map<String, Object> response = caseworkerReferenceDataClient
-            .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+                .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
         assertThat(response).containsEntry("http_status", "201 CREATED");
         List<CaseWorkerRole> caseWorkerRoles = caseWorkerRoleRepository.findAll();
         assertEquals(13, (long) caseWorkerRoles.get(0).getRoleId());
-        assertEquals(14,(long)caseWorkerRoles.get(2).getRoleId());
-        assertEquals(16,(long)caseWorkerRoles.get(3).getRoleId());
+        assertEquals(14, (long) caseWorkerRoles.get(2).getRoleId());
+        assertEquals(16, (long) caseWorkerRoles.get(3).getRoleId());
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
-        assertEquals(5,caseWorkerProfile.get(0).getUserTypeId());
+        assertEquals(5, caseWorkerProfile.get(0).getUserTypeId());
     }
 }

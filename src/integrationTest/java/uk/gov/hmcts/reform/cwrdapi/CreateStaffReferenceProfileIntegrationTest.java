@@ -38,10 +38,9 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SER
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_ROLE_PRESENT_PROFILE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 
 public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEnabledIntegrationTest {
-
-    public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
     @Autowired
     CaseWorkerProfileRepository caseWorkerProfileRepository;

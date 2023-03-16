@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.internal;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,39 +57,45 @@ public class StaffReferenceInternalController {
     @Autowired
     CaseWorkerService caseWorkerService;
 
-    @ApiOperation(
-            value = "This API returns the Staff(Case Worker) profiles based on Service Name and Pagination parameters",
-            notes = "**IDAM Role to access API** :\n cwd-system-user",
-            authorizations = {
-                    @Authorization(value = "ServiceAuthorization"),
-                    @Authorization(value = "Authorization")
+    @Operation(
+            summary = "This API returns the Staff(Case Worker) "
+                    + "profiles based on Service Name and Pagination parameters",
+            description = "**IDAM Role to access API** :\n cwd-system-user",
+            security = {
+                    @SecurityRequirement(name = "ServiceAuthorization"),
+                    @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponses({
             @ApiResponse(
-                    code = 200,
-                    message = "The Staff profiles have been retrieved successfully",
-                    response = StaffProfileWithServiceName.class
+                    responseCode = "200",
+                    description = "The Staff profiles have been retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = StaffProfileWithServiceName.class))
             ),
             @ApiResponse(
-                    code = 400,
-                    message = BAD_REQUEST
+                    responseCode = "400",
+                    description = BAD_REQUEST,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 401,
-                    message = UNAUTHORIZED_ERROR
+                    responseCode = "401",
+                    description = UNAUTHORIZED_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 403,
-                    message = FORBIDDEN_ERROR
+                    responseCode = "403",
+                    description = FORBIDDEN_ERROR,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 404,
-                    message = NO_DATA_FOUND
+                    responseCode = "404",
+                    description = NO_DATA_FOUND,
+                    content = @Content
             ),
             @ApiResponse(
-                    code = 500,
-                    message = INTERNAL_SERVER_ERROR
+                    responseCode = "500",
+                    description = INTERNAL_SERVER_ERROR,
+                    content = @Content
             )
     })
     @GetMapping(
