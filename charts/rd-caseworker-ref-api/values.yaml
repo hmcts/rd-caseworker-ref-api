@@ -28,8 +28,8 @@ java:
       secrets:
         - name: caseworker-ref-api-POSTGRES-PASS
           alias: POSTGRES_PASSWORD
-        - name: ApplicationInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: caseworker-topic-primary-send-listen-shared-access-key
           alias: CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY
         - name: caseworker-ref-api-s2s-secret
