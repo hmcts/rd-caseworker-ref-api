@@ -76,7 +76,7 @@ class IdamRepositoryTest {
                 new HashMap<>(), null, new RequestTemplate());
         when(idamClient.getUserInfo(anyString()))
                 .thenThrow(new FeignException
-                        .Unauthorized("User is not authorized", request,null));
+                        .Unauthorized("User is not authorized", request,null, null));
 
         when(cacheManager.getCache(anyString())).thenReturn(caffeineCacheMock);
         doReturn(cache).when(caffeineCacheMock).getNativeCache();
