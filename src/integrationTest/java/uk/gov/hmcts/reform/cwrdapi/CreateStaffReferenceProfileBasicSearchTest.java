@@ -35,6 +35,7 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_ADMIN;
 
 public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEnabledIntegrationTest {
 
@@ -42,7 +43,6 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
     public static final String CASE_WORKER_PROFILE_URL = "/refdata/case-worker/profile";
 
     public static final String EMAIL_TEMPLATE = "CWR-func-test-user-%s@justice.gov.uk";
-    public static final String ROLE_CWD_ADMIN = "cwd-admin";
 
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
