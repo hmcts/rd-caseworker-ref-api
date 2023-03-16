@@ -27,6 +27,7 @@ spring:
           time_zone: UTC
   main:
     allow-bean-definition-overriding: true
+    allow-circular-references: true
   application:
     name: RD Caseworker Ref API
   security:
@@ -78,7 +79,9 @@ security:
     - "/loggers/**"
     - "/swagger-ui.html"
     - "/swagger-resources/**"
-    - "/v2/api-docs"
+    - "/v3/api-docs"
+    - "/swagger-ui/**"
+    - "/v3/**"
     - "/webjars/springfox-swagger-ui/**"
     - "/csrf"
     - "/error"
