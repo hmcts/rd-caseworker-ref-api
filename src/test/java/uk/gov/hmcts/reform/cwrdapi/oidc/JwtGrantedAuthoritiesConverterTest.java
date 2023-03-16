@@ -120,7 +120,7 @@ class JwtGrantedAuthoritiesConverterTest {
     void test_shouldReturnEmptyAuthoritiesWhenIdamReturnsUsersWithNullRoles() {
         List<String> roles = null;
 
-        when(jwtMock.containsClaim(anyString())).thenReturn(true);
+        when(jwtMock.hasClaim(anyString())).thenReturn(true);
         when(jwtMock.getClaim(anyString())).thenReturn("access_token");
         when(jwtMock.getTokenValue()).thenReturn("access_token");
         when(userInfoMock.getRoles()).thenReturn(roles);
@@ -130,7 +130,7 @@ class JwtGrantedAuthoritiesConverterTest {
 
         assertNotNull(authorities);
         assertEquals(0, authorities.size());
-        verify(jwtMock, times(1)).containsClaim(anyString());
+        verify(jwtMock, times(1)).hasClaim(anyString());
         verify(jwtMock, times(1)).getClaim(anyString());
         verify(jwtMock, times(1)).getTokenValue();
         verify(userInfoMock, times(1)).getRoles();
