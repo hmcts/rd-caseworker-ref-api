@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -80,7 +81,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public static WireMockExtension userProfileService = new WireMockExtension(8091);
 
     @RegisterExtension
-    public static WireMockExtension sidamService = new WireMockExtension(5000,new CaseWorkerTransformer());
+    public static WireMockExtension sidamService = new WireMockExtension(5000, new CaseWorkerTransformer());
 
     @RegisterExtension
     public static WireMockExtension mockHttpServerForOidc = new WireMockExtension(7000);
@@ -105,6 +106,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     Flyway flyway;
+
+    @MockBean
+    protected static JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
@@ -245,6 +249,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @AfterEach
     public void cleanupTestData() {
+        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
 

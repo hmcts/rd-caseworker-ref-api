@@ -142,7 +142,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .role("task supervisor,case allocator,staff administrator")
                 .skill("9")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -167,7 +167,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -191,7 +191,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .serviceCode("ABA1,serviceCode2")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -214,7 +214,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .location("12345")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -240,7 +240,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .location("12345,6789")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -265,7 +265,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .userType("1")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -290,7 +290,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .jobTitle("2")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -316,7 +316,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .role("task supervisor")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
     @Test
@@ -341,7 +341,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .skill("9")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -355,7 +355,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
                 .createStaffProfileCreationRequest();
         staffProfileCreationRequest.setSkills(null);
         Map<String, Object> staffProfileResponse = caseworkerReferenceDataClient
-                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
+                .createStaffProfile(staffProfileCreationRequest, ROLE_STAFF_ADMIN);
         assertThat(staffProfileResponse).containsEntry("http_status", "201 CREATED");
 
 
@@ -380,8 +380,8 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
 
     @ParameterizedTest
-    @ValueSource(strings = {"serviceCode=sddd","location=127494","userType=12","jobTitle=4224",
-            "role=staff administrator","skill=132"})
+    @ValueSource(strings = {"serviceCode=sddd", "location=127494", "userType=12", "jobTitle=4224",
+            "role=staff administrator", "skill=132"})
     void should_return_staff_user_with_status_code_200_with_empty_search_response(String searchString) {
 
         createCaseWorkerProfiles();
@@ -419,7 +419,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         searchReq = SearchRequest.builder()
                 .role("task supervisor,case allocator,staff administrator")
                 .build();
-        assertTrue(validateSearchUserProfileResponse(response,searchReq));
+        assertTrue(validateSearchUserProfileResponse(response, searchReq));
     }
 
 
@@ -450,8 +450,8 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"","serviceCode=*_sd","location=1adf*_","userType=1sdfs*__","jobTitle=asdfs",
-            "role=task_supervisor","skill=asdfd"})
+    @ValueSource(strings = {"", "serviceCode=*_sd", "location=1adf*_", "userType=1sdfs*__", "jobTitle=asdfs",
+            "role=task_supervisor", "skill=asdfd"})
     void should_return_status_code_400(String searchString) {
         String path = "/profile/search?";
 
@@ -468,14 +468,14 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
         StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
                 .createStaffProfileCreationRequest();
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
+                .createStaffProfile(staffProfileCreationRequest, ROLE_STAFF_ADMIN);
         assertThat(response).containsEntry("http_status", "201 CREATED");
 
     }
 
 
     private void createCaseWorkerProfiles() {
-        IntStream.range(0,5).forEach(i -> createCaseWorkerTestData());
+        IntStream.range(0, 5).forEach(i -> createCaseWorkerTestData());
     }
 
 }
