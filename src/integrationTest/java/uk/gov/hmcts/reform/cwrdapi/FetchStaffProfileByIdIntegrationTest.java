@@ -25,8 +25,8 @@ import java.util.Set;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.CreateStaffReferenceProfileBasicSearchTest.ROLE_CWD_ADMIN;
-import static uk.gov.hmcts.reform.cwrdapi.UpdateStaffReferenceProfileTest.ROLE_STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.StaffReferenceProfileAdvanceIntegrationSearchTest.ROLE_STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_ADMIN;
 
 public class FetchStaffProfileByIdIntegrationTest extends AuthorizationEnabledIntegrationTest {
 

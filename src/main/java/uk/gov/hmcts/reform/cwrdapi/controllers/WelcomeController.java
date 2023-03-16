@@ -1,9 +1,11 @@
 
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -45,12 +47,12 @@ public class WelcomeController {
      */
 
 
-    @ApiOperation("Welcome message for the Caseworker Ref Data API")
+    @Operation(summary = "Welcome message for the Caseworker Ref Data API")
     @ApiResponses({
-        @ApiResponse(
-            code = 200,
-            message = "Welcome message",
-            response = String.class
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Welcome message",
+                    content = @Content(schema = @Schema(implementation = String.class))
         )
     })
     @GetMapping(
