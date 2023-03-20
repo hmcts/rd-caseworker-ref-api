@@ -4,4 +4,7 @@
      <packageUrl regex="true">^pkg:maven/org\.apache\.poi.*$</packageUrl>
      <cve>CVE-2022-26336</cve>
   </suppress>
+  <suppress>
+     <cve>CVE-2022-45688</cve>
+  </suppress>
 </suppressions>
