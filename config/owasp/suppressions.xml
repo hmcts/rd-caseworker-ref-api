@@ -13,10 +13,6 @@
     ]]></notes>
     <cve>CVE-2016-1000027</cve>
   </suppress>
-  <suppress until="2023-09-24">
-     <packageUrl regex="true">^pkg:maven/org\.apache\.poi.*$</packageUrl>
-     <cve>CVE-2022-26336</cve>
-  </suppress>
   <suppress until="2023-12-30">
     <notes><![CDATA[
     file name: fasterxml:jackson-databind.jar
