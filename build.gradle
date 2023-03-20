@@ -484,7 +484,7 @@ dependencies {
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
 
-  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+  implementation group: 'org.apache.poi', name: 'poi-ooxml', version: versions.poi
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
 
@@ -531,6 +531,11 @@ dependencyManagement {
     //CVE-2023-24998
     dependencySet(group: 'commons-fileupload', version: '1.5') {
       entry 'commons-fileupload'
+    }
+    //CVE-2021-22044
+    dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
+      entry 'spring-cloud-starter-openfeign'
+      entry 'spring-cloud-openfeign-core'
     }
   }
 }
