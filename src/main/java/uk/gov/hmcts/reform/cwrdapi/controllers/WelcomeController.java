@@ -48,13 +48,11 @@ public class WelcomeController {
 
 
     @Operation(summary = "Welcome message for the Caseworker Ref Data API")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Welcome message",
-                    content = @Content(schema = @Schema(implementation = String.class))
-        )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "Welcome message",
+            content = @Content(schema = @Schema(implementation = String.class))
+    )
     @GetMapping(
         path = "/",
         produces = APPLICATION_JSON_VALUE
