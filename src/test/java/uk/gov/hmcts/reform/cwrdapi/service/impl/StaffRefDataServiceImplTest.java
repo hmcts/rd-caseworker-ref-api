@@ -1481,4 +1481,22 @@ class StaffRefDataServiceImplTest {
         assertThat(thrown.getMessage()).contains(errorMsg);
     }
 
+    @Test
+    void test_getProfileResponse() {
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("27fbd198-552e-4c32-9caf-37be1545caaf");
+        Optional<Object> userProfileResponseOptional = Optional.ofNullable(userProfileResponse);
+
+        assertThat(staffRefDataServiceImpl.getProfileResponse(userProfileResponseOptional)).isNotNull();
+
+        userProfileResponseOptional = Optional.ofNullable(null);
+
+        assertThat(staffRefDataServiceImpl.getProfileResponse(userProfileResponseOptional)).isNull();
+
+        userProfileResponseOptional = Optional.empty();
+
+        assertThat(staffRefDataServiceImpl.getProfileResponse(userProfileResponseOptional)).isNull();
+
+    }
+
 }

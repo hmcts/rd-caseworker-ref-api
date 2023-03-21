@@ -746,15 +746,20 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
-            if (nonNull(profileResponse.getIdamId())) {
-                return profileResponse;
-            }
-        }
-        return null;
+
+
+        return getProfileResponse(resultResponse);
     }
 
+    public UserProfileResponse getProfileResponse(Optional<Object> resultResponse) {
 
+        UserProfileResponse result = null;
+        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
+                && nonNull(profileResponse.getIdamId())) {
+            result = profileResponse;
+        }
+        return result;
+    }
 
     public CaseWorkerProfile updateStaffProfiles(StaffProfileCreationRequest cwUiRequest,
                                                        CaseWorkerProfile caseWorkerProfile) {
