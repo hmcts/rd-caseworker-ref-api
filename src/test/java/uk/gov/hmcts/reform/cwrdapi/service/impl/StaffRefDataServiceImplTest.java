@@ -1457,4 +1457,28 @@ class StaffRefDataServiceImplTest {
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
     }
 
+    @Test
+    void test_checkStaffProfileEmailAndSuspendFlag_ProfileAlreadyPresent() {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+
+        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+            staffRefDataServiceImpl.checkStaffProfileEmailAndSuspendFlag(staffProfileCreationRequest);
+        });
+
+        assertThat(thrown.getMessage()).contains("The profile is already created for the given email Id");
+    }
+
+    @Test
+    void test_checkStaffProfileEmailAndSuspendFlag_ProfileSuspended() {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+
+        staffProfileCreationRequest.setSuspended(true);
+        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+            staffRefDataServiceImpl.checkStaffProfileEmailAndSuspendFlag(staffProfileCreationRequest);
+        });
+        String errorMsg = "There is no user present to suspend. "
+                + "Please try again or check with HMCTS Support Team";
+        assertThat(thrown.getMessage()).contains(errorMsg);
+    }
+
 }
