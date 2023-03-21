@@ -812,7 +812,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, cwUiRequest);
 
 
-        if (isNotEmpty(profilesToBePersisted)) {
+        if (profilesToBePersisted != null) {
             processedCwProfiles = caseWorkerProfileRepo.save(profilesToBePersisted);
             log.info("{}::case worker profile inserted ", loggingComponentName);
         }
