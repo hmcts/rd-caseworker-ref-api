@@ -208,7 +208,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
 
-    private void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
+    void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId().toLowerCase());
