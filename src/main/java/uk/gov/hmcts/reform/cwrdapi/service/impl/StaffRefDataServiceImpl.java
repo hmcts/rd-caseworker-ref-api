@@ -208,7 +208,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
 
-    void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
+    public void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId().toLowerCase());
@@ -222,7 +222,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
-    private void invalidRequestError(StaffProfileCreationRequest profileRequest, String errorMessage) {
+    public void invalidRequestError(StaffProfileCreationRequest profileRequest, String errorMessage) {
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,errorMessage,
                 StringUtil.EMPTY_STRING,profileRequest,STAFF_PROFILE_CREATE);
 
