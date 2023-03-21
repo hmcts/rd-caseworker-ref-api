@@ -130,7 +130,8 @@ public class CaseWorkerRefUsersController {
                         .builder();
         trimIdamRoles(caseWorkersProfileCreationRequest);
 
-        List<CaseWorkerProfile> processedCwProfiles = caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+        List<CaseWorkerProfile> processedCwProfiles =
+                caseWorkerService.processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
 
         if (isNotEmpty(processedCwProfiles)) {
 
