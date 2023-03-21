@@ -222,7 +222,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
     }
 
-    public void invalidRequestError(StaffProfileCreationRequest profileRequest, String errorMessage) {
+    private void invalidRequestError(StaffProfileCreationRequest profileRequest, String errorMessage) {
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,errorMessage,
                 StringUtil.EMPTY_STRING,profileRequest,STAFF_PROFILE_CREATE);
 
@@ -746,9 +746,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
-                && nonNull(profileResponse.getIdamId())) {
-            return profileResponse;
+        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
+            if (nonNull(profileResponse.getIdamId())) {
+                return profileResponse;
+            }
         }
         return null;
     }
@@ -811,7 +812,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, cwUiRequest);
 
 
-        if (profilesToBePersisted != null && isNotEmpty(profilesToBePersisted)) {
+        if (isNotEmpty(profilesToBePersisted)) {
             processedCwProfiles = caseWorkerProfileRepo.save(profilesToBePersisted);
             log.info("{}::case worker profile inserted ", loggingComponentName);
         }
@@ -1116,7 +1117,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             List<String> convertToList = convertToList(serviceCodeData);
 
             serviceCodes = convertToList.stream()
-                    .filter(RequestUtils::validateServiceCode).toList();
+                    .filter(serviceCode -> validateServiceCode(serviceCode))
+                    .collect(Collectors.toList());
         }
 
         return serviceCodes;
