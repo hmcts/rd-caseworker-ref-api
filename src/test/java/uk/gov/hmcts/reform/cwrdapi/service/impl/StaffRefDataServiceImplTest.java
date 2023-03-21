@@ -310,7 +310,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
 
-        assertThat(serviceSkills.size()).isEqualTo(2);
+        assertThat(serviceSkills).hasSize(2);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
@@ -338,7 +338,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
 
-        assertThat(serviceSkills.size()).isEqualTo(2);
+        assertThat(serviceSkills).hasSize(2);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
@@ -367,7 +367,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
 
-        assertThat(serviceSkills.size()).isEqualTo(2);
+        assertThat(serviceSkills).hasSize(2);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 

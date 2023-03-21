@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
+import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
@@ -745,10 +746,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse) {
-            if (nonNull(profileResponse.getIdamId())) {
-                return profileResponse;
-            }
+        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
+                && nonNull(profileResponse.getIdamId())) {
+            return profileResponse;
         }
         return null;
     }
@@ -811,7 +811,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 deleteChildrenAndUpdateCwProfiles(updateCaseWorkerProfile, cwUiRequest);
 
 
-        if (isNotEmpty(profilesToBePersisted)) {
+        if (profilesToBePersisted != null && isNotEmpty(profilesToBePersisted)) {
             processedCwProfiles = caseWorkerProfileRepo.save(profilesToBePersisted);
             log.info("{}::case worker profile inserted ", loggingComponentName);
         }
@@ -1097,7 +1097,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public List<Skill> getServiceSkillsData(String serviceCodeData) {
 
-        List<Skill> skills = new ArrayList<>();
+        List<Skill> skills = null;
         List<String> serviceCodes = getValidServiceCodes(serviceCodeData);
 
         if (!CollectionUtils.isEmpty(serviceCodes)) {
@@ -1116,8 +1116,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             List<String> convertToList = convertToList(serviceCodeData);
 
             serviceCodes = convertToList.stream()
-                    .filter(serviceCode -> validateServiceCode(serviceCode))
-                    .collect(Collectors.toList());
+                    .filter(RequestUtils::validateServiceCode).toList();
         }
 
         return serviceCodes;
