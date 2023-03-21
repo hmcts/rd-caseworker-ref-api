@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil;
+import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
@@ -1116,8 +1117,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             List<String> convertToList = convertToList(serviceCodeData);
 
             serviceCodes = convertToList.stream()
-                    .filter(serviceCode -> validateServiceCode(serviceCode))
-                    .collect(Collectors.toList());
+                    .filter(RequestUtils::validateServiceCode)
+                    .toList();
         }
 
         return serviceCodes;
