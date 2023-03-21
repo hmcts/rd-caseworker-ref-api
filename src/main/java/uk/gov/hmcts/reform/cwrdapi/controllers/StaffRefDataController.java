@@ -167,8 +167,7 @@ public class StaffRefDataController {
     )
     @Secured("staff-admin")
     public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills(
-            @RequestParam(value = "service_codes", required = false) String serviceCodes
-    ) {
+            @RequestParam(value = "service_codes", required = false) String serviceCodes) {
         log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
 
         StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataService.getServiceSkills(serviceCodes);
@@ -209,6 +208,7 @@ public class StaffRefDataController {
     )
     @Secured("staff-admin")
     public ResponseEntity<Object> fetchUserTypes() {
+
         log.info("{} : Fetching the user types", loggingComponentName);
         StaffRefDataUserTypesResponse.StaffRefDataUserTypesResponseBuilder staffReferenceDataUserTypesResponseBuilder
                 = StaffRefDataUserTypesResponse.builder();
@@ -373,6 +373,7 @@ public class StaffRefDataController {
             @RequestHeader(name = "page-number", required = false) Integer pageNumber,
             @RequestHeader(name = "page-size", required = false) Integer pageSize,
             @ParameterObject SearchRequest searchRequest) {
+
         validateSearchRequest(searchRequest);
         var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize,
                 configPageNumber);
