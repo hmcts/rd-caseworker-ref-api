@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,19 +16,40 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SearchStaffUserByIdResponse extends SearchStaffUserResponse {
+@Builder(builderMethodName = "withIdBuilder")
+@AllArgsConstructor
+public class SearchStaffUserByIdResponse {
 
-    @Builder(builderMethodName = "withIdBuilder")
-    public SearchStaffUserByIdResponse(String firstName, String lastName, String emailId, String caseWorkerId,
-                                       List<ServiceResponse> services, String region, Integer regionId,
-                                       List<Role> roles, boolean taskSupervisor, boolean caseAllocator,
-                                       boolean suspended, boolean staffAdmin, List<Location> baseLocations,
-                                       String userType, List<SkillResponse> skills, String idamStatus) {
-        super(firstName, lastName, emailId, caseWorkerId, services, region, regionId, roles, taskSupervisor,
-                caseAllocator, suspended, staffAdmin, baseLocations, userType, skills);
-        this.idamStatus = idamStatus;
-    }
-
+    @JsonProperty("first_name")
+    private String firstName;
+    @JsonProperty("last_name")
+    private String lastName;
+    @JsonProperty("email_id")
+    private String emailId;
+    @JsonProperty("case_worker_id")
+    private String caseWorkerId;
+    @JsonProperty("services")
+    private List<ServiceResponse> services;
+    @JsonProperty("region")
+    private String region;
+    @JsonProperty("region_id")
+    private Integer regionId;
+    @JsonProperty("roles")
+    private List<Role> roles;
+    @JsonProperty("task_supervisor")
+    private boolean taskSupervisor;
+    @JsonProperty("case_allocator")
+    private boolean caseAllocator;
+    @JsonProperty("suspended")
+    private boolean suspended;
+    @JsonProperty("staff_admin")
+    private boolean staffAdmin;
+    @JsonProperty("base_locations")
+    private List<Location> baseLocations;
+    @JsonProperty("user_type")
+    private String userType;
+    @JsonProperty("skills")
+    private List<SkillResponse> skills;
     @JsonProperty("up_idam_status")
     private String idamStatus;
 
