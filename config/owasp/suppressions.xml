@@ -8,4 +8,11 @@
      <cve>CVE-2022-45688</cve>
       <cve>CVE-2022-1471</cve>
   </suppress>
+  <suppress>
+      <notes><![CDATA[
+file name: launchdarkly-java-server-sdk-5.10.2.jar (shaded: org.yaml:snakeyaml:1.32)
+]]></notes>
+      <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+      <cve>CVE-2022-1471</cve>
+   </suppress>
 </suppressions>
