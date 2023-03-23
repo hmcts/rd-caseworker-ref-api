@@ -34,17 +34,17 @@ class SearchStaffUserByIdResponseTest {
         assertThat(searchStaffUserByIdResponse.getFirstName()).isEqualTo("firstName");
         assertThat(searchStaffUserByIdResponse.getLastName()).isEqualTo("lastName");
         assertThat(searchStaffUserByIdResponse.getEmailId()).isEqualTo("emailId");
-        assertThat(searchStaffUserByIdResponse.getServices()).hasSize(0);
+        assertThat(searchStaffUserByIdResponse.getServices()).isEmpty();
 
         assertThat(searchStaffUserByIdResponse.getRegion()).isEqualTo("region");
         assertThat(searchStaffUserByIdResponse.getRegionId()).isEqualTo(123);
-        assertThat(searchStaffUserByIdResponse.getRoles()).hasSize(0);
+        assertThat(searchStaffUserByIdResponse.getRoles()).isEmpty();
         assertThat(searchStaffUserByIdResponse.isTaskSupervisor()).isTrue();
         assertThat(searchStaffUserByIdResponse.isCaseAllocator()).isTrue();
         assertThat(searchStaffUserByIdResponse.isSuspended()).isFalse();
         assertThat(searchStaffUserByIdResponse.isStaffAdmin()).isTrue();
-        assertThat(searchStaffUserByIdResponse.getBaseLocations()).hasSize(0);
-        assertThat(searchStaffUserByIdResponse.getSkills()).hasSize(0);
+        assertThat(searchStaffUserByIdResponse.getBaseLocations()).isEmpty();
+        assertThat(searchStaffUserByIdResponse.getSkills()).isEmpty();
         assertThat(searchStaffUserByIdResponse.getIdamStatus()).isEqualTo("Pending");
 
     }
