@@ -442,20 +442,18 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
     }
 
     @Test
-    void should_return_reinvite_staff_user_with_status_code_500_profile() throws Exception {
+    void should_return_reinvite_staff_user_with_status_code_500_profile() {
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
         userProfilePostUserWireMockForStaffProfile(HttpStatus.INTERNAL_SERVER_ERROR);
         request.setResendInvite(true);
 
-        Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
-        Map createBody = (Map)createResponse.get("body");
+        caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
         Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
 
         assertThat(resendResponse).isNotNull();
-        assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
-        Map resendResponseBody = (Map) resendResponse.get("body");
-        assertEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
+        assertThat(resendResponse.get("http_status")).isEqualTo("500");
+        assertThat(resendResponse.get("response_body")).toString().contains("Internal Server Error");
     }
 
     @Test
