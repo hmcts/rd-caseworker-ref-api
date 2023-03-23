@@ -714,10 +714,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
                     PROFILE_NOT_PRESENT_IN_SRD);
         }
-
         UserProfileResponse userProfileResponse = getUserProfileFromUP(caseWorkerProfile.getCaseWorkerId());
 
-        if (nonNull(userProfileResponse) && isNotTrue(STATUS_ACTIVE.equals(userProfileResponse.getIdamStatus()))) {
+        if (nonNull(userProfileResponse) && isNotTrue(STATUS_ACTIVE.equals(userProfileResponse.getIdamStatus()))
+                && profileRequest.isSuspended()) {
 
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_NOT_ACTIVE,
                     IDAM_STATUS_NOT_ACTIVE);
@@ -728,7 +728,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
         }
 
-        if (isTrue(caseWorkerProfile.getSuspended())) {
+        if (isTrue(caseWorkerProfile.getSuspended()) && profileRequest.isSuspended()) {
             //when existing profile with delete flag is true then log exception add entry in exception table
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
                     caseWorkerProfile.getCaseWorkerId(), profileRequest, STAFF_PROFILE_UPDATE);
@@ -788,11 +788,19 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             //when existing profile with delete flag is true in request then suspend user
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                     caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
-                caseWorkerProfiles.setSuspended(true);
+                caseWorkerProfiles.setSuspended(cwUiRequest.isSuspended());
+                filteredProfile = caseWorkerProfiles;
+                return filteredProfile;
+            }
+        } else if (!cwUiRequest.isSuspended() && caseWorkerProfiles.getSuspended()) {
+            if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(STATUS_ACTIVE).build(),
+                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
+                caseWorkerProfiles.setSuspended(cwUiRequest.isSuspended());
                 filteredProfile = caseWorkerProfiles;
                 return filteredProfile;
             }
         } else {
+
             //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
             filteredProfile = updateSidamRoles(caseWorkerProfiles, cwUiRequest);
             return filteredProfile;
@@ -908,7 +916,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
         if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
                 && nonNull(profileResponse.getIdamStatus())) {
-            if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+            if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))
+                    && isNotTrue(profileResponse.getIdamStatus().equals(IDAM_STATUS_SUSPENDED))) {
 
                 staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, IDAM_STATUS_NOT_ACTIVE,
                         profileResponse.getIdamId(), cwrProfileRequest, operationType);
