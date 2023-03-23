@@ -686,10 +686,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     PROFILE_NOT_PRESENT_IN_SRD);
         }
         ResponseEntity<Object> responseEntity = createUserProfileInIdamUP(profileRequest);
-        UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
-
-        // update idamid in case its different in idam
-        if (upResponse != null && !upResponse.getIdamId().equals(caseWorkerProfile.getCaseWorkerId())) {
+        if (responseEntity.getBody() != null && responseEntity.getBody() instanceof UserProfileCreationResponse
+                upResponse && !upResponse.getIdamId().equals(caseWorkerProfile.getCaseWorkerId())) {
+            // update idamid in case its different in idam
             caseWorkerProfileRepo.delete(caseWorkerProfile);
             cwrCommonRepository.flush();
             caseWorkerProfile.setCaseWorkerId(upResponse.getIdamId());
@@ -698,6 +697,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             caseWorkerProfile.getCaseWorkerWorkAreas().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfile.getCaseWorkerSkills().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfileRepo.save(caseWorkerProfile);
+        } else {
+            ErrorResponse error = (ErrorResponse) responseEntity.getBody();
+            throw new StaffReferenceException(responseEntity.getStatusCode(), error.getErrorMessage(),
+                    error.getErrorDescription());
         }
         return new StaffProfileCreationResponse(caseWorkerProfile.getCaseWorkerId());
     }
