@@ -278,6 +278,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
+
     public void userProfilePostUserWireMockForStaffProfile(boolean resend) {
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
                 .withRequestBody(equalToJson("{ \"resendInvite\": " + resend + "}", true,
@@ -288,6 +289,17 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody("{"
                                 + "  \"idamId\":\"" + UUID.randomUUID() + "\","
                                 + "  \"idamRegistrationResponse\":\"" + 201 + "\""
+                                + "}")));
+    }
+
+    public void userProfilePostUserWireMockForStaffProfileWithEmptyResponse(boolean resend, HttpStatus status) {
+        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+                .withRequestBody(equalToJson("{ \"resendInvite\": " + resend + "}", true,
+                        true))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(status.value())
+                        .withBody("{"
                                 + "}")));
     }
 
