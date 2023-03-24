@@ -445,7 +445,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
     void should_return_reinvite_staff_user_with_status_code_500_profile() {
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
-        userProfilePostUserWireMockForStaffProfile(HttpStatus.INTERNAL_SERVER_ERROR);
+        userProfileCreateUserWireMock(HttpStatus.INTERNAL_SERVER_ERROR);
         request.setResendInvite(true);
 
         caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
