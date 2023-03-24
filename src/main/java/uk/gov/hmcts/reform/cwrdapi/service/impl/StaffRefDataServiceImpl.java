@@ -697,8 +697,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             caseWorkerProfile.getCaseWorkerWorkAreas().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfile.getCaseWorkerSkills().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfileRepo.save(caseWorkerProfile);
-        } else {
-            ErrorResponse error = (ErrorResponse) responseEntity.getBody();
+        } else if (responseEntity.getBody() != null && responseEntity.getBody() instanceof ErrorResponse error) {
             throw new StaffReferenceException(responseEntity.getStatusCode(), error.getErrorMessage(),
                     error.getErrorDescription());
         }
