@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -250,7 +249,7 @@ public class RequestUtils {
     public static List<Integer> getAsIntegerList(SearchRequest searchRequest) {
         return Splitter.on(',').trimResults().omitEmptyStrings()
                 .splitToList(searchRequest.getLocation()).stream().map(Integer::parseInt)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static boolean validateServiceCode(String serviceCode) {
