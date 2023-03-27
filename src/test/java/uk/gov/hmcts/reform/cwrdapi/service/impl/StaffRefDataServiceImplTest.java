@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -307,7 +310,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
 
-        assertThat(serviceSkills.size()).isEqualTo(2);
+        assertThat(serviceSkills).hasSize(2);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
@@ -322,11 +325,12 @@ class StaffRefDataServiceImplTest {
 
     }
 
-    @Test
-    void should_return_multiple_skills_for_empty_list_of_service_codes() {
+    @ParameterizedTest
+    @EmptySource
+    @NullSource
+    void should_return_multiple_skills_for_service_codes(String serviceCodes) {
         List<Skill> skills = getSkillsData();
         when(skillRepository.findAll()).thenReturn(skills);
-        String serviceCodes = "";
         StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
 
         assertThat(staffWorkerSkillResponse).isNotNull();
@@ -334,7 +338,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
 
-        assertThat(serviceSkills.size()).isEqualTo(2);
+        assertThat(serviceSkills).hasSize(2);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
@@ -349,35 +353,10 @@ class StaffRefDataServiceImplTest {
 
     }
 
-    @Test
-    void should_return_multiple_skills_for_null_service_codes() {
-        List<Skill> skills = getSkillsData();
-        when(skillRepository.findAll()).thenReturn(skills);
-        String serviceCodes = null;
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
 
-        assertThat(staffWorkerSkillResponse).isNotNull();
-
-        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-
-
-        assertThat(serviceSkills.size()).isEqualTo(2);
-
-        ServiceSkill serviceSkill = serviceSkills.get(0);
-
-        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
-
-        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
-
-        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
-        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
-        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
-        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
-
-    }
 
     @Test
-    void should_return_multiple_skills_for_list_of_service_codes_with_invalid_codes() {
+    void should_return_skills_for_service_codes_with_invalid_codes() {
         List<Skill> skills = getSkillsData();
         when(skillRepository.getSkillsByServiceCodes(anyList())).thenReturn(skills);
         String serviceCodes = "BBA3".concat(", ").concat(",ABA1").concat(",null");
@@ -388,7 +367,7 @@ class StaffRefDataServiceImplTest {
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
 
-        assertThat(serviceSkills.size()).isEqualTo(2);
+        assertThat(serviceSkills).hasSize(2);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
@@ -403,32 +382,6 @@ class StaffRefDataServiceImplTest {
 
     }
 
-    @Test
-    void should_return_multiple_skills_for_list_of_service_codes_with_empty_codes() {
-        List<Skill> skills = getSkillsData();
-        when(skillRepository.findAll()).thenReturn(skills);
-        String serviceCodes = "";
-        StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataServiceImpl.getServiceSkills(serviceCodes);
-
-        assertThat(staffWorkerSkillResponse).isNotNull();
-
-        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-
-
-        assertThat(serviceSkills.size()).isEqualTo(2);
-
-        ServiceSkill serviceSkill = serviceSkills.get(0);
-
-        assertThat(serviceSkill.getId()).isEqualTo("BBA3");
-
-        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
-
-        assertThat(skillDTO.getSkillId()).isEqualTo(1L);
-        assertThat(skillDTO.getSkillCode()).isEqualTo("A1");
-        assertThat(skillDTO.getDescription()).isEqualTo("desc1");
-        assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
-
-    }
 
     @Test
     void should_return_empty_list_of_service_skills() {
@@ -1502,6 +1455,48 @@ class StaffRefDataServiceImplTest {
                         staffProfileCreationRequest));
         assertNotNull(ex);
         assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+    }
+
+    @Test
+    void test_checkStaffProfileEmailAndSuspendFlag_ProfileAlreadyPresent() {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+
+        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+            staffRefDataServiceImpl.checkStaffProfileEmailAndSuspendFlag(staffProfileCreationRequest);
+        });
+
+        assertThat(thrown.getMessage()).contains("The profile is already created for the given email Id");
+    }
+
+    @Test
+    void test_checkStaffProfileEmailAndSuspendFlag_ProfileSuspended() {
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+
+        staffProfileCreationRequest.setSuspended(true);
+        InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
+            staffRefDataServiceImpl.checkStaffProfileEmailAndSuspendFlag(staffProfileCreationRequest);
+        });
+        String errorMsg = "There is no user present to suspend. "
+                + "Please try again or check with HMCTS Support Team";
+        assertThat(thrown.getMessage()).contains(errorMsg);
+    }
+
+    @Test
+    void test_getProfileResponse() {
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("27fbd198-552e-4c32-9caf-37be1545caaf");
+        Optional<Object> userProfileResponseOptional = Optional.ofNullable(userProfileResponse);
+
+        assertThat(staffRefDataServiceImpl.getProfileResponse(userProfileResponseOptional)).isNotNull();
+
+        userProfileResponseOptional = Optional.ofNullable(null);
+
+        assertThat(staffRefDataServiceImpl.getProfileResponse(userProfileResponseOptional)).isNull();
+
+        userProfileResponseOptional = Optional.empty();
+
+        assertThat(staffRefDataServiceImpl.getProfileResponse(userProfileResponseOptional)).isNull();
+
     }
 
 }

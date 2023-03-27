@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -64,33 +63,31 @@ public class CaseWorkerRefController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = REQUEST_COMPLETED_SUCCESSFULLY,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "201",
+            description = REQUEST_COMPLETED_SUCCESSFULLY,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @PostMapping(value = "/upload-file",
             consumes = "multipart/form-data")
     @Secured("cwd-admin")
@@ -107,33 +104,31 @@ public class CaseWorkerRefController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Successfully built idam role mappings for case worker roles",
-                    content = @Content(schema = @Schema(implementation = IdamRolesMappingResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "201",
+            description = "Successfully built idam role mappings for case worker roles",
+            content = @Content(schema = @Schema(implementation = IdamRolesMappingResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @PostMapping(
             path = "/idam-roles-mapping",
             consumes = APPLICATION_JSON_VALUE,
