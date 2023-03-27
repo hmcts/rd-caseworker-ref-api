@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -91,33 +90,31 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = REQUEST_COMPLETED_SUCCESSFULLY,
-                    content = @Content(schema = @Schema(implementation = SearchStaffUserResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = REQUEST_COMPLETED_SUCCESSFULLY,
+            content = @Content(schema = @Schema(implementation = SearchStaffUserResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @Validated
     @GetMapping(path = "/profile/search-by-name",
             produces = APPLICATION_JSON_VALUE)
@@ -144,36 +141,33 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved list of ServiceSkills for the request provided",
-                    content = @Content(schema = @Schema(implementation = StaffWorkerSkillResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved list of ServiceSkills for the request provided",
+            content = @Content(schema = @Schema(implementation = StaffWorkerSkillResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @GetMapping(
             produces = APPLICATION_JSON_VALUE,
             path = {"/skill"}
     )
     @Secured("staff-admin")
     public ResponseEntity<StaffWorkerSkillResponse> retrieveAllServiceSkills(
-            @RequestParam(value = "service_codes", required = false) String serviceCodes
-    ) {
+            @RequestParam(value = "service_codes", required = false) String serviceCodes) {
         log.info("StaffRefDataController.retrieveAllServiceSkills Calling Service layer");
 
         StaffWorkerSkillResponse staffWorkerSkillResponse = staffRefDataService.getServiceSkills(serviceCodes);
@@ -188,34 +182,33 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
             })
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully fetched the user types",
-                    content = @Content(schema = @Schema(implementation = StaffRefDataUserTypesResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully fetched the user types",
+            content = @Content(schema = @Schema(implementation = StaffRefDataUserTypesResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @GetMapping(
             path = "/user-type",
             produces = APPLICATION_JSON_VALUE
     )
     @Secured("staff-admin")
     public ResponseEntity<Object> fetchUserTypes() {
+
         log.info("{} : Fetching the user types", loggingComponentName);
         StaffRefDataUserTypesResponse.StaffRefDataUserTypesResponseBuilder staffReferenceDataUserTypesResponseBuilder
                 = StaffRefDataUserTypesResponse.builder();
@@ -239,28 +232,26 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved list of Job Titles for the request provided",
-                    content = @Content(schema = @Schema(implementation = StaffRefJobTitleResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad Request",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Forbidden Error: Access denied",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved list of Job Titles for the request provided",
+            content = @Content(schema = @Schema(implementation = StaffRefJobTitleResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Bad Request",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
     @GetMapping(
             produces = APPLICATION_JSON_VALUE,
             path = {"/job-title"}
@@ -291,34 +282,32 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Successfully created staff user profile",
-                    content = @Content(array =
-                    @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "201",
+            description = "Successfully created staff user profile",
+            content = @Content(array =
+            @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @PostMapping(
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE,
@@ -350,34 +339,32 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = REQUEST_COMPLETED_SUCCESSFULLY,
-                    content = @Content(array =
-                    @ArraySchema(schema = @Schema(implementation = SearchStaffUserResponse.class)))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = REQUEST_COMPLETED_SUCCESSFULLY,
+            content = @Content(array =
+            @ArraySchema(schema = @Schema(implementation = SearchStaffUserResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @Validated
     @GetMapping(path = "/profile/search",
             produces = APPLICATION_JSON_VALUE)
@@ -386,6 +373,7 @@ public class StaffRefDataController {
             @RequestHeader(name = "page-number", required = false) Integer pageNumber,
             @RequestHeader(name = "page-size", required = false) Integer pageSize,
             @ParameterObject SearchRequest searchRequest) {
+
         validateSearchRequest(searchRequest);
         var pageRequest = validateAndBuildPagination(pageSize, pageNumber, configPageSize,
                 configPageNumber);
@@ -400,34 +388,32 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully updated staff user profile",
-                    content = @Content(array =
-                    @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully updated staff user profile",
+            content = @Content(array =
+            @ArraySchema(schema = @Schema(implementation = StaffProfileCreationResponse.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @PutMapping(
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE,
@@ -462,33 +448,31 @@ public class StaffRefDataController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Request is successful",
-                    content = @Content(schema = @Schema(implementation = SearchStaffUserByIdResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "Request is successful",
+            content = @Content(schema = @Schema(implementation = SearchStaffUserByIdResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @GetMapping(
             path = "/profile/search-by-id",
             produces = APPLICATION_JSON_VALUE

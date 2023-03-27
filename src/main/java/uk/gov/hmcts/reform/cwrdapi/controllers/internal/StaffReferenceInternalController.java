@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -66,38 +65,36 @@ public class StaffReferenceInternalController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "The Staff profiles have been retrieved successfully",
-                    content = @Content(schema = @Schema(implementation = StaffProfileWithServiceName.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = NO_DATA_FOUND,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "The Staff profiles have been retrieved successfully",
+            content = @Content(schema = @Schema(implementation = StaffProfileWithServiceName.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = NO_DATA_FOUND,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @GetMapping(
             path = "/usersByServiceName",
             produces = APPLICATION_JSON_VALUE
