@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @SuppressWarnings("AbbreviationAsWordInName")
-public class CaseWorkerSkillTest {
+class CaseWorkerSkillTest {
 
     @Test
     void testCaseWorkerSkill() {

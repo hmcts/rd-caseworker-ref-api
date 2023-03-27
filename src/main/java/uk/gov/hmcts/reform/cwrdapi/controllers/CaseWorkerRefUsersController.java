@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -88,33 +87,31 @@ public class CaseWorkerRefUsersController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Successfully created caseworker user profiles",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "201",
+            description = "Successfully created caseworker user profiles",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @PostMapping(
             consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE
@@ -162,38 +159,36 @@ public class CaseWorkerRefUsersController {
                     @SecurityRequirement(name = "Authorization")
             }
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully fetched the Caseworker profile(s)",
-                    content = @Content(schema = @Schema(implementation = CaseWorkerProfile.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = BAD_REQUEST,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = UNAUTHORIZED_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = FORBIDDEN_ERROR,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = NO_DATA_FOUND,
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = INTERNAL_SERVER_ERROR,
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully fetched the Caseworker profile(s)",
+            content = @Content(schema = @Schema(implementation = CaseWorkerProfile.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = BAD_REQUEST,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = NO_DATA_FOUND,
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = INTERNAL_SERVER_ERROR,
+            content = @Content
+    )
     @PostMapping(
             path = "/fetchUsersById",
             consumes = APPLICATION_JSON_VALUE,
@@ -217,34 +212,32 @@ public class CaseWorkerRefUsersController {
                     @SecurityRequirement(name = "ServiceAuthorization"),
                     @SecurityRequirement(name = "Authorization")
             })
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Case Worker Profiles deleted successfully",
-                    content = @Content(schema = @Schema(implementation = CaseWorkerProfilesDeletionResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "An invalid request has been provided",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Unauthorized Error : "
-                            + "The requested resource is restricted and requires authentication",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden Error: Access denied",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content
-            )
-    })
+    @ApiResponse(
+            responseCode = "204",
+            description = "Case Worker Profiles deleted successfully",
+            content = @Content(schema = @Schema(implementation = CaseWorkerProfilesDeletionResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "An invalid request has been provided",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized Error : "
+                    + "The requested resource is restricted and requires authentication",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden Error: Access denied",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal Server Error",
+            content = @Content
+    )
 
     @DeleteMapping(
             produces = APPLICATION_JSON_VALUE
