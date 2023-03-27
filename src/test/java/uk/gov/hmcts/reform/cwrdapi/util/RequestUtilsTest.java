@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.trimIdamRoles;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagination;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPaginationObject;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateSearchString;
+import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateServiceCode;
 
 class RequestUtilsTest {
 
@@ -137,5 +138,14 @@ class RequestUtilsTest {
         Assertions.assertThrows(InvalidRequestException.class, () ->
                 validateSearchString("abcd123")
         );
+    }
+
+    @Test
+    void testServiceCode() {
+
+        assertThat(validateServiceCode(null)).isFalse();
+        assertThat(validateServiceCode("null")).isFalse();
+        assertThat(validateServiceCode(" ")).isFalse();
+        assertThat(validateServiceCode("BBA3")).isTrue();
     }
 }
