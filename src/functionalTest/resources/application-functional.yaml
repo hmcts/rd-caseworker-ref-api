@@ -1,6 +1,6 @@
 targetInstance: ${TEST_URL:http://localhost:8095}
 
-s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.aat.platform.hmcts.net}
+s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
 
 s2s-name: rd_caseworker_ref_api
 scope-name: openid profile roles manage-user create-user search-user
@@ -8,7 +8,7 @@ scope-name: openid profile roles manage-user create-user search-user
 idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
 oauth2.client.secret: ${CA_REF_OAUTH2_CLIENT_SECRET:}
 idam.auth.clientId: ${CA_REF_OAUTH2_CLIENT_ID:}
-idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.aat.platform.hmcts.net/oauth2redirect}
+idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/oauth2redirect}
 s2s-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
-userProfUrl: http://rd-user-profile-api-aat.aat.platform.hmcts.net
-locationRefDataUrl: http://rd-location-ref-api-aat.aat.platform.hmcts.net
+userProfUrl: http://rd-user-profile-api-aat.service.core-compute-aat.internal
+locationRefDataUrl: http://rd-location-ref-api-aat.service.core-compute-aat.internal
