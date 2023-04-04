@@ -51,20 +51,23 @@ withPipeline(type, product, component) {
     enableDbMigration('rd')
     disableLegacyDeployment()
     enableAksStagingDeployment()
+    
+    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
 
     before('functionalTest:preview') {
       env.execution_environment = "preview"
+      env.TEST_URL = "http://rd-caseworker-ref-api.preview.platform.hmcts.net"
     }
 
     before('functionalTest:aat') {
       env.execution_environment = "aat"
+      env.TEST_URL = "http://rd-caseworker-ref-api.aat.platform.hmcts.net"
     }
     // Sync demo and perftest with master branch
     syncBranchesWithMaster(branchesToSync)
 
-    env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
 
     afterSuccess('integrationTest:preview') {
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
