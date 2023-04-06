@@ -72,6 +72,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -305,7 +306,7 @@ public class StaffReferenceDataProviderTest {
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
-        caseWorkerProfile.setCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
+        caseWorkerProfile.setCaseWorkerId("CWID1");
         caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
         caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
         CaseWorkerSkill caseWorkerSkill = getCaseWorkerSkill();
@@ -585,6 +586,24 @@ public class StaffReferenceDataProviderTest {
                 .roles(singletonList(staffProfileRoleRequest))
                 .skills(singletonList(skillsRequest))
                 .build();
+    }
+
+    @State({"A staff profile by caseworker id"})
+    public void fetchStaffProfileById() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+        String body = mapper.writeValueAsString(List.of(userProfileResponse));
+
+        when(userProfileFeignClient.getUserProfile(any()))
+            .thenReturn(Response.builder()
+                .request(mock(Request.class)).body(body, defaultCharset()).status(200).build());
+
+        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
+
+        doReturn(Optional.of(caseWorkerProfile)).when(caseWorkerProfileRepo).findByCaseWorkerId(anyString());
     }
 }
 
