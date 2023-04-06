@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static org.apache.logging.log4j.util.Strings.isNotBlank;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.EXCEPTION_MSG_SPCL_CHAR;
 import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.NUMERIC_VALUE_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALPHA_NUMERIC_WITH_SPECIAL_CHAR_REGEX;
@@ -114,10 +113,7 @@ public class RequestUtils {
     }
 
     public static String removeEmptySpaces(String value) {
-        if (isNotBlank(value)) {
-            return value.trim().replaceAll("\\s+", " ");
-        }
-        return value;
+        return value != null ? value.trim().replaceAll("\\s+", " ") : value;
     }
 
     public static void validateSearchString(String searchString) {
