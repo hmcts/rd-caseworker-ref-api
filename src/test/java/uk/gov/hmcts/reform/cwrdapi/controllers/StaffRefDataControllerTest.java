@@ -695,7 +695,6 @@ class StaffRefDataControllerTest {
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 staffRefDataController.fetchStaffProfileById("185a0254-ff80-458b-8f62-2a759788afd2"));
     }
-    //Copied Code from StaffRefDataJobTitleControllerTest ==>Start
 
     @Test
     void shouldFetchJobTitles() {
@@ -789,7 +788,6 @@ class StaffRefDataControllerTest {
         Assert.assertTrue(actualJobTitles.isEmpty());
         verify(staffRefDataService).getJobTitles();
     }
-    //Copied Code from StaffRefDataJobTitleControllerTest ==> End
 
     @ParameterizedTest
     @ValueSource(strings = {"firstname", "lastname", "firstname lastname", "f l", "name"})
