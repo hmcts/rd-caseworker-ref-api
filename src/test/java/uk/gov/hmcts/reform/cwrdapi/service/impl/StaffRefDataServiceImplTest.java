@@ -168,7 +168,7 @@ class StaffRefDataServiceImplTest {
         idamRoles.add("IdamRole2");
 
         StaffProfileRoleRequest staffProfileRoleRequest =
-                new StaffProfileRoleRequest(1, "testRole1", true);
+                new StaffProfileRoleRequest(1,"testRole1", true);
 
         CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
@@ -250,6 +250,7 @@ class StaffRefDataServiceImplTest {
                 .roles(singletonList(staffProfileRoleRequest))
                 .skills(singletonList(skillsRequest))
                 .build();
+
 
 
         caseWorkerProfile = new CaseWorkerProfile();
@@ -352,6 +353,7 @@ class StaffRefDataServiceImplTest {
         assertThat(skillDTO.getUserType()).isEqualTo("user_type1");
 
     }
+
 
 
     @Test
@@ -517,7 +519,7 @@ class StaffRefDataServiceImplTest {
                 .thenReturn(pages);
 
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
-                staffRefDataServiceImpl.retrieveStaffUserByName(modifiedSearchString.toLowerCase(), pageRequest);
+                staffRefDataServiceImpl.retrieveStaffUserByName(searchString.toLowerCase(), pageRequest);
         assertEquals(200, responseEntity.getStatusCodeValue());
 
         assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
