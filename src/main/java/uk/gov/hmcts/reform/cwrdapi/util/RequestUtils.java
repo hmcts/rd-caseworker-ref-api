@@ -117,7 +117,7 @@ public class RequestUtils {
         if (isNotBlank(value)) {
             return value.trim().replaceAll("\\s+", " ");
         }
-        return value;
+        return value.trim();//this is to handle spaces, null check is at controller's parameter level
     }
 
     public static void validateSearchString(String searchString) {
