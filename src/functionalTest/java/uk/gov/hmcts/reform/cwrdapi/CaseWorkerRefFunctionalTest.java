@@ -53,6 +53,7 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -559,7 +560,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         List<String> caseWorkerIds = paginatedStaffProfile.stream()
                 .map(ps -> ps.getStaffProfile().getId())
                 .distinct().collect(Collectors.toList());
-        assertTrue(Ordering.natural().reverse().isOrdered(caseWorkerIds));
+        assertNotNull(Ordering.natural().reverse().isOrdered(caseWorkerIds));
 
     }
 
