@@ -200,7 +200,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     @Test
     void should_retrieveAllUserTypes_return_status_code_200()
             throws JsonProcessingException {
-        String path = "/job-title";
+        String path = "/user-type";
 
         String role = "staff-admin";
 
@@ -213,12 +213,12 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<StaffRefDataUserType> userTypes = staffRefDataUserTypesResponse.getUserTypes();
 
         assertThat(userTypes).isNotNull();
-        assertThat(userTypes).hasSize(16);
+        assertThat(userTypes).hasSize(5);
 
         StaffRefDataUserType staffRefDataUserType = userTypes.get(0);
 
-        assertThat(staffRefDataUserType.getId()).isEqualTo(3L);
-        assertThat(staffRefDataUserType.getCode()).isEqualTo("Hearing Centre Team Leader");
+        assertThat(staffRefDataUserType.getId()).isEqualTo(1L);
+        assertThat(staffRefDataUserType.getCode()).isEqualTo("CTSC");
 
     }
 
