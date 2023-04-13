@@ -72,6 +72,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.RequestUtils;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -414,7 +415,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     @Override
     public ResponseEntity<List<SearchStaffUserResponse>> retrieveStaffUserByName(String searchString,
                                                                                  PageRequest pageRequest) {
-
+        searchString = generateSQLSearchString(searchString);
         Page<CaseWorkerProfile> pageable =
                 caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest);
         long totalRecords = pageable.getTotalElements();
@@ -1127,5 +1128,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
 
         return serviceCodes;
+    }
+
+    private String generateSQLSearchString(String searchString) {
+        String[] searchTuple = searchString.split(" ");
+        if (searchTuple.length > 1) {
+            searchString = Arrays.stream(searchTuple).collect(Collectors.joining("%"));
+        }
+        return searchString;
     }
 }

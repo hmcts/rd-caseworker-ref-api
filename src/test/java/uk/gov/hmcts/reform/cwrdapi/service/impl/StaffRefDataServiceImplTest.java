@@ -79,6 +79,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.EMPTY_SET;
@@ -495,6 +496,45 @@ class StaffRefDataServiceImplTest {
     }
 
     @Test
+    void should_return_case_worker_profile_for_search_string_status_code_200() {
+        final String searchString = "firstName Last`name";
+
+        CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
+
+        caseWorkerProfile.setSuspended(true);
+        caseWorkerProfile.setTaskSupervisor(true);
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setUserAdmin(true);
+
+        ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+        caseWorkerProfiles.add(caseWorkerProfile);
+        Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
+
+        var pageRequest =
+                validateAndBuildPagination(20, 1,
+                        20, 1);
+        String modifiedSearchString = generateSearchString(searchString);
+
+        when(caseWorkerProfileRepository.findByFirstNameOrLastName(modifiedSearchString.toLowerCase(), pageRequest))
+                .thenReturn(pages);
+
+        ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
+                staffRefDataServiceImpl.retrieveStaffUserByName(searchString.toLowerCase(), pageRequest);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+
+        assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
+
+        List<SearchStaffUserResponse> searchResponse = responseEntity.getBody();
+        assertThat(responseEntity.getBody()).isNotNull();
+        validateSearchStaffUserResponses(searchResponse);
+    }
+
+    private String generateSearchString(String searchString) {
+        String[] searchTuple = searchString.split(" ");
+        return Arrays.stream(searchTuple).collect(Collectors.joining("%"));
+    }
+
+    @Test
     void should_return_case_worker_profileSearch_with_status_code_200() {
         ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         CaseWorkerProfile caseWorkerProfile = buildCaseWorkerProfile();
@@ -511,7 +551,7 @@ class StaffRefDataServiceImplTest {
                 .build();
 
         when(caseWorkerProfileRepository.findByCaseWorkerProfiles(any(), any(), any(),
-                any(), any(), any(),any()))
+                any(), any(), any(), any()))
                 .thenReturn(pages);
         var pageRequest = validateAndBuildPagination(20, 1,
                 20, 1);
@@ -1377,7 +1417,6 @@ class StaffRefDataServiceImplTest {
         assertEquals(true, searchStaffUserByIdResponse.isSuspended());
 
 
-
         assertEquals(1L, searchStaffUserByIdResponse.getSkills().size());
         assertEquals(1L, searchStaffUserByIdResponse.getSkills().get(0).getSkillId());
         assertEquals("desc1", searchStaffUserByIdResponse.getSkills().get(0).getDescription());
@@ -1407,7 +1446,7 @@ class StaffRefDataServiceImplTest {
                 .when(caseWorkerProfileRepository).findByCaseWorkerId("27fbd198-552e-4c32-9caf-37be1545caaf");
 
         when(userProfileFeignClient.getUserProfile(any())).thenReturn(Response.builder().request(mock(Request.class))
-                        .body(mapper.writeValueAsString(null), defaultCharset()).status(200).build());
+                .body(mapper.writeValueAsString(null), defaultCharset()).status(200).build());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 staffRefDataServiceImpl.fetchStaffProfileById("27fbd198-552e-4c32-9caf-37be1545caaf"));
@@ -1432,7 +1471,7 @@ class StaffRefDataServiceImplTest {
         userProfileCreationResponse.setIdamRegistrationResponse(201);
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+        when(userProfileFeignClient.createUserProfile(any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
         staffRefDataServiceImpl.reinviteStaffProfile(staffProfileCreationRequest);
         verify(staffAuditRepository, times(0)).save(any());
@@ -1448,7 +1487,7 @@ class StaffRefDataServiceImplTest {
         userProfileCreationResponse.setIdamRegistrationResponse(1);
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(userProfileFeignClient.createUserProfile(any(),any())).thenReturn(Response.builder()
+        when(userProfileFeignClient.createUserProfile(any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(400).build());
         StaffReferenceException ex = assertThrows(StaffReferenceException.class, () -> staffRefDataServiceImpl
                 .reinviteStaffProfile(

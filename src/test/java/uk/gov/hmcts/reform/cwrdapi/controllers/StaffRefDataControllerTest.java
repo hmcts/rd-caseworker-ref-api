@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +32,12 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationReque
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
@@ -691,4 +697,133 @@ class StaffRefDataControllerTest {
         Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 staffRefDataController.fetchStaffProfileById("185a0254-ff80-458b-8f62-2a759788afd2"));
     }
+
+    @Test
+    void shouldFetchJobTitles() {
+        //given
+
+        final long roleId1 = RandomUtils.nextLong();
+        final long roleId2 = RandomUtils.nextLong();
+        final String roleDescription1 = RandomStringUtils.randomAlphanumeric(10);
+        final String roleDescription2 = RandomStringUtils.randomAlphanumeric(10);
+
+        final List<RoleType> roleTypes = List.of(
+                new RoleType(roleId1, roleDescription1),
+                new RoleType(roleId2, roleDescription2));
+
+
+        final StaffRefDataJobTitle staffRefDataJobTitle1 = StaffRefDataJobTitle.builder()
+                .roleId(roleId1)
+                .roleDescription(roleDescription1)
+                .build();
+
+        final StaffRefDataJobTitle staffRefDataJobTitle2 = StaffRefDataJobTitle.builder()
+                .roleId(roleId2)
+                .roleDescription(roleDescription2)
+                .build();
+
+        final List<StaffRefDataJobTitle> staffRefDataJobTitles = List.of(staffRefDataJobTitle1, staffRefDataJobTitle2);
+        final StaffRefJobTitleResponse srJobTitleResponse =
+                StaffRefJobTitleResponse
+                        .builder()
+                        .jobTitles(staffRefDataJobTitles)
+                        .build();
+
+        final ResponseEntity<Object> expectedResponseEntity =
+                new ResponseEntity<>(srJobTitleResponse, null, HttpStatus.OK);
+
+
+        //when
+        when(staffRefDataService.getJobTitles()).thenReturn(roleTypes);
+
+
+        //then
+        ResponseEntity<?> actualReponseEntity = staffRefDataController.retrieveJobTitles();
+        Assert.assertNotNull(actualReponseEntity);
+        Assert.assertEquals(expectedResponseEntity.getStatusCode(), actualReponseEntity.getStatusCode());
+
+        final StaffRefJobTitleResponse actualStaffRefJobTitleResponse =
+                (StaffRefJobTitleResponse) actualReponseEntity.getBody();
+        Assert.assertNotNull(actualStaffRefJobTitleResponse);
+
+        final StaffRefJobTitleResponse expectedResponseEntityBody =
+                (StaffRefJobTitleResponse) expectedResponseEntity.getBody();
+        Assert.assertNotNull(expectedResponseEntityBody);
+
+
+        final List<StaffRefDataJobTitle> expectedJobTitles = expectedResponseEntityBody.getJobTitles();
+        Assert.assertNotNull(actualStaffRefJobTitleResponse);
+
+        List<StaffRefDataJobTitle> actualJobTitles = actualStaffRefJobTitleResponse.getJobTitles();
+        Assert.assertNotNull(actualJobTitles);
+
+        Assert.assertEquals(expectedJobTitles.size(), actualJobTitles.size());
+        assertThat(expectedJobTitles).usingRecursiveComparison().isEqualTo(actualJobTitles);
+        verify(staffRefDataService).getJobTitles();
+    }
+
+
+    @Test
+    void shouldFetchEmptyJobTitles() {
+        //given
+        final StaffRefJobTitleResponse srJobTitleResponse = StaffRefJobTitleResponse
+                .builder()
+                .jobTitles(List.of())
+                .build();
+
+        final ResponseEntity<Object> expectedResponseEntity =
+                new ResponseEntity<>(srJobTitleResponse, null, HttpStatus.OK);
+        //when
+        when(staffRefDataService.getJobTitles()).thenReturn(List.of());
+
+        //then
+        final ResponseEntity<?> actualResponseEntity = staffRefDataController.retrieveJobTitles();
+        Assert.assertNotNull(actualResponseEntity);
+        Assert.assertEquals(expectedResponseEntity.getStatusCode(), actualResponseEntity.getStatusCode());
+
+        final StaffRefJobTitleResponse actualResponse = (StaffRefJobTitleResponse) actualResponseEntity.getBody();
+        Assert.assertNotNull(actualResponse);
+
+        final List<StaffRefDataJobTitle> actualJobTitles = actualResponse.getJobTitles();
+
+        Assert.assertNotNull(actualJobTitles);
+        Assert.assertTrue(actualJobTitles.isEmpty());
+        verify(staffRefDataService).getJobTitles();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"firstname", "lastname", "firstname lastname", "f l", "name"})
+    void should_return_staff_search_by_name_with_search_string_status_code_200(String searchString) {
+
+        ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserResponseEntity =
+                new ResponseEntity<>(List.of(searchResponse), null, HttpStatus.OK);
+        when(staffRefDataService.retrieveStaffUserByName(eq(searchString), Mockito.any(PageRequest.class)))
+                .thenReturn(searchStaffUserResponseEntity);
+        ResponseEntity<List<SearchStaffUserResponse>> response =
+                staffRefDataController.searchStaffUserByName(1, 2, searchString);
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(staffRefDataService, times(1))
+                .retrieveStaffUserByName(eq(searchString), Mockito.any(PageRequest.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "ab", "ab*", "ab123", "a     ", "     ", " s  ", "  ab  ", "&ab  ", " "})
+    void should_return_staff_search_by_name_with_invalid_search_string_status_code_400(String searchString) {
+
+        Exception ex = assertThrows(InvalidRequestException.class, () -> staffRefDataController
+                .searchStaffUserByName(2, 2, searchString));
+        verify(staffRefDataService, times(0))
+                .retrieveStaffUserByName(eq(searchString), Mockito.any(PageRequest.class));
+        assertNotNull(ex);
+        String searchStringTrim = searchString.trim();
+        if (searchStringTrim.length() == 0) {
+            assertEquals("Empty search string. Please enter a valid search string.", ex.getMessage());
+        } else if (searchStringTrim.length() <= 2) {
+            assertEquals("The search string should contain at least 3 characters.", ex.getMessage());
+        } else {
+            assertEquals("Invalid search string. Please input a valid string.", ex.getMessage());
+        }
+    }
+
 }
