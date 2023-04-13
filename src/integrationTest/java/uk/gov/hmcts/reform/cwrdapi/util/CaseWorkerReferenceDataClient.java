@@ -122,6 +122,12 @@ public class CaseWorkerReferenceDataClient {
         return mapServiceSkillsIdResponse(responseEntity, clazz);
     }
 
+    public Object retrieveStaffRefData(Class<?> clazz,
+                                           String path, String role) throws JsonProcessingException {
+        ResponseEntity<Object> responseEntity = getRequest(path, clazz, role);
+        return mapServiceSkillsIdResponse(responseEntity, clazz);
+    }
+
     private Object mapServiceSkillsIdResponse(ResponseEntity<Object> responseEntity,
                                               Class<?> clazz) throws JsonProcessingException {
         HttpStatus status = responseEntity.getStatusCode();

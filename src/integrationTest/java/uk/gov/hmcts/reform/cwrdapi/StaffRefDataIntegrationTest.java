@@ -5,6 +5,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefJobTitleResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
 import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
@@ -167,5 +171,57 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
 
     }
+
+    @Test
+    void should_retrieveAllTitles_return_status_code_200()
+            throws JsonProcessingException {
+        String path = "/job-title";
+
+        String role = "staff-admin";
+
+
+        final var staffRefJobTitleResponse = (StaffRefJobTitleResponse) caseworkerReferenceDataClient
+                .retrieveStaffRefData(StaffRefJobTitleResponse.class, path, role);
+
+        assertThat(staffRefJobTitleResponse).isNotNull();
+
+        List<StaffRefDataJobTitle> jobTitles = staffRefJobTitleResponse.getJobTitles();
+
+        assertThat(jobTitles).isNotNull();
+        assertThat(jobTitles).hasSize(16);
+
+        StaffRefDataJobTitle staffRefDataJobTitle = jobTitles.get(0);
+
+        assertThat(staffRefDataJobTitle.getRoleId()).isEqualTo(3L);
+        assertThat(staffRefDataJobTitle.getRoleDescription()).isEqualTo("Hearing Centre Team Leader");
+
+    }
+
+    @Test
+    void should_retrieveAllUserTypes_return_status_code_200()
+            throws JsonProcessingException {
+        String path = "/job-title";
+
+        String role = "staff-admin";
+
+
+        final var staffRefDataUserTypesResponse = (StaffRefDataUserTypesResponse) caseworkerReferenceDataClient
+                .retrieveStaffRefData(StaffRefDataUserTypesResponse.class, path, role);
+
+        assertThat(staffRefDataUserTypesResponse).isNotNull();
+
+        List<StaffRefDataUserType> userTypes = staffRefDataUserTypesResponse.getUserTypes();
+
+        assertThat(userTypes).isNotNull();
+        assertThat(userTypes).hasSize(16);
+
+        StaffRefDataUserType staffRefDataUserType = userTypes.get(0);
+
+        assertThat(staffRefDataUserType.getId()).isEqualTo(3L);
+        assertThat(staffRefDataUserType.getCode()).isEqualTo("Hearing Centre Team Leader");
+
+    }
+
+
 
 }
