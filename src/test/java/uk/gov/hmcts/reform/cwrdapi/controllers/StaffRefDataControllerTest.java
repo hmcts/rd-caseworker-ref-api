@@ -792,7 +792,7 @@ class StaffRefDataControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"firstname", "lastname", "firstname lastname", "f l", "name",
             "Ab 123", "I II III IV V VI VII VIII IX X", "VïlæŚ Śhëłkę", "Æñdrèw", "àáâäæãåā", "Ęéëį",
-            "a & b_-."})
+            "a'b-’"})
     void should_return_staff_search_by_name_with_search_string_status_code_200(String searchString) {
 
         ResponseEntity<List<SearchStaffUserResponse>> searchStaffUserResponseEntity =
