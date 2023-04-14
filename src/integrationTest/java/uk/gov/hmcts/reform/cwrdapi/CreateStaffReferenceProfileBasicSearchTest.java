@@ -204,6 +204,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-IVXIIV");
         assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-I.V-X&IIV");
     }
+
     @Test
     void should_return_staff_search_by_firstname_and_lastname_initial_status_code_200() {
 
