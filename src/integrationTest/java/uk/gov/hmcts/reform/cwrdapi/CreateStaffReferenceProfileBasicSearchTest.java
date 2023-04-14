@@ -178,7 +178,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
         generateCaseWorkerDataPhoneticAndSpecial();
         String searchString = "sbn-Æquen";
-        List<SearchStaffUserResponse> searchStaffUserResponse = searchAPICallAndCommonAssertions(searchString);
+        List<SearchStaffUserResponse> searchStaffUserResponse = searchApiCallAndCommonAssertions(searchString);
         assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-Æquen");
         assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-Ïndîkä");
     }
@@ -189,7 +189,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         generateCaseWorkerDataPhoneticAndSpecial();
         String searchString = "sbn-IVXIIV";
 
-        List<SearchStaffUserResponse> searchStaffUserResponse = searchAPICallAndCommonAssertions(searchString);
+        List<SearchStaffUserResponse> searchStaffUserResponse = searchApiCallAndCommonAssertions(searchString);
         assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-IVXIIV");
         assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-I.V-X&IIV");
     }
@@ -199,7 +199,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
         generateCaseWorkerDataPhoneticAndSpecial();
         String searchString = "sbn-I.V-X&IIV";
-        List<SearchStaffUserResponse> searchStaffUserResponse = searchAPICallAndCommonAssertions(searchString);
+        List<SearchStaffUserResponse> searchStaffUserResponse = searchApiCallAndCommonAssertions(searchString);
 
         assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-IVXIIV");
         assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-I.V-X&IIV");
@@ -357,7 +357,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
     }
 
-    private List<SearchStaffUserResponse> searchAPICallAndCommonAssertions(String searchString) {
+    private List<SearchStaffUserResponse> searchApiCallAndCommonAssertions(String searchString) {
         String path = "/profile/search-by-name";
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
