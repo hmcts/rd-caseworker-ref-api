@@ -181,7 +181,7 @@ public final class CaseWorkerConstants {
     public static final String CW_LAST_NAME = "lastName";
 
 
-    public static final String SEARCH_STRING_REGEX_PATTERN = "([a-zA-Z\\-\\s']){3,}+";
+    public static final String SEARCH_STRING_REGEX_PATTERN = "[(a-zA-Z0-9 )\\p{L}\\p{N}.\\-\\_@&$]{3,}";
 
 
     public static final String REG_EXP_SPCL_CHAR = "^[^<>{}\"/|;:.~!?@#$%^=&*\\]\\\\()\\[¿§«»ω⊙¤°℃℉€¥£¢¡®©+]*$";

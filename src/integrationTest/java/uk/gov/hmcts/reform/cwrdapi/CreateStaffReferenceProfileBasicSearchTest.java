@@ -174,6 +174,37 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
     }
 
     @Test
+    void should_return_staff_search_by_name_with_firstname_and_lastname_with_phonetics_status_code_200() {
+
+        generateCaseWorkerDataPhoneticAndSpecial();
+        String searchString = "sbn-Æquen";
+        List<SearchStaffUserResponse> searchStaffUserResponse = searchAPICallAndCommonAssertions(searchString);
+        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-Æquen");
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-Ïndîkä");
+    }
+
+    @Test
+    void should_return_staff_search_by_name_with_firstname_and_lastname_with_roman_status_code_200() {
+
+        generateCaseWorkerDataPhoneticAndSpecial();
+        String searchString = "sbn-IVXIIV";
+
+        List<SearchStaffUserResponse> searchStaffUserResponse = searchAPICallAndCommonAssertions(searchString);
+        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-IVXIIV");
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-I.V-X&IIV");
+    }
+
+    @Test
+    void should_return_staff_search_by_name_with_firstname_and_lastname_with_specialCharacters_status_code_200() {
+
+        generateCaseWorkerDataPhoneticAndSpecial();
+        String searchString = "sbn-I.V-X&IIV";
+        List<SearchStaffUserResponse> searchStaffUserResponse = searchAPICallAndCommonAssertions(searchString);
+
+        assertThat(searchStaffUserResponse.get(0).getFirstName()).contains("sbn-IVXIIV");
+        assertThat(searchStaffUserResponse.get(0).getLastName()).contains("sbn-I.V-X&IIV");
+    }
+    @Test
     void should_return_staff_search_by_firstname_and_lastname_initial_status_code_200() {
 
         generateCaseWorkerData();
@@ -292,7 +323,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
         assertThat(response).containsEntry("http_status", "400");
         assertThat(response.get("response_body").toString())
-                .contains("Invalid search string. Please input a valid string.");
+                .contains("The field Page Size is invalid. Please provide a valid value.");
 
     }
 
@@ -326,6 +357,23 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
     }
 
+    private List<SearchStaffUserResponse> searchAPICallAndCommonAssertions(String searchString) {
+        String path = "/profile/search-by-name";
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        ResponseEntity<SearchStaffUserResponse[]> response = caseworkerReferenceDataClient
+                .searchStaffUserByNameExchange(path, searchString, null, null, ROLE_STAFF_ADMIN);
+
+        assertThat(response).isNotNull();
+
+        assertThat(Integer.valueOf(response.getHeaders().get("total-records").get(0))).isEqualTo(1);
+
+        List<SearchStaffUserResponse> searchStaffUserResponse = Arrays.asList(
+                response.getBody());
+
+        assertThat(searchStaffUserResponse).isNotNull();
+        return searchStaffUserResponse;
+    }
+
     private void generateCaseWorkerData() {
         String emailPattern = "sbnTest1234";
         String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
@@ -340,6 +388,15 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
         createCaseWorkerTestData("sbn-Ron", "sbn-David", email);
         email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
         createCaseWorkerTestData("sbn-Mary", "sbn-David", email);
+    }
+
+    private void generateCaseWorkerDataPhoneticAndSpecial() {
+        String emailPattern = "sbnTest1234";
+        String email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-Æquen", "sbn-Ïndîkä", email);
+        email = format(EMAIL_TEMPLATE, randomAlphanumeric(10) + emailPattern).toLowerCase();
+        createCaseWorkerTestData("sbn-IVXIIV", "sbn-I.V-X&IIV", email);
     }
 
     private void validateSearchStaffUserResponse(List<SearchStaffUserResponse> searchStaffUserResponse) {
