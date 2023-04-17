@@ -110,5 +110,6 @@
   "10021_X-Content-Type-Options Header Missing_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal_GET": "ignore",
   "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal_GET": "ignore",
   "90033_Loosely Scoped Cookie_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/robots.txt_GET": "ignore",
-  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/robots.txt_GET": "ignore"
+  "10096_Timestamp Disclosure - Unix_http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/robots.txt_GET": "ignore",
+  "10096_Timestamp Disclosure - Unix_http://****-aat.service.core-compute-aat.internal/sitemap.xml_GET": "ignore"
 }
