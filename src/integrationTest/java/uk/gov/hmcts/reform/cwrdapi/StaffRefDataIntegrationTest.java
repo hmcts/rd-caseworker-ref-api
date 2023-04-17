@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
@@ -15,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
@@ -54,11 +58,13 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills).isNotNull();
+        assertThat(serviceSkills.size()).isEqualTo(3);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
         assertThat(serviceSkill.getId()).isEqualTo("AAA7");
+
+        assertThat(serviceSkill.getSkills().size()).isEqualTo(4);
 
         SkillDTO skillDTO = serviceSkill.getSkills().get(0);
 
@@ -84,12 +90,15 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
         assertThat(serviceSkills).isNotNull();
+        assertThat(serviceSkills.size()).isEqualTo(3);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
         assertThat(serviceSkill.getId()).isEqualTo("AAA7");
 
         SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        assertThat(serviceSkill.getSkills().size()).isEqualTo(4);
 
         assertThat(skillDTO.getSkillId()).isEqualTo(9L);
         assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
@@ -120,6 +129,8 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         SkillDTO skillDTO = serviceSkill.getSkills().get(0);
 
+        assertThat(serviceSkill.getSkills().size()).isEqualTo(4);
+
         assertThat(skillDTO.getSkillId()).isEqualTo(9L);
         assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
         assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
@@ -132,6 +143,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         skillDTO = serviceSkill.getSkills().get(0);
 
+        assertThat(serviceSkill.getSkills().size()).isEqualTo(11);
 
 
         assertThat(skillDTO.getSkillId()).isEqualTo(26L);
@@ -164,11 +176,32 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         SkillDTO skillDTO = serviceSkill.getSkills().get(0);
 
+        assertThat(serviceSkill.getSkills().size()).isEqualTo(4);
+
         assertThat(skillDTO.getSkillId()).isEqualTo(9L);
         assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
         assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
         assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
 
+
+    }
+
+    @Test
+    void should_retrieveAllServiceSkills_return_status_code_200_when_provide_invalid_servicecode()
+            throws JsonProcessingException {
+        String path = "/skill?service_codes=Invalid";
+
+        String role = "staff-admin";
+
+
+        final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
+                .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
+
+        assertThat(staffWorkerSkillResponse).isNotNull();
+
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+
+        assertThat(serviceSkills.size()).isEqualTo(0);
 
     }
 
@@ -199,7 +232,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
     @Test
     void should_retrieveAllUserTypes_return_status_code_200()
-            throws JsonProcessingException {
+            throws JsonProcessingException, JSONException {
         String path = "/user-type";
 
         String role = "staff-admin";
@@ -215,11 +248,54 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         assertThat(userTypes).isNotNull();
         assertThat(userTypes).hasSize(5);
 
-        StaffRefDataUserType staffRefDataUserType = userTypes.get(0);
 
-        assertThat(staffRefDataUserType.getId()).isEqualTo(1L);
-        assertThat(staffRefDataUserType.getCode()).isEqualTo("CTSC");
+        validateUserTypes(userTypes);
 
+    }
+
+    void validateUserTypes(List<StaffRefDataUserType> userTypes) throws JsonProcessingException, JSONException {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String actual = mapper.writeValueAsString(getUserTypesData());
+        String userTypesData = mapper.writeValueAsString(userTypes);
+
+        JSONAssert.assertEquals(userTypesData, actual, false);
+
+    }
+
+    private List<StaffRefDataUserType> getUserTypesData() {
+
+        List<StaffRefDataUserType> userTypes = new ArrayList<>();
+        StaffRefDataUserType staffRefDataUserType;
+
+        userTypes.add(StaffRefDataUserType.builder()
+                .id(1L)
+                .code("CTSC")
+                .build());
+
+        userTypes.add(StaffRefDataUserType.builder()
+                .id(2L)
+                .code("Future Operations")
+                .build());
+
+        userTypes.add(StaffRefDataUserType.builder()
+                .id(3L)
+                .code("Legal office")
+                .build());
+
+        userTypes.add(StaffRefDataUserType.builder()
+                .id(4L)
+                .code("NBC")
+                .build());
+
+        userTypes.add(StaffRefDataUserType.builder()
+                .id(5L)
+                .code("Other Government Department")
+                .build());
+
+
+        return userTypes;
     }
 
 

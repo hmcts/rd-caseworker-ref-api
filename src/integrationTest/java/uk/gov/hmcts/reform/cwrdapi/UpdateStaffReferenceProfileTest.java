@@ -12,12 +12,14 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -99,6 +101,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
 
     @Test
+    @Transactional
     void should_return_update_staff_user_with_status_code_200_child_tables_size() throws Exception {
 
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
@@ -124,6 +127,9 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         assertThat(response).isNotNull();
         assertThat(response.get("case_worker_id")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
+
+
+        validateUpdateCaseWorkerProfile(request.getEmailId());
 
 
         List<StaffAudit> staffAudits = staffAuditRepository.findAll();
@@ -532,7 +538,43 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
     }
 
+    void validateUpdateCaseWorkerProfile(String emailId) {
 
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailId(emailId);
+
+        assertThat(caseWorkerProfile).isNotNull();
+
+        assertThat(caseWorkerProfile.getEmailId()).isNotNull();
+
+
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("StaffProfilefirstNameCN");
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo("StaffProfilelastNameCN");
+        assertThat(caseWorkerProfile.getRegion()).isEqualTo("National");
+        assertThat(caseWorkerProfile.getSuspended()).isFalse();
+        assertThat(caseWorkerProfile.getTaskSupervisor()).isTrue();
+        assertThat(caseWorkerProfile.getCaseAllocator()).isTrue();
+
+        assertThat(caseWorkerProfile.getUserAdmin()).isFalse();
+
+        assertThat(caseWorkerProfile.getUserType().getUserTypeId()).isEqualTo(1);
+        assertThat(caseWorkerProfile.getUserType().getDescription()).isEqualTo("CTSC");
+
+        assertThat(caseWorkerProfile.getCaseWorkerRoles()).hasSize(1);
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getRoleId()).isEqualTo(2);
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag()).isTrue();
+
+        assertThat(caseWorkerProfile.getCaseWorkerLocations()).hasSize(2);
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId()).isEqualTo(6789);
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation()).isEqualTo("test location2");
+
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas()).hasSize(2);
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getServiceCode()).isEqualTo("ABA1");
+
+        assertThat(caseWorkerProfile.getCaseWorkerSkills()).hasSize(1);
+        assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getSkillId()).isEqualTo(9);
+
+
+    }
 
 
 }
