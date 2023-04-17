@@ -105,8 +105,9 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
                 .isNotNull()
                 .containsEntry("http_status", "201 CREATED");
 
-        assertThat(response.get("case_worker_id")).isNotNull();
-        validateCreateCaseWorkerProfile(request.getEmailId());
+        String caseWorkerId = ((Map<String, String>)response.get("body")).get("case_worker_id");
+        assertThat(caseWorkerId).isNotNull();
+        validateCreateCaseWorkerProfile(request.getEmailId(),caseWorkerId);
     }
 
     @Test
@@ -403,7 +404,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         assertThat(staffAuditRepository.count()).isEqualTo(1);
     }
 
-    void validateCreateCaseWorkerProfile(String emailId) {
+    void validateCreateCaseWorkerProfile(String emailId, String caseWorkerId) {
 
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailId(emailId);
 
@@ -436,6 +437,16 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
         assertThat(caseWorkerProfile.getCaseWorkerSkills()).hasSize(1);
         assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getSkillId()).isEqualTo(9);
+
+        List<StaffAudit> staffAudits = staffAuditRepository.findAll();
+
+        assertThat(staffAudits.size()).isEqualTo(1);
+        assertThat(staffAudits.get(0).getStatus()).isEqualTo("SUCCESS");
+        assertThat(staffAudits.get(0).getOperationType()).isEqualTo("CREATE");
+        assertThat(staffAudits.get(0).getErrorDescription()).isBlank();
+        assertThat(staffAudits.get(0).getRequestLog()).isNotNull();
+        assertThat(staffAudits.get(0).getRequestTimeStamp()).isNotNull();
+        assertThat(staffAudits.get(0).getCaseWorkerId()).isEqualTo(caseWorkerId);
 
 
     }

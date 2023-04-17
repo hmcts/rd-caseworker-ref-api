@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataJobTitle;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserType;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffRefDataUserTypesResponse;
@@ -260,7 +261,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         String actual = mapper.writeValueAsString(getUserTypesData());
         String userTypesData = mapper.writeValueAsString(userTypes);
 
-        JSONAssert.assertEquals(userTypesData, actual, false);
+        JSONAssert.assertEquals(userTypesData, actual, JSONCompareMode.LENIENT);
 
     }
 

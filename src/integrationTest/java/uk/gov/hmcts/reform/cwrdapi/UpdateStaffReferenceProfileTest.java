@@ -128,25 +128,14 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         assertThat(response.get("case_worker_id")).isNotNull();
         assertThat(response.get("http_status")).isEqualTo("200 OK");
 
+        String caseWorkerId = ((Map<String, String>)response.get("body")).get("case_worker_id");
+        assertThat(caseWorkerId).isNotNull();
 
-        validateUpdateCaseWorkerProfile(request.getEmailId());
+        validateUpdateCaseWorkerProfile(request.getEmailId(),caseWorkerId);
 
 
         List<StaffAudit> staffAudits = staffAuditRepository.findAll();
 
-
-
-        assertThat(staffAudits.size()).isEqualTo(2);
-        assertThat(staffAudits.get(0).getStatus()).isEqualTo("SUCCESS");
-        assertThat(staffAudits.get(0).getOperationType()).isEqualTo("CREATE");
-        assertThat(staffAudits.get(0).getErrorDescription()).isBlank();
-
-        assertThat(staffAudits.get(1).getStatus()).isEqualTo("SUCCESS");
-        assertThat(staffAudits.get(1).getOperationType()).isEqualTo("UPDATE");
-        assertThat(staffAudits.get(1).getErrorDescription()).isBlank();
-
-        assertThat(staffAudits.get(1).getRequestLog().contains(request.getFirstName())).isTrue();
-        assertThat(staffAudits.get(1).getRequestLog().contains(request.getLastName())).isTrue();
 
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -538,7 +527,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
     }
 
-    void validateUpdateCaseWorkerProfile(String emailId) {
+    void validateUpdateCaseWorkerProfile(String emailId, String caseWorkerId) {
 
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailId(emailId);
 
@@ -573,6 +562,21 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         assertThat(caseWorkerProfile.getCaseWorkerSkills()).hasSize(1);
         assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getSkillId()).isEqualTo(9);
 
+        List<StaffAudit> staffAudits = staffAuditRepository.findAll();
+
+
+
+        assertThat(staffAudits.size()).isEqualTo(2);
+        assertThat(staffAudits.get(0).getStatus()).isEqualTo("SUCCESS");
+        assertThat(staffAudits.get(0).getOperationType()).isEqualTo("CREATE");
+        assertThat(staffAudits.get(0).getErrorDescription()).isBlank();
+
+        assertThat(staffAudits.get(1).getStatus()).isEqualTo("SUCCESS");
+        assertThat(staffAudits.get(1).getOperationType()).isEqualTo("UPDATE");
+        assertThat(staffAudits.get(1).getErrorDescription()).isBlank();
+
+        assertThat(staffAudits.get(1).getRequestLog().contains(caseWorkerProfile.getFirstName())).isTrue();
+        assertThat(staffAudits.get(1).getRequestLog().contains(caseWorkerProfile.getFirstName())).isTrue();
 
     }
 
