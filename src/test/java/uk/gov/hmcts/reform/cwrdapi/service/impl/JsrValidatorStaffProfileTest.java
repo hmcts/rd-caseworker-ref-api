@@ -74,7 +74,7 @@ class JsrValidatorStaffProfileTest {
     @DisplayName("staff profile invalid first name")
     void testValidateStaffProfileInvalidFirstName() {
         StaffProfileCreationRequest profile = buildStaffProfileRequest();
-        profile.setFirstName("123name");
+        profile.setFirstName("123.name");
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
@@ -87,7 +87,7 @@ class JsrValidatorStaffProfileTest {
     @DisplayName("staff profile invalid last name")
     void testValidateStaffProfileInvalidLastName() {
         StaffProfileCreationRequest profile = buildStaffProfileRequest();
-        profile.setLastName("123name");
+        profile.setLastName("123.name");
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
