@@ -10,6 +10,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,7 +100,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
 
-        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
 
         assertThat(response)
                 .isNotNull()
@@ -105,6 +109,61 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         assertThat(response.get("case_worker_id")).isNotNull();
     }
 
+
+    @ParameterizedTest(name = "{index} => firstName={0}, lastName={1}")
+    @MethodSource("validNameProvider")
+    @DisplayName("Create Staff profile with valid names status 201")
+    void should_return_staff_user_with_valid_name_status_code_201(String firstName, String lastName) {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName, lastName);
+
+        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
+
+        assertThat(response)
+                .isNotNull()
+                .containsEntry("http_status", "201 CREATED");
+
+        assertThat(response.get("case_worker_id")).isNotNull();
+    }
+
+
+    @ParameterizedTest(name = "{index} => firstName={0}, lastName={1}")
+    @MethodSource("inValidNameProvider")
+    @DisplayName("Create Staff profile with invalid names status 400")
+    void should_return_staff_user_with_invalid_name_status_code_400(String firstName, String lastName) {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName, lastName);
+
+        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
+
+        assertThat(response)
+                .isNotNull()
+                .containsEntry("http_status", "400");
+
+        assertThat(response.get("case_worker_id")).isNull();
+    }
+
+    private static Stream<Arguments> validNameProvider() {
+        return Stream.of(
+                Arguments.of("Vilas", "Shelke"),//normal
+                Arguments.of("Vilas1234", "Sh456"),//numeric
+                Arguments.of("IIIIVVI", "XIII"),//Roman
+                Arguments.of("Nando's", "Zi-n ac"),//Space, and Special characters - '
+                Arguments.of("Æâçdëøœoo", "Qętŷįłgå12"),//Space, and Special characters - '
+                Arguments.of("Æmaze", "Zìœ")//phonetic
+        );
+    }
+
+    private static Stream<Arguments> inValidNameProvider() {
+        return Stream.of(
+                Arguments.of("Vilas&", "She_lke"),//invalid special characters & _
+                Arguments.of("Vilas1234", "Sh+456"),//valid first name and invalid last name
+                Arguments.of("Nando*s", "Zi-n ac"),//valid last name and valid last name
+                Arguments.of("??%%/", "()*&^)")//invalid special characters
+        );
+    }
     @Test
     @DisplayName("Create Staff profile with status 201 with child tables entries")
     void should_return_staff_user_with_status_code_201_child_tables_size() {
@@ -113,7 +172,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
+                .createStaffProfile(request, ROLE_STAFF_ADMIN);
 
         assertThat(response)
                 .isNotNull()
@@ -135,7 +194,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
+                .createStaffProfile(request, ROLE_STAFF_ADMIN);
 
         assertThat(response)
                 .isNotNull()
@@ -173,9 +232,9 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
+                .createStaffProfile(request, ROLE_STAFF_ADMIN);
 
-        assertThat(response).containsEntry("http_status","400");
+        assertThat(response).containsEntry("http_status", "400");
         String responseBody = (String) response.get("response_body");
         assertThat(responseBody).contains(INVALID_EMAIL);
 
@@ -222,12 +281,12 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
 
-        request.setBaseLocations(List.of(caseWorkerLocationRequest,caseWorkerLocationRequest2));
+        request.setBaseLocations(List.of(caseWorkerLocationRequest, caseWorkerLocationRequest2));
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
+                .createStaffProfile(request, ROLE_STAFF_ADMIN);
 
-        assertThat(response).containsEntry("http_status","400");
+        assertThat(response).containsEntry("http_status", "400");
         String responseBody = (String) response.get("response_body");
         assertThat(responseBody).contains(NO_PRIMARY_LOCATION_PRESENT_PROFILE);
 
@@ -275,13 +334,13 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
                 .build();
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
-        request.setServices(List.of(caseWorkerServicesRequest,caseWorkerServicesRequest2));
+        request.setServices(List.of(caseWorkerServicesRequest, caseWorkerServicesRequest2));
 
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
+                .createStaffProfile(request, ROLE_STAFF_ADMIN);
 
-        assertThat(response).containsEntry("http_status","400");
+        assertThat(response).containsEntry("http_status", "400");
         String responseBody = (String) response.get("response_body");
         assertThat(responseBody).contains(DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK);
 
@@ -322,13 +381,13 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
-        request.setRoles(List.of(staffProfileRoleRequest1,staffProfileRoleRequest2));
+        request.setRoles(List.of(staffProfileRoleRequest1, staffProfileRoleRequest2));
 
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
+                .createStaffProfile(request, ROLE_STAFF_ADMIN);
 
-        assertThat(response).containsEntry("http_status","400");
+        assertThat(response).containsEntry("http_status", "400");
         String responseBody = (String) response.get("response_body");
         assertThat(responseBody).contains(DUPLICATE_PRIMARY_AND_SECONDARY_ROLES);
 
@@ -366,12 +425,12 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
                 new StaffProfileRoleRequest(1, "adminRole", false);
 
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
-        request.setRoles(List.of(staffProfileRoleRequest1,staffProfileRoleRequest2));
+        request.setRoles(List.of(staffProfileRoleRequest1, staffProfileRoleRequest2));
 
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(request,ROLE_STAFF_ADMIN);
+                .createStaffProfile(request, ROLE_STAFF_ADMIN);
 
-        assertThat(response).containsEntry("http_status","400");
+        assertThat(response).containsEntry("http_status", "400");
         String responseBody = (String) response.get("response_body");
         assertThat(responseBody).contains(NO_PRIMARY_ROLE_PRESENT_PROFILE);
 

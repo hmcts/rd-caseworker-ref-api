@@ -57,7 +57,7 @@ class JsrValidatorStaffProfileTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "abc.com","test.gov","user@gmail.com"})
+    @ValueSource(strings = {"", "abc.com", "test.gov", "user@gmail.com"})
     void testValidateStaffProfileEmail(String email) {
         StaffProfileCreationRequest profile = buildStaffProfileRequest();
         profile.setEmailId(email);
@@ -65,36 +65,62 @@ class JsrValidatorStaffProfileTest {
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
         InvalidRequestException exception = Assertions.assertThrows(InvalidRequestException.class, () ->
-                jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE));
+                jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
         assertThat(exception.getMessage()).contains(INVALID_EMAIL);
     }
 
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"123.name", "name&", "vilas_shelke", "vilas.:\"_shelke", "*()"})
     @DisplayName("staff profile invalid first name")
-    void testValidateStaffProfileInvalidFirstName() {
+    void testValidateStaffProfileInvalidFirstName(String name) {
         StaffProfileCreationRequest profile = buildStaffProfileRequest();
-        profile.setFirstName("123.name");
+        profile.setFirstName(name);
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
         InvalidRequestException exception = Assertions.assertThrows(InvalidRequestException.class, () ->
-                jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE));
+                jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
         assertThat(exception.getMessage()).contains(FIRST_NAME_INVALID);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"123.name", "name&", "vilas_shelke", "vilas.:\"_shelke", "*()"})
     @DisplayName("staff profile invalid last name")
-    void testValidateStaffProfileInvalidLastName() {
+    void testValidateStaffProfileInvalidLastName(String name) {
         StaffProfileCreationRequest profile = buildStaffProfileRequest();
-        profile.setLastName("123.name");
+        profile.setLastName(name);
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
         InvalidRequestException lastNameException = Assertions.assertThrows(InvalidRequestException.class, () ->
-                jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE));
+                jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
         Assertions.assertNotNull(lastNameException.getLocalizedMessage());
         assertThat(lastNameException.getMessage()).contains(LAST_NAME_INVALID);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"123name", "IIIIVVI", "vilas-shelke", "Nando's", "Æâçdëøœoo", "Æmaze"})
+    @DisplayName("staff profile valid first name")
+    void testValidateStaffProfileValidFirstName(String name) {
+        StaffProfileCreationRequest profile = buildStaffProfileRequest();
+        profile.setFirstName(name);
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
+        jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE);
+        verify(staffAuditRepository, times(0)).save(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"123name", "IIIIVVI", "vilas-shelke", "Nando's", "Æâçdëøœoo", "Æmaze"})
+    @DisplayName("staff profile valid last name")
+    void testValidateStaffProfileValidLastName(String name) {
+        StaffProfileCreationRequest profile = buildStaffProfileRequest();
+        profile.setLastName(name);
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
+        jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE);
+        verify(staffAuditRepository, times(0)).save(any());
     }
 
     @Test
@@ -106,7 +132,7 @@ class JsrValidatorStaffProfileTest {
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
         InvalidRequestException lastNameException = Assertions.assertThrows(InvalidRequestException.class, () ->
-                jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE));
+                jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
         Assertions.assertNotNull(lastNameException.getLocalizedMessage());
         assertThat(lastNameException.getMessage()).contains(MISSING_REGION_PROFILE);
     }
@@ -119,7 +145,7 @@ class JsrValidatorStaffProfileTest {
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
 
         InvalidRequestException exception = Assertions.assertThrows(InvalidRequestException.class, () ->
-                jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE));
+                jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
         Assertions.assertNotNull(exception.getLocalizedMessage());
 
     }
@@ -130,7 +156,7 @@ class JsrValidatorStaffProfileTest {
         StaffProfileCreationRequest profile = buildStaffProfileRequest();
         when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
         when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
-        jsrValidatorStaffProfile.validateStaffProfile(profile,STAFF_PROFILE_CREATE);
+        jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE);
         verify(staffAuditRepository, times(0)).save(any());
     }
 }
