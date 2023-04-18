@@ -116,7 +116,8 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
     void should_return_staff_user_with_valid_name_status_code_201(String firstName, String lastName) {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
-        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName, lastName);
+        StaffProfileCreationRequest request =
+                caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName, lastName);
 
         Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
 
@@ -134,7 +135,8 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
     void should_return_staff_user_with_invalid_name_status_code_400(String firstName, String lastName) {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
-        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName, lastName);
+        StaffProfileCreationRequest request =
+                caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName, lastName);
 
         Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
 
@@ -164,6 +166,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
                 Arguments.of("??%%/", "()*&^)")//invalid special characters
         );
     }
+
     @Test
     @DisplayName("Create Staff profile with status 201 with child tables entries")
     void should_return_staff_user_with_status_code_201_child_tables_size() {
