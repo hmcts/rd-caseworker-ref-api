@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -57,7 +58,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @SerenityTest
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
-    "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
+        "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -122,52 +123,54 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void setupIdamStubs() throws Exception {
 
         s2sService.stubFor(get(urlEqualTo("/details"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withBody("rd_caseworker_ref_api")));
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withBody("rd_caseworker_ref_api")));
+
+
+        UserInfo userDetails = UserInfo.builder()
+                .id("%s")
+                .uid("%s")
+                .forename("Super")
+                .surname("User")
+                .email("super.user@hmcts.net")
+                .accountStatus("active")
+                .roles(List.of("%s"))
+                .build();
 
         sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withBody("{"
-                    + "  \"id\": \"%s\","
-                    + "  \"uid\": \"%s\","
-                    + "  \"forename\": \"Super\","
-                    + "  \"surname\": \"User\","
-                    + "  \"email\": \"super.user@hmcts.net\","
-                    + "  \"accountStatus\": \"active\","
-                    + "  \"roles\": ["
-                    + "  \"%s\""
-                    + "  ]"
-                    + "}")
-                .withTransformers("user-token-response")));
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withBody(WireMockUtil.getObjectMapper()
+                                .writeValueAsString(userDetails))
+                        .withTransformers("user-token-response")));
 
         mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withBody(getDynamicJwksResponse())));
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withBody(getDynamicJwksResponse())));
     }
 
     public void userProfileGetUserWireMock(String idamStatus, String roles) {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withStatus(200)
-                .withBody("{"
-                    + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
-                    + "  \"firstName\": \"prashanth\","
-                    + "  \"lastName\": \"rao\","
-                    + "  \"email\": \"super.user@hmcts.net\","
-                    + "  \"idamStatus\": \"" + idamStatus + "\","
-                    + "  \"roles\": " + roles
-                    + "}")));
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withStatus(200)
+                        .withBody("{"
+                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
+                                + "  \"firstName\": \"prashanth\","
+                                + "  \"lastName\": \"rao\","
+                                + "  \"email\": \"super.user@hmcts.net\","
+                                + "  \"idamStatus\": \"" + idamStatus + "\","
+                                + "  \"roles\": " + roles
+                                + "}")));
     }
 
     public void userProfileGetUserByIdWireMock(String idamId, Integer status) {
@@ -209,11 +212,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionRes);
 
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withStatus(201)
-                .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withStatus(201)
+                        .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
 
     public void modifyUserStatus(int idamStatus) throws Exception {
@@ -225,11 +228,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
         userProfileService.stubFor(put(urlPathMatching("/v1/userprofile.*"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withStatus(201)
-                .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withStatus(201)
+                        .withBody(objectMapper.writeValueAsString(userProfileRolesResponse))));
     }
 
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
@@ -237,14 +240,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @BeforeEach
     public void userProfilePostUserWireMock() {
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
-            .inScenario("")
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withStatus(201)
-                .withBody("{"
-                    + "  \"idamRegistrationResponse\":\"201\""
-                    + "}")));
+                .inScenario("")
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withStatus(201)
+                        .withBody("{"
+                                + "  \"idamRegistrationResponse\":\"201\""
+                                + "}")));
     }
 
     @AfterEach
@@ -258,13 +261,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     public void userProfileCreateUserWireMock(HttpStatus status) {
 
         userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                    .withHeader("Connection", "close")
-                .withStatus(status.value())
-                .withBody("{"
-                    + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
-                    + "}")));
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("Connection", "close")
+                        .withStatus(status.value())
+                        .withBody("{"
+                                + "  \"idamRegistrationResponse\":\"" + status.value() + "\""
+                                + "}")));
     }
 
     public void userProfilePostUserWireMockForStaffProfile(HttpStatus status) {
@@ -303,8 +306,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
             formatResponse = format(formatResponse, tokenInfo.get(1), tokenInfo.get(1), tokenInfo.get(0));
 
             return Response.Builder.like(response)
-                .but().body(formatResponse)
-                .build();
+                    .but().body(formatResponse)
+                    .build();
         }
 
         @Override
