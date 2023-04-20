@@ -26,9 +26,9 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
 
     List<CaseWorkerProfile> findByEmailIdIgnoreCaseContaining(String emailPattern);
 
-    @Query(value = "select cw from case_worker_profile cw where lower(cw.firstName) like "
-            + "concat('%', :searchString, '%') "
-            + "or lower(cw.lastName) like concat('%', :searchString, '%')")
+    @Query(value = "select cw from case_worker_profile cw where "
+            + "lower(concat_ws(' ',cw.firstName,cw.lastName)) like concat('%', :searchString, '%')"
+    )
     Page<CaseWorkerProfile> findByFirstNameOrLastName(String searchString, Pageable pageable);
 
     @Query(value = """
