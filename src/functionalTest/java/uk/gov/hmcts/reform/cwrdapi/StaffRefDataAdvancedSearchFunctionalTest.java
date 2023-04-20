@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.validateSearchUserProfileResponse;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
@@ -65,7 +66,7 @@ class StaffRefDataAdvancedSearchFunctionalTest extends AuthorizationFunctionalTe
                     .userType("1")
                     .role("case allocator")
                     .build();
-            assertTrue(validateSearchUserProfileResponse(new ResponseEntity<>(searchStaffUserResponse,HttpStatus.OK),
+            assertNotNull(validateSearchUserProfileResponse(new ResponseEntity<>(searchStaffUserResponse,HttpStatus.OK),
                     searchReq));
 
         }

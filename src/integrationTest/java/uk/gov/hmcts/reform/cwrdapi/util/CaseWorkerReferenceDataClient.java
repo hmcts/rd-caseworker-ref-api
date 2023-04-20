@@ -593,44 +593,17 @@ public class CaseWorkerReferenceDataClient {
 
 
     public StaffProfileCreationRequest createStaffProfileCreationRequest() {
+        return buildStaffProfileCreationRequest("StaffProfilefirstName", "StaffProfilelastName");
+    }
 
+    public StaffProfileCreationRequest buildStaffProfileCreationRequest(String firstName, String lastName) {
         String emailPattern = "deleteTest1234";
         String email = format(STAFF_EMAIL_TEMPLATE, RandomStringUtils.randomAlphanumeric(10)
                 + emailPattern).toLowerCase();
-
-        List<StaffProfileRoleRequest> caseWorkerRoleRequests =
-                ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest()
-                        .roleId(2)
-                        .role("Legal Caseworker")
-                        .isPrimaryFlag(true).build());
-
-        List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
-                .caseWorkersLocationRequest()
-                .isPrimaryFlag(true).locationId(12345)
-                .location("test location").build(), CaseWorkerLocationRequest
-                .caseWorkersLocationRequest()
-                .isPrimaryFlag(true).locationId(6789)
-                .location("test location2").build());
-
-        List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
-                .caseWorkerServicesRequest()
-                .service("Immigration and Asylum Appeals").serviceCode("serviceCode2")
-                .build(), CaseWorkerServicesRequest
-                .caseWorkerServicesRequest()
-                .service("Divorce").serviceCode("ABA1")
-                .build());
-
-        List<SkillsRequest> skillsRequest = ImmutableList.of(SkillsRequest
-                .skillsRequest()
-                .skillId(9)
-                .skillCode("1")
-                .description("testskill1")
-                .build());
-
         return StaffProfileCreationRequest
                 .staffProfileCreationRequest()
-                .firstName("StaffProfilefirstName")
-                .lastName("StaffProfilelastName")
+                .firstName(firstName)
+                .lastName(lastName)
                 .emailId(email)
                 .regionId(1).userType("CTSC")
                 .region("National")
@@ -638,11 +611,47 @@ public class CaseWorkerReferenceDataClient {
                 .taskSupervisor(true)
                 .caseAllocator(true)
                 .staffAdmin(false)
-                .roles(caseWorkerRoleRequests)
-                .baseLocations(caseWorkerLocationRequests)
-                .services(caseWorkerServicesRequests)
-                .skills(skillsRequest)
+                .roles(getCaseWorkerRoleRequests())
+                .baseLocations(getCaseWorkerLocationRequests())
+                .services(getCaseWorkerServicesRequests())
+                .skills(getSkillsRequest())
                 .build();
+    }
+
+    private List<SkillsRequest> getSkillsRequest() {
+        return ImmutableList.of(SkillsRequest
+                .skillsRequest()
+                .skillId(9)
+                .skillCode("1")
+                .description("testskill1")
+                .build());
+    }
+
+    private List<CaseWorkerServicesRequest> getCaseWorkerServicesRequests() {
+        return ImmutableList.of(CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .service("Immigration and Asylum Appeals").serviceCode("serviceCode2")
+                .build(), CaseWorkerServicesRequest
+                .caseWorkerServicesRequest()
+                .service("Divorce").serviceCode("ABA1")
+                .build());
+    }
+
+    private List<CaseWorkerLocationRequest> getCaseWorkerLocationRequests() {
+        return ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(12345)
+                .location("test location").build(), CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(6789)
+                .location("test location2").build());
+    }
+
+    private List<StaffProfileRoleRequest> getCaseWorkerRoleRequests() {
+        return ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest()
+                .roleId(2)
+                .role("Legal Caseworker")
+                .isPrimaryFlag(true).build());
     }
 
     public Map<String, Object> updateStaffProfile(StaffProfileCreationRequest request, String role) {
@@ -650,8 +659,8 @@ public class CaseWorkerReferenceDataClient {
     }
 
     public Object fetchStaffUserById(Class<?> clazz,
-                                                          String userId, String role) throws JsonProcessingException {
+                                     String userId, String role) throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequest(userId, clazz, role);
-        return  mapServiceSkillsIdResponse(responseEntity, clazz);
+        return mapServiceSkillsIdResponse(responseEntity, clazz);
     }
 }
