@@ -10,7 +10,6 @@ public class WireMockUtil {
     }
 
     public static ObjectMapper getObjectMapper() {
-
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;

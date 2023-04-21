@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.Parameters;
@@ -130,7 +131,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody("rd_caseworker_ref_api")));
 
 
-        UserInfo userDetails = UserInfo.builder()
+        UserIdentifier userDetails = UserIdentifier.builder()
                 .id("%s")
                 .uid("%s")
                 .forename("Super")
@@ -145,8 +146,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withHeader("Connection", "close")
-                        .withBody(WireMockUtil.getObjectMapper()
-                                .writeValueAsString(userDetails))
+                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(userDetails))
                         .withTransformers("user-token-response")));
 
         mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
@@ -157,40 +157,38 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody(getDynamicJwksResponse())));
     }
 
-    public void userProfileGetUserWireMock(String idamStatus, String roles) {
+    public void userProfileGetUserWireMock(String idamStatus, String roles) throws JsonProcessingException {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withHeader("Connection", "close")
                         .withStatus(200)
-                        .withBody("{"
-                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"prashanth\","
-                                + "  \"lastName\": \"rao\","
-                                + "  \"email\": \"super.user@hmcts.net\","
-                                + "  \"idamStatus\": \"" + idamStatus + "\","
-                                + "  \"roles\": " + roles
-                                + "}")));
+                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(
+                                getUserIdentifierData(idamStatus, roles))))
+        );
     }
 
-    public void userProfileGetUserByIdWireMock(String idamId, Integer status) {
+    public void userProfileGetUserByIdWireMock(String idamId, Integer status) throws JsonProcessingException {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withHeader("Connection", "close")
                         .withStatus(status)
-                        .withBody("{"
-                                + "  \"userIdentifier\":\"" + UUID.randomUUID().toString() + "\","
-                                + "  \"firstName\": \"prashanth\","
-                                + "  \"lastName\": \"rao\","
-                                + "  \"email\": \"super.user@hmcts.net\","
-                                + "  \"idamStatus\": \"pending\","
-                                + "  \"roles\": ["
-                                + "  \"%s\""
-                                + "  ]"
-                                + "}")));
+                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(
+                                getUserIdentifierData("pending", "%s"))))
+        );
     }
 
+    private UserIdentifier getUserIdentifierData(String idamStatus, String roles) {
+        return UserIdentifier.builder()
+                .userIdentifier(UUID.randomUUID().toString())
+                .firstName("prashanth")
+                .lastName("rao")
+                .email("super.user@hmcts.net")
+                .idamStatus(idamStatus)
+                .roles(List.of(roles))
+                .build();
+    }
 
     public void userProfileDeleteUserWireMock() {
         userProfileService.stubFor(delete(urlPathMatching("/v1/userprofile/users.*"))

@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserInfo {
+public class UserIdentifier {
     private String id;
     private String uid;
     private String forename;
@@ -23,4 +23,9 @@ public class UserInfo {
     private String email;
     private String accountStatus;
     private List<String> roles;
+    private String userIdentifier;
+    private String firstName;
+    private String lastName;
+    private String idamStatus;
+
 }
