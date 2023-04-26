@@ -10,7 +10,7 @@ import java.util.Set;
 public class UserProfileUpdatedData {
 
     private String idamStatus;
-
+    private Set<RoleName> rolesDelete;
     private Set<RoleName> rolesAdd;
     private String firstName;
     private String lastName;
