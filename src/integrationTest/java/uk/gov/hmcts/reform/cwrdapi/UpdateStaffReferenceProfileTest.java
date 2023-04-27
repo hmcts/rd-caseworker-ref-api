@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -359,6 +360,35 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         assertThat(caseWorkerSkillRepository.findAll().size()).isEqualTo(0);
 
     }
+
+    @Test
+    void should_return_update_staff_user_with_status_code_200_del_roles() throws Exception {
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
+        request.setFirstName("prashanth");
+        request.setLastName("rao");
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        userProfileGetUserWireMock("ACTIVE", "[\"Senior Legal Caseworker\"]");
+
+        Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map createBody = (Map)createResponse.get("body");
+
+        request.setStaffAdmin(false);
+
+        modifyUserRoles();
+        Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
+
+        assertThat(resendResponse).isNotNull();
+        assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
+        Map resendResponseBody = (Map) resendResponse.get("body");
+        assertEquals(createBody.get("case_worker_id"), resendResponseBody.get("case_worker_id"));
+
+        List<CaseWorkerProfile> caseWorkerProfiles = caseWorkerProfileRepository.findAll();
+        assertThat(caseWorkerProfiles.size()).isEqualTo(1);
+        assertThat(caseWorkerProfiles.get(0).getUserAdmin()).isFalse();
+
+    }
+
+
 
     @Test
     void should_return_update_staff_user_with_status_code_400_invalid_roles() throws Exception {
