@@ -1000,7 +1000,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse
                     userProfileRolesResponse) {
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
-                        || nonNull(userProfileRolesResponse.getAttributeResponse())) {
+                        || nonNull(userProfileRolesResponse.getAttributeResponse())
+                        || nonNull(userProfileRolesResponse.getRoleDeletionResponse())) {
                     isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse);
 
                 } else {

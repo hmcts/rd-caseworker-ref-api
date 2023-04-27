@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -1021,7 +1022,10 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         userProfileCreationResponse.setIdamId("12345678");
-
+        RoleDeletionResponse roleDeletionResponse = new RoleDeletionResponse();
+        roleDeletionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleDeletionResponse(List.of(roleDeletionResponse));
+        roleDeletionResponse.setIdamMessage("success");
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
                 .thenReturn(Response.builder()
@@ -1039,7 +1043,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         boolean updateUserRolesInIdam = staffRefDataServiceImpl
                 .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId(),STAFF_PROFILE_UPDATE);
-        assertThat(updateUserRolesInIdam).isFalse();
+        assertThat(updateUserRolesInIdam).isTrue();
     }
 
 
