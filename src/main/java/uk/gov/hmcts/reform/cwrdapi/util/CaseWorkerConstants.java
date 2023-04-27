@@ -118,7 +118,9 @@ public final class CaseWorkerConstants {
             + " empty space, ', - characters and must be less than 128 characters";
     public static final String LAST_NAME_INVALID = "Last Name is invalid - can only contain Alphabetic,"
             + " empty space, ', - characters and must be less than 128 characters";
-    public static final String NAME_REGEX = "^[a-zA-Z' .-]{1,127}$";
+
+    public static final String COMMON_NAME_AND_SEARCH_REGEX = "^[(a-zA-Z0-9 )\\p{L}\\p{N}'’-]";
+    public static final String NAME_REGEX = COMMON_NAME_AND_SEARCH_REGEX + "{1,127}$";
 
     public static final String MISSING_REGION = "You must add a region and upload the file again";
     public static final String NO_USER_TO_SUSPEND = "There is no user present for row id %s to suspend. "
@@ -181,7 +183,7 @@ public final class CaseWorkerConstants {
     public static final String CW_LAST_NAME = "lastName";
 
 
-    public static final String SEARCH_STRING_REGEX_PATTERN = "([a-zA-Z\\-\\s']){3,}+";
+    public static final String SEARCH_STRING_REGEX_PATTERN = COMMON_NAME_AND_SEARCH_REGEX + "{3,}";
 
 
     public static final String REG_EXP_SPCL_CHAR = "^[^<>{}\"/|;:.~!?@#$%^=&*\\]\\\\()\\[¿§«»ω⊙¤°℃℉€¥£¢¡®©+]*$";
