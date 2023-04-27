@@ -370,12 +370,12 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         userProfileGetUserWireMock("ACTIVE", "[\"Senior Legal Caseworker\"]");
 
         Map<String, Object> createResponse = caseworkerReferenceDataClient.createStaffProfile(request,ROLE_STAFF_ADMIN);
-        Map createBody = (Map)createResponse.get("body");
 
         request.setStaffAdmin(false);
 
         modifyUserRoles();
         Map<String, Object> resendResponse = caseworkerReferenceDataClient.updateStaffProfile(request,ROLE_STAFF_ADMIN);
+        Map createBody = (Map)createResponse.get("body");
 
         assertThat(resendResponse).isNotNull();
         assertThat(resendResponse.get("http_status")).isEqualTo("200 OK");
