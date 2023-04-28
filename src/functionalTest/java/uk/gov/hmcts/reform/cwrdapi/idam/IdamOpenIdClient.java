@@ -57,7 +57,19 @@ public class IdamOpenIdClient extends IdamOpenId {
         return generatedUserResponse.getBody().as(Map.class);
     }
 
+    public void deleteRoleByUserIDNRoleName(String idamId, String roleName) {
+        log.info(":::: Delete a role By UserId and RoleName");
 
+        Response generatedUserResponse = RestAssured.given().relaxedHTTPSValidation()
+                .baseUri(testConfig.getIdamApiUrl())
+                .header(AUTHORIZATION_HEADER, "Bearer " + getOpenIdTokenByRoles(List.of(ROLE_STAFF_ADMIN)))
+                .delete("/api/v1/users/" + idamId + "/roles/" + roleName)
+                .andReturn();
+        if (generatedUserResponse.getStatusCode() == 404) {
+            log.info("SIDAM getUser response 404");
+        }
+
+    }
 
 
     public String getOpenIdTokenByRole(String role) {
