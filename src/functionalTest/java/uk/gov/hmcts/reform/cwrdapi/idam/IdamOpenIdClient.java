@@ -21,6 +21,8 @@ import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF
 @Slf4j
 public class IdamOpenIdClient extends IdamOpenId {
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
     public static String cwdStaffAdminUserToken;
 
     public IdamOpenIdClient(TestConfigProperties testConfig) {
@@ -40,6 +42,23 @@ public class IdamOpenIdClient extends IdamOpenId {
         }
         return generatedUserResponse.getBody().as(Map.class);
     }
+
+    public Map getUserByUserID(String idamId) {
+        log.info(":::: Get an User");
+
+        Response generatedUserResponse = RestAssured.given().relaxedHTTPSValidation()
+                .baseUri(testConfig.getIdamApiUrl())
+                .header(AUTHORIZATION_HEADER, "Bearer " + getOpenIdTokenByRoles(List.of(ROLE_STAFF_ADMIN)))
+                .get("/api/v1/users/" + idamId)
+                .andReturn();
+        if (generatedUserResponse.getStatusCode() == 404) {
+            log.info("SIDAM getUser response 404");
+        }
+        return generatedUserResponse.getBody().as(Map.class);
+    }
+
+
+
 
     public String getOpenIdTokenByRole(String role) {
         if (StringUtils.isNotEmpty(role)) {

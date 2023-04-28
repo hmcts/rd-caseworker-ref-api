@@ -335,9 +335,10 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         StaffProfileCreationResponse staffProfileCreationResponse =
                 response.getBody().as(StaffProfileCreationResponse.class);
         String cwId = staffProfileCreationResponse.getCaseWorkerId();
-        var idamResponse = getIdamResponse(cwId);
+        var idamResponse = idamOpenIdClient.getUserByUserID(cwId);
         assertEquals(staffRequest.getEmailId(), idamResponse.get("email"));
         assertTrue(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
 
         //Step 3: create user in SRD with staff admin false
         staffRequest.setStaffAdmin(false);
@@ -361,22 +362,26 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
 
         // validate Idam user doesn't have staff admin role
-        idamResponse = getIdamResponse(cwId);
+        idamResponse = idamOpenIdClient.getUserByUserID(cwId);
         assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
         assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
         assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
         assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
         assertFalse(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertFalse(((List)idamResponse.get("roles")).isEmpty());
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
 
+        idamOpenIdClient.getcwdAdminOpenIdToken("cwd-admin");
         UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
         assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
         assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
         assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertFalse(upResponse.getRoles().contains(ROLE_STAFF_ADMIN));
+        assertFalse((upResponse.getRoles()).isEmpty());
+        assertTrue(upResponse.getRoles().contains(CWD_USER));
+
     }
-
-
 
     @Test
     @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
