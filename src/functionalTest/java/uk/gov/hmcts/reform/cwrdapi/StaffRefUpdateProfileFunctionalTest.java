@@ -384,8 +384,8 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
+   // @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+   // @ExtendWith(FeatureToggleConditionExtension.class)
     void updateStaffProfileDelStaffAdminRoleDirectlyFromIdamAndStaffAdminIsTrue() throws JsonProcessingException {
 
         StaffProfileCreationRequest staffRequest = caseWorkerApiClient
@@ -411,6 +411,10 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
 
         idamOpenIdClient.deleteRoleByUserIDNRoleName(cwId,ROLE_STAFF_ADMIN);
+        idamResponse = idamOpenIdClient.getUserByUserID(cwId);
+        assertEquals(staffRequest.getEmailId(), idamResponse.get("email"));
+        assertFalse(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
 
         //Step 3: create user in SRD with staff admin false
         response = caseWorkerApiClient.updateStaffUserProfile(staffRequest);
