@@ -384,8 +384,8 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    //@ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
-    //@ExtendWith(FeatureToggleConditionExtension.class)
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
     void updateStaffProfileDelStaffAdminRoleDirectlyFromIdamAndStaffAdminIsTrue() throws JsonProcessingException {
 
         StaffProfileCreationRequest staffRequest = caseWorkerApiClient
