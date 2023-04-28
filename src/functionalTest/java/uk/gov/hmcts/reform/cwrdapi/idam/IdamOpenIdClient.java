@@ -57,7 +57,7 @@ public class IdamOpenIdClient extends IdamOpenId {
         return generatedUserResponse.getBody().as(Map.class);
     }
 
-    public void deleteRoleByUserIDNRoleName(String idamId, String roleName) {
+    public void deleteRoleByUserIdNRoleName(String idamId, String roleName) {
         log.info(":::: Delete a role By UserId and RoleName");
 
         Response generatedUserResponse = RestAssured.given().relaxedHTTPSValidation()

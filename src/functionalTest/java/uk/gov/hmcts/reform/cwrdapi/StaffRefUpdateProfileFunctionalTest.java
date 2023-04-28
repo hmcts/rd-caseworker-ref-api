@@ -410,7 +410,7 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         assertTrue(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
         assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
 
-        idamOpenIdClient.deleteRoleByUserIDNRoleName(cwId,ROLE_STAFF_ADMIN);
+        idamOpenIdClient.deleteRoleByUserIdNRoleName(cwId,ROLE_STAFF_ADMIN);
         idamResponse = idamOpenIdClient.getUserByUserID(cwId);
         assertEquals(staffRequest.getEmailId(), idamResponse.get("email"));
         assertFalse(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
