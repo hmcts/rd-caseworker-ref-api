@@ -21,7 +21,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.11'
     id "org.flywaydb.flyway" version '8.5.4'
     id 'au.com.dius.pact' version '4.1.7' // do not change, otherwise serenity report fails
-    id 'org.owasp.dependencycheck' version '8.0.1'
+    id 'org.owasp.dependencycheck' version '8.2.1'
 }
 
 apply plugin: 'java'
