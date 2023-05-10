@@ -1,0 +1,1 @@
+DELETE FROM skill WHERE description LIKE 'testskill%';
