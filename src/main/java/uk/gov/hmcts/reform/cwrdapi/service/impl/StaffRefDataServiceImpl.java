@@ -932,7 +932,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
                 || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
-        if (isNotEmpty(mergedRoles) || hasNameChanged) {
+        if (isNotEmpty(mergedRoles) || hasNameChanged || !cwrProfileRequest.isStaffAdmin()) {
             return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
         }
 
@@ -947,6 +947,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (isNotEmpty(mergedRoles)) {
             builder
                     .rolesAdd(mergedRoles);
+        }
+
+        if (!cwrProfileRequest.isStaffAdmin()) {
+            builder.rolesDelete(Set.of(new RoleName(ROLE_STAFF_ADMIN)));
         }
 
         if (hasNameChanged) {
@@ -969,7 +973,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileRolesResponse
                     userProfileRolesResponse) {
                 if (nonNull(userProfileRolesResponse.getRoleAdditionResponse())
-                        || nonNull(userProfileRolesResponse.getAttributeResponse())) {
+                        || nonNull(userProfileRolesResponse.getAttributeResponse())
+                        || nonNull(userProfileRolesResponse.getRoleDeletionResponse())) {
                     isEachRoleUpdated = isRecordupdatedinUP(userProfileRolesResponse);
 
                 } else {
