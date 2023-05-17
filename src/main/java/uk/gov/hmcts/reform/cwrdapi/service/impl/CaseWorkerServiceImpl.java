@@ -591,7 +591,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public boolean updateUserRolesInIdam(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId) {
 
         try {
-            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId,"SRD");
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);

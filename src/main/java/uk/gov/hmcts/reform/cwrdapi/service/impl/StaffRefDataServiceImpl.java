@@ -731,7 +731,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     }
 
     public UserProfileResponse getUserProfileFromUP(String idamId) {
-        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId, "SRD");
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
 
@@ -894,7 +894,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                                          String operationType) {
 
 
-        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId, "SRD");
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
