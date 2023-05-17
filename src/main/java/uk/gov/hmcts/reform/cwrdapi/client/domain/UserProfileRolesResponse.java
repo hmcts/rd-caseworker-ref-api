@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +15,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserProfileRolesResponse {
     private RoleAdditionResponse roleAdditionResponse;
+    private List<RoleDeletionResponse> roleDeletionResponse;
     @JsonProperty("statusUpdateResponse")
     private AttributeResponse attributeResponse;
 }
