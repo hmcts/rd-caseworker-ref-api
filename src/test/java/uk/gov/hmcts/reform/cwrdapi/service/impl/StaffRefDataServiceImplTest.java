@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
@@ -993,34 +994,28 @@ class StaffRefDataServiceImplTest {
         assertNotNull(response);
     }
 
-    @Test
-    void test_createUserProfileInIdamUP_error() throws JsonProcessingException {
-        ErrorResponse errorResponse = new ErrorResponse(500, "Failure", "Method Not Allowed ",
-                "Internal Server Error", "2022-01-10");
+    @ParameterizedTest
+    @CsvSource({
+        "500,Internal Server Error",
+        "405,Method Not Allowed"
+    })
+    void test_createUserProfileInIdamUP_error(int errorCode,String errorDescription) throws JsonProcessingException {
+        ErrorResponse errorResponse = new ErrorResponse(errorCode, "Failure", "Method Not Allowed ",
+            errorDescription, "2022-01-10");
         String body = mapper.writeValueAsString(errorResponse);
         doReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(500).build())
+                .request(mock(Request.class)).body(body, defaultCharset()).status(errorCode).build())
                 .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class), anyString());
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             staffRefDataServiceImpl.createUserProfileInIdamUP(staffProfileCreationRequest);
         });
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, thrown.getStatus());
-    }
+        if (errorCode == 500) {
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, thrown.getStatus());
+        } else if (errorCode == 405) {
+            assertEquals(HttpStatus.METHOD_NOT_ALLOWED, thrown.getStatus());
+        }
 
-    @Test
-    void test_createUserProfileInIdamUP_forbiddenError() throws JsonProcessingException {
-        ErrorResponse errorResponse = new ErrorResponse(405, "Failure", "Method Not Allowed ",
-                "Method Not Allowed", "2022-01-10");
-        String body = mapper.writeValueAsString(errorResponse);
-
-        doReturn(Response.builder()
-                .request(mock(Request.class)).body(body, defaultCharset()).status(405).build())
-                .when(userProfileFeignClient).createUserProfile(any(UserProfileCreationRequest.class), anyString());
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl.createUserProfileInIdamUP(staffProfileCreationRequest);
-        });
-        assertEquals(HttpStatus.METHOD_NOT_ALLOWED, thrown.getStatus());
     }
 
 
