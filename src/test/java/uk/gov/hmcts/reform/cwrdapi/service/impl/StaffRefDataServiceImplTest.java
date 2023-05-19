@@ -93,13 +93,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.validateSearchUserProfileResponse;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_PENDING;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
@@ -1051,7 +1052,7 @@ class StaffRefDataServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -1253,7 +1254,7 @@ class StaffRefDataServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -1284,23 +1285,36 @@ class StaffRefDataServiceImplTest {
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setIdamId("12345678");
         List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
-        userProfileResponse.setIdamStatus(IDAM_STATUS_NOT_ACTIVE);
+        userProfileResponse.setIdamStatus(IDAM_STATUS_PENDING);
+        userProfileResponse.setRoles(roles);
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),eq("SRD")))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
                                 defaultCharset())
                         .status(200).build());
 
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl
+        Boolean response = staffRefDataServiceImpl
                     .updateUserRolesInIdam(staffProfileCreationRequest, "1234", STAFF_PROFILE_CREATE);
 
-        });
+        assertTrue(response);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
     }
 
     @Test
@@ -1308,7 +1322,7 @@ class StaffRefDataServiceImplTest {
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
