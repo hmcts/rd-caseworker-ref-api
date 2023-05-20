@@ -92,10 +92,8 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
@@ -105,13 +103,11 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateServiceCode;
 
 /**
  * The type Staff ref data service.
@@ -778,10 +774,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         CaseWorkerProfile filteredProfile = null;
 
 
-        //when existing profile with delete flag is true in request then suspend user
-        if (cwUiRequest.isSuspended() && isUserSuspended(UserProfileUpdatedData.builder()
-                            .idamStatus(IDAM_STATUS_SUSPENDED).build(),
-                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
+        //suspend user when status is suspended
+        if (cwUiRequest.isSuspended()) {
             caseWorkerProfiles.setSuspended(true);
         }
         filteredProfile = updateSidamRoles(caseWorkerProfiles,cwUiRequest);
@@ -930,7 +924,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
                 || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
         if (isNotEmpty(mergedRoles) || hasNameChanged || !cwrProfileRequest.isStaffAdmin()) {
-            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
+            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged,
+                    userProfileResponse.getIdamStatus());
         }
 
         return true;
@@ -938,12 +933,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     private boolean updateMismatchedDatatoUP(StaffProfileCreationRequest cwrProfileRequest, String idamId,
                                              Set<RoleName> mergedRoles,
-                                             boolean hasNameChanged) {
+                                             boolean hasNameChanged, String idamStatus) {
         UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
 
         if (isNotEmpty(mergedRoles)) {
-            builder
-                    .rolesAdd(mergedRoles);
+            builder.rolesAdd(mergedRoles);
         }
 
         if (!cwrProfileRequest.isStaffAdmin()) {
@@ -951,12 +945,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
 
         if (hasNameChanged) {
-
-            builder
-                    .firstName(cwrProfileRequest.getFirstName())
-                    .lastName(cwrProfileRequest.getLastName())
-                    .idamStatus(STATUS_ACTIVE);
-
+            builder.firstName(cwrProfileRequest.getFirstName())
+                    .lastName(cwrProfileRequest.getLastName());
+        }
+        if (!cwrProfileRequest.isSuspended()) {
+            builder.idamStatus(idamStatus);
         }
         return isEachRoleUpdated(builder.build(), idamId, "EXUI");
     }
