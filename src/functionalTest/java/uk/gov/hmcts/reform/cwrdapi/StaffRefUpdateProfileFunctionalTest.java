@@ -522,6 +522,40 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
 
     }
 
+
+    @Test
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void should_update_staff_profile_for_suspended_user_and_returns_status_200() {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        staffProfileCreationRequest.setSuspended(true);
+
+        StaffProfileCreationResponse staffProfileResponse1 =
+                response.getBody().as(StaffProfileCreationResponse.class);
+        assertThat(staffProfileResponse1).isNotNull();
+
+        assertThat(staffProfileCreationRequest.isSuspended()).isTrue();
+        assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
+        assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
+
+        String firstNameUpdated = "StaffProfilefirstNameChanged";
+        String lastNameUpdated = "StaffProfilelastNameChanged";
+        staffProfileCreationRequest.setFirstName(firstNameUpdated);
+        staffProfileCreationRequest.setLastName(lastNameUpdated);
+
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        StaffProfileCreationResponse staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(staffProfileResponse).isNotNull();
+        assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
+
+    }
+
     @AfterAll
     public static void cleanUpTestData() {
         try {
@@ -530,7 +564,4 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
             log.error("cleanUpTestData :: threw the following exception: " + e);
         }
     }
-
-
-
 }
