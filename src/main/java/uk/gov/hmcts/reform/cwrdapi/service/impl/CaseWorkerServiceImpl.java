@@ -623,7 +623,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
                     || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
             if (isNotEmpty(mergedRoles) || hasNameChanged) {
-                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
+                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged,
+                        userProfileResponse.getIdamStatus());
             }
         } catch (Exception exception) {
             log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
@@ -855,7 +856,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     private boolean updateMismatchedDatatoUP(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId,
                                              Set<RoleName> mergedRoles,
-                                             boolean hasNameChanged) {
+                                             boolean hasNameChanged, String idamStatus) {
         UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
 
         if (isNotEmpty(mergedRoles)) {
@@ -867,10 +868,13 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             builder
                     .firstName(cwrProfileRequest.getFirstName())
-                    .lastName(cwrProfileRequest.getLastName())
-                    .idamStatus(STATUS_ACTIVE);
+                    .lastName(cwrProfileRequest.getLastName());
 
         }
+        if (!cwrProfileRequest.isSuspended()) {
+            builder.idamStatus(idamStatus);
+        }
+
         return isEachRoleUpdated(builder.build(), idamId, "EXUI",
                 cwrProfileRequest.getRowId());
     }
