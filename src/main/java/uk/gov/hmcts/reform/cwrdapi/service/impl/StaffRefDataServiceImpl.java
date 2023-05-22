@@ -951,8 +951,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         if (!cwrProfileRequest.isSuspended()) {
             builder.idamStatus(idamStatus);
-        }
-        else {
+        } else {
             builder.idamStatus(IDAM_STATUS_SUSPENDED);
         }
         return isEachRoleUpdated(builder.build(), idamId, "EXUI");
