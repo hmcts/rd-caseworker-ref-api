@@ -92,6 +92,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
@@ -950,6 +951,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         if (!cwrProfileRequest.isSuspended()) {
             builder.idamStatus(idamStatus);
+        }
+        else {
+            builder.idamStatus(IDAM_STATUS_SUSPENDED);
         }
         return isEachRoleUpdated(builder.build(), idamId, "EXUI");
     }

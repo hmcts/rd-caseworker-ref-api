@@ -75,9 +75,6 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
 
     }
 
-
-
-
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = false)
@@ -297,14 +294,14 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         // validate SRD user and IDM user are same
         var idamResponse = getIdamResponse(cwId);
         assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
-        assertNotEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
-        assertNotEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
         assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
         // validate SRD user and UserProfile are not same
         UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
         assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
-        assertNotEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
-        assertNotEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertEquals("SUSPENDED",upResponse.getIdamStatus());
 
