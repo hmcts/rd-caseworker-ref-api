@@ -591,7 +591,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     public boolean updateUserRolesInIdam(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId) {
 
         try {
-            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId,"SRD");
+            Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId,null);
             ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
             Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
@@ -623,8 +623,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
                     || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
             if (isNotEmpty(mergedRoles) || hasNameChanged) {
-                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged,
-                        userProfileResponse.getIdamStatus());
+                return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
             }
         } catch (Exception exception) {
             log.error("{}:: Update Users api failed:: message {}:: Job Id {}:: Row Id {}", loggingComponentName,
@@ -856,7 +855,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
     private boolean updateMismatchedDatatoUP(CaseWorkersProfileCreationRequest cwrProfileRequest, String idamId,
                                              Set<RoleName> mergedRoles,
-                                             boolean hasNameChanged, String idamStatus) {
+                                             boolean hasNameChanged) {
         UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
 
         if (isNotEmpty(mergedRoles)) {
@@ -868,11 +867,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
             builder
                     .firstName(cwrProfileRequest.getFirstName())
-                    .lastName(cwrProfileRequest.getLastName());
-
-        }
-        if (!cwrProfileRequest.isSuspended()) {
-            builder.idamStatus(idamStatus);
+                    .lastName(cwrProfileRequest.getLastName())
+                    .idamStatus(STATUS_ACTIVE);
         }
 
         return isEachRoleUpdated(builder.build(), idamId, "EXUI",
