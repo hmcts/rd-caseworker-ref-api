@@ -527,32 +527,43 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
                 .createStaffProfileCreationRequest();
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
-        assertThat(staffProfileCreationRequest.isSuspended()).isFalse();
         staffProfileCreationRequest.setSuspended(true);
-        StaffProfileCreationResponse staffProfileResponse1 =
-                response.getBody().as(StaffProfileCreationResponse.class);
+
+        StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
         assertThat(staffProfileResponse1).isNotNull();
 
         assertThat(staffProfileCreationRequest.isSuspended()).isTrue();
         assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
         assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
-
         response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
         StaffProfileCreationResponse staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        // validate SRD user and IDM user are same
+        var idamResponse = getIdamResponse(staffProfileResponse.getCaseWorkerId());
+        assertFalse((Boolean) idamResponse.get("active"));
+        assertEquals(staffProfileResponse.getCaseWorkerId(), idamResponse.get("id"));
+        assertEquals(staffProfileCreationRequest.getFirstName(), idamResponse.get("forename"));
+        assertEquals(staffProfileCreationRequest.getLastName(), idamResponse.get("surname"));
+        assertEquals(staffProfileCreationRequest.getEmailId(), idamResponse.get("email"));
+
+        // validate SRD user and UserProfile are same
+        //idamOpenIdClient.getUserByUserID("cwd-admin");
+        UserProfileResponse upResponse = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+        assertEquals("SUSPENDED",upResponse.getIdamStatus());
+
+
+        String firstNameUpdated = "StaffProfilefirstNameChanged";
+        String lastNameUpdated = "StaffProfilelastNameChanged";
+        staffProfileCreationRequest.setFirstName(firstNameUpdated);
+        staffProfileCreationRequest.setLastName(lastNameUpdated);
+
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(staffProfileResponse).isNotNull();
         assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
-        // checking idam status is suspended as well
-        var idamResponse = idamOpenIdClient.getUserByUserID(staffProfileResponse.getCaseWorkerId());
-        UserProfileResponse upResponse = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
-        assertEquals("SUSPEND",upResponse.getIdamStatus());
-        assertEquals("200",upResponse.getIdamStatusCode());
-        String firstNameUpdated = "StaffProfilefirstNameChanged";
-        String lastNameUpdated = "StaffProfilelastNameChanged";
-        staffProfileCreationRequest.setFirstName(firstNameUpdated);
-        staffProfileCreationRequest.setLastName(lastNameUpdated);
 
     }
 

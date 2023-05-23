@@ -95,6 +95,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATO
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_ALREADY_CREATED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
@@ -774,10 +775,12 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         CaseWorkerProfile filteredProfile = null;
 
-
-        //suspend user when status is suspended
         if (cwUiRequest.isSuspended()) {
-            caseWorkerProfiles.setSuspended(true);
+            //when existing profile with delete flag is true in request then suspend user
+            if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
+                caseWorkerProfiles.setSuspended(true);
+            }
         }
         filteredProfile = updateSidamRoles(caseWorkerProfiles,cwUiRequest);
         return filteredProfile;
