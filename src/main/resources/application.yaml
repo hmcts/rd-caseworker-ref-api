@@ -119,7 +119,7 @@ feign:
   allow:
     headers:
       - authorization
-userProfUrl: ${USER_PROFILE_URL:http://rd-user-profile-api-aat.service.core-compute-aat.internal}
+userProfUrl: https://rd-user-profile-api-pr-974.preview.platform.hmcts.net
 locationRefDataUrl: ${LOCATION_REF_DATA_URL:http://rd-location-ref-api-aat.service.core-compute-aat.internal}
 
 crd:
