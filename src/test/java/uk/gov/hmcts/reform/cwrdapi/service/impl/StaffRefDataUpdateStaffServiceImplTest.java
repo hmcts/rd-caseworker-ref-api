@@ -82,6 +82,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_P
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_STATUS_PENDING;
 
 @ExtendWith(MockitoExtension.class)
@@ -453,25 +454,16 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
-                .thenReturn(Response.builder()
-                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
-                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
-                                defaultCharset())
-                        .status(200).build());
-
-
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 
-        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
-
-        StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
                     .updateStaffProfile(staffProfileCreationRequest);
 
-        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
-        verify(userProfileFeignClient, times(2)).getUserProfileWithRolesById(any(), any());
+        });
 
-
+        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(thrown.getErrorDescription()).isEqualTo(UP_FAILURE_ROLES);
     }
 
     @Test

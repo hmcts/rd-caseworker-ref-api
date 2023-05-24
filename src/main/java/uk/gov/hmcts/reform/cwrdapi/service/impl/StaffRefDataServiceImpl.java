@@ -107,6 +107,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_STATUS_PENDING;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
@@ -711,14 +712,15 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
                     PROFILE_NOT_PRESENT_IN_SRD);
         }
-
         UserProfileResponse userProfileResponse = getUserProfileFromUP(caseWorkerProfile.getCaseWorkerId());
-
         if (userProfileResponse == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
                     StringUtils.EMPTY, profileRequest, STAFF_PROFILE_UPDATE);
             throw new StaffReferenceException(HttpStatus.NOT_FOUND, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
                     PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
+        } else if (UP_STATUS_PENDING.equals(userProfileResponse.getIdamStatus())) {
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, UP_FAILURE_ROLES,
+                    UP_FAILURE_ROLES);
         }
 
         return caseWorkerProfile;
