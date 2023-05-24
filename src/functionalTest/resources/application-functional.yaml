@@ -12,3 +12,12 @@ idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.s
 s2s-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
 userProfUrl: https://rd-user-profile-api-pr-974.preview.platform.hmcts.net
 locationRefDataUrl: http://rd-location-ref-api-aat.service.core-compute-aat.internal
+
+
+#######
+postgres.host_name: ${FUNC_DATABASE_HOST}
+postgres.name: ${FUNC_DATABASE_NAME}
+postgres.user: ${FUNC_DATABASE_USER}
+postgres.password: ${FUNC_DATABASE_PASS}
+postgres.port: ${FUNC_DATABASE_PORT}
+#######

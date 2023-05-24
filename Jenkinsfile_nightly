@@ -14,7 +14,7 @@ properties([
 
 def type = "java"
 def product = "rd"
-def component = "caseworker-ref-api.jar"
+def component = "caseworker-ref-api"
 
 def secrets = [
   's2s-${env}': [
@@ -24,6 +24,9 @@ def secrets = [
     secret('CA-REF-OAUTH2-CLIENT-SECRET', 'CA_REF_OAUTH2_CLIENT_SECRET'),
     secret('CA-REF-OAUTH2-CLIENT-ID', 'CA_REF_OAUTH2_CLIENT_ID'),
     secret('LD-SDK-KEY', 'LD_SDK_KEY'),
+    secret('OAUTH2-CLIENT-SECRET', 'OAUTH2_CLIENT_SECRET'),
+    secret('OAUTH2-CLIENT-AUTH', 'OAUTH2_CLIENT_AUTH'),
+    secret('OAUTH2-CLIENT-ID', 'OAUTH2_CLIENT_ID'),
     secret('caseworker-ref-api-POSTGRES-HOST', 'FUNC_DATABASE_HOST'),
     secret('caseworker-ref-api-POSTGRES-PASS', 'FUNC_DATABASE_PASS'),
     secret('caseworker-ref-api-POSTGRES-USER', 'FUNC_DATABASE_USER'),
@@ -55,6 +58,7 @@ config.vaultSecrets = secrets
 
 withNightlyPipeline(type, product, component) {
 
+  env.TEST_URL = params.URL_TO_TEST
   env.S2S_URL_FOR_TESTS = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
   env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
   env.TEST_URL = "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
@@ -99,19 +103,6 @@ withNightlyPipeline(type, product, component) {
             reportDir            : "build/reports/pitest",
             reportFiles          : "index.html",
             reportName           : "Mutation Test Report"
-    ]
-  }
-
-  afterSuccess('fullFunctionalTest') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/**/*'
-    publishHTML target: [
-            allowMissing         : true,
-            alwaysLinkToLastBuild: true,
-            keepAll              : true,
-            reportDir            : "target/site/serenity/",
-            reportFiles          : "index.html",
-            reportName           : "Functional Tests Report"
     ]
   }
 }
