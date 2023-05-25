@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.cwrdapi.TestSupport;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
@@ -104,8 +106,9 @@ class CaseWorkerProfileConverterTest {
         assertThat(suspendedRowIds.get(0)).isEqualTo(1L);
     }
 
-    @Test
-    void testIsNotSuspended() {
+    @ParameterizedTest
+    @ValueSource(strings = {"N", "Y"})
+    void testSuspended(String suspendFlag) {
         CaseWorkerProfile caseWorkerProfile = CaseWorkerProfile.builder()
                 .firstName("test").lastName("test")
                 .officialEmail("email@gov.justice.uk")
@@ -113,25 +116,14 @@ class CaseWorkerProfileConverterTest {
                 .regionName("test")
                 .userType("testUser")
                 .idamRoles("role1, role2")
-                .suspended("N")
+                .suspended(suspendFlag)
                 .build();
+        if ("N".equals(suspendFlag)) {
+            assertFalse(caseWorkerProfileConverter.isSuspended(caseWorkerProfile));
+        } else {
+            assertTrue(caseWorkerProfileConverter.isSuspended(caseWorkerProfile));
+        }
 
-        assertFalse(caseWorkerProfileConverter.isSuspended(caseWorkerProfile));
-    }
-
-    @Test
-    void testIsSuspended() {
-        CaseWorkerProfile caseWorkerProfile = CaseWorkerProfile.builder()
-                .firstName("test").lastName("test")
-                .officialEmail("email@gov.justice.uk")
-                .regionId(1)
-                .regionName("test")
-                .userType("testUser")
-                .idamRoles("role1, role2")
-                .suspended("Y")
-                .build();
-
-        assertTrue(caseWorkerProfileConverter.isSuspended(caseWorkerProfile));
     }
 
 }
