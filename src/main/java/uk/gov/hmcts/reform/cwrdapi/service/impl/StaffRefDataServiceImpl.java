@@ -721,10 +721,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         } else if (UP_STATUS_PENDING.equals(userProfileResponse.getIdamStatus())) {
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, UP_FAILURE_ROLES,
                     UP_FAILURE_ROLES);
+        } else if (IDAM_STATUS_SUSPENDED.equals(userProfileResponse.getIdamStatus()) && !profileRequest.isSuspended()) {
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, UP_FAILURE_ROLES,
+                    UP_FAILURE_ROLES);
         }
-
         return caseWorkerProfile;
-
     }
 
     public UserProfileResponse getUserProfileFromUP(String idamId) {

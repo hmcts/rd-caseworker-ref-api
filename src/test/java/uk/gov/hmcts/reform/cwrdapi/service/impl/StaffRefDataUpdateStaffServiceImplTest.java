@@ -479,7 +479,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
-        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setIdamId("12345678");
@@ -507,26 +506,13 @@ class StaffRefDataUpdateStaffServiceImplTest {
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
-
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
-                .thenReturn(Response.builder()
-                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
-                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
-                                defaultCharset())
-                        .status(200).build());
-
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 
-
-        StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
-                    .updateStaffProfile(staffProfileCreationRequest);
-
-        assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
-        assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
-
-        verify(caseWorkerProfileRepository, times(1)).save(any());
-        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
-
+        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
+            staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
+        });
+        assertThat(thrown.getMessage()).contains("An update to the user is not possible at this moment. Please "
+                + "try again later.");
     }
 
     @Test
