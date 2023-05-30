@@ -4,10 +4,10 @@ java:
 
   secrets:
     CWRD_MQ_PASSWORD:
-      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
+      secretRef: rd-sb-preview
       key: primaryKey
     CWRD_MQ_HOST:
-      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
+      secretRef: rd-sb-preview
       key: namespaceName
 
   environment:
@@ -45,7 +45,7 @@ java:
 servicebus:
   enabled: true
   teamName: RD
-  resourceGroup: rd-aks
+  resourceGroup: rd-aso-preview-rg
   serviceplan: standard
   setup:
     topics:
