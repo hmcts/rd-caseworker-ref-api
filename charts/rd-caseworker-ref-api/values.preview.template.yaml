@@ -49,5 +49,5 @@ servicebus:
   sbNamespace: rd
   setup:
     topics:
-      - name: crd-aks-topic
+      - name: rd-topic
         subscriptionNeeded: yes
