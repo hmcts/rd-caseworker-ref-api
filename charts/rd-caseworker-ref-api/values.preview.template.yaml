@@ -46,7 +46,7 @@ servicebus:
   enabled: true
   teamName: RD
   resourceGroup: rd-aso-preview-rg
-  sbNamespace: rd-servicebus-preview
+  sbNamespace: rd
   setup:
     topics:
       - name: crd-aks-topic
