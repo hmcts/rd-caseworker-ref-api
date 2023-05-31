@@ -782,11 +782,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                     caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
                 caseWorkerProfiles.setSuspended(true);
             }
-        } else if (Boolean.TRUE.equals(caseWorkerProfiles.getSuspended())) {
-            if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(STATUS_ACTIVE).build(),
-                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
-                caseWorkerProfiles.setSuspended(cwUiRequest.isSuspended());
-            }
+        } else if (caseWorkerProfiles.getSuspended() && isUserSuspended(UserProfileUpdatedData.builder()
+                        .idamStatus(STATUS_ACTIVE).build(), caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
+            caseWorkerProfiles.setSuspended(cwUiRequest.isSuspended());
         }
         filteredProfile = updateSidamRoles(caseWorkerProfiles,cwUiRequest);
         return filteredProfile;
