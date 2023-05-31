@@ -16,7 +16,7 @@ java:
     CWRD_MQ_HOST: "rd-sb-preview.servicebus.windows.net"
     CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY: "$(CWRD_MQ_PASSWORD)"
     CWRD_MQ_USERNAME: RootManageSharedAccessKey
-    CWRD_MQ_TOPIC_NAME: crd-topic
+    CWRD_MQ_TOPIC_NAME: "{{ .Release.Name }}-servicebus-crd-topic"
     CWRD_MQ_TRUST_ALL_CERTS: false
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
