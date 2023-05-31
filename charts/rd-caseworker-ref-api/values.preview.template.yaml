@@ -8,7 +8,7 @@ java:
       key: primaryKey
     CWRD_MQ_HOST:
       secretRef: rd-sb-preview
-      key: namespaceName
+      key: connectionString
 
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
