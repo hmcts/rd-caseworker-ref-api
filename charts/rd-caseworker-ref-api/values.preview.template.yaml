@@ -6,9 +6,6 @@ java:
     CWRD_MQ_PASSWORD:
       secretRef: rd-sb-preview
       key: primaryKey
-    CWRD_MQ_HOST:
-      secretRef: rd-sb-preview
-      key: connectionString
 
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
@@ -16,7 +13,7 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     POSTGRES_PORT: "{{ .Values.postgresql.auth.port}}"
-    CWRD_MQ_HOST: "$(CWRD_MQ_HOST).servicebus.windows.net"
+    CWRD_MQ_HOST: "rd-sb-preview.servicebus.windows.net"
     CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY: "$(CWRD_MQ_PASSWORD)"
     CWRD_MQ_USERNAME: RootManageSharedAccessKey
     CWRD_MQ_TOPIC_NAME: crd-topic
