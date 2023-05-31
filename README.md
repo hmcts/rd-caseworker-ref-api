@@ -10,7 +10,7 @@ Provides Case worker user profile data to clients, implemented as a Java/SpringB
 
 To run the project you will need to have the following installed:
 
-* Java 11
+* Java 17
 * Docker
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
