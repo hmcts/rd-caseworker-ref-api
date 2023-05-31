@@ -45,8 +45,8 @@ java:
 servicebus:
   enabled: true
   teamName: RD
-  resourceGroup: rd-aks
-  serviceplan: standard
+  resourceGroup: rd-aso-preview-rg
+  sbNamespace: rd-servicebus-preview
   setup:
     topics:
       - name: crd-aks-topic
