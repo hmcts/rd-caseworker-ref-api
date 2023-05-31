@@ -475,7 +475,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
-
+        caseWorkerProfile.setSuspended(true);
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
@@ -508,11 +508,22 @@ class StaffRefDataUpdateStaffServiceImplTest {
         roleAdditionResponse.setIdamMessage("success");
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
-        });
-        assertThat(thrown.getMessage()).contains("An update to the user is not possible at this moment. Please "
-                + "try again later.");
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        StaffProfileCreationResponse staffProfileCreationResponse = staffRefDataServiceImpl
+                .updateStaffProfile(staffProfileCreationRequest);
+
+
+        assertThat(staffProfileCreationResponse).isNotNull();
+        assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
+
     }
 
     @Test
@@ -524,6 +535,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setSuspended(true);
 
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
@@ -585,7 +597,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
-
+        caseWorkerProfile.setSuspended(true);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
 
@@ -651,7 +663,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         assertThat(caseWorkerProfile1).isNotNull();
 
-        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(2)).modifyUserRoles(any(), any(), any());
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
 
@@ -1121,6 +1133,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setSuspended(true);
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setIdamId("12345678");
@@ -1163,7 +1176,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         assertNotNull(caseWorkerProfile1);
 
-        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(2)).modifyUserRoles(any(), any(), any());
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
 
@@ -1320,6 +1333,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setSuspended(true);
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setIdamId("12345678");
@@ -1362,7 +1376,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         assertNotNull(caseWorkerProfile1);
 
-        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(2)).modifyUserRoles(any(), any(), any());
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
 

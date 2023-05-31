@@ -1031,6 +1031,7 @@ class StaffRefDataServiceImplTest {
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setSuspended(true);
 
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 

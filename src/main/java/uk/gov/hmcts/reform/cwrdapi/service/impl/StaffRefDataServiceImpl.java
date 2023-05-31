@@ -105,6 +105,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_STATUS_PENDING;
@@ -721,9 +722,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         } else if (UP_STATUS_PENDING.equals(userProfileResponse.getIdamStatus())) {
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, UP_FAILURE_ROLES,
                     UP_FAILURE_ROLES);
-        } else if (IDAM_STATUS_SUSPENDED.equals(userProfileResponse.getIdamStatus()) && !profileRequest.isSuspended()) {
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, UP_FAILURE_ROLES,
-                    UP_FAILURE_ROLES);
         }
         return caseWorkerProfile;
     }
@@ -783,6 +781,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                     caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
                 caseWorkerProfiles.setSuspended(true);
+            }
+        } else if (caseWorkerProfiles.getSuspended()) {
+            if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(STATUS_ACTIVE).build(),
+                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
+                caseWorkerProfiles.setSuspended(cwUiRequest.isSuspended());
             }
         }
         filteredProfile = updateSidamRoles(caseWorkerProfiles,cwUiRequest);
