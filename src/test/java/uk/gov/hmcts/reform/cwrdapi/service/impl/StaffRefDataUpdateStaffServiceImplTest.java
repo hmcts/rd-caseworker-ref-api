@@ -74,6 +74,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
@@ -1366,7 +1367,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setIdamId("12345678");
         List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
-        userProfileResponse.setIdamStatus(IDAM_STATUS_SUSPENDED);
+        userProfileResponse.setIdamStatus(IDAM_STATUS_ACTIVE);
 
         userProfileResponse.setRoles(roles);
         userProfileResponse.setFirstName("testFNChanged");
@@ -1377,6 +1378,10 @@ class StaffRefDataUpdateStaffServiceImplTest {
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
+
+        AttributeResponse attributeResponse = new AttributeResponse();
+        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
+        userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
                 .thenReturn(Response.builder()
