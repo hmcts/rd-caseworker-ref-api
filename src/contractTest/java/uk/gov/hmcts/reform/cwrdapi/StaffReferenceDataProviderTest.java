@@ -110,8 +110,6 @@ public class StaffReferenceDataProviderTest {
     @InjectMocks
     private CaseWorkerProfileUpdateserviceImpl caseWorkerProfileUpdateservice;
 
-    @InjectMocks
-    private StaffRefDataService staffRefDataService;
 
     @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
@@ -181,7 +179,7 @@ public class StaffReferenceDataProviderTest {
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         "preview", caseWorkerServiceImpl,
-                    caseWorkerDeleteServiceImpl,caseWorkerProfileUpdateservice,staffRefDataService),
+                    caseWorkerDeleteServiceImpl,caseWorkerProfileUpdateservice,staffRefDataServiceImpl),
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
