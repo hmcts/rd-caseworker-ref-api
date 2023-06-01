@@ -1081,13 +1081,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleDeletionResponse(List.of(roleDeletionResponse));
         roleDeletionResponse.setIdamMessage("success");
 
-        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
-                .thenReturn(Response.builder()
-                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
-                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
-                                defaultCharset())
-                        .status(200).build());
-
         StaffProfileCreationRequest cwUiRequest =  getStaffProfileUpdateRequest();
         cwUiRequest.setStaffAdmin(false);
 
