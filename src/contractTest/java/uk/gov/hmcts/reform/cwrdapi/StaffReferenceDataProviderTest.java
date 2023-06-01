@@ -517,7 +517,7 @@ public class StaffReferenceDataProviderTest {
         userProfileResponse.setLastName("testLNChanged");
 
         ObjectMapper mapper = new ObjectMapper();
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
