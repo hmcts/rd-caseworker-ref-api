@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
@@ -57,6 +58,21 @@ public class JsrValidatorStaffProfile implements IJsrValidatorStaffProfile {
                 String errorMsg =    constraintError.getMessage();
                 staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,errorMsg,
                             StringUtils.EMPTY,profileRequest,operationType);
+                throw new InvalidRequestException(errorMsg);
+            });
+        }
+        log.info("{}:: JsrValidatorStaffProfile data processing validate complete::", logComponentName);
+    }
+
+    @Override
+    public void validateCaseWorkerUpdateRequest(CaseWorkersProfileUpdationRequest cwUpdateProfileRequest,
+                                                String operationType) {
+        log.info("{}:: JsrValidatorStaffProfile data processing validate starts::", logComponentName);
+        Set<ConstraintViolation<CaseWorkersProfileUpdationRequest>> constraintErrors =
+            validator.validate(cwUpdateProfileRequest);
+        if (isNotEmpty(constraintErrors)) {
+            constraintErrors.forEach(constraintError -> {
+                String errorMsg =    constraintError.getMessage();
                 throw new InvalidRequestException(errorMsg);
             });
         }

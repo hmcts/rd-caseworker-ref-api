@@ -19,6 +19,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,16 +28,22 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeletionResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkersProfileUpdationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerDeleteService;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileUpdateservice;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.List;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -77,6 +84,12 @@ public class CaseWorkerRefUsersController {
 
     @Autowired
     CaseWorkerDeleteService caseWorkerDeleteService;
+
+    @Autowired
+    CaseWorkerProfileUpdateservice caseWorkerProfileUpdateservice;
+
+    @Autowired
+    StaffRefDataService staffRefDataService;
 
     @Operation(
             hidden = true,
@@ -271,5 +284,64 @@ public class CaseWorkerRefUsersController {
         }
 
         return ResponseEntity.status(resource.getStatusCode()).body(resource);
+    }
+
+    @Operation(
+        summary = "This API builds the idam role mappings for case worker roles",
+        description = "This API will be invoked by user having idam role of cwd-admin",
+        security = {
+            @SecurityRequirement(name = "ServiceAuthorization"),
+            @SecurityRequirement(name = "Authorization")
+        }
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Successfully updated the caseworkerProfile",
+        content = @Content(schema = @Schema(implementation = CaseWorkersProfileUpdationResponse.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = BAD_REQUEST,
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = UNAUTHORIZED_ERROR,
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = FORBIDDEN_ERROR,
+        content = @Content
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = INTERNAL_SERVER_ERROR,
+        content = @Content
+    )
+    @PutMapping(
+        path = "/sync",
+        produces = APPLICATION_JSON_VALUE
+    )
+    //Sonar reported the below code as Security Hotspot with LOW priority.
+    //Currently it has been made false positive and reviewed as safe.
+    @Secured("prd-admin")
+    @Transactional
+    public ResponseEntity<Object> updateCaseWorkerDetails(@RequestBody CaseWorkersProfileUpdationRequest
+                                                                  caseWorkersProfileUpdationRequest) {
+        log.info("Inside update createStaffUserProfile Controller");
+        if (isEmpty(caseWorkersProfileUpdationRequest)) {
+            throw new InvalidRequestException(BAD_REQUEST);
+        }
+        CaseWorkersProfileUpdationResponse caseWorkersProfileUpdationResponse = null;
+        caseWorkersProfileUpdationResponse = caseWorkerProfileUpdateservice
+            .updateCaseWorkerProfile(caseWorkersProfileUpdationRequest);
+        if (isNotEmpty(caseWorkersProfileUpdationResponse)) {
+            StaffProfileCreationResponse staffProfileCreationResponse = StaffProfileCreationResponse
+                .builder().caseWorkerId(caseWorkersProfileUpdationResponse.getUserId()).build();
+            staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
+        }
+        return ResponseEntity
+            .status(HttpStatus.CREATED).body(caseWorkersProfileUpdationResponse);
     }
 }

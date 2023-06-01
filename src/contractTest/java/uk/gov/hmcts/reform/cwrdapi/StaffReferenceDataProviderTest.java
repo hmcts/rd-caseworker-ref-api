@@ -56,11 +56,13 @@ import uk.gov.hmcts.reform.cwrdapi.repository.RoleTypeRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.SkillRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.UserTypeRepository;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileUpdateservice;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerServiceFacade;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccessor;
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
@@ -104,6 +106,12 @@ public class StaffReferenceDataProviderTest {
 
     @InjectMocks
     private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
+
+    @InjectMocks
+    private CaseWorkerProfileUpdateservice caseWorkerProfileUpdateservice;
+
+    @InjectMocks
+    private StaffRefDataService staffRefDataService;
 
     @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
@@ -172,7 +180,8 @@ public class StaffReferenceDataProviderTest {
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
-                        "preview", caseWorkerServiceImpl, caseWorkerDeleteServiceImpl),
+                        "preview", caseWorkerServiceImpl,
+                    caseWorkerDeleteServiceImpl,caseWorkerProfileUpdateservice,staffRefDataService),
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),

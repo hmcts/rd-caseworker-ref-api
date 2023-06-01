@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
@@ -656,6 +657,10 @@ public class CaseWorkerReferenceDataClient {
 
     public Map<String, Object> updateStaffProfile(StaffProfileCreationRequest request, String role) {
         return putRequest(baseUrl + "/profile", request, role, null);
+    }
+
+    public Map<String, Object> updateCwProfile(CaseWorkersProfileUpdationRequest request, String role) {
+        return putRequest(baseUrl + "/users/sync", request, role, null);
     }
 
     public Object fetchStaffUserById(Class<?> clazz,
