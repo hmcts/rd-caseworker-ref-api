@@ -61,7 +61,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccess
 import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
-import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerProfileUpdateserviceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
