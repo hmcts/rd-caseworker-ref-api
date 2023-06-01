@@ -910,13 +910,10 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
 
         Set<String> idamRolesCwr = new HashSet<>();
-        Set<RoleName> deleteRoles = new HashSet<>();
 
         if (cwrProfileRequest.isStaffAdmin()) {
             idamRolesCwr.add(ROLE_CWD_USER);
             idamRolesCwr.add(ROLE_STAFF_ADMIN);
-        } else if (mappedRoles.contains(ROLE_STAFF_ADMIN)) {
-            deleteRoles.add(new RoleName(ROLE_STAFF_ADMIN));
         }
 
         idamRolesCwr.addAll(mappedRoles);
@@ -933,8 +930,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
         var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
                 || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
-        if (isNotEmpty(mergedRoles) || hasNameChanged || isNotEmpty(deleteRoles)) {
-            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged, deleteRoles,
+        if (isNotEmpty(mergedRoles) || hasNameChanged || !cwrProfileRequest.isStaffAdmin()) {
+            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged,
                     userProfileResponse.getIdamStatus());
         }
 
@@ -943,15 +940,15 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     private boolean updateMismatchedDatatoUP(StaffProfileCreationRequest cwrProfileRequest, String idamId,
                                              Set<RoleName> mergedRoles,
-                                             boolean hasNameChanged, Set<RoleName> deleteRoles, String idamStatus) {
+                                             boolean hasNameChanged, String idamStatus) {
         UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
 
         if (isNotEmpty(mergedRoles)) {
             builder.rolesAdd(mergedRoles);
         }
 
-        if (isNotEmpty(deleteRoles)) {
-            builder.rolesDelete(deleteRoles);
+        if (!cwrProfileRequest.isStaffAdmin()) {
+            builder.rolesDelete(Set.of(new RoleName(ROLE_STAFF_ADMIN)));
         }
 
         if (hasNameChanged) {
