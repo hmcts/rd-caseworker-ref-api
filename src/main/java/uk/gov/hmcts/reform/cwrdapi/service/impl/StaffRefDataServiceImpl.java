@@ -90,11 +90,8 @@ import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
-import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_USER_TO_SUSPEND_PROFILE;
@@ -108,13 +105,12 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_STATUS_PENDING;
 import static uk.gov.hmcts.reform.cwrdapi.util.JsonFeignResponseUtil.toResponseEntity;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.convertToList;
 import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.getAsIntegerList;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateServiceCode;
 
 /**
  * The type Staff ref data service.
@@ -716,33 +712,24 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             throw new StaffReferenceException(HttpStatus.NOT_FOUND,PROFILE_NOT_PRESENT_IN_SRD,
                     PROFILE_NOT_PRESENT_IN_SRD);
         }
-
         UserProfileResponse userProfileResponse = getUserProfileFromUP(caseWorkerProfile.getCaseWorkerId());
-
-        if (nonNull(userProfileResponse) && isNotTrue(STATUS_ACTIVE.equals(userProfileResponse.getIdamStatus()))) {
-
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_NOT_ACTIVE,
-                    IDAM_STATUS_NOT_ACTIVE);
-        } else if (userProfileResponse == null) {
+        if (userProfileResponse == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
                     StringUtils.EMPTY, profileRequest, STAFF_PROFILE_UPDATE);
             throw new StaffReferenceException(HttpStatus.NOT_FOUND, PROFILE_NOT_PRESENT_IN_UP_OR_IDAM,
                     PROFILE_NOT_PRESENT_IN_UP_OR_IDAM);
-        }
-
-        if (isTrue(caseWorkerProfile.getSuspended())) {
-            //when existing profile with delete flag is true then log exception add entry in exception table
-            staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, ALREADY_SUSPENDED_ERROR_MESSAGE,
-                    caseWorkerProfile.getCaseWorkerId(), profileRequest, STAFF_PROFILE_UPDATE);
-            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, ALREADY_SUSPENDED_ERROR_MESSAGE,
-                    ALREADY_SUSPENDED_ERROR_MESSAGE);
+        } else if (UP_STATUS_PENDING.equals(userProfileResponse.getIdamStatus())) {
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, UP_FAILURE_ROLES,
+                    UP_FAILURE_ROLES);
+        } else if (IDAM_STATUS_SUSPENDED.equals(userProfileResponse.getIdamStatus()) && !profileRequest.isSuspended()) {
+            throw new StaffReferenceException(HttpStatus.BAD_REQUEST, UP_FAILURE_ROLES,
+                    UP_FAILURE_ROLES);
         }
         return caseWorkerProfile;
-
     }
 
     public UserProfileResponse getUserProfileFromUP(String idamId) {
-        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId, "SRD");
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
 
@@ -796,17 +783,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                     caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
                 caseWorkerProfiles.setSuspended(true);
-                filteredProfile = caseWorkerProfiles;
-                return filteredProfile;
             }
-        } else {
-            //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
-            filteredProfile = updateSidamRoles(caseWorkerProfiles, cwUiRequest);
-            return filteredProfile;
         }
-        //add user roles in user profile and filter out UP failed records
+        filteredProfile = updateSidamRoles(caseWorkerProfiles,cwUiRequest);
+        return filteredProfile;
 
-        return null;
+        //when existing profile with delete flag is false then update user in CRD db and roles in SIDAM
+        //add user roles in user profile and filter out UP failed records
     }
 
 
@@ -905,29 +888,17 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         return filteredUpdateCwProfile;
     }
 
-    public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId,
+    public boolean  updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId,
                                          String operationType) {
 
 
-        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId);
+        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId, "SRD");
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
         Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-        if (resultResponse.isPresent() && resultResponse.get() instanceof UserProfileResponse profileResponse
-                && nonNull(profileResponse.getIdamStatus())) {
-            if (isNotTrue(profileResponse.getIdamStatus().equals(STATUS_ACTIVE))) {
+        if (!resultResponse.isPresent() || !(resultResponse.get() instanceof UserProfileResponse profileResponse)
+                || !nonNull(profileResponse.getIdamStatus())) {
 
-                staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, IDAM_STATUS_NOT_ACTIVE,
-                        profileResponse.getIdamId(), cwrProfileRequest, operationType);
-
-                log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
-                        profileResponse.getIdamStatus());
-
-                throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_NOT_ACTIVE,
-                        IDAM_STATUS_NOT_ACTIVE);
-            }
-
-        } else {
             log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
                     UP_FAILURE_ROLES);
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_USER_PROFILE,
@@ -960,7 +931,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
                 || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
         if (isNotEmpty(mergedRoles) || hasNameChanged || !cwrProfileRequest.isStaffAdmin()) {
-            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
+            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged,
+                    userProfileResponse.getIdamStatus());
         }
 
         return true;
@@ -968,12 +940,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     private boolean updateMismatchedDatatoUP(StaffProfileCreationRequest cwrProfileRequest, String idamId,
                                              Set<RoleName> mergedRoles,
-                                             boolean hasNameChanged) {
+                                             boolean hasNameChanged, String idamStatus) {
         UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
 
         if (isNotEmpty(mergedRoles)) {
-            builder
-                    .rolesAdd(mergedRoles);
+            builder.rolesAdd(mergedRoles);
         }
 
         if (!cwrProfileRequest.isStaffAdmin()) {
@@ -981,12 +952,13 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         }
 
         if (hasNameChanged) {
-
-            builder
-                    .firstName(cwrProfileRequest.getFirstName())
-                    .lastName(cwrProfileRequest.getLastName())
-                    .idamStatus(STATUS_ACTIVE);
-
+            builder.firstName(cwrProfileRequest.getFirstName())
+                    .lastName(cwrProfileRequest.getLastName());
+        }
+        if (!cwrProfileRequest.isSuspended()) {
+            builder.idamStatus(idamStatus);
+        } else {
+            builder.idamStatus(IDAM_STATUS_SUSPENDED);
         }
         return isEachRoleUpdated(builder.build(), idamId, "EXUI");
     }
