@@ -36,7 +36,7 @@ public interface UserProfileFeignClient {
     @RequestLine("GET /v1/userprofile/{id}/roles")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
         "Content-Type: application/json"})
-    Response getUserProfileWithRolesById(@PathVariable String id);
+    Response getUserProfileWithRolesById(@PathVariable String id,@RequestParam(value = "origin") String origin);
 
     @DeleteMapping(value = "/v1/userprofile/users")
     @RequestLine("DELETE /v1/userprofile/users")

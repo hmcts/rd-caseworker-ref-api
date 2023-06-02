@@ -30,7 +30,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
@@ -74,9 +73,6 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
 
     }
-
-
-
 
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
@@ -297,18 +293,18 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         // validate SRD user and IDM user are same
         var idamResponse = getIdamResponse(cwId);
         assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
-        assertNotEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
-        assertNotEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
         assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
         // validate SRD user and UserProfile are not same
         UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
         assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
-        assertNotEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
-        assertNotEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertEquals("SUSPENDED",upResponse.getIdamStatus());
 
-        assertEquals(caseWorkerProfile.getSuspended(),"true");
+        assertEquals("true", caseWorkerProfile.getSuspended());
 
     }
 
@@ -522,6 +518,55 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
 
     }
 
+
+    @Test
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void should_update_staff_profile_for_suspended_user_and_returns_status_200() {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        staffProfileCreationRequest.setSuspended(true);
+
+        StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
+        assertThat(staffProfileResponse1).isNotNull();
+
+        assertThat(staffProfileCreationRequest.isSuspended()).isTrue();
+        assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
+        assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        StaffProfileCreationResponse staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        // validate SRD user and IDM user are same
+        var idamResponse = getIdamResponse(staffProfileResponse.getCaseWorkerId());
+        assertFalse((Boolean) idamResponse.get("active"));
+        assertEquals(staffProfileResponse.getCaseWorkerId(), idamResponse.get("id"));
+        assertEquals(staffProfileCreationRequest.getFirstName(), idamResponse.get("forename"));
+        assertEquals(staffProfileCreationRequest.getLastName(), idamResponse.get("surname"));
+        assertEquals(staffProfileCreationRequest.getEmailId(), idamResponse.get("email"));
+
+        // validate SRD user and UserProfile are same
+        //idamOpenIdClient.getUserByUserID("cwd-admin");
+        UserProfileResponse upResponse = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+        assertEquals("SUSPENDED",upResponse.getIdamStatus());
+
+
+        String firstNameUpdated = "StaffProfilefirstNameChanged";
+        String lastNameUpdated = "StaffProfilelastNameChanged";
+        staffProfileCreationRequest.setFirstName(firstNameUpdated);
+        staffProfileCreationRequest.setLastName(lastNameUpdated);
+
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(staffProfileResponse).isNotNull();
+        assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
+
+    }
+
     @AfterAll
     public static void cleanUpTestData() {
         try {
@@ -530,7 +575,4 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
             log.error("cleanUpTestData :: threw the following exception: " + e);
         }
     }
-
-
-
 }
