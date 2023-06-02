@@ -287,8 +287,8 @@ public class CaseWorkerRefUsersController {
     }
 
     @Operation(
-        summary = "This API builds the idam role mappings for case worker roles",
-        description = "This API will be invoked by user having idam role of cwd-admin",
+        summary = "This API update the Caseworker Profile from profile sync",
+        description = "This API will be invoked by user having idam role of prd-admin",
         security = {
             @SecurityRequirement(name = "ServiceAuthorization"),
             @SecurityRequirement(name = "Authorization")
