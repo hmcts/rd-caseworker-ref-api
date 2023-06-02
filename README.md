@@ -143,8 +143,31 @@ ServiceAuthorization: Bearer {{token}}
 Authorization :  Bearer copy IDAM access token
 
 ### Contract testing with pact
+    
+To publish against remote broker:
+`./gradlew pactPublish`
 
-Please refer to the confluence on how to run and publish PACT tests.
+Turn on VPN and verify on url `https://pact-broker.platform.hmcts.net/`
+The pact contract(s) should be published
+
+
+To publish against local broker:
+Uncomment out the line found in the build.gradle:
+`pactBrokerUrl = 'http://localhost:9292'`
+comment out the real broker
+
+Start the docker container from the root dir run
+`docker-compose -f broker-compose.yml up`
+
+Publish via the gradle command
+`./gradlew pactPublish`
+
+Once Verify on url `http://localhost:9292/`
+The pact contract(s) should be published
+
+Remember to return the localhost back to the remote broker
+
+for more information, Please refer to the confluence on how to run and publish PACT tests.
 https://tools.hmcts.net/confluence/display/RTRD/PACT+testing
 
 
