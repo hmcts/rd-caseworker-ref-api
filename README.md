@@ -15,6 +15,20 @@ To run the project you will need to have the following installed:
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle
 
+While not essential, it is highly recommended to use the pre-push git hook included in this repository to ensure that all tests are passing. This can be done by running the following command:
+`$ git config core.hooksPath .githooks`
+
+### Environment Vars
+
+If running locally for development or testing you will need to set the following environment variables
+
+* export POSTGRES_USERNAME=dbrefdata
+* export POSTGRES_PASSWORD=<The database password. Please check with the dev team for more information.>
+* export client-secret=<The actual client-secret. Please check with the dev team for more information.>
+* export totp_secret=<The actual totp_secret. Please check with the dev team for more information.>
+* export password=<The actual password. Please check with the dev team for more information.>
+* export key-secret=<The actual key. Please check with the dev team for more information.>
+
 ### Running the application
 
 To run the API quickly use the docker helper script as follows:
