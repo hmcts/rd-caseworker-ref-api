@@ -27,7 +27,7 @@ If running locally for development or testing you will need to set the following
 * export client-secret=<The actual client-secret. Please check with the dev team for more information.>
 * export totp_secret=<The actual totp_secret. Please check with the dev team for more information.>
 * export password=<The actual password. Please check with the dev team for more information.>
-* export key-secret=<The actual key. Please check with the dev team for more information.>
+* export key=<The actual key. Please check with the dev team for more information.>
 
 ### Running the application
 
