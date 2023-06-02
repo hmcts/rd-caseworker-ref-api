@@ -342,6 +342,6 @@ public class CaseWorkerRefUsersController {
             staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
         }
         return ResponseEntity
-            .status(HttpStatus.CREATED).body(caseWorkersProfileUpdationResponse);
+            .status(HttpStatus.OK).body(caseWorkersProfileUpdationResponse);
     }
 }
