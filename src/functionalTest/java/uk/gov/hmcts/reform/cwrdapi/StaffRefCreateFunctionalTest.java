@@ -544,8 +544,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    @ToggleEnable(mapKey = RD_CASEWORKER_SYNC, withFeature = false)
     void updateCaseWorkerProfile() {
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
