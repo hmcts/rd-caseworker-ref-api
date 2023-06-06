@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefFunctionalTest.DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN;
-import static uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl.RD_CASEWORKER_SYNC;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -53,6 +52,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_STAFF_PROFILE = "StaffRefDataController.createStaffUserProfile";
+    public static final String RD_CASEWORKER_SYNC = "CaseWorkerRefUsersController.updateCaseWorkerDetails";
 
     public static List<String> caseWorkerIds = new ArrayList<>();
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
@@ -544,7 +544,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
-    @ToggleEnable(mapKey = RD_CASEWORKER_SYNC, withFeature = true)
+    @ToggleEnable(mapKey = RD_CASEWORKER_SYNC, withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
     void updateCaseWorkerProfile() {
 
