@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefFunctionalTest.DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN;
-import static uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl.RD_CASEWORKER_SYNC;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
