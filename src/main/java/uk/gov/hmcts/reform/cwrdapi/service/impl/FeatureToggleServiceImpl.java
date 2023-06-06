@@ -18,6 +18,7 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
     public static final String CWD_DELETE_BY_ID_OR_EMAILPATTERN_FLAG = "delete-caseworker-by-id-or-emailpattern";
     public static final String CWD_FETCH_STAFF_BY_CCD_SERVICE_NAMES = "fetch-staff-by-ccd-service-names";
     public static final String STAFF_REF_DATA_RD_STAFF_UI = "rd-staff-ui";
+    public static final String RD_CASEWORKER_SYNC = "rd_caseworker_sync";
 
     public static final String SRD_RD_STAFF_UI = "rd-staff-ui";
 
@@ -75,6 +76,8 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
                 RD_STAFF_UI);
         launchDarklyMap.put("StaffRefDataController.fetchStaffProfileById",
                 RD_STAFF_UI);
+        launchDarklyMap.put("CaseWorkerRefUsersController.updateCaseWorkerDetails",
+            RD_CASEWORKER_SYNC);
     }
 
     @Override
