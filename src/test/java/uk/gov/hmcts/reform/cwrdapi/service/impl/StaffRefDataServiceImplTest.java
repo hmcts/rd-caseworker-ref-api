@@ -910,6 +910,7 @@ class StaffRefDataServiceImplTest {
         assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(1);
     }
 
+
     @Test
     void test_createUserProfileRequest_StaffAdmin() {
         staffProfileCreationRequest.setStaffAdmin(true);
@@ -922,6 +923,8 @@ class StaffRefDataServiceImplTest {
         assertThat(response.getUserCategory().toString()).hasToString("CASEWORKER");
         assertThat(response.getUserType().toString()).hasToString("INTERNAL");
         assertThat(response.getRoles()).hasSizeGreaterThanOrEqualTo(1);
+        assertThat(response.getRoles()).contains("staff-admin");
+        assertTrue(staffProfileCreationRequest.isStaffAdmin());
     }
 
     @Test
@@ -1099,6 +1102,8 @@ class StaffRefDataServiceImplTest {
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setUserTypeId(staffProfileCreateUpdateUtil
+                .getUserTypeIdByDesc(staffProfileCreationRequest.getUserType()));
 
 
         StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
@@ -1114,6 +1119,8 @@ class StaffRefDataServiceImplTest {
         assertThat(caseWorkerProfile.getEmailId()).isEqualTo("cwr-func-test-user@test.com");
         assertThat(caseWorkerProfile.getFirstName()).isEqualTo("testFN");
         assertThat(caseWorkerProfile.getLastName()).isEqualTo("testLN");
+        assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
+        assertThat(caseWorkerProfile.getUserTypeId()).isNotNull();
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(1);
         assertThat(caseWorkerProfile.getRegion()).isEqualTo("testRegion");
 
