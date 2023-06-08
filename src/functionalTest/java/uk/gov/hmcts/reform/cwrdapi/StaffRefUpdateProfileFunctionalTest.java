@@ -29,8 +29,9 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
@@ -72,9 +73,6 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
 
     }
-
-
-
 
     @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
@@ -295,21 +293,165 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         // validate SRD user and IDM user are same
         var idamResponse = getIdamResponse(cwId);
         assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
-        assertNotEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
-        assertNotEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
         assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
         // validate SRD user and UserProfile are not same
         UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
         assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
-        assertNotEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
-        assertNotEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertEquals("SUSPENDED",upResponse.getIdamStatus());
 
-        assertEquals(caseWorkerProfile.getSuspended(),"true");
+        assertEquals("true", caseWorkerProfile.getSuspended());
 
     }
 
+
+    @Test
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateStaffProfileDelStaffAdminRoleWhenStaffAdminIsFalse() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        staffRequest.setStaffAdmin(true);
+        //Step 1: create user in IDM for active status
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,staffRequest.getEmailId(),
+                staffRequest.getFirstName(),staffRequest.getFirstName());
+        //Step 2: create user in UP
+        UserProfileCreationRequest userProfileRequest = caseWorkerApiClient.createUserProfileRequest(staffRequest);
+        createUserProfileFromUp(userProfileRequest);
+
+        Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
+
+        //Verify idam profile roles has staff admin
+        StaffProfileCreationResponse staffProfileCreationResponse =
+                response.getBody().as(StaffProfileCreationResponse.class);
+        String cwId = staffProfileCreationResponse.getCaseWorkerId();
+        var idamResponse = idamOpenIdClient.getUserByUserID(cwId);
+        assertEquals(staffRequest.getEmailId(), idamResponse.get("email"));
+        assertTrue(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
+
+        //Step 3: create user in SRD with staff admin false
+        staffRequest.setStaffAdmin(false);
+        response = caseWorkerApiClient.updateStaffUserProfile(staffRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //Step 4: Retrieve the user in SRD
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(cwId)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+
+        // validate Idam user doesn't have staff admin role
+        idamResponse = idamOpenIdClient.getUserByUserID(cwId);
+        assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
+        assertFalse(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertFalse(((List)idamResponse.get("roles")).isEmpty());
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
+
+        idamOpenIdClient.getcwdAdminOpenIdToken("cwd-admin");
+        UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
+        assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
+        assertFalse(upResponse.getRoles().contains(ROLE_STAFF_ADMIN));
+        assertFalse((upResponse.getRoles()).isEmpty());
+        assertTrue(upResponse.getRoles().contains(CWD_USER));
+
+    }
+
+    @Test
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateStaffProfileDelStaffAdminRoleDirectlyFromIdamAndStaffAdminIsTrue() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        staffRequest.setStaffAdmin(true);
+        //Step 1: create user in IDM for active status
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,staffRequest.getEmailId(),
+                staffRequest.getFirstName(),staffRequest.getFirstName());
+        //Step 2: create user in UP
+        UserProfileCreationRequest userProfileRequest = caseWorkerApiClient.createUserProfileRequest(staffRequest);
+        createUserProfileFromUp(userProfileRequest);
+
+        Response response = caseWorkerApiClient.createStaffUserProfileWithOutIdm(staffRequest);
+
+        //Verify idam profile roles has staff admin
+        StaffProfileCreationResponse staffProfileCreationResponse =
+                response.getBody().as(StaffProfileCreationResponse.class);
+        String cwId = staffProfileCreationResponse.getCaseWorkerId();
+        var idamResponse = idamOpenIdClient.getUserByUserID(cwId);
+        assertEquals(staffRequest.getEmailId(), idamResponse.get("email"));
+        assertTrue(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
+
+        idamOpenIdClient.deleteRoleByUserIdNRoleName(cwId,ROLE_STAFF_ADMIN);
+        idamResponse = idamOpenIdClient.getUserByUserID(cwId);
+        assertEquals(staffRequest.getEmailId(), idamResponse.get("email"));
+        assertFalse(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
+
+        //Step 3: create user in SRD with staff admin false
+        response = caseWorkerApiClient.updateStaffUserProfile(staffRequest);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+
+        //Step 4: Retrieve the user in SRD
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(List.of(cwId)).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile caseWorkerProfile = fetchedList.get(0);
+
+        // validate Idam user doesn't have staff admin role
+        idamResponse = idamOpenIdClient.getUserByUserID(cwId);
+        assertEquals(caseWorkerProfile.getId(), idamResponse.get("id"));
+        assertEquals(caseWorkerProfile.getFirstName(), idamResponse.get("forename"));
+        assertEquals(caseWorkerProfile.getLastName(), idamResponse.get("surname"));
+        assertEquals(caseWorkerProfile.getOfficialEmail(), idamResponse.get("email"));
+        assertTrue(((List)idamResponse.get("roles")).contains(ROLE_STAFF_ADMIN));
+        assertFalse(((List)idamResponse.get("roles")).isEmpty());
+        assertTrue(((List)idamResponse.get("roles")).contains(CWD_USER));
+
+        idamOpenIdClient.getcwdAdminOpenIdToken("cwd-admin");
+        UserProfileResponse upResponse = getUserProfileFromUp(caseWorkerProfile.getOfficialEmail());
+        assertEquals(caseWorkerProfile.getId(), upResponse.getIdamId());
+        assertEquals(caseWorkerProfile.getFirstName(), upResponse.getFirstName());
+        assertEquals(caseWorkerProfile.getLastName(), upResponse.getLastName());
+        assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
+        assertTrue(upResponse.getRoles().contains(ROLE_STAFF_ADMIN));
+        assertFalse((upResponse.getRoles()).isEmpty());
+        assertTrue(upResponse.getRoles().contains(CWD_USER));
+    }
 
     @Test
     @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
@@ -376,6 +518,55 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
 
     }
 
+
+    @Test
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void should_update_staff_profile_for_suspended_user_and_returns_status_200() {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        staffProfileCreationRequest.setSuspended(true);
+
+        StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
+        assertThat(staffProfileResponse1).isNotNull();
+
+        assertThat(staffProfileCreationRequest.isSuspended()).isTrue();
+        assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
+        assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        StaffProfileCreationResponse staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        // validate SRD user and IDM user are same
+        var idamResponse = getIdamResponse(staffProfileResponse.getCaseWorkerId());
+        assertFalse((Boolean) idamResponse.get("active"));
+        assertEquals(staffProfileResponse.getCaseWorkerId(), idamResponse.get("id"));
+        assertEquals(staffProfileCreationRequest.getFirstName(), idamResponse.get("forename"));
+        assertEquals(staffProfileCreationRequest.getLastName(), idamResponse.get("surname"));
+        assertEquals(staffProfileCreationRequest.getEmailId(), idamResponse.get("email"));
+
+        // validate SRD user and UserProfile are same
+        //idamOpenIdClient.getUserByUserID("cwd-admin");
+        UserProfileResponse upResponse = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+        assertEquals("SUSPENDED",upResponse.getIdamStatus());
+
+
+        String firstNameUpdated = "StaffProfilefirstNameChanged";
+        String lastNameUpdated = "StaffProfilelastNameChanged";
+        staffProfileCreationRequest.setFirstName(firstNameUpdated);
+        staffProfileCreationRequest.setLastName(lastNameUpdated);
+
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(staffProfileResponse).isNotNull();
+        assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
+
+    }
+
     @AfterAll
     public static void cleanUpTestData() {
         try {
@@ -384,7 +575,4 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
             log.error("cleanUpTestData :: threw the following exception: " + e);
         }
     }
-
-
-
 }

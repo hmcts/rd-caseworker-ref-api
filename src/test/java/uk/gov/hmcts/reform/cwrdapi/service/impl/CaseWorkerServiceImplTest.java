@@ -245,7 +245,7 @@ class CaseWorkerServiceImplTest {
                 .request(mock(Request.class)).body(mapper.writeValueAsString(userProfileCreationResponse),
                         defaultCharset())
                 .status(409).build());
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -594,7 +594,7 @@ class CaseWorkerServiceImplTest {
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
         when(caseWorkerProfileRepository.findByEmailIdIn(any())).thenReturn(profiles);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset()).status(200).build());
@@ -610,7 +610,7 @@ class CaseWorkerServiceImplTest {
         requests.add(cwProfileCreationRequest);
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
@@ -645,7 +645,7 @@ class CaseWorkerServiceImplTest {
         emails.add(cwProfileCreationRequest.getEmailId());
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -655,7 +655,7 @@ class CaseWorkerServiceImplTest {
         requests.add(cwProfileCreationRequest);
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(0)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
@@ -694,7 +694,7 @@ class CaseWorkerServiceImplTest {
         emails.add(cwProfileCreationRequest.getEmailId());
         when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -712,7 +712,7 @@ class CaseWorkerServiceImplTest {
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
         verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
 
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
@@ -746,7 +746,7 @@ class CaseWorkerServiceImplTest {
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         userProfileCreationResponse.setIdamId("1");
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -763,7 +763,7 @@ class CaseWorkerServiceImplTest {
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
         verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
 
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
@@ -801,7 +801,7 @@ class CaseWorkerServiceImplTest {
         emails.add(cwProfileCreationRequest.getEmailId());
         when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -816,7 +816,7 @@ class CaseWorkerServiceImplTest {
         requests.add(cwProfileCreationRequest);
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
@@ -855,7 +855,7 @@ class CaseWorkerServiceImplTest {
         emails.add(cwProfileCreationRequest.getEmailId());
         when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -867,7 +867,7 @@ class CaseWorkerServiceImplTest {
         requests.add(cwProfileCreationRequest);
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
         verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
@@ -1055,7 +1055,7 @@ class CaseWorkerServiceImplTest {
         cwProfileCreationRequest.setIdamRoles(idamroles);
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -1066,7 +1066,7 @@ class CaseWorkerServiceImplTest {
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
         caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
@@ -1091,13 +1091,13 @@ class CaseWorkerServiceImplTest {
         cwProfileCreationRequest.setIdamRoles(idamroles);
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
                         .status(200).build());
         caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(0)).modifyUserRoles(any(), any(), any());
 
     }
@@ -1123,7 +1123,7 @@ class CaseWorkerServiceImplTest {
         cwProfileCreationRequest.setIdamRoles(idamroles);
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -1134,7 +1134,7 @@ class CaseWorkerServiceImplTest {
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
         caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
@@ -1159,7 +1159,7 @@ class CaseWorkerServiceImplTest {
         cwProfileCreationRequest.setIdamRoles(idamroles);
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -1170,7 +1170,7 @@ class CaseWorkerServiceImplTest {
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
         caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
@@ -1195,7 +1195,7 @@ class CaseWorkerServiceImplTest {
         cwProfileCreationRequest.setIdamRoles(idamroles);
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())
@@ -1206,7 +1206,7 @@ class CaseWorkerServiceImplTest {
                                 null)).body(userProfileRolesResponseBody, defaultCharset())
                         .status(200).build());
         caseWorkerServiceImpl.updateUserRolesInIdam(cwProfileCreationRequest, "1");
-        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
     }
 
@@ -1231,7 +1231,7 @@ class CaseWorkerServiceImplTest {
         cwProfileCreationRequest.setIdamRoles(idamroles);
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         String userProfileRolesResponseBody = mapper.writeValueAsString(userProfileRolesResponse);
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(userProfileResponseBody, defaultCharset())

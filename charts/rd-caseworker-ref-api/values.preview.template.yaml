@@ -4,11 +4,8 @@ java:
 
   secrets:
     CWRD_MQ_PASSWORD:
-      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
+      secretRef: rd-sb-preview
       key: primaryKey
-    CWRD_MQ_HOST:
-      secretRef: servicebus-secret-namespace-{{ .Release.Name }}-servicebus
-      key: namespaceName
 
   environment:
     POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
@@ -16,10 +13,10 @@ java:
     POSTGRES_USERNAME: "{{ .Values.postgresql.auth.username}}"
     POSTGRES_PASSWORD: "{{ .Values.postgresql.auth.password}}"
     POSTGRES_PORT: "{{ .Values.postgresql.auth.port}}"
-    CWRD_MQ_HOST: "$(CWRD_MQ_HOST).servicebus.windows.net"
+    CWRD_MQ_HOST: "rd-sb-preview.servicebus.windows.net"
     CASEWORKER_TOPIC_PRIMARY_SEND_LISTEN_SHARED_ACCESS_KEY: "$(CWRD_MQ_PASSWORD)"
     CWRD_MQ_USERNAME: RootManageSharedAccessKey
-    CWRD_MQ_TOPIC_NAME: crd-aks-topic
+    CWRD_MQ_TOPIC_NAME: "{{ .Release.Name }}-servicebus-crd-topic"
     CWRD_MQ_TRUST_ALL_CERTS: false
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
@@ -45,9 +42,9 @@ java:
 servicebus:
   enabled: true
   teamName: RD
-  resourceGroup: rd-aks
-  serviceplan: standard
+  resourceGroup: rd-aso-preview-rg
+  sbNamespace: rd
   setup:
     topics:
-      - name: crd-aks-topic
+      - name: crd-topic
         subscriptionNeeded: yes

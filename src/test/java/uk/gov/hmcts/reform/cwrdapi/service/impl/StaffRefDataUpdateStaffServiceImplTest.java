@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleDeletionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
@@ -62,15 +63,17 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_NOT_ACTIVE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_USER_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
@@ -79,6 +82,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_P
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_FAILURE_ROLES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_STATUS_PENDING;
 
 @ExtendWith(MockitoExtension.class)
@@ -322,7 +326,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         UserProfileResponse userProfileResponseEmpty = new UserProfileResponse();
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponseEmpty),
@@ -432,7 +436,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -450,7 +454,6 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
-
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
@@ -460,7 +463,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         });
 
         assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
+        assertThat(thrown.getErrorDescription()).isEqualTo(UP_FAILURE_ROLES);
     }
 
     @Test
@@ -486,7 +489,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -503,18 +506,13 @@ class StaffRefDataUpdateStaffServiceImplTest {
         roleAdditionResponse.setIdamStatusCode("201");
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
-
-
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            StaffProfileCreationResponse staffProfileCreationResponse  = staffRefDataServiceImpl
-                    .updateStaffProfile(staffProfileCreationRequest);
-
+            staffRefDataServiceImpl.updateStaffProfile(staffProfileCreationRequest);
         });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
+        assertThat(thrown.getMessage()).contains("An update to the user is not possible at this moment. Please "
+                + "try again later.");
     }
 
     @Test
@@ -542,7 +540,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -601,7 +599,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -619,6 +617,13 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
 
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
         StaffProfileCreationRequest staffProfileCreationRequestEmpty = StaffProfileCreationRequest
@@ -632,18 +637,22 @@ class StaffRefDataUpdateStaffServiceImplTest {
                 .lastName("testLN")
                 .regionId(1)
                 .region("testRegion")
+                .roles(emptyList())
+                .services(emptyList())
                 .userType("testUser1").build();
 
         List<StaffProfileCreationRequest> stafProfiles  =
                 List.of(staffProfileCreationRequest, staffProfileCreationRequestEmpty);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
 
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequestEmpty,caseWorkerProfile);
 
-        });
+        CaseWorkerProfile caseWorkerProfile1  = staffRefDataServiceImpl
+                .updateStaffProfiles(staffProfileCreationRequestEmpty,caseWorkerProfile);
 
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
+        assertThat(caseWorkerProfile1).isNotNull();
+
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
 
     }
@@ -705,12 +714,28 @@ class StaffRefDataUpdateStaffServiceImplTest {
         profile.setSuspended(false);
         profile.setEmailId(staffProfileCreationRequest.getEmailId());
 
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
         AttributeResponse attributeResponse = new AttributeResponse();
         attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
         userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
                 .thenReturn(Response.builder()
@@ -724,7 +749,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         staffRefDataServiceImpl.updateStaffProfiles(staffProfileCreationRequest,profile);
 
         verify(caseWorkerProfileRepository, times(1)).save(any());
-        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(2)).modifyUserRoles(any(), any(), any());
     }
 
 
@@ -749,7 +774,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -807,7 +832,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -825,6 +850,13 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
         StaffProfileCreationRequest cwUiRequest =  getStaffProfileUpdateRequest();
 
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
@@ -832,14 +864,13 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         String caseWorkerId = caseWorkerProfile.getCaseWorkerId();
 
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            boolean updateUserRolesInIdam = staffRefDataServiceImpl
+
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl
                     .updateUserRolesInIdam(cwUiRequest,caseWorkerId,STAFF_PROFILE_UPDATE);
 
-        });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
+        assertTrue(updateUserRolesInIdam);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
     }
 
@@ -864,7 +895,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(null),
@@ -917,7 +948,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -931,20 +962,25 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
         StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
 
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
         String caserWorkerId = dbProfile.getCaseWorkerId();
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            boolean updateUserRolesInIdam = staffRefDataServiceImpl
+
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl
                     .updateUserRolesInIdam(cwUiRequest,caserWorkerId,STAFF_PROFILE_UPDATE);
 
-        });
-
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
-
+        assertTrue(updateUserRolesInIdam);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
     }
 
     @Test
@@ -964,7 +1000,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -978,22 +1014,78 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
         roleAdditionResponse.setIdamMessage("success");
 
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
         StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
                 StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
         String caserWorkerId = dbProfile.getCaseWorkerId();
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            boolean updateUserRolesInIdam = staffRefDataServiceImpl
+
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl
                     .updateUserRolesInIdam(cwUiRequest,caserWorkerId,STAFF_PROFILE_UPDATE);
 
-        });
+        assertTrue(updateUserRolesInIdam);
 
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
-
-
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
     }
+
+
+    @Test
+    void test_updateUserRolesInIdam_with_StaffAdminRoleDelete_Idam_Status_Active() throws JsonProcessingException {
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFN");
+        userProfileResponse.setLastName("testLN");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        userProfileCreationResponse.setIdamRegistrationResponse(1);
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        userProfileCreationResponse.setIdamId("12345678");
+        RoleDeletionResponse roleDeletionResponse = new RoleDeletionResponse();
+        roleDeletionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleDeletionResponse(List.of(roleDeletionResponse));
+        roleDeletionResponse.setIdamMessage("success");
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        StaffProfileCreationRequest cwUiRequest =  getStaffProfileUpdateRequest();
+        cwUiRequest.setStaffAdmin(false);
+
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
+                StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
+
+
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl
+                .updateUserRolesInIdam(cwUiRequest,caseWorkerProfile.getCaseWorkerId(),STAFF_PROFILE_UPDATE);
+        assertThat(updateUserRolesInIdam).isTrue();
+    }
+
 
 
     @Test
@@ -1039,10 +1131,23 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
                                 defaultCharset())
                         .status(200).build());
 
@@ -1052,14 +1157,15 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl
-                    .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
 
-        });
+        CaseWorkerProfile caseWorkerProfile1 = staffRefDataServiceImpl
+                .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
 
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
+        assertNotNull(caseWorkerProfile1);
+
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
+
 
 
     }
@@ -1224,10 +1330,23 @@ class StaffRefDataUpdateStaffServiceImplTest {
         userProfileResponse.setFirstName("testFNChanged");
         userProfileResponse.setLastName("testLNChanged");
 
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
                                 defaultCharset())
                         .status(200).build());
 
@@ -1237,14 +1356,14 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         emailToRequestMap.put("cwr-func-test-user@test.com",staffProfileCreationRequest);
 
-        StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
-            staffRefDataServiceImpl
+
+        CaseWorkerProfile caseWorkerProfile1 =  staffRefDataServiceImpl
                     .processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
 
-        });
+        assertNotNull(caseWorkerProfile1);
 
-        assertThat(thrown.getStatus().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(thrown.getErrorDescription()).isEqualTo(IDAM_STATUS_NOT_ACTIVE);
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
 
 
