@@ -232,6 +232,7 @@ public final class CaseWorkerConstants {
     public static final String CASEWORKER_ID_MISSING = "CaseWorker id missing";
     public static final String FIRST_NAME_NOT_PRESENT = "You must add the first name";
     public static final String LAST_NAME_NOT_PRESENT = "You must add the last name";
+    public static final String SUSPENDED_FLAG_MANDATORY = "You must add the suspended flag";
 
 
 }

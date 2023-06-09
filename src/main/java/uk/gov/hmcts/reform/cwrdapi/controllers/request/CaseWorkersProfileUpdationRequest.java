@@ -12,14 +12,16 @@ import uk.gov.hmcts.reform.cwrdapi.util.ValidateCaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateEmail;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASEWORKER_ID_MISSING;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_INVALID;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_NOT_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_INVALID;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_MISSING;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_NOT_PRESENT;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NAME_REGEX;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SUSPENDED_FLAG_MANDATORY;
 
 @Getter
 @Setter
@@ -41,7 +43,7 @@ public class CaseWorkersProfileUpdationRequest {
 
     @JsonProperty("last_name")
     @Pattern(regexp = NAME_REGEX, message = LAST_NAME_INVALID)
-    @NotEmpty(message = LAST_NAME_MISSING)
+    @NotEmpty(message = LAST_NAME_NOT_PRESENT)
     @JsonDeserialize(using = TrimStringFields.class)
     private String lastName;
 
@@ -53,6 +55,7 @@ public class CaseWorkersProfileUpdationRequest {
 
     @JsonProperty("suspended")
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @NotNull(message = SUSPENDED_FLAG_MANDATORY)
     private Boolean suspended;
 
 }
