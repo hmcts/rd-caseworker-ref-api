@@ -18,5 +18,6 @@ file name: launchdarkly-java-server-sdk-5.10.2.jar (shaded: org.yaml:snakeyaml:1
     <suppress>
         <notes>Temporary suppression for org.apache.tomcat.embed please remove it once cve is fixed</notes>
         <cve>CVE-2023-28709</cve>
+        <cve>CVE-2023-20883</cve>
     </suppress>
 </suppressions>
