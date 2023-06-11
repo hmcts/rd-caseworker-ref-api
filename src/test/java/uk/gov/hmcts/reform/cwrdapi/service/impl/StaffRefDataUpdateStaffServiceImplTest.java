@@ -91,8 +91,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.UP_STATUS_PEN
 class StaffRefDataUpdateStaffServiceImplTest {
     @Mock
     private SkillRepository skillRepository;
-
-
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
     @Mock
@@ -1296,9 +1294,125 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
     }
 
+    @Test
+    void test_processExistingCaseWorkersWhenSuspendNotSetInRequestAndUserIsSuspended() throws JsonProcessingException {
+
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setSuspended(true);
+
+        staffProfileCreationRequest.setSuspended(null);
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(IDAM_STATUS_SUSPENDED);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        AttributeResponse attributeResponse = new AttributeResponse();
+        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
+        userProfileRolesResponse.setAttributeResponse(attributeResponse);
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        CaseWorkerProfile caseWorkerProfile1 =
+                staffRefDataServiceImpl.processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
+
+        assertNotNull(caseWorkerProfile1);
+        assertThat(caseWorkerProfile1.getSuspended()).isEqualTo(true);
+
+        verify(userProfileFeignClient, times(2)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
 
+    }
 
+    @Test
+    void test_processExistingCaseWorkersWhenSuspendNotSetInRequestAndUserIsActive() throws JsonProcessingException {
+
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+                "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setSuspended(false);
+
+        staffProfileCreationRequest.setSuspended(null);
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList("IdamRole1", "IdamRole4");
+        userProfileResponse.setIdamStatus(IDAM_STATUS_ACTIVE);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFNChanged");
+        userProfileResponse.setLastName("testLNChanged");
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        AttributeResponse attributeResponse = new AttributeResponse();
+        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
+        userProfileRolesResponse.setAttributeResponse(attributeResponse);
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        CaseWorkerProfile caseWorkerProfile1 =
+                staffRefDataServiceImpl.processExistingCaseWorkers(staffProfileCreationRequest, caseWorkerProfile);
+
+        assertNotNull(caseWorkerProfile1);
+        assertThat(caseWorkerProfile1.getSuspended()).isEqualTo(false);
+
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
+
+
+    }
     @Test
     void test_PopulateStaffProfile() throws JsonProcessingException {
 
