@@ -71,7 +71,7 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("suspended")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private boolean suspended;
+    private Boolean suspended;
 
     @JsonProperty("case_allocator")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -93,5 +93,9 @@ public class StaffProfileCreationRequest {
 
     @JsonProperty("is_resend_invite")
     private boolean resendInvite;
+
+    public Boolean isSuspended() {
+        return suspended;
+    }
 
 }

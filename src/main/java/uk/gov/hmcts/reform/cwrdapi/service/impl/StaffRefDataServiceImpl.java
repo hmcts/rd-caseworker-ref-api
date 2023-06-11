@@ -775,7 +775,9 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
 
         CaseWorkerProfile filteredProfile = null;
-
+        if (cwUiRequest.isSuspended() == null) {
+            cwUiRequest.setSuspended(caseWorkerProfiles.getSuspended());
+        }
         if (cwUiRequest.isSuspended()) {
             //when existing profile with delete flag is true in request then suspend user
             if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
@@ -954,11 +956,6 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (hasNameChanged) {
             builder.firstName(cwrProfileRequest.getFirstName())
                     .lastName(cwrProfileRequest.getLastName());
-        }
-        if (!cwrProfileRequest.isSuspended()) {
-            builder.idamStatus(idamStatus);
-        } else {
-            builder.idamStatus(IDAM_STATUS_SUSPENDED);
         }
         return isEachRoleUpdated(builder.build(), idamId, "EXUI");
     }
