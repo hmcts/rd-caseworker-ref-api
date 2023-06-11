@@ -775,7 +775,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
 
         CaseWorkerProfile filteredProfile = null;
-        if (cwUiRequest.isSuspended() == null) {
+        if (cwUiRequest.getSuspended() == null) {
             cwUiRequest.setSuspended(caseWorkerProfiles.getSuspended());
         }
         if (cwUiRequest.isSuspended()) {
