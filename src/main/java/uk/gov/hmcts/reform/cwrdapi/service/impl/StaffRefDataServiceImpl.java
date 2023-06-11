@@ -933,7 +933,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         var hasNameChanged = !cwrProfileRequest.getFirstName().equals(userProfileResponse.getFirstName())
                 || !cwrProfileRequest.getLastName().equals(userProfileResponse.getLastName());
         if (isNotEmpty(mergedRoles) || hasNameChanged || !cwrProfileRequest.isStaffAdmin()) {
-            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged);
+            return updateMismatchedDatatoUP(cwrProfileRequest, idamId, mergedRoles, hasNameChanged,
+                    userProfileResponse.getIdamStatus());
         }
 
         return true;
@@ -941,7 +942,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     private boolean updateMismatchedDatatoUP(StaffProfileCreationRequest cwrProfileRequest, String idamId,
                                              Set<RoleName> mergedRoles,
-                                             boolean hasNameChanged) {
+                                             boolean hasNameChanged, String idamStatus) {
         UserProfileUpdatedData.UserProfileUpdatedDataBuilder builder = UserProfileUpdatedData.builder();
 
         if (isNotEmpty(mergedRoles)) {
@@ -955,6 +956,11 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (hasNameChanged) {
             builder.firstName(cwrProfileRequest.getFirstName())
                     .lastName(cwrProfileRequest.getLastName());
+        }
+        if (!cwrProfileRequest.isSuspended()) {
+            builder.idamStatus(idamStatus);
+        } else {
+            builder.idamStatus(IDAM_STATUS_SUSPENDED);
         }
         return isEachRoleUpdated(builder.build(), idamId, "EXUI");
     }
