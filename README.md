@@ -6,6 +6,14 @@ CaseWorker Ref API
 
 Provides Case worker user profile data to clients, implemented as a Java/SpringBoot application.
 
+for more Info about the CaseWorker, Please refer to the confluence
+
+Architecture of the Caseworker (https://tools.hmcts.net/confluence/pages/viewpage.action?pageId=1444742328) and 
+
+Business of the CaseWorker (https://tools.hmcts.net/confluence/display/RTRD/Caseworker+Reference+Data)
+
+
+
 ### Prerequisites
 
 To run the project you will need to have the following installed:
@@ -31,6 +39,7 @@ If running locally for development or testing you will need to set the following
 
 ### Running the application
 
+Please Make sure you are connected to the VPN (https://portal.platform.hmcts.net/vdesk/webtop.eui?webtop=/Common/webtop_full&webtop_type=webtop_full) before running the API
 To run the API quickly use the docker helper script as follows:
 
 ```
@@ -43,7 +52,7 @@ docker-compose up
 ```
 
 
-Alternatively, you can start the application from the current source files using Gradle as follows:
+After, you can start the application from the current source files using Gradle as follows:
 
 ```
 ./gradlew clean bootRun
@@ -67,6 +76,12 @@ If the API is running, you should see this response:
 
 ```
 {"status":"UP"}
+```
+
+If the API is running, you should see this response in swagger : 
+
+```
+http://localhost:8091/swagger-ui.html
 ```
 
 ### DB Initialisation˙
