@@ -39,7 +39,10 @@ If running locally for development or testing you will need to set the following
 
 ### Running the application
 
-Please Make sure you are connected to the VPN (https://portal.platform.hmcts.net/vdesk/webtop.eui?webtop=/Common/webtop_full&webtop_type=webtop_full) before running the API
+Please Make sure you are connected to the VPN before running the Application.
+(https://portal.platform.hmcts.net/vdesk/webtop.eui?webtop=/Common/webtop_full&webtop_type=webtop_full)
+
+
 To run the API quickly use the docker helper script as follows:
 
 ```
@@ -78,7 +81,7 @@ If the API is running, you should see this response:
 {"status":"UP"}
 ```
 
-If the API is running, you should see this response in swagger : 
+If the API is running, you can see API's in swagger : 
 
 ```
 http://localhost:8091/swagger-ui.html
