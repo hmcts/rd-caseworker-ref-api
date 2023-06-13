@@ -21,6 +21,6 @@ file name: launchdarkly-java-server-sdk-5.10.2.jar (shaded: org.yaml:snakeyaml:1
     </suppress>
     <suppress>
         <notes>Temporary suppression - remove me once we're on spring boot v3.0.7 or higher</notes>
-        <cve>CVE-2022-1471</cve>
+        <cve>CVE-2023-20883</cve>
     </suppress>
 </suppressions>
