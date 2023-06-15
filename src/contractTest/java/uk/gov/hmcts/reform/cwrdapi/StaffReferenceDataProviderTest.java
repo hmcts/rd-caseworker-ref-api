@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerProfileUpdateserviceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
@@ -104,6 +105,10 @@ public class StaffReferenceDataProviderTest {
 
     @InjectMocks
     private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
+
+    @InjectMocks
+    private CaseWorkerProfileUpdateserviceImpl caseWorkerProfileUpdateservice;
+
 
     @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
@@ -172,7 +177,8 @@ public class StaffReferenceDataProviderTest {
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
-                        "preview", caseWorkerServiceImpl, caseWorkerDeleteServiceImpl),
+                        "preview", caseWorkerServiceImpl,
+                    caseWorkerDeleteServiceImpl,caseWorkerProfileUpdateservice,staffRefDataServiceImpl),
                 new StaffReferenceInternalController(
                         "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
                         caseWorkerServiceImpl),
