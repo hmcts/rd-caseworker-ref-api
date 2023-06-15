@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.LanguagePreference;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
@@ -34,6 +35,7 @@ import static java.util.Objects.nonNull;
 import static net.logstash.logback.encoder.org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.PRD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_CWD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.AuthorizationFunctionalTest.STAFF_EMAIL_TEMPLATE;
@@ -408,6 +410,21 @@ public class CaseWorkerApiClient {
         response.then()
                 .assertThat()
                 .statusCode(201);
+
+        return response;
+    }
+
+    public Response updateCaseWorkerProfile(CaseWorkersProfileUpdationRequest request) {
+
+        Response response = getMultipleAuthHeadersInternal(PRD_ADMIN)
+            .body(request)
+            .put("/refdata/case-worker/users/sync")
+            .andReturn();
+        log.info(":: Update staff profile response status code :: " + response.statusCode());
+
+        response.then()
+            .assertThat()
+            .statusCode(200);
 
         return response;
     }
