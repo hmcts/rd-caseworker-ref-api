@@ -566,7 +566,7 @@ class StaffRefDataServiceImplTest {
             assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
         }
         List<SearchStaffUserResponse> searchStaffUserResponses = responseEntity.getBody();
-        assertNotNull(searchStaffUserResponses.get(0).isCaseAllocator());
+        assertThat(searchStaffUserResponses.get(0).isCaseAllocator()).isFalse();
         assertThat(responseEntity.getBody()).isNotNull();
         assertTrue(validateSearchUserProfileResponse(responseEntity, searchReq));
     }
