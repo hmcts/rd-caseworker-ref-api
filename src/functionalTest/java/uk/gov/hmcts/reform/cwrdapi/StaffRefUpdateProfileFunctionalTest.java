@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.idam.IdamOpenIdClient;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
@@ -45,6 +47,7 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String UPDATE_STAFF_PROFILE = "StaffRefDataController.updateStaffUserProfile";
 
+    public static final String STAFF_PROFILE_URL = "/refdata/case-worker";
 
     @Test
     @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
@@ -566,6 +569,139 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
 
     }
+
+    @Test
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void should_update_staff_profile_for_Unsuspend_a_suspend_user_and_returns_status_200() {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+
+        StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
+        assertThat(staffProfileResponse1).isNotNull();
+
+        assertThat(staffProfileCreationRequest.isSuspended()).isFalse();
+        assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
+        assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
+        staffProfileCreationRequest.setSuspended(true);
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        StaffProfileCreationResponse staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        // validate SRD user and IDM user are same
+        var idamResponse = getIdamResponse(staffProfileResponse.getCaseWorkerId());
+        assertFalse((Boolean) idamResponse.get("active"));
+        assertEquals(staffProfileResponse.getCaseWorkerId(), idamResponse.get("id"));
+        assertEquals(staffProfileCreationRequest.getFirstName(), idamResponse.get("forename"));
+        assertEquals(staffProfileCreationRequest.getLastName(), idamResponse.get("surname"));
+        assertEquals(staffProfileCreationRequest.getEmailId(), idamResponse.get("email"));
+
+        // validate SRD user and UserProfile are same
+        //idamOpenIdClient.getUserByUserID("cwd-admin");
+        UserProfileResponse upResponse = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+        assertEquals("SUSPENDED",upResponse.getIdamStatus());
+
+        // UnSuspend an User
+        staffProfileCreationRequest.setSuspended(false);
+
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(staffProfileResponse).isNotNull();
+        assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
+        //Verify Unsuspend User in UserProfile
+        UserProfileResponse upResponse1 = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+        assertEquals("ACTIVE",upResponse1.getIdamStatus());
+
+        //Verify Unsuspend User in Idam
+        var idamResponse1 = getIdamResponse(staffProfileResponse.getCaseWorkerId());
+        assertTrue((Boolean) idamResponse1.get("active"));
+        assertEquals(staffProfileResponse.getCaseWorkerId(), idamResponse1.get("id"));
+        assertEquals(staffProfileCreationRequest.getFirstName(), idamResponse1.get("forename"));
+        assertEquals(staffProfileCreationRequest.getLastName(), idamResponse1.get("surname"));
+        assertEquals(staffProfileCreationRequest.getEmailId(), idamResponse1.get("email"));
+
+    }
+
+    @Test
+    @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void should_update_staff_profile_for_Suspend_Not_SetIn_Request_Profile_status_Suspend() {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+                .createStaffProfileCreationRequest();
+
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+
+        StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
+        assertThat(staffProfileResponse1).isNotNull();
+
+        assertThat(staffProfileCreationRequest.isSuspended()).isFalse();
+        assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
+        assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
+        staffProfileCreationRequest.setSuspended(true);
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        StaffProfileCreationResponse staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        // validate SRD user and IDM user are same
+        var idamResponse = getIdamResponse(staffProfileResponse.getCaseWorkerId());
+        assertFalse((Boolean) idamResponse.get("active"));
+        assertEquals(staffProfileResponse.getCaseWorkerId(), idamResponse.get("id"));
+        assertEquals(staffProfileCreationRequest.getFirstName(), idamResponse.get("forename"));
+        assertEquals(staffProfileCreationRequest.getLastName(), idamResponse.get("surname"));
+        assertEquals(staffProfileCreationRequest.getEmailId(), idamResponse.get("email"));
+
+        // validate SRD user and UserProfile are same
+        //idamOpenIdClient.getUserByUserID("cwd-admin");
+        UserProfileResponse upResponse = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+        assertEquals("SUSPENDED",upResponse.getIdamStatus());
+
+        // UnSuspend an User
+        staffProfileCreationRequest.setSuspended(null);
+
+        response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
+        staffProfileResponse = response.getBody().as(StaffProfileCreationResponse.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(staffProfileResponse).isNotNull();
+        assertThat(staffProfileResponse.getCaseWorkerId()).isNotBlank();
+        //Verify Unsuspend User in UserProfile
+        UserProfileResponse upResponse1 = getUserProfileFromUp(staffProfileCreationRequest.getEmailId());
+        assertEquals("SUSPENDED",upResponse1.getIdamStatus());
+
+        //Verify Unsuspend User in Idam
+
+        var idamResponse1 = getIdamResponse(staffProfileResponse.getCaseWorkerId());
+        assertFalse((Boolean) idamResponse1.get("active"));
+        assertEquals(staffProfileResponse.getCaseWorkerId(), idamResponse1.get("id"));
+        assertEquals(staffProfileCreationRequest.getFirstName(), idamResponse1.get("forename"));
+        assertEquals(staffProfileCreationRequest.getLastName(), idamResponse1.get("surname"));
+        assertEquals(staffProfileCreationRequest.getEmailId(), idamResponse1.get("email"));
+
+        String firstCaseworkerId = staffProfileResponse.getCaseWorkerId();
+
+        // Fetching cwp from db to verify the profile suspend status not changed when suspend flag is not set in Request
+
+        IdamOpenIdClient.cwdStaffAdminUserToken = null;
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
+                .get(STAFF_PROFILE_URL  + "/profile/search-by-id?id=" + firstCaseworkerId)
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        SearchStaffUserByIdResponse caseWorkerProfile =
+                fetchResponse.getBody().as(SearchStaffUserByIdResponse.class);
+
+        assertThat(caseWorkerProfile.isSuspended()).isTrue();
+
+    }
+
 
     @AfterAll
     public static void cleanUpTestData() {

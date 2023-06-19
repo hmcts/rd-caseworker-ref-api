@@ -33,6 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/refdata/case-worker",
                         "/refdata/case-worker/idam-roles-mapping",
                         "/refdata/case-worker/users",
+                        "/refdata/case-worker/users/sync",
                         "/refdata/case-worker/upload-file",
                         "/refdata/internal/staff/usersByServiceName",
                         "/refdata/case-worker/skill",
