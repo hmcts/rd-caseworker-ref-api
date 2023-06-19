@@ -127,6 +127,7 @@ public final class CaseWorkerConstants {
             + "Please try again or check with HMCTS Support Team";
     public static final String ROLE_CWD_USER = "cwd-user";
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
+    public static final String ROLE_PRD_ADMIN = "prd-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
     public static final String ROLE_CWD_ADMIN = "cwd-admin";
 
@@ -228,6 +229,10 @@ public final class CaseWorkerConstants {
     public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
     public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
             + TRY_AGAIN;
+    public static final String CASEWORKER_ID_MISSING = "CaseWorker id missing";
+    public static final String FIRST_NAME_NOT_PRESENT = "You must add the first name";
+    public static final String LAST_NAME_NOT_PRESENT = "You must add the last name";
+    public static final String SUSPENDED_FLAG_MANDATORY = "You must add the suspended flag";
 
 
 }
