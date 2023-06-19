@@ -565,7 +565,8 @@ class StaffRefDataServiceImplTest {
                 && !responseEntity.getHeaders().get("total-records").isEmpty()) {
             assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
         }
-
+        List<SearchStaffUserResponse> searchStaffUserResponses = responseEntity.getBody();
+        assertNotNull(searchStaffUserResponses.get(0).isCaseAllocator());
         assertThat(responseEntity.getBody()).isNotNull();
         assertTrue(validateSearchUserProfileResponse(responseEntity, searchReq));
     }
@@ -592,7 +593,7 @@ class StaffRefDataServiceImplTest {
                 && !responseEntity.getHeaders().get("total-records").isEmpty()) {
             assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("0");
         }
-
+        responseEntity.getBody();
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody()).isEmpty();
     }
@@ -972,6 +973,7 @@ class StaffRefDataServiceImplTest {
     void test_persistStaffProfileNull() {
         when(caseWorkerProfileRepository.save(any())).thenReturn(null);
         caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile, staffProfileCreationRequest);
+        verify(staffProfileAuditService,times(1)).saveStaffAudit(any(),any(),any(),any(),any());
         assertNull(caseWorkerProfile);
     }
 
@@ -979,9 +981,11 @@ class StaffRefDataServiceImplTest {
     void test_persistStaffProfile() {
         when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
         caseWorkerProfile = staffRefDataServiceImpl.persistStaffProfile(caseWorkerProfile, staffProfileCreationRequest);
+        verify(staffProfileAuditService,times(1)).saveStaffAudit(any(),any(),any(),any(),any());
         assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("CWID1");
         assertThat(caseWorkerProfile.getFirstName()).isEqualTo("CWFirstName");
         assertThat(caseWorkerProfile.getLastName()).isEqualTo("CWLastName");
+        assertThat(caseWorkerProfile.isNew()).isEqualTo(true);
     }
 
     @Test
@@ -1016,10 +1020,17 @@ class StaffRefDataServiceImplTest {
         });
         if (errorCode == 500) {
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, thrown.getStatus());
+            assertNotNull(thrown.getErrorMessage());
+            assertNotNull(thrown.getErrorDescription());
+            verify(staffProfileAuditService,times(1))
+                .saveStaffAudit(any(),any(),any(),any(),any());
         } else if (errorCode == 405) {
             assertEquals(HttpStatus.METHOD_NOT_ALLOWED, thrown.getStatus());
+            assertNotNull(thrown.getErrorMessage());
+            assertNotNull(thrown.getErrorDescription());
+            verify(staffProfileAuditService,times(1))
+                .saveStaffAudit(any(),any(),any(),any(),any());
         }
-
     }
 
 
@@ -1080,7 +1091,8 @@ class StaffRefDataServiceImplTest {
         StaffProfileCreationResponse staffProfileCreationResponse = staffRefDataServiceImpl
                 .updateStaffProfile(staffProfileCreationRequest);
 
-
+        verify(jsrValidatorStaffProfile,times(1)).validateStaffProfile(any(),any());
+        verify(staffProfileAuditService,times(1)).saveStaffAudit(any(),any(),any(),any(),any());
         assertThat(staffProfileCreationResponse).isNotNull();
         assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
     }
@@ -1120,6 +1132,23 @@ class StaffRefDataServiceImplTest {
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(1);
         assertThat(caseWorkerProfile.getRegion()).isEqualTo("testRegion");
 
+    }
+
+    @Test
+    void test_populateStaffProfileWithCaseWorkerProfile() throws JsonProcessingException {
+
+        //ValidateStaffProfile
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
+            "1234", staffProfileCreationRequest, STAFF_PROFILE_UPDATE);
+
+        CaseWorkerProfile caseWorkerProfiles = mock(CaseWorkerProfile.class);
+
+
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+
+        staffRefDataServiceImpl.populateStaffProfile(staffProfileCreationRequest, caseWorkerProfiles, "CWID1");
+        verify(caseWorkerProfiles,times(1)).setCaseWorkerId(any());
+        verify(caseWorkerProfiles,times(1)).setUserTypeId(any());
     }
 
 
@@ -1473,6 +1502,7 @@ class StaffRefDataServiceImplTest {
         when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
         Exception ex = assertThrows(StaffReferenceException.class, () -> staffRefDataServiceImpl.reinviteStaffProfile(
                 staffProfileCreationRequest));
+        verify(staffProfileAuditService,times(1)).saveStaffAudit(any(),any(),any(),any(),any());
         assertNotNull(ex);
         assertEquals("User does not exist in SRD", ex.getMessage());
         //verify(staffRefDataServiceImpl, times(0))
@@ -1489,10 +1519,15 @@ class StaffRefDataServiceImplTest {
         String body = mapper.writeValueAsString(userProfileCreationResponse);
         when(userProfileFeignClient.createUserProfile(any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
-        staffRefDataServiceImpl.reinviteStaffProfile(staffProfileCreationRequest);
+        var staffProfileCreationResponse = staffRefDataServiceImpl
+            .reinviteStaffProfile(staffProfileCreationRequest);
+        assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
         verify(staffAuditRepository, times(0)).save(any());
         verify(caseWorkerProfileRepository, times(1))
                 .findByEmailId(any());
+        verify(caseWorkerProfileRepository,times(1)).delete(any());
+        verify(cwrCommonRepository,times(1)).flush();
+
     }
 
     @Test
@@ -1519,7 +1554,7 @@ class StaffRefDataServiceImplTest {
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
             staffRefDataServiceImpl.checkStaffProfileEmailAndSuspendFlag(staffProfileCreationRequest);
         });
-
+        verify(staffProfileAuditService,times(1)).saveStaffAudit(any(),any(),any(),any(),any());
         assertThat(thrown.getMessage()).contains("The profile is already created for the given email Id");
     }
 
