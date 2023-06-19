@@ -134,6 +134,7 @@ class JsrValidatorStaffProfileTest {
         InvalidRequestException lastNameException = Assertions.assertThrows(InvalidRequestException.class, () ->
                 jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
         Assertions.assertNotNull(lastNameException.getLocalizedMessage());
+        verify(staffProfileAuditService,times(1)).saveStaffAudit(any(),any(),any(),any(),any());
         assertThat(lastNameException.getMessage()).contains(MISSING_REGION_PROFILE);
     }
 

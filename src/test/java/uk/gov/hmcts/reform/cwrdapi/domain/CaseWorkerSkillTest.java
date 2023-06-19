@@ -22,6 +22,7 @@ class CaseWorkerSkillTest {
         caseWorkerSkill.setCreatedDate(LocalDateTime.now());
         caseWorkerSkill.setLastUpdate(LocalDateTime.now());
         caseWorkerSkill.setCaseWorkerProfile(new CaseWorkerProfile());
+        caseWorkerSkill.setCaseWorkerSkill(new CaseWorkerSkill());
 
 
         assertNotNull(caseWorkerSkill);
@@ -29,6 +30,7 @@ class CaseWorkerSkillTest {
         assertNotNull(caseWorkerSkill.getCaseWorkerProfile());
         assertNotNull(caseWorkerSkill.getCreatedDate());
         assertNotNull(caseWorkerSkill.getLastUpdate());
+        assertNotNull(caseWorkerSkill.getCaseWorkerSkill());
 
         assertThat(caseWorkerSkill.getCaseWorkerId(), is("case_worker_id"));
         assertThat(caseWorkerSkill.getSkillId(), is(1L));

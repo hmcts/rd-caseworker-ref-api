@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,6 +26,7 @@ import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -77,6 +79,8 @@ class StaffProfileAuditServiceImplTest {
                 + "have exceeded limit of   index   columns. Use settings.setMaxColumns(int) "
                 + "to define the maximum number of columns your input can have";
 
+        testErrorDescription = testErrorDescription.substring(0, 511);
+
         StaffAudit staffAudit = StaffAudit.builder()
                 .status(AuditStatus.FAILURE.getStatus().toUpperCase())
                 .requestTimeStamp(LocalDateTime.now())
@@ -96,6 +100,121 @@ class StaffProfileAuditServiceImplTest {
         verify(staffAuditRepository, times(1))
                 .save(any());
 
+        assertThat(staffAudit.getErrorDescription().length()).isEqualTo(511);
+
+    }
+
+    @Test
+    void test_SaveStaffAudit_for_error_message_less_than_512() throws JsonProcessingException {
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+        UserInfo userInfo = UserInfo.builder()
+                .uid("12345")
+                .build();
+
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(userInfo);
+
+        String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : null;
+        String request = objectMapper.writeValueAsString(staffProfileCreationRequest);
+
+        String testErrorDescription = "Error message length is less than 512 ";
+
+        StaffAudit staffAudit = StaffAudit.builder()
+                .status(AuditStatus.FAILURE.getStatus().toUpperCase())
+                .requestTimeStamp(LocalDateTime.now())
+                .errorDescription(testErrorDescription)
+                .authenticatedUserId(userId)
+                .caseWorkerId("1234")
+                .operationType(STAFF_PROFILE_UPDATE)
+                .requestLog(request)
+                .build();
+
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit);
+
+
+        staffProfileAuditServiceImpl.saveStaffAudit(AuditStatus.FAILURE, testErrorDescription,
+                "1234", staffProfileCreationRequest, STAFF_PROFILE_UPDATE);
+
+        verify(staffAuditRepository, times(1))
+                .save(any());
+
+    }
+
+    @Test
+    void test_SaveStaffAudit_for_error_message_is_null_2() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+        UserInfo userInfo = UserInfo.builder()
+                .uid("12345")
+                .build();
+
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(userInfo);
+
+        String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : null;
+        String request = objectMapper.writeValueAsString(staffProfileCreationRequest);
+
+        String testErrorDescription = null;
+
+        StaffAudit staffAudit = StaffAudit.builder()
+                .status(AuditStatus.FAILURE.getStatus().toUpperCase())
+                .requestTimeStamp(LocalDateTime.now())
+                .errorDescription(testErrorDescription)
+                .authenticatedUserId(userId)
+                .caseWorkerId("1234")
+                .operationType(STAFF_PROFILE_UPDATE)
+                .requestLog(request)
+                .build();
+
+        Assertions.assertThatCode(() ->
+                    staffProfileAuditServiceImpl
+                            .saveStaffAudit(AuditStatus.FAILURE, testErrorDescription,
+                                    "1234",staffProfileCreationRequest, STAFF_PROFILE_UPDATE)
+                )
+                .doesNotThrowAnyException();
+
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit);
+
+
+        staffProfileAuditServiceImpl.saveStaffAudit(AuditStatus.FAILURE, testErrorDescription,
+                "1234", staffProfileCreationRequest, STAFF_PROFILE_UPDATE);
+
+        verify(staffAuditRepository, times(2))
+                .save(any());
+    }
+
+    @Test
+    void test_SaveStaffAudit_for_error_message_is_null() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+        String testErrorDescription = null;
+
+        Assertions.assertThatCode(() ->
+                        staffProfileAuditServiceImpl
+                                .saveStaffAudit(AuditStatus.FAILURE, testErrorDescription,
+                                        "1234",staffProfileCreationRequest, STAFF_PROFILE_UPDATE)
+                )
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void test_SaveStaffAudit_for_error_message_is_null2() throws JsonProcessingException {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+        UserInfo userInfo = null;
+
+        Assertions.assertThatCode(() -> userInfo.getUid()
+
+                )
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("\"userInfo\" is null");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void test_SaveStaffAudit_with_empty_userInfo_userid_null() throws JsonProcessingException {
+
+        UserInfo userInfo = UserInfo.builder().uid(null).build();
+
+        Assertions.assertThatCode(() -> userInfo.getUid()).doesNotThrowAnyException();
     }
 
     @Test
