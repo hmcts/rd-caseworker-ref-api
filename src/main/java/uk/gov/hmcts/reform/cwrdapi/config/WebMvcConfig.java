@@ -30,7 +30,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
         //Launch Darkly Feature Toggle
         registry.addInterceptor(featureConditionEvaluation)
-                .addPathPatterns("/refdata/case-worker/users/fetchUsersById",
+                .addPathPatterns("/refdata/case-worker",
                         "/refdata/case-worker/idam-roles-mapping",
                         "/refdata/case-worker/users",
                         "/refdata/case-worker/users/sync",

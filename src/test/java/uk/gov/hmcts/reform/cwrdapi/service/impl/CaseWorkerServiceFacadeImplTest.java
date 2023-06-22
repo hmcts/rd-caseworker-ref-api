@@ -39,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.util.ResourceUtils.getFile;
@@ -98,6 +99,7 @@ class CaseWorkerServiceFacadeImplTest {
             ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
         when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(exceptionCaseWorkers);
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
+        verify(validationServiceFacadeImpl,times(1)).saveJsrExceptionsForCaseworkerJob(anyLong());
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -233,10 +235,47 @@ class CaseWorkerServiceFacadeImplTest {
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
         when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
         ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
+        verify(caseWorkerInternalApiClient,times(1)).postRequest(any(),anyString());
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         ObjectMapper mapper = new ObjectMapper();
         String responseString = mapper.writeValueAsString(responseEntity.getBody());
         assertTrue(responseString.contains("1 record(s) failed validation and 1 record(s) uploaded"));
+    }
+
+    @Test
+    void shouldProcessCaseWorkerFileWithDuplicateEmail() throws IOException {
+        CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
+            .firstName("test").lastName("test")
+            .officialEmail("test@justice.gov.uk")
+            .regionId(1)
+            .regionName("test")
+            .userType("testUser")
+            .build();
+
+        CaseWorkerProfile caseWorkerProfile2 = CaseWorkerProfile.builder()
+            .firstName("test1").lastName("test1")
+            .officialEmail("test@justice.gov.uk")
+            .regionId(1)
+            .regionName("test1")
+            .userType("testUser")
+            .build();
+        List<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
+
+        caseWorkerProfiles.add(caseWorkerProfile1);
+        caseWorkerProfiles.add(caseWorkerProfile2);
+        MultipartFile multipartFile = createCaseWorkerMultiPartFile("Staff Data Upload.xls");
+
+        List<ExceptionCaseWorker> exceptionCaseWorkers =
+            ImmutableList.of(ExceptionCaseWorker.builder().errorDescription("Up Failed").excelRowId("1").build());
+        when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(exceptionCaseWorkers);
+        when(excelAdaptorService
+            .parseExcel(workbook, CaseWorkerProfile.class))
+            .thenReturn(caseWorkerProfiles);
+        when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
+        when(caseWorkerProfileConverter.getSuspendedRowIds()).thenReturn(List.of(1L));
+        ResponseEntity<Object> responseEntity = caseWorkerServiceFacade.processFile(multipartFile);
+        verify(validationServiceFacadeImpl,times(2)).logFailures(anyString(),anyLong());
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
