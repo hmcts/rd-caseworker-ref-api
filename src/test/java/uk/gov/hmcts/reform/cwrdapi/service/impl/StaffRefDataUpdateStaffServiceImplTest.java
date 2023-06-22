@@ -80,6 +80,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_U
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ORIGIN_EXUI;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_SRD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PROFILE_NOT_PRESENT_IN_UP_OR_IDAM;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_USER;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_UPDATE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STATUS_ACTIVE;
@@ -1045,6 +1047,49 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
+
+    }
+
+    @Test
+    void test_updateUserRolesInIdamDataNoMismatch() throws JsonProcessingException {
+        CaseWorkerProfile dbProfile = new CaseWorkerProfile();
+        dbProfile.setCaseWorkerId("CWID1");
+        dbProfile.setFirstName("CWFirstNameU");
+        dbProfile.setLastName("CWLastNameU");
+        dbProfile.setEmailId("cwr-func-test-user@test.com");
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("12345678");
+        List<String> roles = Arrays.asList(ROLE_CWD_USER, ROLE_STAFF_ADMIN);
+        userProfileResponse.setIdamStatus(IDAM_STATUS_SUSPENDED);
+
+        userProfileResponse.setRoles(roles);
+        userProfileResponse.setFirstName("testFN");
+        userProfileResponse.setLastName("testLN");
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
+            .thenReturn(Response.builder()
+                .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
+                    null)).body(mapper.writeValueAsString(userProfileResponse),
+                    defaultCharset())
+                .status(200).build());
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+
+        RoleAdditionResponse roleAdditionResponse = new RoleAdditionResponse();
+        roleAdditionResponse.setIdamStatusCode("201");
+        userProfileRolesResponse.setRoleAdditionResponse(roleAdditionResponse);
+        roleAdditionResponse.setIdamMessage("success");
+
+        StaffProfileCreationRequest cwUiRequest = getStaffProfileUpdateRequest();
+        staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,IDAM_STATUS,
+            StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
+        String caserWorkerId = dbProfile.getCaseWorkerId();
+        boolean updateUserRolesInIdam = staffRefDataServiceImpl
+            .updateUserRolesInIdam(cwUiRequest,caserWorkerId,STAFF_PROFILE_UPDATE);
+
+        assertTrue(updateUserRolesInIdam);
+
 
     }
 
