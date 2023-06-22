@@ -215,7 +215,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             invalidRequestError(profileRequest, PROFILE_ALREADY_CREATED);
         }
 
-        if (profileRequest.isSuspended()) {
+        if (profileRequest.getSuspended()) {
             invalidRequestError(profileRequest, NO_USER_TO_SUSPEND_PROFILE);
         }
     }
@@ -346,7 +346,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         finalCaseWorkerProfile.setFirstName(staffProfileRequest.getFirstName());
         finalCaseWorkerProfile.setLastName(staffProfileRequest.getLastName());
         finalCaseWorkerProfile.setEmailId(staffProfileRequest.getEmailId().toLowerCase());
-        finalCaseWorkerProfile.setSuspended(staffProfileRequest.isSuspended());
+        finalCaseWorkerProfile.setSuspended(staffProfileRequest.getSuspended());
         finalCaseWorkerProfile.setUserTypeId(staffProfileCreateUpdateUtil.getUserTypeIdByDesc(
                 staffProfileRequest.getUserType()));
         finalCaseWorkerProfile.setRegionId(staffProfileRequest.getRegionId());
@@ -775,18 +775,25 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             StaffProfileCreationRequest cwUiRequest, CaseWorkerProfile caseWorkerProfiles) {
 
         CaseWorkerProfile filteredProfile = null;
-        if (cwUiRequest.getSuspended() == null) {
-            cwUiRequest.setSuspended(caseWorkerProfiles.getSuspended());
-        }
-        if (cwUiRequest.isSuspended()) {
-            //when existing profile with delete flag is true in request then suspend user
-            if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
+
+        var hasSuspendFlagChanged = cwUiRequest.getSuspended() != null
+             && !cwUiRequest.getSuspended().equals(caseWorkerProfiles.getSuspended());
+
+        if (hasSuspendFlagChanged) {
+            if (Boolean.TRUE.equals(cwUiRequest.getSuspended())) {
+                //when existing profile with delete flag is true in request then suspend user
+                if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(IDAM_STATUS_SUSPENDED).build(),
                     caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
-                caseWorkerProfiles.setSuspended(true);
+                    caseWorkerProfiles.setSuspended(true);
+                }
+            } else if (Boolean.FALSE.equals(cwUiRequest.getSuspended())) {
+                if (isUserSuspended(UserProfileUpdatedData.builder().idamStatus(STATUS_ACTIVE).build(),
+                    caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
+                    caseWorkerProfiles.setSuspended(false);
+                }
             }
-        } else if (Boolean.TRUE.equals(caseWorkerProfiles.getSuspended()) && isUserSuspended(UserProfileUpdatedData
-                .builder().idamStatus(STATUS_ACTIVE).build(), caseWorkerProfiles.getCaseWorkerId(), ORIGIN_EXUI)) {
-            caseWorkerProfiles.setSuspended(cwUiRequest.isSuspended());
+        } else {
+            cwUiRequest.setSuspended(caseWorkerProfiles.getSuspended());
         }
         filteredProfile = updateSidamRoles(caseWorkerProfiles,cwUiRequest);
         return filteredProfile;
@@ -957,7 +964,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             builder.firstName(cwrProfileRequest.getFirstName())
                     .lastName(cwrProfileRequest.getLastName());
         }
-        if (!cwrProfileRequest.isSuspended()) {
+        if (!cwrProfileRequest.getSuspended()) {
             builder.idamStatus(idamStatus);
         } else {
             builder.idamStatus(IDAM_STATUS_SUSPENDED);
