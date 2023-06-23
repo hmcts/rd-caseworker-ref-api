@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_INVALID;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_PROFILE_CREATE;
 
-class JsrValidateCaseWorkerUpdateRequest {
+class JsrValidateCaseWorkerUpdateRequestTest {
 
 
     @Spy
