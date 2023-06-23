@@ -215,7 +215,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             invalidRequestError(profileRequest, PROFILE_ALREADY_CREATED);
         }
 
-        if (profileRequest.getSuspended()) {
+        if (profileRequest.isSuspended()) {
             invalidRequestError(profileRequest, NO_USER_TO_SUSPEND_PROFILE);
         }
     }
