@@ -964,7 +964,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
             builder.firstName(cwrProfileRequest.getFirstName())
                     .lastName(cwrProfileRequest.getLastName());
         }
-        if (!cwrProfileRequest.getSuspended()) {
+        if (!cwrProfileRequest.isSuspended()) {
             builder.idamStatus(idamStatus);
         } else {
             builder.idamStatus(IDAM_STATUS_SUSPENDED);

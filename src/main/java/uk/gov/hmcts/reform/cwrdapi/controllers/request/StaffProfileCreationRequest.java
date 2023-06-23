@@ -94,4 +94,8 @@ public class StaffProfileCreationRequest {
     @JsonProperty("is_resend_invite")
     private boolean resendInvite;
 
+    public boolean isSuspended() {
+        return suspended != null ? suspended.booleanValue() : false;
+    }
+
 }
