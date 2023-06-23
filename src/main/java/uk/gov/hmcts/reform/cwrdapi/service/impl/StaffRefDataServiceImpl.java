@@ -901,8 +901,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (!resultResponse.isPresent() || !(resultResponse.get() instanceof UserProfileResponse profileResponse)
                 || !nonNull(profileResponse.getIdamStatus())) {
 
-            log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
-                    UP_FAILURE_ROLES);
+            log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName);
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_USER_PROFILE,
                     IDAM_STATUS_USER_PROFILE);
 

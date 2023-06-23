@@ -1086,7 +1086,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
             StringUtils.EMPTY,cwUiRequest,STAFF_PROFILE_UPDATE);
         String caserWorkerId = dbProfile.getCaseWorkerId();
         boolean updateUserRolesInIdam = staffRefDataServiceImpl
-            .updateUserRolesInIdam(cwUiRequest,caserWorkerId,STAFF_PROFILE_UPDATE);
+            .updateUserRolesInIdam(cwUiRequest,caserWorkerId);
 
         assertTrue(updateUserRolesInIdam);
 
