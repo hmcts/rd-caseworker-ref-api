@@ -326,7 +326,7 @@ public class StaffRefDataController {
         staffProfileCreationResponse = staffRefDataService.processStaffProfileCreation(staffProfileCreationRequest);
         if (isNotEmpty(staffProfileCreationResponse)) {
 
-           // staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
+            staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(staffProfileCreationResponse);
     }
@@ -435,7 +435,7 @@ public class StaffRefDataController {
         }
         if (isNotEmpty(staffProfileCreationResponse)) {
 
-         //   staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
+            staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
         }
         return ResponseEntity.status(HttpStatus.OK).body(staffProfileCreationResponse);
     }
