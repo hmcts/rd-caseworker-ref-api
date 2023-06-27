@@ -476,7 +476,6 @@ dependencies {
   testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.7.0'
   testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 
-
   testImplementation 'io.github.openfeign:feign-jackson:12.1'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 

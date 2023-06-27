@@ -149,7 +149,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         UserProfileResponse upResponse = getUserProfileFromUp(profileCreateRequests.get(0).getEmailId());
         Assertions.assertThat(upResponse.getRoles())
                 .containsExactlyInAnyOrderElementsOf(ImmutableList
-                        .of(CWD_USER, CASEWORKER_IAC_BULKSCAN, CASEWORKER_SENIOR_IAC));
+                        .of(CWD_USER, CASEWORKER_IAC_BULKSCAN, CASEWORKER_CIVIL, CASEWORKER_CIVIL_STAFF));
     }
 
     @Test
