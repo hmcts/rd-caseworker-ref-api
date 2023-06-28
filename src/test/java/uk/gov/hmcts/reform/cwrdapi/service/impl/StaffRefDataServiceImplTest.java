@@ -1348,7 +1348,7 @@ class StaffRefDataServiceImplTest {
                         .status(200).build());
 
         Boolean response = staffRefDataServiceImpl
-                    .updateUserRolesInIdam(staffProfileCreationRequest, "1234", STAFF_PROFILE_CREATE);
+                    .updateUserRolesInIdam(staffProfileCreationRequest, "1234");
 
         assertTrue(response);
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
@@ -1370,7 +1370,7 @@ class StaffRefDataServiceImplTest {
 
         StaffReferenceException thrown = Assertions.assertThrows(StaffReferenceException.class, () -> {
             staffRefDataServiceImpl
-                    .updateUserRolesInIdam(staffProfileCreationRequest, "1234", STAFF_PROFILE_CREATE);
+                    .updateUserRolesInIdam(staffProfileCreationRequest, "1234");
 
         });
 

@@ -273,7 +273,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 //validate the request info with UserProfile response.
                 UserProfileCreationResponse upResponse = (UserProfileCreationResponse) (responseEntity.getBody());
                 if (nonNull(upResponse)) {
-                    updateUserRolesInIdam(staffProfileRequest, upResponse.getIdamId(),STAFF_PROFILE_CREATE);
+                    updateUserRolesInIdam(staffProfileRequest, upResponse.getIdamId());
                 }
             }
 
@@ -884,15 +884,14 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                                                     StaffProfileCreationRequest cwUiRequest) {
         CaseWorkerProfile filteredUpdateCwProfile = null;
         boolean isAddRoleSuccess = updateUserRolesInIdam(cwUiRequest,
-                updateCaseWorkerProfiles.getCaseWorkerId(),STAFF_PROFILE_UPDATE);
+                updateCaseWorkerProfiles.getCaseWorkerId());
         if (isAddRoleSuccess) {
             filteredUpdateCwProfile = updateCaseWorkerProfiles;
         }
         return filteredUpdateCwProfile;
     }
 
-    public boolean  updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId,
-                                         String operationType) {
+    public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId) {
 
 
         Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId, "SRD");
@@ -902,8 +901,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (!resultResponse.isPresent() || !(resultResponse.get() instanceof UserProfileResponse profileResponse)
                 || !nonNull(profileResponse.getIdamStatus())) {
 
-            log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName,
-                    UP_FAILURE_ROLES);
+            log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName);
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_USER_PROFILE,
                     IDAM_STATUS_USER_PROFILE);
 
