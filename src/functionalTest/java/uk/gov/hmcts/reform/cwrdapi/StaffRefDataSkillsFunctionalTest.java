@@ -54,7 +54,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
         assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isGreaterThan(0);
 
         ServiceSkill serviceSkill = staffWorkerSkillResponse.getServiceSkills().get(0);
-        assertThat(serviceSkill.getId()).isEqualTo("ABA5");
+        assertThat(serviceSkill.getId()).isEqualTo("BHA1");
         assertThat(serviceSkill.getSkills().size()).isGreaterThan(1);
 
     }
