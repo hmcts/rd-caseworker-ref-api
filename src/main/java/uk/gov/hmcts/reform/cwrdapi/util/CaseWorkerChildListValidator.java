@@ -57,8 +57,8 @@ public class CaseWorkerChildListValidator implements ConstraintValidator<Validat
             //@TO do remove getLocationName with Id problem with excel sheet
             isValidLocations = negate(
                     ObjectUtils.nullSafeEquals(
-                            caseWorkerProfile.getLocations().get(0).getLocationName(),
-                            caseWorkerProfile.getLocations().get(1).getLocationName()));
+                            String.valueOf(caseWorkerProfile.getLocations().get(0).getLocationName()).toLowerCase(),
+                            String.valueOf(caseWorkerProfile.getLocations().get(1).getLocationName()).toLowerCase()));
 
             if (FALSE.equals(isValidLocations)) {
                 context.buildConstraintViolationWithTemplate(DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS)
