@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
@@ -56,9 +57,9 @@ public class CaseWorkerChildListValidator implements ConstraintValidator<Validat
             && caseWorkerProfile.getLocations().size() > 1) {
             //@TO do remove getLocationName with Id problem with excel sheet
             isValidLocations = negate(
-                    ObjectUtils.nullSafeEquals(
-                            String.valueOf(caseWorkerProfile.getLocations().get(0).getLocationName()).toLowerCase(),
-                            String.valueOf(caseWorkerProfile.getLocations().get(1).getLocationName()).toLowerCase()));
+                    StringUtils.equalsIgnoreCase(
+                            caseWorkerProfile.getLocations().get(0).getLocationName(),
+                            caseWorkerProfile.getLocations().get(1).getLocationName()));
 
             if (FALSE.equals(isValidLocations)) {
                 context.buildConstraintViolationWithTemplate(DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS)
