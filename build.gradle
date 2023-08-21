@@ -585,8 +585,6 @@ configurations.all {
       details.useVersion "4.1.94.Final"
     }
 
-
-
   }
 }
 
