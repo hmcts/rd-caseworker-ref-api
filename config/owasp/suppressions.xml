@@ -7,6 +7,7 @@
   <suppress>
      <cve>CVE-2022-45688</cve>
       <cve>CVE-2022-1471</cve>
+      <cve>CVE-2023-39533</cve>
   </suppress>
   <suppress>
       <notes><![CDATA[
