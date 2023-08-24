@@ -10,8 +10,8 @@ def component = "caseworker-ref-api"
 
 def secrets = [
   's2s-${env}': [
-          secret('app-insights-connection-string', 'app-insights-connection-string'),
-    secret('microservicekey-rd-caseworker-ref-api', 'CASEWORKER_REF_API_S2S_SECRET')
+     secret('app-insights-connection-string', 'app-insights-connection-string'),
+     secret('microservicekey-rd-caseworker-ref-api', 'CASEWORKER_REF_API_S2S_SECRET')
   ],
   'rd-${env}': [
 
