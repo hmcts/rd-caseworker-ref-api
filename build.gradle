@@ -98,14 +98,14 @@ sourceSets {
     resources.srcDir file('src/integrationTest/resources')
   }
 
- /* functionalTest {
+  functionalTest {
     java {
       compileClasspath += main.output + test.output
       runtimeClasspath += main.output + test.output
       srcDir file('src/functionalTest/java')
     }
     resources.srcDir file('src/functionalTest/resources')
-  }*/
+  }
 
   smokeTest {
     java {
@@ -139,8 +139,8 @@ idea {
   module {
     testSourceDirs += project.sourceSets.integrationTest.java.srcDirs
     testSourceDirs += project.sourceSets.integrationTest.resources.srcDirs
-    //testSourceDirs += project.sourceSets.functionalTest.java.srcDirs
-    //testSourceDirs += project.sourceSets.functionalTest.resources.srcDirs
+    testSourceDirs += project.sourceSets.functionalTest.java.srcDirs
+    testSourceDirs += project.sourceSets.functionalTest.resources.srcDirs
     testSourceDirs += project.sourceSets.smokeTest.java.srcDirs
     testSourceDirs += project.sourceSets.smokeTest.resources.srcDirs
   }
@@ -149,8 +149,8 @@ idea {
 configurations {
   integrationTestImplementation.extendsFrom testCompile
   integrationTestRuntime.extendsFrom testRuntime
-  //functionalTestImplementation.extendsFrom testCompile
-  //functionalTestRuntime.extendsFrom testRuntime
+  functionalTestImplementation.extendsFrom testCompile
+  functionalTestRuntime.extendsFrom testRuntime
   contractTestImplementation.extendsFrom testCompile
   contractTestRuntimeOnly.extendsFrom testRuntime
   pactTestImplementation.extendsFrom testCompile
@@ -431,8 +431,8 @@ dependencies {
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-   // functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-   // functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     smokeTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     smokeTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
@@ -495,8 +495,8 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
- // functionalTestImplementation sourceSets.main.runtimeClasspath
- // functionalTestImplementation sourceSets.test.runtimeClasspath
+  functionalTestImplementation sourceSets.main.runtimeClasspath
+  functionalTestImplementation sourceSets.test.runtimeClasspath
 
   smokeTestImplementation sourceSets.main.runtimeClasspath
   smokeTestImplementation sourceSets.test.runtimeClasspath
