@@ -597,9 +597,9 @@ tasks.withType(Test) {
 // java flag that configures the deployed applications
 applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
 
-rootProject.tasks.named("processFunctionalTestResources") {
-  duplicatesStrategy = 'include'
-}
+//rootProject.tasks.named("processFunctionalTestResources") {
+  //duplicatesStrategy = 'include'
+//}
 
 rootProject.tasks.named("processIntegrationTestResources") {
   duplicatesStrategy = 'include'
