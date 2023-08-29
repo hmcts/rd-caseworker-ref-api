@@ -161,7 +161,7 @@ configurations {
 pmd {
   toolVersion = '6.53.0'
   ignoreFailures = true
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.smokeTest]
+  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   ruleSets = [
     'category/java/errorprone.xml',
@@ -180,9 +180,9 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
 
   systemProperty "scenario", System.getProperty('scenario')
 
-  //testClassesDirs = sourceSets.functionalTest.output.classesDirs
-  //classpath = sourceSets.functionalTest.runtimeClasspath
-  //finalizedBy aggregate
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
+  finalizedBy aggregate
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
