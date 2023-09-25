@@ -528,7 +528,7 @@ dependencyManagement {
       entry 'tomcat-embed-websocket'
     }
     //CVE-2022-40152
-    dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
+    dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.1') {
       entry 'woodstox-core'
     }
     //CVE-2023-24998
