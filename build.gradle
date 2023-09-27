@@ -30,7 +30,7 @@ apply plugin: 'project-report'
 apply plugin: 'idea'
 
 def versions = [
-  lombok             : '1.18.22',
+  lombok             : '1.18.30',
   gradlePitest       : '1.5.1',
   pitest             : '1.7.4',
   reformHealthStarter: '0.0.5',
