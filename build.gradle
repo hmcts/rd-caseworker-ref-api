@@ -414,7 +414,7 @@ dependencies {
   implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.7'
   // https://mvnrepository.com/artifact/net.minidev/json-smart
   implementation group: 'net.minidev', name: 'json-smart', version: '2.4.8'
 
@@ -479,7 +479,7 @@ dependencies {
   testImplementation 'io.github.openfeign:feign-jackson:12.1'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.0'
+  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.8'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.4')
   testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.17'
@@ -536,7 +536,7 @@ dependencyManagement {
       entry 'commons-fileupload'
     }
     //CVE-2021-22044
-    dependencySet(group: 'org.springframework.cloud', version: '3.1.5') {
+    dependencySet(group: 'org.springframework.cloud', version: '3.1.8') {
       entry 'spring-cloud-starter-openfeign'
       entry 'spring-cloud-openfeign-core'
     }
