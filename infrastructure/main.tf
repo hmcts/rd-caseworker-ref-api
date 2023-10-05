@@ -91,7 +91,7 @@ module "db-rd-caseworker-ref-v15" {
   env                  = var.env
   pgsql_databases = [
     {
-      name = "rd-caseworker-ref-api-db"
+      name = "dbrdcaseworker"
     }
   ]
   pgsql_version        = "15"
@@ -107,7 +107,7 @@ resource "azurerm_key_vault_secret" "POSTGRES-PASS-V15" {
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-V15" {
   name          = join("-", [var.component, "POSTGRES-DATABASE-V15"])
-  value         = "rd-caseworker-ref-api-db"
+  value         = "dbrdcaseworker"
   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
 
