@@ -7,6 +7,11 @@ variable "product-V15" {
   default="rd-caseworker-ref-api"
 }
 
+variable "database_name" {
+  type = string
+  default="dbrdcaseworker"
+}
+
 variable "raw_product" {
   type    = string
   default = "rd" // jenkins-library overrides product for PRs and adds e.g. pr-123-ia
