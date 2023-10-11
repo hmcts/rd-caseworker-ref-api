@@ -12,6 +12,12 @@ variable "database_name" {
   default="dbrdcaseworker"
 }
 
+variable "pgsql_admin_username" {
+  description = "Admin username"
+  type        = string
+  default     = "dbrdcaseworker@rd-caseworker-ref-api-postgres-db-v15"
+}
+
 variable "raw_product" {
   type    = string
   default = "rd" // jenkins-library overrides product for PRs and adds e.g. pr-123-ia

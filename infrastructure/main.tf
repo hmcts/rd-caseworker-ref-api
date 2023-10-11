@@ -6,6 +6,7 @@ locals {
   s2s_rg_prefix               = "rpe-service-auth-provider"
   s2s_key_vault_name          = var.env == "preview" || var.env == "spreview" ? join("-", ["s2s", "aat"]) : join("-", ["s2s", var.env])
   s2s_vault_resource_group    = var.env == "preview" || var.env == "spreview" ? join("-", [local.s2s_rg_prefix, "aat"]) : join("-", [local.s2s_rg_prefix, var.env])
+  postgresql_user = "${var.pgsql_admin_username}-${var.env}"
 }
 
 data "azurerm_key_vault" "rd_key_vault" {
@@ -83,7 +84,7 @@ module "db-rd-caseworker-ref-v15" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-
+  pgsql_admin_username = local.postgresql_user
   admin_user_object_id = var.jenkins_AAD_objectId
   business_area        = "cft"
   common_tags          = var.common_tags
@@ -125,7 +126,7 @@ resource "azurerm_key_vault_secret" "POSTGRES_PORT-V15" {
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
   name          = join("-", [var.component, "POSTGRES-USER-V15"])
-  value         = join("@", [var.database_name, join("-", [var.product-V15, var.component-V15])])
+  value         = "${var.pgsql_admin_username}-${var.env}"
   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
 
