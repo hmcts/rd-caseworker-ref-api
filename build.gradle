@@ -418,7 +418,18 @@ dependencies {
   // https://mvnrepository.com/artifact/net.minidev/json-smart
   implementation group: 'net.minidev', name: 'json-smart', version: '2.4.8'
 
-
+  dependencySet(group: 'io.netty', version: '4.1.100.Final') {
+    entry 'netty-buffer'
+    entry 'netty-codec'
+    entry 'netty-codec-http'
+    entry 'netty-codec-socks'
+    entry 'netty-common'
+    entry 'netty-handler'
+    entry 'netty-handler-proxy'
+    entry 'netty-resolver'
+    entry 'netty-transport'
+    entry 'netty-transport-native-unix-common'
+  }
   testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.13'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
@@ -575,10 +586,6 @@ configurations.all {
     if (details.requested.group == 'io.netty'
             && details.requested.name == 'netty-tcnative-boringssl-static' ){
       details.useVersion "2.0.35.Final"
-    }
-    if (details.requested.group == 'io.netty'
-            && details.requested.name != 'netty-tcnative-boringssl-static' ) {
-      details.useVersion "4.1.94.Final"
     }
   }
 }
