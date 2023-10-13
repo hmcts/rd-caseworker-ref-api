@@ -128,4 +128,3 @@ resource "azurerm_key_vault_secret" "POSTGRES-USER-V15" {
   value         = module.db-rd-caseworker-ref-v15.username
   key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 }
-
