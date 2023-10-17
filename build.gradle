@@ -541,7 +541,6 @@ dependencyManagement {
       entry 'spring-cloud-openfeign-core'
     }
 
-
     //        Resolves CVE-2023-4586
     dependencySet(group: 'io.netty', version: '4.1.100.Final') {
       entry 'netty-buffer'
