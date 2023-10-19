@@ -42,6 +42,7 @@ variable "db_replicas" {
   type    = list(string)
   default = []
 }
+
 variable "product-V15" {
   type = string
   default="rd-caseworker-ref-api"
@@ -96,3 +97,4 @@ variable "pgsql_server_configuration" {
     }
   ]
 }
+
