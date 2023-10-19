@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ExceptionMapper;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
@@ -46,12 +48,14 @@ import static uk.gov.hmcts.reform.cwrdapi.util.AuditStatus.SUCCESS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.AND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DELIMITER_COMMA;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_EMAIL_PROFILES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_ROLE_MAPPING_FILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.MULTIPLE_SERVICE_CODES;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_UPLOAD_FILE_ERROR;
 
 @Service
 @Slf4j
@@ -59,6 +63,12 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
     @Value("${loggingComponentName}")
     private String loggingComponentName;
+
+    @Value("${staff_upload_file}")
+    private boolean stopStaffUploadFile;
+
+    @Value("${idam_role_mapping_file}")
+    private boolean enableIdamRoleMappingFile;
 
     @Autowired
     ExcelValidatorService excelValidatorService;
@@ -92,6 +102,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             boolean isCaseWorker = nonNull(fileName)
                 && fileName.toLowerCase(Locale.ENGLISH).startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME);
+            uploadFile(isCaseWorker);
 
             Class<? extends CaseWorkerDomain> ob = isCaseWorker
                 ? CaseWorkerProfile.class : ServiceRoleMapping.class;
@@ -136,6 +147,15 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             auditLog(file, ex);
 
             throw ex;
+        }
+    }
+
+    private void uploadFile(boolean isCaseWorker) {
+        if (!stopStaffUploadFile && isCaseWorker) {
+            throw new StaffReferenceException(HttpStatus.FORBIDDEN,STAFF_UPLOAD_FILE_ERROR,STAFF_UPLOAD_FILE_ERROR);
+        }
+        if (!enableIdamRoleMappingFile && !isCaseWorker) {
+            throw new StaffReferenceException(HttpStatus.FORBIDDEN,IDAM_ROLE_MAPPING_FILE,IDAM_ROLE_MAPPING_FILE);
         }
     }
 

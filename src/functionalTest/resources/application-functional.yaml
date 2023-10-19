@@ -12,7 +12,9 @@ idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.s
 s2s-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
 userProfUrl: http://rd-user-profile-api-aat.service.core-compute-aat.internal
 locationRefDataUrl: http://rd-location-ref-api-aat.service.core-compute-aat.internal
-
+### staff Upload File configuration
+staff_upload_file: ${STAFF_UPLOAD_FILE:true}
+idam_role_mapping_file: ${IDAM_ROLE_MAPPING_FILE:true}
 
 #######
 postgres.host_name: ${FUNC_DATABASE_HOST}
