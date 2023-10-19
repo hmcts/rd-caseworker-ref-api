@@ -102,6 +102,10 @@ oidc:
   expiration: 14400000 # milliseconds 4 hours
 
 environment_name: ${ENVIRONMENT_NAME:preview}
+### staff Upload File configuration
+staff_upload_file: ${STAFF_UPLOAD_FILE:true}
+idam_role_mapping_file: ${IDAM_ROLE_MAPPING_FILE:true}
+
 
 ## user profile feign connection
 userProfUrl: ${USER_PROFILE_URL:http://127.0.0.1:8091}
