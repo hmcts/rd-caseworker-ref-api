@@ -102,7 +102,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
 
             boolean isCaseWorker = nonNull(fileName)
                 && fileName.toLowerCase(Locale.ENGLISH).startsWith(CaseWorkerConstants.CASE_WORKER_FILE_NAME);
-            uploadFile(isCaseWorker);
+            blockUploadFileVerification(isCaseWorker);
 
             Class<? extends CaseWorkerDomain> ob = isCaseWorker
                 ? CaseWorkerProfile.class : ServiceRoleMapping.class;
@@ -150,7 +150,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
         }
     }
 
-    private void uploadFile(boolean isCaseWorker) {
+    private void blockUploadFileVerification(boolean isCaseWorker) {
         if (!stopStaffUploadFile && isCaseWorker) {
             throw new StaffReferenceException(HttpStatus.FORBIDDEN,STAFF_UPLOAD_FILE_ERROR,STAFF_UPLOAD_FILE_ERROR);
         }
