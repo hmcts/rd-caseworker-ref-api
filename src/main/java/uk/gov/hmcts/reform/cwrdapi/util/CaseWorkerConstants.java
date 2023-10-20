@@ -146,6 +146,11 @@ public final class CaseWorkerConstants {
     public static final String DUPLICATE_EMAIL_PROFILES = "User record in row ID %s is duplicate to another row. "
             + "Please ensure that the record is not duplicate and try again";
 
+    public static final String STAFF_UPLOAD_FILE_ERROR = "The Staff Upload template is now disabled. "
+        + "Please use the Staff UI";
+
+    public static final String IDAM_ROLE_MAPPING_FILE = "IDAM-Role-mapping file upload is now disabled!";
+
     public static final String INVALID_FIELD = "The field %s is invalid. Please provide a valid value.";
     public static final String PAGE_NUMBER = "Page Number";
     public static final String PAGE_SIZE = "Page Size";
