@@ -22,8 +22,8 @@ java:
     LAUNCH_DARKLY_ENV: "preview"
     ENVIRONMENT_NAME: "preview"
     EMAIL_DOMAIN_LIST: "justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk"
-    STAFF_UPLOAD_FILE: "{{ .Values.global.environment }}"
-    IDAM_ROLE_MAPPING_FILE: "{{ .Values.global.environment }}"
+    STAFF_UPLOAD_FILE: false
+    IDAM_ROLE_MAPPING_FILE: true
   postgresql:
     enabled: true
     auth:
