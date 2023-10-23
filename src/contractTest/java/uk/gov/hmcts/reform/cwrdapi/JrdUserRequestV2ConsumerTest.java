@@ -33,9 +33,9 @@ import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
 @ExtendWith(PactConsumerTestExt.class)
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@PactTestFor(providerName = "referenceData_judicial")
+//@PactTestFor(providerName = "referenceData_judicialv2")
 //@PactFolder("pacts")
-public class JrdUserRequestV1ConsumerTest {
+public class JrdUserRequestV2ConsumerTest {
 
     private static final String JRD_GET_PROFILES_URL = "/refdata/judicial/users";
 
@@ -54,11 +54,11 @@ public class JrdUserRequestV1ConsumerTest {
 
 
     //To run the Pact tests please uncommnet all Pact Test annotations
-    //@Pact(provider = "referenceData_judicial", consumer = "JRD_API_V1_Search_ConsumerTest")
+    //@Pact(provider = "referenceData_judicialv2", consumer = "JRD_API_V2_Search_ConsumerTest")
     public RequestResponsePact searchJrdProfiles(PactDslWithProvider builder) throws JsonProcessingException {
 
         return builder
-                .given("User profile details exist for the search request provided")
+                .given("return judicial user profiles")
                 .uponReceiving("the api returns judicial user profiles "
                         + "based on the provided list of user ids")
                 .path(JRD_GET_PROFILES_URL + "/search")
@@ -90,46 +90,11 @@ public class JrdUserRequestV1ConsumerTest {
 
     }
 
-    //@Pact(provider = "referenceData_judicial", consumer = "JRD_Fetch_API_ConsumerTest")
-    public RequestResponsePact getJudicialUserProfiles(PactDslWithProvider builder) throws JsonProcessingException {
-
-        return builder
-                .given("User profile details exist")
-                .uponReceiving("the api returns judicial user profiles ")
-                .path(JRD_GET_PROFILES_URL + "/fetch")
-                .body(createJrdProfileUserRequest())
-                .method(HttpMethod.POST.toString())
-                .willRespondWith()
-                .status(HttpStatus.OK.value())
-                .headers(getResponseHeaders())
-                .body(createJrdFetchProfilesResponse())
-                .toPact();
-    }
-
-    //@Test
-    //@PactTestFor(pactMethod = "getJudicialUserProfiles")
-    void executeGetJudicialUserProfiles(MockServer mockServer)
-            throws JSONException {
-        var actualResponseBody =
-                SerenityRest
-                        .given()
-                        .headers(getHttpHeaders())
-                        .body(createJrdProfileUserRequest().toString())
-                        .contentType(ContentType.JSON)
-                        .post(mockServer.getUrl() + JRD_GET_PROFILES_URL + "/fetch")
-                        .then()
-                        .log().all().extract().asString();
-
-        JSONArray response = new JSONArray(actualResponseBody);
-        Assertions.assertThat(response).isNotNull();
-
-    }
-
-    //@Pact(provider = "referenceData_judicial", consumer = "JRD_API_ConsumerTest")
+    //@Pact(provider = "referenceData_judicialv2", consumer = "JRD_API_V2_ConsumerTest")
     public RequestResponsePact getJrdProfilesListOfIds(PactDslWithProvider builder) throws JsonProcessingException {
 
         return builder
-                .given("return judicial user profiles along with their active appointments and authorisations")
+                .given("return judicial user profiles v2 along with their active appointments and authorisations")
                 .uponReceiving("the api returns judicial user profiles "
                         + "based on the provided list of user ids")
                 .path(JRD_GET_PROFILES_URL)
@@ -161,11 +126,11 @@ public class JrdUserRequestV1ConsumerTest {
 
     }
 
-    //@Pact(provider = "referenceData_judicial", consumer = "JRD_API_consumerTest")
+    //@Pact(provider = "referenceData_judicialv2", consumer = "JRD_API_V2_consumerTest")
     public RequestResponsePact getJrdProfilesServiceName(PactDslWithProvider builder) throws JsonProcessingException {
 
         return builder
-                .given("return judicial user profiles along with their active appointments and authorisations")
+                .given("return judicial user profiles v2 along with their active appointments and authorisations")
                 .uponReceiving("the api returns judicial user profiles "
                         + "based on the provided service name")
                 .path(JRD_GET_PROFILES_URL)
@@ -197,47 +162,82 @@ public class JrdUserRequestV1ConsumerTest {
 
     }
 
+    private DslPart searchJrdProfilesResponse() {
+        return newJsonArray(o -> o.object(ob -> ob
+                .stringType("idamId", SIDAM_ID)
+                .stringType("fullName", "testFullName")
+                .stringType("knownAs", "testKnownAs")
+                .stringType("surname", "surname")
+                .stringType("emailId", "test@test.com")
+                .stringType("title", "Family Judge")
+                .stringType("personalCode", "1234")
+                .stringType("postNominals", "Mr")
+                .stringType("initials", "I N")))
+                .build();
+    }
+
     private DslPart createJrdProfilesResponse() {
         return newJsonArray(o -> o.object(ob -> ob
                 .stringType("sidam_id", SIDAM_ID)
-                .stringType("object_id", "fcb4f03c-4b3f-4c3c-bf3a-662b4557b470")
-                .stringType("email_id", "e@mail.com")
+                .stringType("full_name", "testFullName")
+                .stringType("known_as", "testKnownAs")
+                .stringType("surname", "surname")
+                .stringType("email_id", "test@test.com")
+                .stringType("title", "Family Judge")
+                .stringType("personal_code", "1234")
+                .stringType("post_nominals", "Mr")
+                .stringType("initials", "I N")
                 .minArrayLike("appointments", 1, r -> r
-                        .stringType("location_id", "1")
+                        .stringType("base_location_id")
+                        .stringType("epimms_id")
+                        .stringType("cft_region_id")
+                        .stringType("cft_region")
+                        .stringType("is_principal_appointment")
+                        .date("start_date", "yyyy-MM-dd")
+                        .date("end_date", "yyyy-MM-dd")
+                        .stringType("appointment")
+                        .stringType("appointment_type")
+                        .array("service_codes", (s) -> {
+                            s.stringType("BFA1");
+                        })
+                        .stringType("appointment_id")
                 )
                 .minArrayLike("authorisations", 1, r -> r
-                        .stringType("jurisdiction", "IA")
+                        .stringType("jurisdiction")
+                        .stringType("ticket_description")
+                        .date("start_date", "yyyy-MM-dd")
+                        .minArrayLike("service_codes", 0, (s) -> {
+                            s.stringType("BFA1");
+                        })
+                        .stringType("ticket_code")
+                        .date("end_date", "yyyy-MM-dd")
+                        .stringType("appointment_id")
+                        .stringType("authorisation_id")
+                        .stringType("jurisdiction_id")
+                )
+                .minArrayLike("roles", 1, r -> r
+                        .stringType("jurisdiction_role_name")
+                        .stringType("jurisdiction_role_id")
+                        .stringType("start_date")
+                        .stringType("end_date")
                 )
         )).build();
     }
 
-    private DslPart createJrdFetchProfilesResponse() {
-        return newJsonArray(o -> o.object(ob -> ob
-                .stringType("idamId", SIDAM_ID)
-                .minArrayLike("appointments", 1, r -> r
-                        .stringType("appointmentId", "1")
-                )
-                .minArrayLike("authorisations", 1, r -> r
 
-                        .stringType("authorisationId", "1234")
-                )
-        )).build();
+    private DslPart createJrdProfileSearchRequest() {
+        return newJsonBody(o -> o
+                .stringType("searchString", "testFullName")
+                .stringType("serviceCode", "CMC")
+                .stringType("location", "location")
+        ).build();
     }
-
 
     private DslPart createJrdProfileUpdateRequest() {
         return newJsonBody(o -> o
                 .stringType("ccdServiceName", null)
                 .stringType("object_ids", null)
                 .minArrayLike("sidam_ids", 1,
-                        PactDslJsonRootValue.stringType("44362987-4b00-f2e7-4ff8-761b87f16bf9"),1)
-        ).build();
-    }
-
-
-    private DslPart createJrdProfileUserRequest() {
-        return newJsonBody(o -> o
-                .minArrayLike("userIds", 1,
                         PactDslJsonRootValue.stringType("44362987-4b00-f2e7-4ff8-761b87f16bf9"),1)
         ).build();
     }
@@ -253,7 +253,7 @@ public class JrdUserRequestV1ConsumerTest {
 
     @NotNull
     private Map<String, String> getResponseHeaders() {
-        Map<String, String> responseHeaders = Map.of("Content-Type", "application/json");
+        Map<String, String> responseHeaders = Map.of("Content-Type", "application/vnd.jrd.api+json;Version=2.0");
         return responseHeaders;
     }
 
@@ -261,26 +261,7 @@ public class JrdUserRequestV1ConsumerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("ServiceAuthorization", "Bearer " + "1234");
         headers.add("Authorization", "Bearer " + "2345");
+        headers.add("Accept", "application/vnd.jrd.api+json;Version=2.0");
         return headers;
-    }
-
-    private DslPart createJrdProfileSearchRequest() {
-        return newJsonBody(o -> o
-                .stringType("searchString", "testFullName")
-                .stringType("serviceCode", "CMC")
-                .stringType("location", "location")
-        ).build();
-    }
-
-    private DslPart searchJrdProfilesResponse() {
-        return newJsonArray(o -> o.object(ob -> ob
-                .stringType("idamId", SIDAM_ID)
-                .stringType("fullName", "testFullName")
-                .stringType("knownAs", "testKnownAs")
-                .stringType("surname", "surname")
-                .stringType("emailId", "test@test.com")
-                .stringType("title", "Family Judge")
-                .stringType("personalCode", "1234")))
-                .build();
     }
 }
