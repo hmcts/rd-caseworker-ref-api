@@ -23,7 +23,7 @@ java:
     OPEN_ID_API_BASE_URI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o
     REFRESH_PAGE_SIZE: 20
     REFRESH_SORT_COLUMN: caseWorkerId
-    STAFF_UPLOAD_FILE : false
+    STAFF_UPLOAD_FILE: false
     IDAM_ROLE_MAPPING_FILE: true
   keyVaults:
     rd:
