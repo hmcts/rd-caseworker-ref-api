@@ -1393,7 +1393,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         assertNotNull(caseWorkerProfile1);
         assertThat(caseWorkerProfile1.getSuspended()).isTrue();
 
-        verify(userProfileFeignClient, times(2)).modifyUserRoles(any(), any(), any());
+        verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(), any());
 
 
