@@ -23,7 +23,7 @@ java:
     ENVIRONMENT_NAME: "preview"
     EMAIL_DOMAIN_LIST: "justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk"
     STAFF_UPLOAD_FILE: false
-    IDAM_ROLE_MAPPING_FILE: true
+    IDAM_ROLE_MAPPING_FILE: false
   postgresql:
     enabled: true
     auth:
