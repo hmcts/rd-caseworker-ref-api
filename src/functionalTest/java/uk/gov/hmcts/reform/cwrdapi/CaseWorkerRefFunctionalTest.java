@@ -677,26 +677,26 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    public void shouldUploadXlsFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
-                if (staffUploadFile) {
-                    ExtractableResponse<Response> uploadCaseWorkerFileResponse =
-                        uploadCaseWorkerFile("src/functionalTest/resources/Staff_Data_Upload_with_non_idam_roles.xls",
-                            200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
-                            ROLE_CWD_ADMIN);
-                    CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
-                        .as(CaseWorkerFileCreationResponse.class);
-                    assertTrue(caseWorkerFileCreationResponse.getMessage()
-                        .contains(REQUEST_COMPLETED_SUCCESSFULLY));
-                    assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
-                        .contains(format(RECORDS_UPLOADED, 3)));
+    void shouldUploadXlsFileWithCaseAllocatorAndTaskSupervisorRolesSuccessfully() throws IOException {
+        if (staffUploadFile) {
+            ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff_Data_Upload_with_non_idam_roles.xls",
+                    200, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
+            CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
+                .as(CaseWorkerFileCreationResponse.class);
+            assertTrue(caseWorkerFileCreationResponse.getMessage()
+                .contains(REQUEST_COMPLETED_SUCCESSFULLY));
+            assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
+                .contains(format(RECORDS_UPLOADED, 3)));
 
-                } else {
-                    ExtractableResponse<Response> uploadCaseWorkerFileRespnse =
-                        uploadCaseWorkerFile("src/functionalTest/resources/Staff_Data_Upload_with_non_idam_roles.xls",
-                            403, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
-                            ROLE_CWD_ADMIN);
-                    assertTrue(true);
-                }
+        } else {
+            ExtractableResponse<Response> uploadCaseWorkerFileRespnse =
+                uploadCaseWorkerFile("src/functionalTest/resources/Staff_Data_Upload_with_non_idam_roles.xls",
+                    403, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
+            assertTrue(true);
+        }
     }
 
     private ExtractableResponse<Response> uploadCaseWorkerFile(String filePath,
