@@ -346,55 +346,83 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @Order(1)
-    public void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
-        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+    void shouldUploadServiceRoleMappingXlsxFileSuccessfully() throws IOException {
+        if (idamRoleMappingFile) {
+            ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
-                        200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                    200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
 
 
-        CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
+            CaseWorkerFileCreationResponse caseWorkerFileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
-        assertTrue(caseWorkerFileCreationResponse.getMessage()
+            assertTrue(caseWorkerFileCreationResponse.getMessage()
                 .contains(REQUEST_COMPLETED_SUCCESSFULLY));
-        assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
+            assertTrue(caseWorkerFileCreationResponse.getDetailedMessage()
                 .contains(format(RECORDS_UPLOADED, 4)));
+        } else {
+
+            ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xlsx",
+                    403, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
+            assertTrue(true);
+
+        }
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @Order(2)
-    public void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
-        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+    void shouldUploadServiceRoleMappingXlsFileSuccessfully() throws IOException {
+        if (idamRoleMappingFile) {
+            ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
-                        200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                    200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
 
-        CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+            CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
-        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+            assertTrue(caseWorkerProfileCreationResponse.getMessage()
                 .contains(REQUEST_COMPLETED_SUCCESSFULLY));
-        assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
+            assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
                 .contains(format(RECORDS_UPLOADED, 4)));
+        } else {
+
+            ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_BBA9.xls",
+                    403, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
+            assertTrue(true);
+
+        }
     }
 
     @Test
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     @Order(3)
-    public void shouldUploadServiceRoleMappingAba1XlsFileSuccessfully() throws IOException {
-        ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+    void shouldUploadServiceRoleMappingAba1XlsFileSuccessfully() throws IOException {
+        if (idamRoleMappingFile) {
+            ExtractableResponse<Response> uploadCaseWorkerFileResponse =
                 uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_ABA1.xls",
-                        200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
-                        ROLE_CWD_ADMIN);
+                    200, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
 
-        CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
+            CaseWorkerFileCreationResponse caseWorkerProfileCreationResponse = uploadCaseWorkerFileResponse
                 .as(CaseWorkerFileCreationResponse.class);
-        assertTrue(caseWorkerProfileCreationResponse.getMessage()
+            assertTrue(caseWorkerProfileCreationResponse.getMessage()
                 .contains(REQUEST_COMPLETED_SUCCESSFULLY));
-        assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
+            assertTrue(caseWorkerProfileCreationResponse.getDetailedMessage()
                 .contains(format(RECORDS_UPLOADED, 4)));
+        } else {
+            ExtractableResponse<Response> uploadCaseWorkerFileResponse =
+                uploadCaseWorkerFile("src/functionalTest/resources/ServiceRoleMapping_ABA1.xls",
+                    403, IDAM_ROLE_MAPPINGS_SUCCESS, TYPE_XLS,
+                    ROLE_CWD_ADMIN);
+            assertTrue(true);
+        }
     }
 
     @Test
