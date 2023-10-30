@@ -4,9 +4,7 @@ import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
-import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
-import au.com.dius.pact.core.model.annotations.PactFolder;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
@@ -35,8 +33,8 @@ import static org.junit.Assert.assertNotNull;
 @ExtendWith(PactConsumerTestExt.class)
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PactTestFor(providerName = "referenceData_location")
-@PactFolder("pacts")
+//@PactTestFor(providerName = "referenceData_location")
+//@PactFolder("pacts")
 public class LocationReferenceDataConsumerTest {
 
     private static final String LRD_URL = "/refdata/location/orgServices";
