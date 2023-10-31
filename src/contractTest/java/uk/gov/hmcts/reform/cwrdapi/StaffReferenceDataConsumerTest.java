@@ -55,7 +55,7 @@ public class StaffReferenceDataConsumerTest {
         return builder
             .given("A list of staff ref data Service skills with serviceCodes")
             .uponReceiving("Service Skills Data")
-            .path(CW_URL+"/skill")
+            .path(CW_URL + "/skill")
             .query("service_codes=CCA")
             .method(HttpMethod.GET.toString())
             .headers(getResponseHeaders())
@@ -75,7 +75,7 @@ public class StaffReferenceDataConsumerTest {
                 .given()
                 .headers(getHttpHeaders())
                 .contentType(ContentType.JSON)
-                .get(mockServer.getUrl() + CW_URL+"/skill"+"?service_codes=CCA")
+                .get(mockServer.getUrl() + CW_URL + "/skill" + "?service_codes=CCA")
                 .then()
                 .log().all().extract().asString();
         JSONObject jsonArray = new JSONObject(actualResponseBody);
@@ -90,7 +90,7 @@ public class StaffReferenceDataConsumerTest {
         return builder
             .given("A list of all staff reference data user-type")
             .uponReceiving("user types from staff reference data")
-            .path(CW_URL+"/user-type")
+            .path(CW_URL + "/user-type")
             .method(HttpMethod.GET.toString())
             .headers(getResponseHeaders())
             .willRespondWith()
@@ -109,7 +109,7 @@ public class StaffReferenceDataConsumerTest {
                 .given()
                 .headers(getHttpHeaders())
                 .contentType(ContentType.JSON)
-                .get(mockServer.getUrl() + CW_URL+"/user-type")
+                .get(mockServer.getUrl() + CW_URL + "/user-type")
                 .then()
                 .log().all().extract().asString();
         JSONObject jsonArray = new JSONObject(actualResponseBody);
@@ -123,7 +123,7 @@ public class StaffReferenceDataConsumerTest {
         return builder
             .given("A list of all staff reference data role-type")
             .uponReceiving("role types from staff reference data")
-            .path(CW_URL+"/job-title")
+            .path(CW_URL + "/job-title")
             .method(HttpMethod.GET.toString())
             .headers(getResponseHeaders())
             .willRespondWith()
@@ -142,7 +142,7 @@ public class StaffReferenceDataConsumerTest {
                 .given()
                 .headers(getHttpHeaders())
                 .contentType(ContentType.JSON)
-                .get(mockServer.getUrl() + CW_URL+"/job-title")
+                .get(mockServer.getUrl() + CW_URL + "/job-title")
                 .then()
                 .log().all().extract().asString();
         JSONObject jsonArray = new JSONObject(actualResponseBody);
@@ -157,7 +157,7 @@ public class StaffReferenceDataConsumerTest {
         return builder
             .given("A staff profile by caseworker id")
             .uponReceiving("caseworkerid  from staff reference data")
-            .path(CW_URL+"/profile/search-by-id")
+            .path(CW_URL + "/profile/search-by-id")
             .method(HttpMethod.GET.toString())
             .query("id=123")
             .headers(getResponseHeaders())
@@ -177,7 +177,7 @@ public class StaffReferenceDataConsumerTest {
                 .given()
                 .headers(getHttpHeaders())
                 .contentType(ContentType.JSON)
-                .get(mockServer.getUrl() + CW_URL+"/profile/search-by-id?id=123")
+                .get(mockServer.getUrl() + CW_URL + "/profile/search-by-id?id=123")
                 .then()
                 .log().all().extract().asString();
         JSONObject jsonArray = new JSONObject(actualResponseBody);
