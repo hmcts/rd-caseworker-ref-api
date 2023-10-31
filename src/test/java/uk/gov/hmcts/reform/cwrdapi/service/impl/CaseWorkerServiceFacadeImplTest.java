@@ -14,11 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl.CaseWorkerInternalApiClientImpl;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
@@ -47,6 +49,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLS;
 
 @ExtendWith(MockitoExtension.class)
 class CaseWorkerServiceFacadeImplTest {
+
+
     @Mock
     ExcelAdaptorService excelAdaptorService;
     @Mock
@@ -79,6 +83,7 @@ class CaseWorkerServiceFacadeImplTest {
 
     @Test
     void shouldProcessCaseWorkerFileWithoutInvalidRecords() throws IOException {
+        ReflectionTestUtils.setField(caseWorkerServiceFacade,"stopStaffUploadFile", true);
         MultipartFile multipartFile = createCaseWorkerFileWithoutInvalidRecords("Staff Data Upload.xlsx");
 
         when(exceptionCaseWorkerRepository.findByJobId(anyLong())).thenReturn(new ArrayList<>());
@@ -117,6 +122,7 @@ class CaseWorkerServiceFacadeImplTest {
 
     @Test
     void shouldProcessServiceRoleMappingFile() throws IOException {
+        ReflectionTestUtils.setField(caseWorkerServiceFacade,"enableIdamRoleMappingFile", true);
         ServiceRoleMapping serviceRoleMapping = ServiceRoleMapping
             .builder()
             .roleId(1)
@@ -147,7 +153,7 @@ class CaseWorkerServiceFacadeImplTest {
 
     @Test
     void shouldProcessServiceRoleMappingFileFailure() throws IOException {
-
+        ReflectionTestUtils.setField(caseWorkerServiceFacade,"enableIdamRoleMappingFile", true);
         List<ServiceRoleMapping> serviceRoleMappings = new ArrayList<>();
 
         serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA1").build());
@@ -165,6 +171,31 @@ class CaseWorkerServiceFacadeImplTest {
 
     }
 
+    @Test
+    void shouldNotProcessFileForDisableIdam() throws IOException {
+        ReflectionTestUtils.setField(caseWorkerServiceFacade,"enableIdamRoleMappingFile", false);
+        List<ServiceRoleMapping> serviceRoleMappings = new ArrayList<>();
+
+        serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA1").build());
+        serviceRoleMappings.add(ServiceRoleMapping.builder().roleId(1).serviceId("BBA2").build());
+
+        MultipartFile multipartFile =
+            getMultipartFile("src/test/resources/ServiceRoleMapping_Multiple_Ids.xls", TYPE_XLS);
+        Assertions.assertThrows(StaffReferenceException.class, () ->
+            caseWorkerServiceFacade.processFile(multipartFile));
+    }
+
+    @Test
+    void blockCaseWorkerFile() throws IOException {
+        ReflectionTestUtils.setField(caseWorkerServiceFacade,"stopStaffUploadFile", false);
+        MultipartFile multipartFile =
+            getMultipartFile("src/test/resources/Staff Data Upload.xls", TYPE_XLS);
+
+        Assertions.assertThrows(StaffReferenceException.class, () ->
+            caseWorkerServiceFacade.processFile(multipartFile));
+    }
+
+
     private MultipartFile getMultipartFile(String filePath, String fileType) throws IOException {
         File file = getFile(filePath);
         FileInputStream input = new FileInputStream(file);
@@ -174,6 +205,7 @@ class CaseWorkerServiceFacadeImplTest {
 
     @NotNull
     private MultipartFile createCaseWorkerMultiPartFile(String fileName) throws IOException {
+        ReflectionTestUtils.setField(caseWorkerServiceFacade,"stopStaffUploadFile", true);
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
             .firstName("first name")
             .build();
@@ -195,6 +227,7 @@ class CaseWorkerServiceFacadeImplTest {
 
     @NotNull
     private MultipartFile createCaseWorkerFileWithoutInvalidRecords(String fileName) throws IOException {
+
         when(validationServiceFacadeImpl.getInvalidRecords(anyList())).thenReturn(Collections.emptyList());
         MultipartFile multipartFile =
                 getMultipartFile("src/test/resources/" + fileName, TYPE_XLS);
@@ -205,6 +238,7 @@ class CaseWorkerServiceFacadeImplTest {
 
     @Test
     void shouldProcessCaseWorkerFileWithSuspendedRowFailed() throws IOException {
+        ReflectionTestUtils.setField(caseWorkerServiceFacade,"stopStaffUploadFile", true);
         CaseWorkerProfile caseWorkerProfile1 = CaseWorkerProfile.builder()
             .firstName("test").lastName("test")
             .officialEmail("test@justice.gov.uk")
