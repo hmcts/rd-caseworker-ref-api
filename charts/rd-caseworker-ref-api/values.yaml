@@ -23,6 +23,8 @@ java:
     OPEN_ID_API_BASE_URI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o
     REFRESH_PAGE_SIZE: 20
     REFRESH_SORT_COLUMN: caseWorkerId
+    STAFF_UPLOAD_FILE: false # false: Block the File,  true: Able to Upload the File
+    IDAM_ROLE_MAPPING_FILE: true # false: Block the File,  true: Able to Upload the File
   keyVaults:
     rd:
       secrets:

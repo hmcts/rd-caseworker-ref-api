@@ -113,6 +113,9 @@ idam:
 oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
 environment_name: ${ENVIRONMENT_NAME:prod}
+### staff Upload File configuration
+staff_upload_file: ${STAFF_UPLOAD_FILE:false}
+idam_role_mapping_file: ${IDAM_ROLE_MAPPING_FILE:true}
 
 loggingComponentName: RD-Caseworker-Ref-Api
 feign:
