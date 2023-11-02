@@ -612,7 +612,7 @@ public class StaffReferenceDataProviderTest {
         userProfileResponse.setIdamStatus(STATUS_ACTIVE);
         String body = mapper.writeValueAsString(userProfileResponse);
 
-       when(userProfileFeignClient.getUserProfile(any()))
+        when(userProfileFeignClient.getUserProfile(any()))
             .thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(200).build());
 
