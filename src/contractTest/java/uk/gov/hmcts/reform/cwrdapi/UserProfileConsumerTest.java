@@ -5,10 +5,7 @@ import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
-import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
-import au.com.dius.pact.core.model.annotations.Pact;
-import au.com.dius.pact.core.model.annotations.PactFolder;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
@@ -20,7 +17,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpHeaders;
@@ -81,7 +77,7 @@ public class UserProfileConsumerTest {
                         .headers(getHttpHeadersForpostApi())
                         .contentType(ContentType.JSON)
                         .body(createUserProfileRetrieveRequest().toString())
-                        .post(mockServer.getUrl() + UP_URL +"users"+"?showdeleted=true&rolesRequired=true")
+                        .post(mockServer.getUrl() + UP_URL + "users" + "?showdeleted=true&rolesRequired=true")
                         .then()
                         .log().all().extract().asString();
 
@@ -209,7 +205,7 @@ public class UserProfileConsumerTest {
                         .given()
                         .headers(getHttpHeaders())
                         .contentType(ContentType.JSON)
-                        .get(mockServer.getUrl() + UP_URL + "idamStatus" +"?category=caseworker")
+                        .get(mockServer.getUrl() + UP_URL + "idamStatus" + "?category=caseworker")
                         .then()
                         .log().all().extract().asString();
 
@@ -331,13 +327,14 @@ public class UserProfileConsumerTest {
         ).build();
     }
 
-        private DslPart deleteUserProfileRequest() {
+    private DslPart deleteUserProfileRequest() {
         return newJsonBody(o -> o
                 .array("userIds", obj -> obj
                         .stringType(UUID.randomUUID().toString()))
 
         ).build();
     }
+
     private DslPart createUserProfileIdamStatusRequest() {
         return newJsonBody(o -> o
                 .minArrayLike("userProfiles", 1, obj -> obj
@@ -384,6 +381,7 @@ public class UserProfileConsumerTest {
         headers.add("Content-Type", "application/json");
         return headers;
     }
+
     @NotNull
     private Map<String, String> getRequestHeaders() {
         Map<String, String> requestHeaders = Maps.newHashMap();
