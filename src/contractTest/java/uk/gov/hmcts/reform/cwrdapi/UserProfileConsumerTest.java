@@ -5,7 +5,10 @@ import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
+import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.annotations.Pact;
+import au.com.dius.pact.core.model.annotations.PactFolder;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
@@ -17,6 +20,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpHeaders;
@@ -34,8 +38,8 @@ import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
 @ExtendWith(PactConsumerTestExt.class)
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@PactTestFor(providerName = "rd_user_profile_api_service")
-//@PactFolder("pacts")
+@PactTestFor(providerName = "rd_user_profile_api_service")
+@PactFolder("pacts")
 public class UserProfileConsumerTest {
 
     private static final String UP_URL = "/v1/userprofile/";
@@ -118,7 +122,7 @@ public class UserProfileConsumerTest {
     }
 
     //GET
-    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
+    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
     public RequestResponsePact executeGetUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
@@ -133,8 +137,8 @@ public class UserProfileConsumerTest {
                 .toPact();
     }
 
-    //@Test
-    //@PactTestFor(pactMethod = "executeGetUserProfileAndGet200")
+    @Test
+    @PactTestFor(pactMethod = "executeGetUserProfileAndGet200")
     void getUserProfileAndGet200Test(MockServer mockServer) throws JSONException {
         String actualResponseBody =
                 SerenityRest
@@ -214,7 +218,7 @@ public class UserProfileConsumerTest {
     }
 
     //Update
-    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
+    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
     public RequestResponsePact executeUpdateUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
@@ -230,8 +234,8 @@ public class UserProfileConsumerTest {
                 .toPact();
     }
 
-    //@Test
-    //@PactTestFor(pactMethod = "executeUpdateUserProfileAndGet200")
+    @Test
+    @PactTestFor(pactMethod = "executeUpdateUserProfileAndGet200")
     void updateUserProfileAndGet200Test(MockServer mockServer) throws JSONException {
         String actualResponseBody =
                 SerenityRest
@@ -272,7 +276,7 @@ public class UserProfileConsumerTest {
     }
 
     //Create
-    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
+    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
     public RequestResponsePact executeCreateUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
@@ -288,8 +292,8 @@ public class UserProfileConsumerTest {
                 .toPact();
     }
 
-    //@Test
-    //@PactTestFor(pactMethod = "executeCreateUserProfileAndGet200")
+    @Test
+    @PactTestFor(pactMethod = "executeCreateUserProfileAndGet200")
     void createUserProfileAndGet200Test(MockServer mockServer) throws JSONException {
         String actualResponseBody =
                 SerenityRest
