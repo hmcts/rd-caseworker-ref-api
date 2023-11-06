@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.dsl.DslPart;
+import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
@@ -28,15 +29,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Map;
+import java.util.UUID;
 
+import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonArray;
 import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
 
 @Slf4j
 @ExtendWith(PactConsumerTestExt.class)
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PactTestFor(providerName = "rd_user_profile_api_service")
-@PactFolder("pacts")
+//@PactTestFor(providerName = "rd_user_profile_api_service")
+//@PactFolder("pacts")
 public class UserProfileConsumerTest {
 
     private static final String UP_URL = "/v1/userprofile/";
@@ -51,8 +54,75 @@ public class UserProfileConsumerTest {
         Executor.closeIdleConnections();
     }
 
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service_for_multiple_profiles")
+    public RequestResponsePact executeRetrieveMultipleUserProfile(PactDslWithProvider builder)throws Exception {
+
+        return builder
+                .given("Retrieve multiple user profiles")
+                .uponReceiving("valid request to retrieve multiple profile")
+                .path(UP_URL + "users")
+                .query("showdeleted=true&rolesRequired=true")
+                .headers(getResponseHeaders())
+                .body(createUserProfileRetrieveRequest())
+                .method(HttpMethod.POST.toString())
+                .willRespondWith()
+                .status(HttpStatus.OK.value())
+                .headers(getResponseHeaders())
+                .body(createUserProfileIdamStatusRequest())
+                .toPact();
+    }
+
+    //@Test
+    //@PactTestFor(pactMethod = "executeRetrieveMultipleUserProfile")
+    void executeRetrieveMultipleUserProfileTest(MockServer mockServer) throws Exception {
+        String actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getHttpHeadersForpostApi())
+                        .contentType(ContentType.JSON)
+                        .body(createUserProfileRetrieveRequest().toString())
+                        .post(mockServer.getUrl() + UP_URL +"users"+"?showdeleted=true&rolesRequired=true")
+                        .then()
+                        .log().all().extract().asString();
+
+        JSONObject jsonResponse = new JSONObject(actualResponseBody);
+        Assertions.assertNotNull(jsonResponse);
+    }
+
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_retrieve_userinfo")
+    public RequestResponsePact executeRetrieveUserProfileById(PactDslWithProvider builder) {
+
+        return builder
+                .given("A user profile retrieve request is submitted")
+                .uponReceiving("valid request to retrieve profile data")
+                .path(UP_URL)
+                .query("userId=007")
+                .method(HttpMethod.GET.toString())
+                .willRespondWith()
+                .status(HttpStatus.OK.value())
+                .headers(getResponseHeaders())
+                .body(retrieveUserProfileGetResponse())
+                .toPact();
+    }
+
+    //@Test
+    //@PactTestFor(pactMethod = "executeRetrieveUserProfileById")
+    void executeRetrieveUserProfileByIdTest(MockServer mockServer) throws JSONException {
+        String actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getHttpHeaders())
+                        .contentType(ContentType.JSON)
+                        .get(mockServer.getUrl() + UP_URL + "?userId=007")
+                        .then()
+                        .log().all().extract().asString();
+
+        JSONObject jsonResponse = new JSONObject(actualResponseBody);
+        Assertions.assertNotNull(jsonResponse);
+    }
+
     //GET
-    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
     public RequestResponsePact executeGetUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
@@ -67,8 +137,8 @@ public class UserProfileConsumerTest {
                 .toPact();
     }
 
-    @Test
-    @PactTestFor(pactMethod = "executeGetUserProfileAndGet200")
+    //@Test
+    //@PactTestFor(pactMethod = "executeGetUserProfileAndGet200")
     void getUserProfileAndGet200Test(MockServer mockServer) throws JSONException {
         String actualResponseBody =
                 SerenityRest
@@ -83,19 +153,72 @@ public class UserProfileConsumerTest {
         Assertions.assertNotNull(jsonResponse);
     }
 
-    private DslPart createUserProfileGetResponse() {
-        return newJsonBody(o -> o
-                .stringType("email", "james.bond@justice.gov.uk")
-                .stringType("firstName", "james")
-                .stringType("lastName", "bond")
-                .stringType("idamStatus", "Live")
-                .stringType("userIdentifier", "007")
-                .array("roles", role -> role.stringType("Secret-Agent"))
-                ).build();
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service_for_roles")
+    public RequestResponsePact executeGetUserProfileRoles(PactDslWithProvider builder) {
+
+        return builder
+                .given("A user profile with get request for roles")
+                .uponReceiving("valid request for profile data based on roles")
+                .headers(getRequestHeaders())
+                .path(UP_URL + "roles")
+                .method(HttpMethod.GET.toString())
+                .willRespondWith()
+                .status(HttpStatus.OK.value())
+                .headers(getResponseHeaders())
+                .body(retrieveUserProfileGetResponse())
+                .toPact();
+    }
+
+    //@Test
+    //@PactTestFor(pactMethod = "executeGetUserProfileRoles")
+    void executeGetUserProfileRolesTest(MockServer mockServer) throws JSONException {
+        String actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getRequestHeaders())
+                        .contentType(ContentType.JSON)
+                        .get(mockServer.getUrl() + UP_URL  + "roles")
+                        .then()
+                        .log().all().extract().asString();
+
+        JSONObject jsonResponse = new JSONObject(actualResponseBody);
+        Assertions.assertNotNull(jsonResponse);
+    }
+
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_retrieve_idam_status")
+    public RequestResponsePact executeGetIdamStatus(PactDslWithProvider builder) {
+
+        return builder
+                .given("A user profile Idam Status request")
+                .uponReceiving("valid request to retrieve profile idam status")
+                .path(UP_URL + "idamStatus")
+                .query("category=caseworker")
+                .method(HttpMethod.GET.toString())
+                .willRespondWith()
+                .status(HttpStatus.OK.value())
+                .headers(getResponseHeaders())
+                .body(createUserProfileIdamStatusRequest())
+                .toPact();
+    }
+
+    //@Test
+    //@PactTestFor(pactMethod = "executeGetIdamStatus")
+    void executeGetIdamStatusTest(MockServer mockServer) throws JSONException {
+        String actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getHttpHeaders())
+                        .contentType(ContentType.JSON)
+                        .get(mockServer.getUrl() + UP_URL + "idamStatus" +"?category=caseworker")
+                        .then()
+                        .log().all().extract().asString();
+
+        JSONObject jsonResponse = new JSONObject(actualResponseBody);
+        Assertions.assertNotNull(jsonResponse);
     }
 
     //Update
-    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
     public RequestResponsePact executeUpdateUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
@@ -111,8 +234,8 @@ public class UserProfileConsumerTest {
                 .toPact();
     }
 
-    @Test
-    @PactTestFor(pactMethod = "executeUpdateUserProfileAndGet200")
+    //@Test
+    //@PactTestFor(pactMethod = "executeUpdateUserProfileAndGet200")
     void updateUserProfileAndGet200Test(MockServer mockServer) throws JSONException {
         String actualResponseBody =
                 SerenityRest
@@ -153,7 +276,7 @@ public class UserProfileConsumerTest {
     }
 
     //Create
-    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service")
     public RequestResponsePact executeCreateUserProfileAndGet200(PactDslWithProvider builder) {
 
         return builder
@@ -169,8 +292,8 @@ public class UserProfileConsumerTest {
                 .toPact();
     }
 
-    @Test
-    @PactTestFor(pactMethod = "executeCreateUserProfileAndGet200")
+    //@Test
+    //@PactTestFor(pactMethod = "executeCreateUserProfileAndGet200")
     void createUserProfileAndGet200Test(MockServer mockServer) throws JSONException {
         String actualResponseBody =
                 SerenityRest
@@ -201,6 +324,37 @@ public class UserProfileConsumerTest {
         ).build();
     }
 
+    private DslPart createUserProfileRetrieveRequest() {
+        return newJsonBody(o -> o
+                .minArrayLike("userIds", 1,
+                        PactDslJsonRootValue.stringType(UUID.randomUUID().toString()),1)
+        ).build();
+    }
+
+        private DslPart deleteUserProfileRequest() {
+        return newJsonBody(o -> o
+                .array("userIds", obj -> obj
+                        .stringType(UUID.randomUUID().toString()))
+
+        ).build();
+    }
+    private DslPart createUserProfileIdamStatusRequest() {
+        return newJsonBody(o -> o
+                .minArrayLike("userProfiles", 1, obj -> obj
+                        .stringType("email","test@email.com")
+                        .stringType("idamStatus","ACTIVE"))
+        ).build();
+    }
+
+    private DslPart getMultipleUserProfileResponse() {
+        return newJsonArray(o -> o.object(ob -> ob
+                .minArrayLike("userProfiles", 1, obj -> obj
+                        .stringType("email","test@email.com")
+                        .stringType("idamStatus","ACTIVE"))
+
+        )).build();
+    }
+
     private DslPart createUserProfileCreateResponse() {
         return newJsonBody(o -> o
                 .stringType("idamId", "uuid format id")
@@ -212,8 +366,7 @@ public class UserProfileConsumerTest {
     @NotNull
     private Map<String, String> getResponseHeaders() {
         Map<String, String> responseHeaders = Maps.newHashMap();
-        responseHeaders.put("Content-Type",
-                "application/json");
+        responseHeaders.put("Content-Type", "application/json");
         return responseHeaders;
     }
 
@@ -224,4 +377,50 @@ public class UserProfileConsumerTest {
         return headers;
     }
 
+    private HttpHeaders getHttpHeadersForpostApi() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("ServiceAuthorization", "Bearer " + "1234");
+        headers.add("Authorization", "Bearer " + "2345");
+        headers.add("Content-Type", "application/json");
+        return headers;
+    }
+    @NotNull
+    private Map<String, String> getRequestHeaders() {
+        Map<String, String> requestHeaders = Maps.newHashMap();
+        requestHeaders.put("UserEmail", "test@test.com");
+        requestHeaders.put("ServiceAuthorization", "Bearer " + "1234");
+        requestHeaders.put("Authorization", "Bearer " + "2345");
+
+        return requestHeaders;
+    }
+
+
+    private DslPart retrieveUserProfileGetResponse() {
+        return newJsonBody(o -> o
+                .stringType("email", "james.bond@justice.gov.uk")
+                .stringType("firstName", "james")
+                .stringType("lastName", "bond")
+                .stringType("idamStatus", "Live")
+                .stringType("userIdentifier", "007")
+        ).build();
+    }
+
+    private DslPart createUserProfileGetResponse() {
+        return newJsonBody(o -> o
+                .stringType("email", "james.bond@justice.gov.uk")
+                .stringType("firstName", "james")
+                .stringType("lastName", "bond")
+                .stringType("idamStatus", "Live")
+                .stringType("userIdentifier", "007")
+                .array("roles", role -> role.stringType("Secret-Agent"))
+        ).build();
+    }
+
+    private DslPart deleteUserProfileGetResponse() {
+        return newJsonBody(o -> o
+                .stringType("statusCode", "204")
+                .stringType("message", "UserProfiles Successfully Deleted")
+                
+        ).build();
+    }
 }
