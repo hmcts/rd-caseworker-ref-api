@@ -9,6 +9,8 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import au.com.dius.pact.core.model.annotations.PactFolder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
@@ -28,6 +30,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -89,7 +93,48 @@ public class UserProfileConsumerTest {
         Assertions.assertNotNull(jsonResponse);
     }
 
-    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_retrieve_userinfo")
+    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_delete_user_service")
+    public RequestResponsePact executeDeleteUserProfile(PactDslWithProvider builder)throws IOException {
+
+        return builder
+                .given("A user profile delete request")
+                .uponReceiving("valid request to delete profile")
+                .path(UP_URL)
+                .body(new ObjectMapper().writeValueAsString(new UserProfileDataRequest(List.of("007"))))
+                .method(HttpMethod.DELETE.toString())
+                .willRespondWith()
+                .status(HttpStatus.NO_CONTENT.value())
+                .headers(getResponseHeaders())
+                .body(deleteUserProfileGetResponse())
+                .toPact();
+    }
+
+
+    @Test
+    @PactTestFor(pactMethod = "executeDeleteUserProfile")
+    void executeDeleteUserProfileTest(MockServer mockServer)throws JSONException {
+        var actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getHttpHeadersForpostApi())
+                        .body(new UserProfileDataRequest(List.of("007")))
+                        .contentType(ContentType.JSON)
+                        .delete(mockServer.getUrl() + UP_URL)
+                        .then()
+                        .log().all().extract().asString();
+
+
+        JSONObject jsonResponse = new JSONObject(actualResponseBody);
+        Assertions.assertNotNull(jsonResponse);
+    }
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    private String createJsonObject(Object obj) throws IOException {
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        return objectMapper.writeValueAsString(obj);
+    }
+
+   // @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_retrieve_userinfo")
     public RequestResponsePact executeRetrieveUserProfileById(PactDslWithProvider builder) {
 
         return builder
