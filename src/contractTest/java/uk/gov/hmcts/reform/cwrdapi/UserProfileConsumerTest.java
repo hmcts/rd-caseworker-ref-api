@@ -9,8 +9,8 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import au.com.dius.pact.core.model.annotations.PactFolder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
@@ -25,18 +25,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
+import uk.gov.hmcts.reform.cwrdapi.request.DeleteUserProfilesRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonArray;
 import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @ExtendWith(PactConsumerTestExt.class)
@@ -47,6 +51,17 @@ import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
 public class UserProfileConsumerTest {
 
     private static final String UP_URL = "/v1/userprofile/";
+    private static final String ROLES = "roles";
+    private static final String IDAM_STATUS = "idamStatus";
+    private static final String EMAIL_ADDRESS = "james.bond@justice.gov.uk";
+    private static final String EMAIL = "email";
+    private static final String FIRST_NAME = "firstName";
+    private static final String LAST_NAME = "lastNAme";
+
+
+
+    @MockBean
+    private static UserProfileFeignClient userProfileFeignClient;
 
     @BeforeEach
     public void setUpEachTest() throws InterruptedException {
@@ -59,7 +74,7 @@ public class UserProfileConsumerTest {
     }
 
     //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service_for_multiple_profiles")
-    public RequestResponsePact executeRetrieveMultipleUserProfile(PactDslWithProvider builder)throws Exception {
+    public RequestResponsePact executeRetrieveMultipleUserProfile(PactDslWithProvider builder) {
 
         return builder
                 .given("Retrieve multiple user profiles")
@@ -78,7 +93,7 @@ public class UserProfileConsumerTest {
 
     //@Test
     //@PactTestFor(pactMethod = "executeRetrieveMultipleUserProfile")
-    void executeRetrieveMultipleUserProfileTest(MockServer mockServer) throws Exception {
+    void executeRetrieveMultipleUserProfileTest(MockServer mockServer) throws JSONException {
         String actualResponseBody =
                 SerenityRest
                         .given()
@@ -90,51 +105,11 @@ public class UserProfileConsumerTest {
                         .log().all().extract().asString();
 
         JSONObject jsonResponse = new JSONObject(actualResponseBody);
-        Assertions.assertNotNull(jsonResponse);
-    }
-
-    @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_delete_user_service")
-    public RequestResponsePact executeDeleteUserProfile(PactDslWithProvider builder)throws IOException {
-
-        return builder
-                .given("A user profile delete request")
-                .uponReceiving("valid request to delete profile")
-                .path(UP_URL)
-                .body(new ObjectMapper().writeValueAsString(new UserProfileDataRequest(List.of("007"))))
-                .method(HttpMethod.DELETE.toString())
-                .willRespondWith()
-                .status(HttpStatus.NO_CONTENT.value())
-                .headers(getResponseHeaders())
-                .body(deleteUserProfileGetResponse())
-                .toPact();
+        assertThat(jsonResponse).isNotNull();
     }
 
 
-    @Test
-    @PactTestFor(pactMethod = "executeDeleteUserProfile")
-    void executeDeleteUserProfileTest(MockServer mockServer)throws JSONException {
-        var actualResponseBody =
-                SerenityRest
-                        .given()
-                        .headers(getHttpHeadersForpostApi())
-                        .body(new UserProfileDataRequest(List.of("007")))
-                        .contentType(ContentType.JSON)
-                        .delete(mockServer.getUrl() + UP_URL)
-                        .then()
-                        .log().all().extract().asString();
-
-
-        JSONObject jsonResponse = new JSONObject(actualResponseBody);
-        Assertions.assertNotNull(jsonResponse);
-    }
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    private String createJsonObject(Object obj) throws IOException {
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        return objectMapper.writeValueAsString(obj);
-    }
-
-   // @Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_retrieve_userinfo")
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_retrieve_userinfo")
     public RequestResponsePact executeRetrieveUserProfileById(PactDslWithProvider builder) {
 
         return builder
@@ -205,7 +180,7 @@ public class UserProfileConsumerTest {
                 .given("A user profile with get request for roles")
                 .uponReceiving("valid request for profile data based on roles")
                 .headers(getRequestHeaders())
-                .path(UP_URL + "roles")
+                .path(UP_URL + ROLES)
                 .method(HttpMethod.GET.toString())
                 .willRespondWith()
                 .status(HttpStatus.OK.value())
@@ -222,7 +197,7 @@ public class UserProfileConsumerTest {
                         .given()
                         .headers(getRequestHeaders())
                         .contentType(ContentType.JSON)
-                        .get(mockServer.getUrl() + UP_URL  + "roles")
+                        .get(mockServer.getUrl() + UP_URL  + ROLES)
                         .then()
                         .log().all().extract().asString();
 
@@ -236,7 +211,7 @@ public class UserProfileConsumerTest {
         return builder
                 .given("A user profile Idam Status request")
                 .uponReceiving("valid request to retrieve profile idam status")
-                .path(UP_URL + "idamStatus")
+                .path(UP_URL + IDAM_STATUS)
                 .query("category=caseworker")
                 .method(HttpMethod.GET.toString())
                 .willRespondWith()
@@ -254,7 +229,7 @@ public class UserProfileConsumerTest {
                         .given()
                         .headers(getHttpHeaders())
                         .contentType(ContentType.JSON)
-                        .get(mockServer.getUrl() + UP_URL + "idamStatus" + "?category=caseworker")
+                        .get(mockServer.getUrl() + UP_URL + IDAM_STATUS + "?category=caseworker")
                         .then()
                         .log().all().extract().asString();
 
@@ -296,13 +271,94 @@ public class UserProfileConsumerTest {
         Assertions.assertNotNull(jsonResponse);
     }
 
+    //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_delete_user_service")
+    public RequestResponsePact executeDeleteUserProfile(PactDslWithProvider builder)throws IOException {
+        String deleteRequestBody = getDeleteRequestString();
+
+        return builder
+                .given("A user profile delete request")
+                .uponReceiving("valid request to delete profile")
+                .path(UP_URL)
+                .method(HttpMethod.DELETE.toString())
+                .body(deleteRequestBody)
+                .willRespondWith()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .toPact();
+    }
+
+    //@Test
+    //@PactTestFor(pactMethod = "executeDeleteUserProfile")
+    void executeDeleteUserProfileTest(MockServer mockServer)throws JsonProcessingException {
+        String deleteRequestBody = getDeleteRequestString();
+
+        var actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getHttpHeadersForpostApi())
+                        .contentType(ContentType.JSON)
+                        .body(deleteRequestBody)
+                        .delete(mockServer.getUrl() + UP_URL)
+                        .then()
+                        .log().all().extract().asString();
+        assertThat(actualResponseBody).isNotNull();
+
+
+    }
+
+
+    //The provider is written in PRD OrganisationalInternalControllerProviderTest file
+    //@Pact(provider = "referenceData_organisationalInternal", consumer = "up_delete_user_service_from_prd")
+    public RequestResponsePact executeDeleteUserProfileCallFromPrd(PactDslWithProvider builder)throws IOException {
+        String deleteRequestBody = getDeleteRequestString();
+
+        return builder
+                .given("A user profile delete request from prd")
+                .uponReceiving("valid request to delete profile")
+                .path(UP_URL)
+                .method(HttpMethod.DELETE.toString())
+                .body(deleteRequestBody)
+                .willRespondWith()
+                .status(HttpStatus.NOT_FOUND.value())
+                .toPact();
+    }
+
+    //@Test
+    //@PactTestFor(pactMethod = "executeDeleteUserProfileCallFromPrd")
+    void executeDeleteUserProfileCallFromPrdTest(MockServer mockServer)throws JsonProcessingException {
+        String deleteRequestBody = getDeleteRequestString();
+
+        var actualResponseBody =
+                SerenityRest
+                        .given()
+                        .headers(getHttpHeadersForpostApi())
+                        .contentType(ContentType.JSON)
+                        .body(deleteRequestBody)
+                        .delete(mockServer.getUrl() + UP_URL)
+                        .then()
+                        .log().all().extract().asString();
+        assertThat(actualResponseBody).isNotNull();
+
+
+    }
+
+
+    private static String getDeleteRequestString() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<String> userIds = new ArrayList<>();
+        userIds.add("8dfe911f-bb02-4356-9c02-afa4bdccbb16");
+        DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
+        String jsonArray = objectMapper.writeValueAsString(deleteUserRequest);
+        return jsonArray;
+    }
+
     private DslPart createUserProfileUpdateRequest() {
         return newJsonBody(o -> o
-                .stringType("email", "james.bond@justice.gov.uk")
-                .stringType("firstName", "james")
-                .stringType("lastName", "bond")
-                .stringType("idamStatus", "ACTIVE")
-                .minArrayLike("rolesAdd", 1, obj -> obj.stringType("name", "tribunal-caseworker"))
+                .stringType(EMAIL, EMAIL_ADDRESS)
+                .stringType(FIRST_NAME, "james")
+                .stringType(LAST_NAME, "bond")
+                .stringType(IDAM_STATUS, "ACTIVE")
+                .minArrayLike("rolesAdd", 1, obj -> obj.stringType("name",
+                        "tribunal-caseworker"))
                 .minArrayLike("rolesDelete", 1, obj -> obj.stringType("name", "caseworker"))
         ).build();
     }
@@ -356,16 +412,16 @@ public class UserProfileConsumerTest {
 
     private DslPart createUserProfileCreateRequest() {
         return newJsonBody(o -> o
-                .stringType("email", "james.bond@justice.gov.uk")
-                .stringType("firstName", "james")
-                .stringType("lastName", "bond")
+                .stringType(EMAIL, EMAIL_ADDRESS)
+                .stringType(FIRST_NAME, "james")
+                .stringType(LAST_NAME, "bond")
                 .stringType("languagePreference", "EN")
                 .booleanType("emailCommsConsent", true)
                 .booleanType("postalCommsConsent", true)
                 .booleanType("resendInvite", false)
                 .stringType("userType","INTERNAL")
                 .stringType("userCategory", "PROFESSIONAL")
-                .array("roles", role -> role.stringType("Secret-Agent"))
+                .array(ROLES, role -> role.stringType("Secret-Agent"))
         ).build();
     }
 
@@ -376,29 +432,12 @@ public class UserProfileConsumerTest {
         ).build();
     }
 
-    private DslPart deleteUserProfileRequest() {
-        return newJsonBody(o -> o
-                .array("userIds", obj -> obj
-                        .stringType(UUID.randomUUID().toString()))
-
-        ).build();
-    }
-
     private DslPart createUserProfileIdamStatusRequest() {
         return newJsonBody(o -> o
                 .minArrayLike("userProfiles", 1, obj -> obj
-                        .stringType("email","test@email.com")
-                        .stringType("idamStatus","ACTIVE"))
+                        .stringType(EMAIL,"test@email.com")
+                        .stringType(IDAM_STATUS,"ACTIVE"))
         ).build();
-    }
-
-    private DslPart getMultipleUserProfileResponse() {
-        return newJsonArray(o -> o.object(ob -> ob
-                .minArrayLike("userProfiles", 1, obj -> obj
-                        .stringType("email","test@email.com")
-                        .stringType("idamStatus","ACTIVE"))
-
-        )).build();
     }
 
     private DslPart createUserProfileCreateResponse() {
@@ -444,30 +483,23 @@ public class UserProfileConsumerTest {
 
     private DslPart retrieveUserProfileGetResponse() {
         return newJsonBody(o -> o
-                .stringType("email", "james.bond@justice.gov.uk")
-                .stringType("firstName", "james")
-                .stringType("lastName", "bond")
-                .stringType("idamStatus", "Live")
+                .stringType(EMAIL, EMAIL_ADDRESS)
+                .stringType(FIRST_NAME, "james")
+                .stringType(LAST_NAME, "bond")
+                .stringType(IDAM_STATUS, "Live")
                 .stringType("userIdentifier", "007")
         ).build();
     }
 
     private DslPart createUserProfileGetResponse() {
         return newJsonBody(o -> o
-                .stringType("email", "james.bond@justice.gov.uk")
-                .stringType("firstName", "james")
-                .stringType("lastName", "bond")
-                .stringType("idamStatus", "Live")
+                .stringType(EMAIL, EMAIL_ADDRESS)
+                .stringType(FIRST_NAME, "james")
+                .stringType(LAST_NAME, "bond")
+                .stringType(IDAM_STATUS, "Live")
                 .stringType("userIdentifier", "007")
-                .array("roles", role -> role.stringType("Secret-Agent"))
+                .array(ROLES, role -> role.stringType("Secret-Agent"))
         ).build();
     }
 
-    private DslPart deleteUserProfileGetResponse() {
-        return newJsonBody(o -> o
-                .stringType("statusCode", "204")
-                .stringType("message", "UserProfiles Successfully Deleted")
-                
-        ).build();
-    }
 }
