@@ -25,12 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.cwrdapi.controllers.feign.UserProfileFeignClient;
 import uk.gov.hmcts.reform.cwrdapi.request.DeleteUserProfilesRequest;
 
 import java.io.IOException;
@@ -51,17 +49,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UserProfileConsumerTest {
 
     private static final String UP_URL = "/v1/userprofile/";
-    private static final String ROLES = "roles";
-    private static final String IDAM_STATUS = "idamStatus";
-    private static final String EMAIL_ADDRESS = "james.bond@justice.gov.uk";
-    private static final String EMAIL = "email";
-    private static final String FIRST_NAME = "firstName";
-    private static final String LAST_NAME = "lastNAme";
-
-
-
-    @MockBean
-    private static UserProfileFeignClient userProfileFeignClient;
 
     @BeforeEach
     public void setUpEachTest() throws InterruptedException {
@@ -180,7 +167,7 @@ public class UserProfileConsumerTest {
                 .given("A user profile with get request for roles")
                 .uponReceiving("valid request for profile data based on roles")
                 .headers(getRequestHeaders())
-                .path(UP_URL + ROLES)
+                .path(UP_URL + "roles")
                 .method(HttpMethod.GET.toString())
                 .willRespondWith()
                 .status(HttpStatus.OK.value())
@@ -197,7 +184,7 @@ public class UserProfileConsumerTest {
                         .given()
                         .headers(getRequestHeaders())
                         .contentType(ContentType.JSON)
-                        .get(mockServer.getUrl() + UP_URL  + ROLES)
+                        .get(mockServer.getUrl() + UP_URL  + "roles")
                         .then()
                         .log().all().extract().asString();
 
@@ -211,7 +198,7 @@ public class UserProfileConsumerTest {
         return builder
                 .given("A user profile Idam Status request")
                 .uponReceiving("valid request to retrieve profile idam status")
-                .path(UP_URL + IDAM_STATUS)
+                .path(UP_URL + "idamStatus")
                 .query("category=caseworker")
                 .method(HttpMethod.GET.toString())
                 .willRespondWith()
@@ -229,7 +216,7 @@ public class UserProfileConsumerTest {
                         .given()
                         .headers(getHttpHeaders())
                         .contentType(ContentType.JSON)
-                        .get(mockServer.getUrl() + UP_URL + IDAM_STATUS + "?category=caseworker")
+                        .get(mockServer.getUrl() + UP_URL + "idamStatus" + "?category=caseworker")
                         .then()
                         .log().all().extract().asString();
 
@@ -353,10 +340,10 @@ public class UserProfileConsumerTest {
 
     private DslPart createUserProfileUpdateRequest() {
         return newJsonBody(o -> o
-                .stringType(EMAIL, EMAIL_ADDRESS)
-                .stringType(FIRST_NAME, "james")
-                .stringType(LAST_NAME, "bond")
-                .stringType(IDAM_STATUS, "ACTIVE")
+                .stringType("email", "james.bond@justice.gov.uk")
+                .stringType("firstName", "james")
+                .stringType("lastName", "bond")
+                .stringType("idamStatus", "ACTIVE")
                 .minArrayLike("rolesAdd", 1, obj -> obj.stringType("name",
                         "tribunal-caseworker"))
                 .minArrayLike("rolesDelete", 1, obj -> obj.stringType("name", "caseworker"))
@@ -412,16 +399,16 @@ public class UserProfileConsumerTest {
 
     private DslPart createUserProfileCreateRequest() {
         return newJsonBody(o -> o
-                .stringType(EMAIL, EMAIL_ADDRESS)
-                .stringType(FIRST_NAME, "james")
-                .stringType(LAST_NAME, "bond")
+                .stringType("email", "james.bond@justice.gov.uk")
+                .stringType("firstName", "james")
+                .stringType("lastName", "bond")
                 .stringType("languagePreference", "EN")
                 .booleanType("emailCommsConsent", true)
                 .booleanType("postalCommsConsent", true)
                 .booleanType("resendInvite", false)
                 .stringType("userType","INTERNAL")
                 .stringType("userCategory", "PROFESSIONAL")
-                .array(ROLES, role -> role.stringType("Secret-Agent"))
+                .array("roles", role -> role.stringType("Secret-Agent"))
         ).build();
     }
 
@@ -435,8 +422,8 @@ public class UserProfileConsumerTest {
     private DslPart createUserProfileIdamStatusRequest() {
         return newJsonBody(o -> o
                 .minArrayLike("userProfiles", 1, obj -> obj
-                        .stringType(EMAIL,"test@email.com")
-                        .stringType(IDAM_STATUS,"ACTIVE"))
+                        .stringType("email","test@email.com")
+                        .stringType("idamStatus","ACTIVE"))
         ).build();
     }
 
@@ -483,22 +470,22 @@ public class UserProfileConsumerTest {
 
     private DslPart retrieveUserProfileGetResponse() {
         return newJsonBody(o -> o
-                .stringType(EMAIL, EMAIL_ADDRESS)
-                .stringType(FIRST_NAME, "james")
-                .stringType(LAST_NAME, "bond")
-                .stringType(IDAM_STATUS, "Live")
+                .stringType("email", "james.bond@justice.gov.uk")
+                .stringType("firstName", "james")
+                .stringType("lastName", "bond")
+                .stringType("idamStatus", "Live")
                 .stringType("userIdentifier", "007")
         ).build();
     }
 
     private DslPart createUserProfileGetResponse() {
         return newJsonBody(o -> o
-                .stringType(EMAIL, EMAIL_ADDRESS)
-                .stringType(FIRST_NAME, "james")
-                .stringType(LAST_NAME, "bond")
-                .stringType(IDAM_STATUS, "Live")
+                .stringType("email", "james.bond@justice.gov.uk")
+                .stringType("firstName", "james")
+                .stringType("lastName", "bond")
+                .stringType("idamStatus", "Live")
                 .stringType("userIdentifier", "007")
-                .array(ROLES, role -> role.stringType("Secret-Agent"))
+                .array("roles", role -> role.stringType("Secret-Agent"))
         ).build();
     }
 
