@@ -16,8 +16,10 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+    open-in-view: false
     properties:
       hibernate:
+        default_schema: dbrdcaseworker
         order_updates: true
         order_inserts: true
         jdbc:
