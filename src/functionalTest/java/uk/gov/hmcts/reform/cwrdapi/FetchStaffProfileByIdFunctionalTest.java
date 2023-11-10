@@ -44,9 +44,9 @@ public class FetchStaffProfileByIdFunctionalTest extends AuthorizationFunctional
     void should_fetchStaffProfile_By_ID_200() {
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
-                .skillId(9)
-                .description("testskill1")
-                .skillCode("SKILL:AAA7:TEST1")
+                .skillId(26)
+                .description("Check application C100")
+                .skillCode("SKILL:ABA5:CHECKAPPLICATIONC100")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient

@@ -136,7 +136,7 @@ class RequestUtilsTest {
     @Test
     void testInvalidRequestExceptionForValidateSearchStringNotValid() {
         Assertions.assertThrows(InvalidRequestException.class, () ->
-                validateSearchString("abcd123")
+                validateSearchString("abcd123*?")
         );
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
@@ -54,12 +55,15 @@ public class CaseWorkerChildListValidator implements ConstraintValidator<Validat
         if (isNotEmpty(caseWorkerProfile.getLocations())
             && caseWorkerProfile.getLocations().size() > 1) {
             //@TO do remove getLocationName with Id problem with excel sheet
-            isValidLocations = negate(caseWorkerProfile.getLocations().get(0).getLocationName()
-                .equalsIgnoreCase(caseWorkerProfile.getLocations().get(1).getLocationName()));
+            isValidLocations = negate(
+                    StringUtils.equalsIgnoreCase(
+                            caseWorkerProfile.getLocations().get(0).getLocationName(),
+                            caseWorkerProfile.getLocations().get(1).getLocationName()));
+
             if (FALSE.equals(isValidLocations)) {
                 context.buildConstraintViolationWithTemplate(DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS)
-                    .addPropertyNode(LOCATION_FIELD)
-                    .addConstraintViolation();
+                        .addPropertyNode(LOCATION_FIELD)
+                        .addConstraintViolation();
             }
         } else if (isEmpty(caseWorkerProfile.getLocations())
                    || caseWorkerProfile.getLocations()
