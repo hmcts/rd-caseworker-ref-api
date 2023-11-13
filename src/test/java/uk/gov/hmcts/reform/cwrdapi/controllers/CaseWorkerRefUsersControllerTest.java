@@ -14,9 +14,11 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileUpdateservice;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import static org.mockito.Mockito.when;
 class CaseWorkerRefUsersControllerTest {
 
     CaseWorkerService caseWorkerServiceMock;
+    CaseWorkerProfileUpdateservice caseWorkerProfileUpdateserviceMock;
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequest = new ArrayList<>();
     CaseWorkersProfileCreationRequest cwRequest;
     CaseWorkerProfileCreationResponse cwProfileCreationResponse;
@@ -48,7 +51,7 @@ class CaseWorkerRefUsersControllerTest {
     @BeforeEach
     void setUp() {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
-
+        caseWorkerProfileUpdateserviceMock = mock(CaseWorkerProfileUpdateservice.class);
         cwResponse = CaseWorkerProfileCreationResponse
                 .builder()
                 .caseWorkerRegistrationResponse("Case Worker Profiles Created.")
@@ -200,5 +203,33 @@ class CaseWorkerRefUsersControllerTest {
         assertNotNull(actual);
         verify(caseWorkerServiceMock, times(1))
                 .processCaseWorkerProfiles(caseWorkersProfileCreationRequest);
+    }
+
+    @Test
+    void updateCaseWorkerProfileFromProfileSync() {
+
+        CaseWorkersProfileUpdationRequest caseWorkersProfileUpdationRequest = CaseWorkersProfileUpdationRequest
+            .caseWorkersProfileUpdationRequest().firstName("first_name")
+            .lastName("last_name")
+            .userId("185a0254-ff80-458b-8f62-2a759788afd2")
+            .emailId("firstname@justice.gov.uk")
+            .build();
+        when(caseWorkerProfileUpdateserviceMock.updateCaseWorkerProfile(caseWorkersProfileUpdationRequest))
+            .thenReturn(any());
+        ResponseEntity<?> actual =
+            caseWorkerRefUsersController.updateCaseWorkerDetails(caseWorkersProfileUpdationRequest);
+
+        assertNotNull(actual);
+        verify(caseWorkerProfileUpdateserviceMock, times(1))
+            .updateCaseWorkerProfile(caseWorkersProfileUpdationRequest);
+
+    }
+
+    @Test
+    void updateCaseWorkerProfileFromProfileSyncShouldThrow400() {
+        CaseWorkersProfileUpdationRequest caseWorkersProfileUpdationRequest = null;
+        Assertions.assertThrows(InvalidRequestException.class, () ->
+            caseWorkerRefUsersController.updateCaseWorkerDetails(caseWorkersProfileUpdationRequest));
+
     }
 }

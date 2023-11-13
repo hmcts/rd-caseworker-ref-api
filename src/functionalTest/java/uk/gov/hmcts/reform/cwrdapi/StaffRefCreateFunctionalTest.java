@@ -17,10 +17,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserByIdResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
@@ -50,9 +52,11 @@ import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.g
 class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
     public static final String CREATE_STAFF_PROFILE = "StaffRefDataController.createStaffUserProfile";
+    public static final String RD_CASEWORKER_SYNC = "CaseWorkerRefUsersController.updateCaseWorkerDetails";
 
     public static List<String> caseWorkerIds = new ArrayList<>();
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
+    public static final String STAFF_PROFILE_URL = "/refdata/case-worker";
 
     @Test
     @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
@@ -161,9 +165,9 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     void fetchCaseWorkerDetails() {
         SkillsRequest skillsRequest = SkillsRequest
                 .skillsRequest()
-                .skillId(9)
-                .description("testskill1")
-                .skillCode("SKILL:AAA7:TEST1")
+                .skillId(26)
+                .description("Check application C100")
+                .skillCode("SKILL:ABA5:CHECKAPPLICATIONC100")
                 .build();
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
@@ -537,6 +541,48 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
         assertEquals(caseWorkerProfile.getOfficialEmail(), upResponse.getEmail());
         assertEquals("ACTIVE",upResponse.getIdamStatus());
         assertEquals("200",upResponse.getIdamStatusCode());
+    }
+
+    @Test
+    @ToggleEnable(mapKey = RD_CASEWORKER_SYNC, withFeature = false)
+    @ExtendWith(FeatureToggleConditionExtension.class)
+    void updateCaseWorkerProfile() {
+
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
+            .createStaffProfileCreationRequest();
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        assertEquals(201,response.statusCode());
+
+        StaffProfileCreationResponse staffProfileCreationResponse =
+            response.getBody().as(StaffProfileCreationResponse.class);
+
+        CaseWorkersProfileUpdationRequest caseWorkersProfileUpdationRequest = CaseWorkersProfileUpdationRequest
+            .caseWorkersProfileUpdationRequest().firstName("StaffProfilefirstNamesnew")
+            .lastName("StaffProfilelastNamenew")
+            .userId(staffProfileCreationResponse.getCaseWorkerId())
+            .emailId(staffProfileCreationRequest.getEmailId())
+            .suspended(false)
+            .build();
+
+        Response updateResponse = caseWorkerApiClient.updateCaseWorkerProfile(caseWorkersProfileUpdationRequest);
+        assertEquals(200,updateResponse.statusCode());
+
+        assertNotNull(staffProfileCreationResponse);
+        assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_STAFF_ADMIN)
+            .get(STAFF_PROFILE_URL + "/profile/search-by-id?id=" + staffProfileCreationResponse
+                .getCaseWorkerId())
+            .andReturn();
+        fetchResponse.then()
+            .assertThat()
+            .statusCode(200);
+        SearchStaffUserByIdResponse caseWorkerProfile =
+            fetchResponse.getBody().as(SearchStaffUserByIdResponse.class);
+        assertEquals(caseWorkersProfileUpdationRequest.getFirstName(), caseWorkerProfile.getFirstName());
+        assertEquals(caseWorkersProfileUpdationRequest.getLastName(), caseWorkerProfile.getLastName());
+        assertEquals(caseWorkersProfileUpdationRequest.getEmailId(), caseWorkerProfile.getEmailId());
+        assertEquals(staffProfileCreationRequest.getRoles().get(0).getRole(), caseWorkerProfile
+            .getRoles().get(0).getRoleName());
     }
 
     @AfterAll

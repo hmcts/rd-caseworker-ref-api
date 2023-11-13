@@ -18,6 +18,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
+        default_schema: dbrdcaseworker
         order_updates: true
         order_inserts: true
         jdbc:
@@ -61,7 +62,7 @@ spring:
       charSet: UTF-8
     hikari:
       minimumIdle: 2
-      maximumPoolSize: 10
+      maximumPoolSize: ${HIKARI_MAX_POOL_SIZE:50}
       idleTimeout: 600000
       poolName: CWHikariCP
       maxLifetime: 1800000
@@ -107,12 +108,15 @@ idam:
     microservice: rd_caseworker_ref_api
     url: ${S2S_URL:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
   s2s-authorised:
-    services: ${CRD_S2S_AUTHORISED_SERVICES:rd_caseworker_ref_api,am_org_role_mapping_service,iac,xui_webapp}
+    services: ${CRD_S2S_AUTHORISED_SERVICES:rd_caseworker_ref_api,am_org_role_mapping_service,iac,xui_webapp,rd_profile_sync}
   api.url: ${idam_url:https://idam-api.aat.platform.hmcts.net}
 
 oidc.issuer: ${OIDC_ISSUER_URL:https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts}
 
 environment_name: ${ENVIRONMENT_NAME:prod}
+### staff Upload File configuration
+staff_upload_file: ${STAFF_UPLOAD_FILE:false}
+idam_role_mapping_file: ${IDAM_ROLE_MAPPING_FILE:true}
 
 loggingComponentName: RD-Caseworker-Ref-Api
 feign:

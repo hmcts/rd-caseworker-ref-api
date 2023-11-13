@@ -4,6 +4,8 @@ import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -192,38 +194,24 @@ class CaseWorkerDeleteServiceImplTest {
         verify(caseWorkerProfileRepository, times(1)).deleteAll(any());
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({
+        "204,User deleted in UP but was not present in CRD with userId",
+        "404,User was not present in UP or CRD with userId"
+    })
     @SuppressWarnings("unchecked")
-    void testValidateUserAfterUpDeleteWhenStatusIs204() {
+    void testValidateUserAfterUpDeleteWhenStatusIs204(int status,String description) {
         Optional<CaseWorkerProfile> userProfile = mock(Optional.class);
         String userId = UUID.randomUUID().toString();
 
         when(userProfile.isPresent()).thenReturn(false);
 
         CaseWorkerProfilesDeletionResponse deletionResponse =
-                caseWorkerDeleteServiceImpl.validateUserAfterUpDelete(userProfile, userId, 204);
+                caseWorkerDeleteServiceImpl.validateUserAfterUpDelete(userProfile, userId, status);
 
-        assertThat(deletionResponse.getStatusCode()).isEqualTo(204);
+        assertThat(deletionResponse.getStatusCode()).isEqualTo(status);
         assertThat(deletionResponse.getMessage())
-                .isEqualTo("User deleted in UP but was not present in CRD with userId: " + userId);
-
-        verify(userProfile, times(1)).isPresent();
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testValidateUserAfterUpDeleteWhenStatusIsNot204() {
-        Optional<CaseWorkerProfile> userProfile = mock(Optional.class);
-        String userId = UUID.randomUUID().toString();
-
-        when(userProfile.isPresent()).thenReturn(false);
-
-        CaseWorkerProfilesDeletionResponse deletionResponse =
-                caseWorkerDeleteServiceImpl.validateUserAfterUpDelete(userProfile, userId, 404);
-
-        assertThat(deletionResponse.getStatusCode()).isEqualTo(404);
-        assertThat(deletionResponse.getMessage())
-                .isEqualTo("User was not present in UP or CRD with userId: " + userId);
+                .isEqualTo(description + ": " + userId);
 
         verify(userProfile, times(1)).isPresent();
     }

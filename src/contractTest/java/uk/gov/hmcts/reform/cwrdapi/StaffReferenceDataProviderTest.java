@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.cwrdapi.service.ICwrdCommonRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.IJsrValidatorStaffProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.IStaffProfileAuditService;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerDeleteServiceImpl;
+import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerProfileUpdateserviceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.CaseWorkerServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.StaffRefDataServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.util.StaffProfileCreateUpdateUtil;
@@ -105,6 +106,10 @@ public class StaffReferenceDataProviderTest {
     @InjectMocks
     private CaseWorkerDeleteServiceImpl caseWorkerDeleteServiceImpl;
 
+    @InjectMocks
+    private CaseWorkerProfileUpdateserviceImpl caseWorkerProfileUpdateservice;
+
+
     @Mock
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
 
@@ -128,7 +133,9 @@ public class StaffReferenceDataProviderTest {
     @Mock
     CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
 
+    @Mock
     private UserTypeRepository userTypeRepository;
+
 
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
@@ -158,6 +165,10 @@ public class StaffReferenceDataProviderTest {
     private static final String USER_ID = "234873";
     private static final String USER_ID2 = "234879";
 
+    private static final String RD_CW_REF_API = "RD-Caseworker-Ref-Api";
+
+    private static final String CWID1 = "CWID1";
+
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void pactVerificationTestTemplate(PactVerificationContext context) {
@@ -171,13 +182,14 @@ public class StaffReferenceDataProviderTest {
         MockMvcTestTarget testTarget = new MockMvcTestTarget();
         testTarget.setControllers(
                 new CaseWorkerRefUsersController(
-                        "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
-                        "preview", caseWorkerServiceImpl, caseWorkerDeleteServiceImpl),
+                    RD_CW_REF_API, 20, "caseWorkerId",
+                        "preview", caseWorkerServiceImpl,
+                    caseWorkerDeleteServiceImpl,caseWorkerProfileUpdateservice,staffRefDataServiceImpl),
                 new StaffReferenceInternalController(
-                        "RD-Caseworker-Ref-Api", 20, "caseWorkerId",
+                    RD_CW_REF_API, 20, "caseWorkerId",
                         caseWorkerServiceImpl),
 
-                new StaffRefDataController("RD-Caseworker-Ref-Api",20,1,
+                new StaffRefDataController(RD_CW_REF_API,20,1,
                         staffRefDataServiceImpl)
         );
         if (context != null) {
@@ -267,7 +279,7 @@ public class StaffReferenceDataProviderTest {
 
         CaseWorkerRole caseWorkerRole = new CaseWorkerRole();
         caseWorkerRole.setCaseWorkerRoleId(1L);
-        caseWorkerRole.setCaseWorkerId("CWID1");
+        caseWorkerRole.setCaseWorkerId(CWID1);
         caseWorkerRole.setRoleId(1L);
         caseWorkerRole.setPrimaryFlag(false);
         caseWorkerRole.setCreatedDate(LocalDateTime.now());
@@ -280,7 +292,7 @@ public class StaffReferenceDataProviderTest {
         caseWorkerRole.setRoleType(roleType);
 
         CaseWorkerLocation caseWorkerLocation = new CaseWorkerLocation();
-        caseWorkerLocation.setCaseWorkerId("CWID1");
+        caseWorkerLocation.setCaseWorkerId(CWID1);
         caseWorkerLocation.setCaseWorkerLocationId(11111L);
         caseWorkerLocation.setCreatedDate(LocalDateTime.now());
         caseWorkerLocation.setLastUpdate(LocalDateTime.now());
@@ -292,6 +304,7 @@ public class StaffReferenceDataProviderTest {
         userType.setDescription("userTypeId");
 
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId(CWID1);
         caseWorkerProfile.setFirstName("firstName");
         caseWorkerProfile.setLastName("Last`name");
         caseWorkerProfile.setEmailId("a@b.com");
@@ -306,7 +319,7 @@ public class StaffReferenceDataProviderTest {
         caseWorkerProfile.setCreatedDate(LocalDateTime.now());
         caseWorkerProfile.setLastUpdate(LocalDateTime.now());
 
-        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setCaseWorkerId(CWID1);
         caseWorkerProfile.setCaseWorkerRoles(singletonList(caseWorkerRole));
         caseWorkerProfile.setCaseWorkerLocations(singletonList(caseWorkerLocation));
         CaseWorkerSkill caseWorkerSkill = getCaseWorkerSkill();
@@ -315,7 +328,7 @@ public class StaffReferenceDataProviderTest {
 
         CaseWorkerWorkArea caseWorkerWorkArea = new CaseWorkerWorkArea();
         caseWorkerWorkArea.setCaseWorkerWorkAreaId(1L);
-        caseWorkerWorkArea.setCaseWorkerId("CWID1");
+        caseWorkerWorkArea.setCaseWorkerId(CWID1);
         caseWorkerWorkArea.setAreaOfWork("TestArea");
         caseWorkerWorkArea.setServiceCode("SvcCode1");
         caseWorkerWorkArea.setCreatedDate(LocalDateTime.now());
@@ -485,7 +498,7 @@ public class StaffReferenceDataProviderTest {
     public void updateStaffUserProfile() throws JsonProcessingException {
 
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setCaseWorkerId(CWID1);
         caseWorkerProfile.setFirstName("CWFirstName");
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
@@ -508,7 +521,7 @@ public class StaffReferenceDataProviderTest {
         userProfileResponse.setLastName("testLNChanged");
 
         ObjectMapper mapper = new ObjectMapper();
-        when(userProfileFeignClient.getUserProfileWithRolesById(any()))
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
                                 null)).body(mapper.writeValueAsString(userProfileResponse),
@@ -590,12 +603,14 @@ public class StaffReferenceDataProviderTest {
 
     @State({"A staff profile by caseworker id"})
     public void fetchStaffProfileById() throws JsonProcessingException {
+
+
         ObjectMapper mapper = new ObjectMapper();
 
         UserProfileResponse userProfileResponse = new UserProfileResponse();
         userProfileResponse.setIdamId("12345678");
         userProfileResponse.setIdamStatus(STATUS_ACTIVE);
-        String body = mapper.writeValueAsString(List.of(userProfileResponse));
+        String body = mapper.writeValueAsString(userProfileResponse);
 
         when(userProfileFeignClient.getUserProfile(any()))
             .thenReturn(Response.builder()

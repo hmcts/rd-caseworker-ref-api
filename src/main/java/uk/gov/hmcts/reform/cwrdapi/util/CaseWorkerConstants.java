@@ -127,6 +127,7 @@ public final class CaseWorkerConstants {
             + "Please try again or check with HMCTS Support Team";
     public static final String ROLE_CWD_USER = "cwd-user";
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
+    public static final String ROLE_PRD_ADMIN = "prd-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
     public static final String ROLE_CWD_ADMIN = "cwd-admin";
 
@@ -144,6 +145,11 @@ public final class CaseWorkerConstants {
     public static final String RESPONSE_BODY_MISSING_FROM_UP = "Response Body is missing from User Profile";
     public static final String DUPLICATE_EMAIL_PROFILES = "User record in row ID %s is duplicate to another row. "
             + "Please ensure that the record is not duplicate and try again";
+
+    public static final String STAFF_UPLOAD_FILE_ERROR = "The Staff Upload template is now disabled. "
+            + "Please use the Staff UI";
+
+    public static final String IDAM_ROLE_MAPPING_FILE = "IDAM-Role-mapping file upload is now disabled!";
 
     public static final String INVALID_FIELD = "The field %s is invalid. Please provide a valid value.";
     public static final String PAGE_NUMBER = "Page Number";
@@ -228,6 +234,10 @@ public final class CaseWorkerConstants {
     public static final String IDAM_STATUS_USER_PROFILE = "User does not exists in IDAM";
     public static final String NO_PRIMARY_ROLE_PRESENT_PROFILE = "You must add Primary Role"
             + TRY_AGAIN;
+    public static final String CASEWORKER_ID_MISSING = "CaseWorker id missing";
+    public static final String FIRST_NAME_NOT_PRESENT = "You must add the first name";
+    public static final String LAST_NAME_NOT_PRESENT = "You must add the last name";
+    public static final String SUSPENDED_FLAG_MANDATORY = "You must add the suspended flag";
 
 
 }
