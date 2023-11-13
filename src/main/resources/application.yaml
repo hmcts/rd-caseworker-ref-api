@@ -18,6 +18,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
+        default_schema: dbrdcaseworker
         order_updates: true
         order_inserts: true
         jdbc:
@@ -61,7 +62,7 @@ spring:
       charSet: UTF-8
     hikari:
       minimumIdle: 2
-      maximumPoolSize: 10
+      maximumPoolSize: ${HIKARI_MAX_POOL_SIZE:50}
       idleTimeout: 600000
       poolName: CWHikariCP
       maxLifetime: 1800000
