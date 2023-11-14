@@ -197,6 +197,10 @@ class StaffRefDataServiceTest {
         var staffRefDataUserTypesResponses = (List<UserType>) staffRefDataServiceImpl
                 .fetchUserTypes();
         assertFalse(verifyCurrentUserTypes(staffRefDataUserTypesResponses.get(0)));
+
+        UserType userType = staffRefDataUserTypesResponses.get(0);
+        assertThat(userType.getUserTypeId()).isEqualTo(1L);
+        assertThat(userType.getDescription()).isEqualTo("User Type 1");
     }
 
     @Test

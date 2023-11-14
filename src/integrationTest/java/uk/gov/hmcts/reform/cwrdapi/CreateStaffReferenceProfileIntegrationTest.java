@@ -17,10 +17,12 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
@@ -95,6 +97,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
     @Test
     @DisplayName("Create Staff profile with status 201")
+    @Transactional
     void should_return_staff_user_with_status_code_201() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
@@ -106,7 +109,9 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
                 .isNotNull()
                 .containsEntry("http_status", "201 CREATED");
 
-        assertThat(response.get("case_worker_id")).isNotNull();
+        String caseWorkerId = ((Map<String, String>)response.get("body")).get("case_worker_id");
+        assertThat(caseWorkerId).isNotNull();
+        validateCreateCaseWorkerProfile(request.getEmailId(),caseWorkerId);
     }
 
 
@@ -459,5 +464,52 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         assertThat(caseWorkerWorkAreaRepository.count()).isZero();
         assertThat(caseWorkerSkillRepository.count()).isZero();
         assertThat(staffAuditRepository.count()).isEqualTo(1);
+    }
+
+    void validateCreateCaseWorkerProfile(String emailId, String caseWorkerId) {
+
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailId(emailId);
+
+        assertThat(caseWorkerProfile).isNotNull();
+
+        assertThat(caseWorkerProfile.getEmailId()).isNotNull();
+
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("StaffProfilefirstName");
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo("StaffProfilelastName");
+        assertThat(caseWorkerProfile.getRegion()).isEqualTo("National");
+        assertThat(caseWorkerProfile.getSuspended()).isFalse();
+        assertThat(caseWorkerProfile.getTaskSupervisor()).isTrue();
+        assertThat(caseWorkerProfile.getCaseAllocator()).isTrue();
+
+        assertThat(caseWorkerProfile.getUserAdmin()).isFalse();
+
+        assertThat(caseWorkerProfile.getUserType().getUserTypeId()).isEqualTo(1);
+        assertThat(caseWorkerProfile.getUserType().getDescription()).isEqualTo("CTSC");
+
+        assertThat(caseWorkerProfile.getCaseWorkerRoles()).hasSize(1);
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getRoleId()).isEqualTo(2);
+        assertThat(caseWorkerProfile.getCaseWorkerRoles().get(0).getPrimaryFlag()).isTrue();
+
+        assertThat(caseWorkerProfile.getCaseWorkerLocations()).hasSize(2);
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocationId()).isEqualTo(6789);
+        assertThat(caseWorkerProfile.getCaseWorkerLocations().get(0).getLocation()).isEqualTo("test location2");
+
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas()).hasSize(2);
+        assertThat(caseWorkerProfile.getCaseWorkerWorkAreas().get(0).getServiceCode()).isEqualTo("ABA1");
+
+        assertThat(caseWorkerProfile.getCaseWorkerSkills()).hasSize(1);
+        assertThat(caseWorkerProfile.getCaseWorkerSkills().get(0).getSkillId()).isEqualTo(9);
+
+        List<StaffAudit> staffAudits = staffAuditRepository.findAll();
+
+        assertThat(staffAudits.size()).isEqualTo(1);
+        assertThat(staffAudits.get(0).getStatus()).isEqualTo("SUCCESS");
+        assertThat(staffAudits.get(0).getOperationType()).isEqualTo("CREATE");
+        assertThat(staffAudits.get(0).getErrorDescription()).isBlank();
+        assertThat(staffAudits.get(0).getRequestLog()).isNotNull();
+        assertThat(staffAudits.get(0).getRequestTimeStamp()).isNotNull();
+        assertThat(staffAudits.get(0).getCaseWorkerId()).isEqualTo(caseWorkerId);
+
+
     }
 }

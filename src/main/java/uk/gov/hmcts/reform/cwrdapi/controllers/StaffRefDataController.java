@@ -237,19 +237,20 @@ public class StaffRefDataController {
             description = "Successfully retrieved list of Job Titles for the request provided",
             content = @Content(schema = @Schema(implementation = StaffRefJobTitleResponse.class))
     )
+
     @ApiResponse(
-            responseCode = "400",
-            description = "Bad Request",
+            responseCode = "401",
+            description = UNAUTHORIZED_ERROR,
             content = @Content
     )
     @ApiResponse(
-            responseCode = "401",
-            description = "Forbidden Error: Access denied",
+            responseCode = "403",
+            description = FORBIDDEN_ERROR,
             content = @Content
     )
     @ApiResponse(
             responseCode = "500",
-            description = "Internal Server Error",
+            description = INTERNAL_SERVER_ERROR,
             content = @Content
     )
     @GetMapping(
