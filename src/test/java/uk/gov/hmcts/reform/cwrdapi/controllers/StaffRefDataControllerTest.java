@@ -214,10 +214,6 @@ class StaffRefDataControllerTest {
 
     }
 
-
-
-
-
     @Test
     void shouldFetchUserTypes() {
         responseEntity = ResponseEntity.status(200).body(null);
@@ -232,6 +228,12 @@ class StaffRefDataControllerTest {
         assertEquals(responseEntity.getStatusCode(), actual.getStatusCode());
         assertEquals((userTypes.size()), actualResponse.getUserTypes().size());
         List<StaffRefDataUserType> actualResultUserType = new ArrayList<>(actualResponse.getUserTypes());
+
+        assertThat(actualResultUserType).hasSize(2);
+
+        assertThat(actualResultUserType.get(0).getId()).isEqualTo(1L);
+        assertThat(actualResultUserType.get(0).getCode()).isEqualTo("Test");
+
         //assert all attributes lists
         assertTrue(verifyAllUserTypes(actualResultUserType, userTypes));
     }
