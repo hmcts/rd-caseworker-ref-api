@@ -18,6 +18,7 @@ spring:
     show-sql: false
     properties:
       hibernate:
+        default_schema: dbrdcaseworker
         order_updates: true
         order_inserts: true
         jdbc:
@@ -43,6 +44,7 @@ spring:
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/migration
+  flyway.schemas: dbrdcaseworker,rdstaffreport
   cache:
     cache-names: token
     caffeine:
