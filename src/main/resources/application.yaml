@@ -43,6 +43,7 @@ spring:
             client-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  flyway.schemas: dbrdcaseworker,rdstaffreport
   flyway.locations: classpath:db/migration
   cache:
     cache-names: token
