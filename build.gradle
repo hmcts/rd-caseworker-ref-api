@@ -46,7 +46,8 @@ def versions = [
   springVersion      : '5.3.30',
   poi                : '4.1.2',
   logback            : '1.2.11',
-  testContainer_postgresql: '1.17.6'
+  testContainer_postgresql: '1.17.6',
+  bouncycastle       : '1.77'
 ]
 
 mainClassName = 'uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication'
@@ -356,7 +357,7 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-web', version: versions.springVersion
   implementation group: 'org.springframework', name: 'spring-webmvc', version: versions.springVersion
 
-  implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
+  implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: versions.bouncycastle
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.5'
   implementation (group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0') {
@@ -591,6 +592,36 @@ bootJar {
   manifest {
     attributes('Implementation-Version': project.version.toString())
   }
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        // Remedy for CVE-2020-8908, ensures launchdarkly uses correct version
+        if (details.requested.group == 'com.google.guava'
+                && details.requested.name == 'guava') {
+            details.useVersion "32.1.1-jre"
+        }
+    }
+
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.bouncycastle'
+                && (details.requested.name == 'bcpkix-jdk18on'
+                || details.requested.name == 'bcprov-jdk18on')
+        ){
+            details.useVersion versions.bouncycastle
+        }
+    }
+}
+
+dependencies {
+    modules {
+        module("org.bouncycastle:bcpkix-jdk15on") {
+            replacedBy("org.bouncycastle:bcpkix-jdk18on")
+        }
+        module("org.bouncycastle:bcprov-jdk15on") {
+            replacedBy("org.bouncycastle:bcprov-jdk18on")
+        }
+    }
 }
 
 tasks.withType(Test) {
