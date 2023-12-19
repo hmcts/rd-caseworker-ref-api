@@ -110,7 +110,7 @@ public class StaffReferenceDataProviderTest {
     private CaseWorkerProfileUpdateserviceImpl caseWorkerProfileUpdateservice;
 
 
-    @Mock
+    @Mock(lenient = true)
     private CaseWorkerProfileRepository caseWorkerProfileRepo;
 
     @Mock
