@@ -610,6 +610,14 @@ configurations.all {
             details.useVersion versions.bouncycastle
         }
     }
+
+  resolutionStrategy.eachDependency { details ->
+    // Remedy for CVE-2024-25710
+    if (details.requested.group == 'org.apache.commons'
+            && details.requested.name == 'commons-compress') {
+      details.useVersion "1.26.0"
+    }
+  }
 }
 
 dependencies {
