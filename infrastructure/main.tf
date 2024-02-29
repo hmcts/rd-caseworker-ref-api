@@ -78,7 +78,7 @@ module "db-rd-caseworker-ref-api" {
 # Create the database server v16
 # Name and resource group name will be defaults (<product>-<component>-<env> and <product>-<component>-data-<env> respectively)
 module "db-rd-caseworker-ref-v16" {
-  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=dtspo-16806-schema-owner"
 
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
@@ -97,6 +97,12 @@ module "db-rd-caseworker-ref-v16" {
 
   # Setup Access Reader db user
   force_user_permissions_trigger = "1"
+  
+  enable_schema_ownership = true
+  kv_subscription = var.subscription
+  kv_name = data.azurerm_key_vault.rd_key_vault.name
+  user_secret_name = azurerm_key_vault_secret.POSTGRES-USER.name
+  pass_secret_name = azurerm_key_vault_secret.POSTGRES-PASS.name
 
   subnet_suffix        = "expanded"
   pgsql_version        = "16"
