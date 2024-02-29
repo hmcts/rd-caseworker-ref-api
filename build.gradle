@@ -423,7 +423,7 @@ dependencies {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
   //Fix for CVE-2021-29425
-  implementation 'commons-io:commons-io:2.11.0'
+  implementation 'commons-io:commons-io:2.15.1'
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
@@ -610,6 +610,14 @@ configurations.all {
             details.useVersion versions.bouncycastle
         }
     }
+
+  resolutionStrategy.eachDependency { details ->
+    // Remedy for CVE-2024-25710
+    if (details.requested.group == 'org.apache.commons'
+            && details.requested.name == 'commons-compress') {
+      details.useVersion "1.26.0"
+    }
+  }
 }
 
 dependencies {
