@@ -103,8 +103,8 @@ module "db-rd-caseworker-ref-v16" {
   force_schema_ownership_trigger = "1"
   kv_subscription = var.kv_subscription
   kv_name = data.azurerm_key_vault.rd_key_vault.name
-  user_secret_name = azurerm_key_vault_secret.POSTGRES-USER.name
-  pass_secret_name = azurerm_key_vault_secret.POSTGRES-PASS.name
+  user_secret_name = azurerm_key_vault_secret.POSTGRES-USER.name # This should be v11 username secret
+  pass_secret_name = azurerm_key_vault_secret.POSTGRES-PASS.name # This should be  v11 password secret
 
   subnet_suffix        = "expanded"
   pgsql_version        = "16"
