@@ -690,7 +690,7 @@ public class CaseWorkerReferenceDataClient {
                 .isPrimaryFlag(true).locationId(locationId1)
                 .location(locationName1).build(), CaseWorkerLocationRequest
                 .caseWorkersLocationRequest()
-                .isPrimaryFlag(true).locationId(locationId2)
+                .isPrimaryFlag(false).locationId(locationId2)
                 .location(locationName2).build());
     }
 

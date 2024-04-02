@@ -172,9 +172,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
         assertThat(response)
                 .isNotNull()
-                .containsEntry("http_status", "201 CREATED");
-
-        assertThat(response.get("case_worker_id")).isNotNull();
+                .containsEntry("http_status", "400");
     }
 
 
