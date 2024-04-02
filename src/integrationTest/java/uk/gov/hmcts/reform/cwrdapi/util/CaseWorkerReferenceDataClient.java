@@ -625,6 +625,33 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
+    public StaffProfileCreationRequest buildStaffProfileCreationRequest(String firstName,
+                                                                        String lastName,
+                                                                        Integer locationId1,
+                                                                        String locationName1,
+                                                                        Integer locationId2,
+                                                                        String locationName2) {
+        String emailPattern = "deleteTest1234";
+        String email = format(STAFF_EMAIL_TEMPLATE, RandomStringUtils.randomAlphanumeric(10)
+                + emailPattern).toLowerCase();
+        return StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .emailId(email)
+                .regionId(1).userType("CTSC")
+                .region("National")
+                .suspended(false)
+                .taskSupervisor(true)
+                .caseAllocator(true)
+                .staffAdmin(false)
+                .roles(getCaseWorkerRoleRequests())
+                .baseLocations(getCaseWorkerLocationRequests(locationId1, locationName1, locationId2, locationName2))
+                .services(getCaseWorkerServicesRequests())
+                .skills(getSkillsRequest())
+                .build();
+    }
+
     private List<SkillsRequest> getSkillsRequest() {
         return ImmutableList.of(SkillsRequest
                 .skillsRequest()
@@ -652,6 +679,19 @@ public class CaseWorkerReferenceDataClient {
                 .caseWorkersLocationRequest()
                 .isPrimaryFlag(true).locationId(6789)
                 .location("test location2").build());
+    }
+
+    private List<CaseWorkerLocationRequest> getCaseWorkerLocationRequests(Integer locationId1,
+                                                                          String locationName1,
+                                                                          Integer locationId2,
+                                                                          String locationName2) {
+        return ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(locationId1)
+                .location(locationName1).build(), CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(locationId2)
+                .location(locationName2).build());
     }
 
     private List<StaffProfileRoleRequest> getCaseWorkerRoleRequests() {

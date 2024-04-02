@@ -133,6 +133,50 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         assertThat(response.get("case_worker_id")).isNotNull();
     }
 
+    @ParameterizedTest(name = "{index} => firstName={0}, lastName={1}, locationId1={2}, "
+            + "locationName1={3}, locationId2={4}, locationName2={5}")
+    @MethodSource("validNameLocationProvider")
+    @DisplayName("Create Staff profile with different location name, same location id  status 201")
+    void user_with_different_location_name_same_location_id_status_code_201(String firstName, String lastName,
+                                                                            Integer locationId1, String locationName1,
+                                                                            Integer locationId2, String locationName2) {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        StaffProfileCreationRequest request =
+                caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName,
+                        lastName, locationId1, locationName1, locationId2, locationName2);
+
+        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
+
+        assertThat(response)
+                .isNotNull()
+                .containsEntry("http_status", "201 CREATED");
+
+        assertThat(response.get("case_worker_id")).isNotNull();
+    }
+
+    @ParameterizedTest(name = "{index} => firstName={0}, lastName={1}, locationId1={2}, "
+            + "locationName1={3}, locationId2={4}, locationName2={5}")
+    @MethodSource("inValidNameLocationProvider")
+    @DisplayName("Create Staff profile with same location name, same location id  status 400")
+    void user_with_same_location_name_same_location_id_status_code_400(String firstName, String lastName,
+                                                                            Integer locationId1, String locationName1,
+                                                                            Integer locationId2, String locationName2) {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+        StaffProfileCreationRequest request =
+                caseWorkerReferenceDataClient.buildStaffProfileCreationRequest(firstName,
+                        lastName, locationId1, locationName1, locationId2, locationName2);
+
+        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
+
+        assertThat(response)
+                .isNotNull()
+                .containsEntry("http_status", "201 CREATED");
+
+        assertThat(response.get("case_worker_id")).isNotNull();
+    }
+
 
     @ParameterizedTest(name = "{index} => firstName={0}, lastName={1}")
     @MethodSource("inValidNameProvider")
@@ -160,6 +204,18 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
                 Arguments.of("Nando's", "Zi-n ac"),//Space, and Special characters - '
                 Arguments.of("Æâçdëøœoo", "Qętŷįłgå12"),//Space, and Special characters - '
                 Arguments.of("Æmaze", "Zìœ")//phonetic
+        );
+    }
+
+    private static Stream<Arguments> validNameLocationProvider() {
+        return Stream.of(
+                Arguments.of("Vilas", "Shelke", 12345,  "Test Location 1", 12345,  "Test Location 2")
+        );
+    }
+
+    private static Stream<Arguments> inValidNameLocationProvider() {
+        return Stream.of(
+                Arguments.of("Vilas", "Shelke", 12345,  "Test Location", 12345,  "Test Location")
         );
     }
 
