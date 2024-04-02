@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.cwrdapi.TestSupport.buildStaffProfileRequest;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_INVALID;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LAST_NAME_INVALID;
@@ -67,6 +68,18 @@ class JsrValidatorStaffProfileTest {
         InvalidRequestException exception = Assertions.assertThrows(InvalidRequestException.class, () ->
                 jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
         assertThat(exception.getMessage()).contains(INVALID_EMAIL);
+    }
+
+    @Test
+    @DisplayName("Staff profile with same location name and same location id")
+    void testInvalidStaffProfileSameLocationNameSameLocationId() {
+        StaffProfileCreationRequest profile = buildStaffProfileRequest(1, "testLocation", 1, "testLocation");
+        when(jwtGrantedAuthoritiesConverter.getUserInfo()).thenReturn(UserInfo.builder().name("test").build());
+        when(staffAuditRepository.save(any())).thenReturn(staffAudit.builder().id(1L).build());
+
+        InvalidRequestException exception = Assertions.assertThrows(InvalidRequestException.class, () ->
+                jsrValidatorStaffProfile.validateStaffProfile(profile, STAFF_PROFILE_CREATE));
+        assertThat(exception.getMessage()).contains(DUPLICATE_PRIMARY_AND_SECONDARY_LOCATIONS);
     }
 
 
