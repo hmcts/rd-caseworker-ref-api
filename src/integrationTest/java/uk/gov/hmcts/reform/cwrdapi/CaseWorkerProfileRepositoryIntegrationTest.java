@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -72,12 +73,8 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @BeforeEach
     public void setUpClient() {
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         super.setUpClient();
-        caseWorkerProfileRepository.deleteAll();
-        caseWorkerLocationRepository.deleteAll();
-        caseWorkerRoleRepository.deleteAll();
-        caseWorkerWorkAreaRepository.deleteAll();
+        cleanUpEach();
     }
 
     @AfterEach
@@ -211,12 +208,14 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
     }
 
     @Test
+    @Transactional
     void should_not_save_caseworker_profile_when_same_location_name_same_locationId() {
         CaseWorkerProfile caseWorkerProfile = createCaseWorkerProfile("234873",
                 1, "National 1", 1, "National 1");
-        JpaSystemException exception = assertThrows(JpaSystemException.class,
-                () ->  caseWorkerProfileRepository.save(caseWorkerProfile));
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class,
+                () ->  caseWorkerProfileRepository.saveAndFlush(caseWorkerProfile));
         assertNotNull(exception);
+        assertTrue(exception.getCause().getCause().getMessage().contains("duplicate key value violates unique constraint \"case_worker_locn_id_uq\""));
     }
 
 
@@ -253,12 +252,14 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
         skill.setSkillId(1L);
         skill.setSkillCode("1");
         skill.setServiceId("BFA1");
+        skill.setUserType("Test");
         skill.setDescription("testSkill");
 
         List<CaseWorkerSkill> cwSkills = new ArrayList<>();
         CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
         cwSkills.add(caseWorkerSkill);
         caseWorkerSkill.setCaseWorkerSkillId(1L);
+        caseWorkerSkill.setCaseWorkerId(caseWorkerId);
         caseWorkerSkill.setSkillId(1L);
         caseWorkerSkill.setSkill(skill);
 
