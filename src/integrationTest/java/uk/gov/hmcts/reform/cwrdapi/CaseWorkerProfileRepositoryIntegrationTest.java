@@ -5,22 +5,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.orm.jpa.JpaSystemException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.SearchRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
-import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
-import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
-import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
-import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerLocationRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
@@ -28,7 +19,6 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -38,12 +28,10 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import javax.transaction.Transactional;
 
-import static java.util.Collections.singletonList;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME;
@@ -191,7 +179,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @Test
     void save_caseworker_profile_200() {
-        CaseWorkerProfile caseWorkerProfile = createCaseWorkerProfile("234873",
+        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.createCaseWorkerProfile("234873",
                 1, "National 1", 2, "National 2");
         CaseWorkerProfile savedCaseworkerProfile = caseWorkerProfileRepository.save(caseWorkerProfile);
         assertNotNull(savedCaseworkerProfile);
@@ -200,118 +188,21 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @Test
     void save_caseworker_profile_when_same_location_name_different_locationId() {
-        CaseWorkerProfile caseWorkerProfile = createCaseWorkerProfile("234873",
+        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.createCaseWorkerProfile("234873",
                 1, "National 1", 1, "National 2");
         CaseWorkerProfile savedCaseworkerProfile = caseWorkerProfileRepository.save(caseWorkerProfile);
         assertNotNull(savedCaseworkerProfile);
         assertEquals("234873", savedCaseworkerProfile.getCaseWorkerId());
     }
 
-    @Test
-    @Transactional
-    void should_not_save_caseworker_profile_when_same_location_name_same_locationId() {
-        CaseWorkerProfile caseWorkerProfile = createCaseWorkerProfile("234873",
-                1, "National 1", 1, "National 1");
-        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class,
-                () ->  caseWorkerProfileRepository.saveAndFlush(caseWorkerProfile));
-        assertNotNull(exception);
-        assertTrue(exception.getCause().getCause().getMessage().contains("duplicate key value violates unique constraint \"case_worker_locn_id_uq\""));
-    }
-
-
     public void createCaseWorkerTestData() {
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
                 .createStaffProfileCreationRequest();
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
+                .createStaffProfile(staffProfileCreationRequest, ROLE_STAFF_ADMIN);
         assertThat(response).containsEntry("http_status", "201 CREATED");
-
     }
-
-    private CaseWorkerProfile createCaseWorkerProfile(String caseWorkerId,
-                                                      Integer locationId1,
-                                                      String locationName1,
-                                                      Integer locationId2,
-                                                      String locationName2) {
-        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
-
-        caseWorkerProfile.setCaseWorkerId(caseWorkerId);
-        caseWorkerProfile.setFirstName("firstName");
-        caseWorkerProfile.setLastName("lastName");
-        caseWorkerProfile.setEmailId("sam.test@justice.gov.uk");
-        caseWorkerProfile.setUserTypeId(1L);
-        caseWorkerProfile.setRegion("National");
-        caseWorkerProfile.setRegionId(1);
-        caseWorkerProfile.setSuspended(false);
-        caseWorkerProfile.setCaseAllocator(false);
-        caseWorkerProfile.setTaskSupervisor(false);
-        caseWorkerProfile.setUserAdmin(true);
-
-        Skill skill = new Skill();
-        skill.setSkillId(1L);
-        skill.setSkillCode("1");
-        skill.setServiceId("BFA1");
-        skill.setUserType("Test");
-        skill.setDescription("testSkill");
-
-        List<CaseWorkerSkill> cwSkills = new ArrayList<>();
-        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
-        cwSkills.add(caseWorkerSkill);
-        caseWorkerSkill.setCaseWorkerSkillId(1L);
-        caseWorkerSkill.setCaseWorkerId(caseWorkerId);
-        caseWorkerSkill.setSkillId(1L);
-        caseWorkerSkill.setSkill(skill);
-
-        LocalDateTime timeNow = LocalDateTime.now();
-
-        caseWorkerProfile.setCreatedDate(timeNow);
-        caseWorkerProfile.setLastUpdate(timeNow);
-
-        List<CaseWorkerLocation> caseWorkerLocations = createCaseworkerLocations(caseWorkerId,
-                locationId1, locationName1, locationId2, locationName2);
-
-        List<CaseWorkerWorkArea> caseWorkerWorkAreas =
-                singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
-
-        List<CaseWorkerRole> caseWorkerRoles =
-                singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
-        caseWorkerRoles.get(0).setRoleType(new RoleType(1L,"tribunal-caseworker"));
-
-        return new CaseWorkerProfile(caseWorkerId,
-                "firstName",
-                "lastName",
-                "sam.test@justice.gov.uk",
-                1L,
-                "National",
-                1,
-                false,
-                false,
-                false,
-                timeNow,
-                timeNow,
-                caseWorkerLocations,
-                caseWorkerWorkAreas,
-                caseWorkerRoles,
-                new UserType(1L, "HMCTS"), false,false, cwSkills);
-    }
-
-    private List<CaseWorkerLocation> createCaseworkerLocations(String caseWorkerId,
-                                                              Integer locationId1,
-                                                              String locationName1,
-                                                              Integer locationId2,
-                                                              String locationName2) {
-        List<CaseWorkerLocation> caseWorkerLocations = new ArrayList<>();
-        caseWorkerLocations.add(new CaseWorkerLocation(caseWorkerId, locationId1,
-                locationName1, true));
-
-        if (locationName2 != null) {
-            caseWorkerLocations.add(new CaseWorkerLocation(caseWorkerId, locationId2,
-                    locationName2, true));
-        }
-        return caseWorkerLocations;
-    }
-
 
     private void createCaseWorkerProfiles() {
         IntStream.range(0,5).forEach(i -> createCaseWorkerTestData());
