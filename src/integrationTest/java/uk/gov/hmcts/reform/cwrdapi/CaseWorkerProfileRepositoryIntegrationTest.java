@@ -274,7 +274,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
         List<CaseWorkerRole> caseWorkerRoles =
                 singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
-        caseWorkerRoles.get(0).setRoleType(new RoleType("tribunal-caseworker"));
+        caseWorkerRoles.get(0).setRoleType(new RoleType(1L,"tribunal-caseworker"));
 
         return new CaseWorkerProfile(caseWorkerId,
                 "firstName",
