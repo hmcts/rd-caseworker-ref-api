@@ -726,11 +726,11 @@ public class CaseWorkerReferenceDataClient {
         return mapServiceSkillsIdResponse(responseEntity, clazz);
     }
 
-    public CaseWorkerProfile createCaseWorkerProfile(String caseWorkerId,
-                                                      Integer locationId1,
-                                                      String locationName1,
-                                                      Integer locationId2,
-                                                      String locationName2) {
+    public CaseWorkerProfile generateCaseWorkerProfile(String caseWorkerId,
+                                                       Integer locationId1,
+                                                       String locationName1,
+                                                       Integer locationId2,
+                                                       String locationName2) {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
 
         caseWorkerProfile.setCaseWorkerId(caseWorkerId);

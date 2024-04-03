@@ -179,7 +179,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @Test
     void save_caseworker_profile_200() {
-        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.createCaseWorkerProfile("234873",
+        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.generateCaseWorkerProfile("234873",
                 1, "National 1", 2, "National 2");
         CaseWorkerProfile savedCaseworkerProfile = caseWorkerProfileRepository.save(caseWorkerProfile);
         assertNotNull(savedCaseworkerProfile);
@@ -188,7 +188,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @Test
     void save_caseworker_profile_when_same_location_name_different_locationId() {
-        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.createCaseWorkerProfile("234873",
+        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.generateCaseWorkerProfile("234873",
                 1, "National 1", 1, "National 2");
         CaseWorkerProfile savedCaseworkerProfile = caseWorkerProfileRepository.save(caseWorkerProfile);
         assertNotNull(savedCaseworkerProfile);

@@ -28,7 +28,7 @@ public class CaseWorkerProfileRepositorySaveIntegrationTest extends Authorizatio
 
     @Test
     void should_not_save_caseworker_profile_when_same_location_name_same_locationId() {
-        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.createCaseWorkerProfile("234873",
+        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.generateCaseWorkerProfile("234873",
                 1, "National 1", 1, "National 1");
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class,
                 () ->  caseWorkerProfileRepository.saveAndFlush(caseWorkerProfile));
