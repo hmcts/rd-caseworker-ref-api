@@ -252,6 +252,7 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
         Skill skill = new Skill();
         skill.setSkillId(1L);
         skill.setSkillCode("1");
+        skill.setServiceId("BFA1");
         skill.setDescription("testSkill");
 
         List<CaseWorkerSkill> cwSkills = new ArrayList<>();
