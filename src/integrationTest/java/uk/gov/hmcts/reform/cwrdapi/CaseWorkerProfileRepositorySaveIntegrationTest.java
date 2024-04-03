@@ -33,6 +33,7 @@ public class CaseWorkerProfileRepositorySaveIntegrationTest extends Authorizatio
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class,
                 () ->  caseWorkerProfileRepository.saveAndFlush(caseWorkerProfile));
         assertNotNull(exception);
-        assertTrue(exception.getCause().getCause().getMessage().contains("duplicate key value violates unique constraint \"case_worker_locn_id_uq\""));
+        assertTrue(exception.getCause().getCause().getMessage()
+                .contains("duplicate key value violates unique constraint \"case_worker_locn_id_uq\""));
     }
 }
