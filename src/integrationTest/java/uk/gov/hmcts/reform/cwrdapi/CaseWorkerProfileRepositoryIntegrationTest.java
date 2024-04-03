@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_LAST_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
-import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPaginationObject;
 
 @Transactional
 public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEnabledIntegrationTest {
