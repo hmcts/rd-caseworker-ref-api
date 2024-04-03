@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -213,7 +214,9 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
     void should_not_save_caseworker_profile_when_same_location_name_same_locationId() {
         CaseWorkerProfile caseWorkerProfile = createCaseWorkerProfile("234873",
                 1, "National 1", 1, "National 1");
-        assertThrows(Exception.class, () ->  caseWorkerProfileRepository.save(caseWorkerProfile));
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class,
+                () ->  caseWorkerProfileRepository.save(caseWorkerProfile));
+        assertNotNull(exception);
     }
 
 
