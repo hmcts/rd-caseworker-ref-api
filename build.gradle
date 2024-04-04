@@ -42,7 +42,7 @@ def versions = [
   restAssured        : '4.3.3',
   jackson            : '2.14.2',
   log4j              : '2.17.1',
-  springVersion      : '5.3.30',
+  springVersion      : '5.3.33',
   poi                : '4.1.2',
   logback            : '1.2.13',
   testContainer_postgresql: '1.17.6',
@@ -482,7 +482,7 @@ dependencies {
   testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.10'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.4')
-  testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.30'
+  testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.33'
   testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.10'
   testImplementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
