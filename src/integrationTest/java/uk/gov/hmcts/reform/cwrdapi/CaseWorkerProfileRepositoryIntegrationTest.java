@@ -30,6 +30,8 @@ import javax.transaction.Transactional;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME;
@@ -59,12 +61,8 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     @BeforeEach
     public void setUpClient() {
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         super.setUpClient();
-        caseWorkerProfileRepository.deleteAll();
-        caseWorkerLocationRepository.deleteAll();
-        caseWorkerRoleRepository.deleteAll();
-        caseWorkerWorkAreaRepository.deleteAll();
+        cleanUpEach();
     }
 
     @AfterEach
@@ -179,18 +177,32 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
 
     }
 
+    @Test
+    void save_caseworker_profile_200() {
+        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.generateCaseWorkerProfile("234873",
+                1, "National 1", 2, "National 2");
+        CaseWorkerProfile savedCaseworkerProfile = caseWorkerProfileRepository.save(caseWorkerProfile);
+        assertNotNull(savedCaseworkerProfile);
+        assertEquals("234873", savedCaseworkerProfile.getCaseWorkerId());
+    }
 
+    @Test
+    void save_caseworker_profile_when_same_location_name_different_locationId() {
+        CaseWorkerProfile caseWorkerProfile = caseworkerReferenceDataClient.generateCaseWorkerProfile("234873",
+                1, "National 1", 1, "National 2");
+        CaseWorkerProfile savedCaseworkerProfile = caseWorkerProfileRepository.save(caseWorkerProfile);
+        assertNotNull(savedCaseworkerProfile);
+        assertEquals("234873", savedCaseworkerProfile.getCaseWorkerId());
+    }
 
     public void createCaseWorkerTestData() {
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest staffProfileCreationRequest = caseworkerReferenceDataClient
                 .createStaffProfileCreationRequest();
         Map<String, Object> response = caseworkerReferenceDataClient
-                .createStaffProfile(staffProfileCreationRequest,ROLE_STAFF_ADMIN);
+                .createStaffProfile(staffProfileCreationRequest, ROLE_STAFF_ADMIN);
         assertThat(response).containsEntry("http_status", "201 CREATED");
-
     }
-
 
     private void createCaseWorkerProfiles() {
         IntStream.range(0,5).forEach(i -> createCaseWorkerTestData());

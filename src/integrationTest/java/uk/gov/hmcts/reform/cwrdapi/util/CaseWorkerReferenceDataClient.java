@@ -38,8 +38,18 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.SkillsRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.SearchStaffUserResponse;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerLocation;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerRole;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
+import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
+import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -49,6 +59,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.DELETE;
@@ -625,6 +636,33 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
+    public StaffProfileCreationRequest buildStaffProfileCreationRequest(String firstName,
+                                                                        String lastName,
+                                                                        Integer locationId1,
+                                                                        String locationName1,
+                                                                        Integer locationId2,
+                                                                        String locationName2) {
+        String emailPattern = "deleteTest1234";
+        String email = format(STAFF_EMAIL_TEMPLATE, RandomStringUtils.randomAlphanumeric(10)
+                + emailPattern).toLowerCase();
+        return StaffProfileCreationRequest
+                .staffProfileCreationRequest()
+                .firstName(firstName)
+                .lastName(lastName)
+                .emailId(email)
+                .regionId(1).userType("CTSC")
+                .region("National")
+                .suspended(false)
+                .taskSupervisor(true)
+                .caseAllocator(true)
+                .staffAdmin(false)
+                .roles(getCaseWorkerRoleRequests())
+                .baseLocations(getCaseWorkerLocationRequests(locationId1, locationName1, locationId2, locationName2))
+                .services(getCaseWorkerServicesRequests())
+                .skills(getSkillsRequest())
+                .build();
+    }
+
     private List<SkillsRequest> getSkillsRequest() {
         return ImmutableList.of(SkillsRequest
                 .skillsRequest()
@@ -654,6 +692,19 @@ public class CaseWorkerReferenceDataClient {
                 .location("test location2").build());
     }
 
+    private List<CaseWorkerLocationRequest> getCaseWorkerLocationRequests(Integer locationId1,
+                                                                          String locationName1,
+                                                                          Integer locationId2,
+                                                                          String locationName2) {
+        return ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(locationId1)
+                .location(locationName1).build(), CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(false).locationId(locationId2)
+                .location(locationName2).build());
+    }
+
     private List<StaffProfileRoleRequest> getCaseWorkerRoleRequests() {
         return ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest()
                 .roleId(2)
@@ -673,5 +724,88 @@ public class CaseWorkerReferenceDataClient {
                                      String userId, String role) throws JsonProcessingException {
         ResponseEntity<Object> responseEntity = getRequest(userId, clazz, role);
         return mapServiceSkillsIdResponse(responseEntity, clazz);
+    }
+
+    public CaseWorkerProfile generateCaseWorkerProfile(String caseWorkerId,
+                                                       Integer locationId1,
+                                                       String locationName1,
+                                                       Integer locationId2,
+                                                       String locationName2) {
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+
+        caseWorkerProfile.setCaseWorkerId(caseWorkerId);
+        caseWorkerProfile.setFirstName("firstName");
+        caseWorkerProfile.setLastName("lastName");
+        caseWorkerProfile.setEmailId("sam.test@justice.gov.uk");
+        caseWorkerProfile.setUserTypeId(1L);
+        caseWorkerProfile.setRegion("National");
+        caseWorkerProfile.setRegionId(1);
+        caseWorkerProfile.setSuspended(false);
+        caseWorkerProfile.setCaseAllocator(false);
+        caseWorkerProfile.setTaskSupervisor(false);
+        caseWorkerProfile.setUserAdmin(true);
+
+        Skill skill = new Skill();
+        skill.setSkillId(1L);
+        skill.setSkillCode("1");
+        skill.setServiceId("BFA1");
+        skill.setUserType("Test");
+        skill.setDescription("testSkill");
+
+        List<CaseWorkerSkill> cwSkills = new ArrayList<>();
+        CaseWorkerSkill caseWorkerSkill = new CaseWorkerSkill();
+        cwSkills.add(caseWorkerSkill);
+        caseWorkerSkill.setCaseWorkerSkillId(1L);
+        caseWorkerSkill.setCaseWorkerId(caseWorkerId);
+        caseWorkerSkill.setSkillId(1L);
+        caseWorkerSkill.setSkill(skill);
+
+        LocalDateTime timeNow = LocalDateTime.now();
+
+        caseWorkerProfile.setCreatedDate(timeNow);
+        caseWorkerProfile.setLastUpdate(timeNow);
+
+        List<CaseWorkerLocation> caseWorkerLocations = createCaseworkerLocations(caseWorkerId,
+                locationId1, locationName1, locationId2, locationName2);
+
+        List<CaseWorkerWorkArea> caseWorkerWorkAreas =
+                singletonList(new CaseWorkerWorkArea(caseWorkerId, "1", "BFA1"));
+
+        List<CaseWorkerRole> caseWorkerRoles =
+                singletonList(new CaseWorkerRole(caseWorkerId, 1L, true));
+        caseWorkerRoles.get(0).setRoleType(new RoleType(1L,"tribunal-caseworker"));
+
+        return new CaseWorkerProfile(caseWorkerId,
+                "firstName",
+                "lastName",
+                "sam.test@justice.gov.uk",
+                1L,
+                "National",
+                1,
+                false,
+                false,
+                false,
+                timeNow,
+                timeNow,
+                caseWorkerLocations,
+                caseWorkerWorkAreas,
+                caseWorkerRoles,
+                new UserType(1L, "HMCTS"), false,false, cwSkills);
+    }
+
+    private List<CaseWorkerLocation> createCaseworkerLocations(String caseWorkerId,
+                                                               Integer locationId1,
+                                                               String locationName1,
+                                                               Integer locationId2,
+                                                               String locationName2) {
+        List<CaseWorkerLocation> caseWorkerLocations = new ArrayList<>();
+        caseWorkerLocations.add(new CaseWorkerLocation(caseWorkerId, locationId1,
+                locationName1, true));
+
+        if (locationName2 != null) {
+            caseWorkerLocations.add(new CaseWorkerLocation(caseWorkerId, locationId2,
+                    locationName2, true));
+        }
+        return caseWorkerLocations;
     }
 }
