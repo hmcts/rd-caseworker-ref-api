@@ -880,6 +880,7 @@ class CaseWorkerServiceImplTest {
 
     @Test
     void testMapCaseWorkerProfileRequest() {
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(List.of(userType));
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("1");
         final var caseWorker = new CaseWorkerProfile();
@@ -892,7 +893,7 @@ class CaseWorkerServiceImplTest {
         assertThat(caseWorkerProfile.getLastName()).isEqualTo(cwProfileCreationRequest.getLastName());
         assertThat(caseWorkerProfile.getEmailId()).isEqualTo(cwProfileCreationRequest.getEmailId());
         assertThat(caseWorkerProfile.getSuspended()).isFalse();
-        assertThat(caseWorkerProfile.getUserTypeId()).isZero();
+        assertThat(caseWorkerProfile.getUserTypeId()).isOne();
         assertThat(caseWorkerProfile.getRegionId()).isEqualTo(cwProfileCreationRequest.getRegionId());
         assertThat(caseWorkerProfile.getRegion()).isEqualTo(cwProfileCreationRequest.getRegion());
         assertThat(caseWorkerProfile.getCaseAllocator()).isEqualTo(cwProfileCreationRequest.isCaseAllocator());
@@ -1015,6 +1016,7 @@ class CaseWorkerServiceImplTest {
 
     @Test
     void testUpdateUserProfile() {
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(List.of(userType));
         List<CaseWorkerRole> caseWorkerRoles = new ArrayList<>();
         caseWorkerRoles.add(new CaseWorkerRole());
         List<CaseWorkerWorkArea> caseWorkerWorkAreas = new ArrayList<>();
