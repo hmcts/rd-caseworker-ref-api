@@ -458,8 +458,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .regionName(profile.getRegion())
                 .userType(profile.getUserType().getDescription())
                 .userId(profile.getUserTypeId())
-                .suspended(Boolean.TRUE.equals(profile.getSuspended()) ?
-                        Boolean.TRUE.toString() : Boolean.FALSE.toString())
+                .suspended(Boolean.TRUE.equals(profile.getSuspended())
+                        ? Boolean.TRUE.toString() : Boolean.FALSE.toString())
                 .staffAdmin(Boolean.TRUE.equals(profile.getUserAdmin()) ? "Y" : "N")
                 .createdTime(profile.getCreatedDate())
                 .lastUpdatedTime(profile.getLastUpdate())
