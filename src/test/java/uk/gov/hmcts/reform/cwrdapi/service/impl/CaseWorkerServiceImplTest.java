@@ -883,7 +883,7 @@ class CaseWorkerServiceImplTest {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("1");
         final var caseWorker = new CaseWorkerProfile();
-        caseWorker.setUserTypeId(1L);
+        caseWorker.setUserType(userType);
         CaseWorkerProfile caseWorkerProfile = caseWorkerServiceImpl.mapCaseWorkerProfileRequest(
                 "1", cwProfileCreationRequest, caseWorker);
 
@@ -1025,7 +1025,7 @@ class CaseWorkerServiceImplTest {
         caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
         caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
         caseWorkerProfile.setCaseWorkerLocations(caseWorkerLocations);
-        caseWorkerProfile.setUserTypeId(1L);
+        caseWorkerProfile.setUserType(userType);
 
         CaseWorkerProfile actualUpdatedUser = caseWorkerServiceImpl
                 .updateUserProfile(cwProfileCreationRequest, caseWorkerProfile);
