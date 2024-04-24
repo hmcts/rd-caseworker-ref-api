@@ -882,8 +882,10 @@ class CaseWorkerServiceImplTest {
     void testMapCaseWorkerProfileRequest() {
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("1");
+        final var caseWorker = new CaseWorkerProfile();
+        caseWorker.setUserTypeId(1L);
         CaseWorkerProfile caseWorkerProfile = caseWorkerServiceImpl.mapCaseWorkerProfileRequest(
-                "1", cwProfileCreationRequest, new CaseWorkerProfile());
+                "1", cwProfileCreationRequest, caseWorker);
 
         assertThat(caseWorkerProfile.getCaseWorkerId()).isEqualTo("1");
         assertThat(caseWorkerProfile.getFirstName()).isEqualTo(cwProfileCreationRequest.getFirstName());
@@ -1023,6 +1025,7 @@ class CaseWorkerServiceImplTest {
         caseWorkerProfile.setCaseWorkerWorkAreas(caseWorkerWorkAreas);
         caseWorkerProfile.setCaseWorkerRoles(caseWorkerRoles);
         caseWorkerProfile.setCaseWorkerLocations(caseWorkerLocations);
+        caseWorkerProfile.setUserTypeId(1L);
 
         CaseWorkerProfile actualUpdatedUser = caseWorkerServiceImpl
                 .updateUserProfile(cwProfileCreationRequest, caseWorkerProfile);
