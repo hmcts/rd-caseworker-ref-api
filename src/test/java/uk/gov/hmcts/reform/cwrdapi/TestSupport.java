@@ -204,8 +204,14 @@ public class TestSupport {
 
     }
 
-
     public static StaffProfileCreationRequest  buildStaffProfileRequest() {
+        return buildStaffProfileRequest(1, "testLocation", null, null);
+    }
+
+    public static StaffProfileCreationRequest  buildStaffProfileRequest(Integer locationId1,
+                                                                        String locationName1,
+                                                                        Integer locationId2,
+                                                                        String locationName2) {
 
         StaffProfileRoleRequest caseWorkerRoleRequest =
                 new StaffProfileRoleRequest(1,"testRole1", true);
@@ -244,10 +250,34 @@ public class TestSupport {
                 .region("testRegion")
                 .userType("testUser1")
                 .services(singletonList(caseWorkerServicesRequest))
-                .baseLocations(singletonList(caseWorkerLocationRequest))
+                .baseLocations(createCaseWorkerLocationRequests(locationId1, locationName1, locationId2, locationName2))
                 .roles(singletonList(caseWorkerRoleRequest))
                 .skills(singletonList(skillsRequest))
                 .build();
     }
 
+    private static List<CaseWorkerLocationRequest> createCaseWorkerLocationRequests(Integer locationId1,
+                                                                                    String locationName1,
+                                                                                    Integer locationId2,
+                                                                                    String locationName2) {
+        List<CaseWorkerLocationRequest> caseWorkerLocationRequests = new ArrayList<>();
+        CaseWorkerLocationRequest caseWorkerLocationRequest = CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true)
+                .location(locationName1)
+                .locationId(locationId1)
+                .build();
+        caseWorkerLocationRequests.add(caseWorkerLocationRequest);
+
+        if (locationName2 != null) {
+            caseWorkerLocationRequest = CaseWorkerLocationRequest
+                    .caseWorkersLocationRequest()
+                    .isPrimaryFlag(false)
+                    .location(locationName2)
+                    .locationId(locationId2)
+                    .build();
+            caseWorkerLocationRequests.add(caseWorkerLocationRequest);
+        }
+        return caseWorkerLocationRequests;
+    }
 }
