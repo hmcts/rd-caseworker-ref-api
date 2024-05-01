@@ -381,7 +381,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
     @ParameterizedTest
     @ValueSource(strings = {"serviceCode=sddd", "location=127494", "userType=12", "jobTitle=4224",
-            "role=staff administrator", "skill=132"})
+        "role=staff administrator", "skill=132"})
     void should_return_staff_user_with_status_code_200_with_empty_search_response(String searchString) {
 
         createCaseWorkerProfiles();
@@ -451,7 +451,7 @@ public class StaffReferenceProfileAdvanceIntegrationSearchTest extends Authoriza
 
     @ParameterizedTest
     @ValueSource(strings = {"", "serviceCode=*_sd", "location=1adf*_", "userType=1sdfs*__", "jobTitle=asdfs",
-            "role=task_supervisor", "skill=asdfd"})
+        "role=task_supervisor", "skill=asdfd"})
     void should_return_status_code_400(String searchString) {
         String path = "/profile/search?";
 

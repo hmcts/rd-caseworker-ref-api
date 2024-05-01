@@ -61,8 +61,8 @@ public class StaffReferenceInternalController {
                     + "profiles based on Service Name and Pagination parameters",
             description = "**IDAM Role to access API** :\n cwd-system-user",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
