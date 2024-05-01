@@ -23,13 +23,13 @@ class CaseWorkerProfileRepositoryTest {
 
     @Test
     void findByServiceCodeTest() {
-        when(cwProfileRepository.findByEmailIdIn(any())).thenReturn(new ArrayList<>());
-        assertNotNull(cwProfileRepository.findByEmailIdIn(any()));
-        verify(cwProfileRepository, times(1)).findByEmailIdIn(any());
+        when(cwProfileRepository.findByEmailIdIgnoreCaseIn(any())).thenReturn(new ArrayList<>());
+        assertNotNull(cwProfileRepository.findByEmailIdIgnoreCaseIn(any()));
+        verify(cwProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
     }
 
     @Test
-    void findByEmailIdIgnoreCaseContaining() {
+    void findByEmailIdIgnoreCaseIgnoreCaseContaining() {
         when(cwProfileRepository.findByEmailIdIgnoreCaseContaining(any())).thenReturn(new ArrayList<>());
         assertNotNull(cwProfileRepository.findByEmailIdIgnoreCaseContaining(any()));
         verify(cwProfileRepository, times(1)).findByEmailIdIgnoreCaseContaining(any());
@@ -79,9 +79,9 @@ class CaseWorkerProfileRepositoryTest {
     }
 
     @Test
-    void findByEmailId() {
-        when(cwProfileRepository.findByEmailId(any())).thenReturn(new CaseWorkerProfile());
-        assertNotNull(cwProfileRepository.findByEmailId(any()));
-        verify(cwProfileRepository, times(1)).findByEmailId(any());
+    void findByEmailIdIgnoreCase() {
+        when(cwProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(new CaseWorkerProfile());
+        assertNotNull(cwProfileRepository.findByEmailIdIgnoreCase(any()));
+        verify(cwProfileRepository, times(1)).findByEmailIdIgnoreCase(any());
     }
 }

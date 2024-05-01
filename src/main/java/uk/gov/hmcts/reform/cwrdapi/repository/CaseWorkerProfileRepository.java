@@ -16,9 +16,9 @@ import java.util.Set;
 @Repository
 public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerProfile, Long> {
 
-    CaseWorkerProfile findByEmailId(String emailId);
+    CaseWorkerProfile findByEmailIdIgnoreCase(String emailId);
 
-    List<CaseWorkerProfile> findByEmailIdIn(Set<String> emailIds);
+    List<CaseWorkerProfile> findByEmailIdIgnoreCaseIn(Set<String> emailIds);
 
     List<CaseWorkerProfile> findByCaseWorkerIdIn(List<String> caseWorkerId);
 
