@@ -93,7 +93,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
         host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-        @VersionSelector(tag = "master")})
+            @VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
