@@ -522,7 +522,7 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
     void validateCreateCaseWorkerProfile(String emailId, String caseWorkerId) {
 
-        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase(emailId);
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailId(emailId);
 
         assertThat(caseWorkerProfile).isNotNull();
 

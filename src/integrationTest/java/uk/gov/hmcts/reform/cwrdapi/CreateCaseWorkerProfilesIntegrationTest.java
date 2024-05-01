@@ -107,7 +107,7 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         Set<String> emails = new HashSet<>();
         emails.add("test.inttest@hmcts.gov.uk");
         CaseWorkerProfile profile =
-                caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails).get(0);
+                caseWorkerProfileRepository.findByEmailIdIn(emails).get(0);
         assertThat(profile.getFirstName()).isEqualTo("firstName");
         assertThat(profile.getLastName()).isEqualTo("lastName");
         assertThat(profile.getEmailId()).isEqualTo("test.inttest@hmcts.gov.uk");

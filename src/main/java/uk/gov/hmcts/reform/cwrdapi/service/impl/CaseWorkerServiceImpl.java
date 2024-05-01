@@ -171,7 +171,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         try {
             // get all existing profiles from db (used IN clause)
-            List<CaseWorkerProfile> cwDbProfiles = caseWorkerProfileRepo.findByEmailIdIgnoreCaseIn(
+            List<CaseWorkerProfile> cwDbProfiles = caseWorkerProfileRepo.findByEmailIdIn(
                     emailToRequestMap.keySet());
 
             //remove all existing profiles requests from cwUiRequests to separate out new and update/suspend profiles

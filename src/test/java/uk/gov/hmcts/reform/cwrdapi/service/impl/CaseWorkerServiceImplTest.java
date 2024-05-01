@@ -195,7 +195,7 @@ class CaseWorkerServiceImplTest {
         String body = mapper.writeValueAsString(userProfileCreationResponse);
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(any()))
+        when(caseWorkerProfileRepository.findByEmailIdIn(any()))
                 .thenReturn(new ArrayList<>());
         when(caseWorkerIdamRoleAssociationRepository.findByRoleTypeInAndServiceCodeIn(any(), any()))
                 .thenReturn(new ArrayList<>());
@@ -261,7 +261,7 @@ class CaseWorkerServiceImplTest {
 
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(any())).thenReturn(new ArrayList<>());
+        when(caseWorkerProfileRepository.findByEmailIdIn(any())).thenReturn(new ArrayList<>());
         when(caseWorkerProfileRepository.saveAll(any())).thenReturn(singletonList(new CaseWorkerProfile()));
         List<CaseWorkersProfileCreationRequest> requests = new ArrayList<>();
         requests.add(cwProfileCreationRequest);
@@ -290,7 +290,7 @@ class CaseWorkerServiceImplTest {
         attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
         userProfileRolesResponse.setAttributeResponse(attributeResponse);
 
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(any()))
+        when(caseWorkerProfileRepository.findByEmailIdIn(any()))
                 .thenReturn(Arrays.asList(profile));
 
         when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
@@ -306,7 +306,7 @@ class CaseWorkerServiceImplTest {
 
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
         cwProfileCreationRequest.setSuspended(false);
     }
 
@@ -593,7 +593,7 @@ class CaseWorkerServiceImplTest {
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(singletonList(userType));
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(any())).thenReturn(profiles);
+        when(caseWorkerProfileRepository.findByEmailIdIn(any())).thenReturn(profiles);
         when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
@@ -613,7 +613,7 @@ class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(1)).saveAll(any());
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
         verify(caseWorkerLocationRepository, times(1)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerWorkAreaRepository, times(1)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerRoleRepository, times(1)).deleteByCaseWorkerProfileIn(any());
@@ -644,7 +644,7 @@ class CaseWorkerServiceImplTest {
         Set<String> emails = new HashSet<>();
         emails.add(cwProfileCreationRequest.getEmailId());
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails)).thenReturn(Arrays.asList(profile));
+        when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
                         .request(Request.create(Request.HttpMethod.POST, "", new HashMap<>(), Request.Body.empty(),
@@ -658,7 +658,7 @@ class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(0)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
         verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());
@@ -692,7 +692,7 @@ class CaseWorkerServiceImplTest {
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         Set<String> emails = new HashSet<>();
         emails.add(cwProfileCreationRequest.getEmailId());
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails)).thenReturn(Arrays.asList(profile));
+        when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
@@ -711,7 +711,7 @@ class CaseWorkerServiceImplTest {
         requests.add(cwProfileCreationRequest);
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
 
@@ -740,7 +740,7 @@ class CaseWorkerServiceImplTest {
 
         Set<String> emails = new HashSet<>();
         emails.add(cwProfileCreationRequest.getEmailId());
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails)).thenReturn(Arrays.asList(profile));
+        when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
 
         UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
@@ -762,7 +762,7 @@ class CaseWorkerServiceImplTest {
         requests.add(cwProfileCreationRequest);
         caseWorkerServiceImpl.processCaseWorkerProfiles(requests);
 
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
 
@@ -799,7 +799,7 @@ class CaseWorkerServiceImplTest {
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         Set<String> emails = new HashSet<>();
         emails.add(cwProfileCreationRequest.getEmailId());
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails)).thenReturn(Arrays.asList(profile));
+        when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
@@ -819,7 +819,7 @@ class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
         verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());
@@ -853,7 +853,7 @@ class CaseWorkerServiceImplTest {
         when(caseWorkerStaticValueRepositoryAccessorImpl.getRoleTypes()).thenReturn(singletonList(roleType));
         Set<String> emails = new HashSet<>();
         emails.add(cwProfileCreationRequest.getEmailId());
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails)).thenReturn(Arrays.asList(profile));
+        when(caseWorkerProfileRepository.findByEmailIdIn(emails)).thenReturn(Arrays.asList(profile));
         String userProfileResponseBody = mapper.writeValueAsString(userProfileResponse);
         when(userProfileFeignClient.getUserProfileWithRolesById(any(),any()))
                 .thenReturn(Response.builder()
@@ -870,7 +870,7 @@ class CaseWorkerServiceImplTest {
         verify(userProfileFeignClient, times(1)).getUserProfileWithRolesById(any(),any());
         verify(userProfileFeignClient, times(1)).modifyUserRoles(any(), any(), any());
         verify(caseWorkerProfileRepository, times(0)).saveAll(any());
-        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIgnoreCaseIn(any());
+        verify(caseWorkerProfileRepository, times(1)).findByEmailIdIn(any());
         verify(caseWorkerLocationRepository, times(0)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerWorkAreaRepository, times(0)).deleteByCaseWorkerProfileIn(any());
         verify(caseWorkerRoleRepository, times(0)).deleteByCaseWorkerProfileIn(any());

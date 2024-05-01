@@ -856,7 +856,7 @@ class StaffRefDataServiceImplTest {
         userProfileCreationResponse.setIdamRegistrationResponse(1);
 
         String body = mapper.writeValueAsString(userProfileCreationResponse);
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
 
         when(userProfileFeignClient.createUserProfile(any(), any())).thenReturn(Response.builder()
                 .request(mock(Request.class)).body(body, defaultCharset()).status(201).build());
@@ -876,7 +876,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_saveStaffProfileAlreadyPresent() {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest, STAFF_PROFILE_CREATE);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
@@ -888,7 +888,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_newStaffProfileSuspended() {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest, STAFF_PROFILE_CREATE);
         staffProfileCreationRequest.setSuspended(true);
@@ -1047,7 +1047,7 @@ class StaffRefDataServiceImplTest {
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
         caseWorkerProfile.setSuspended(true);
 
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
         when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
@@ -1206,7 +1206,7 @@ class StaffRefDataServiceImplTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
         when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
@@ -1259,7 +1259,7 @@ class StaffRefDataServiceImplTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
         when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
@@ -1507,7 +1507,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_reInviteStaffProfile_when_no_emailId_found() throws JsonProcessingException {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
         Exception ex = assertThrows(StaffReferenceException.class, () -> staffRefDataServiceImpl.reinviteStaffProfile(
                 staffProfileCreationRequest));
         verify(staffProfileAuditService,times(1)).saveStaffAudit(any(),any(),any(),any(),any());
@@ -1519,7 +1519,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_reInviteStaffProfile_success() throws JsonProcessingException {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("12345678");
         userProfileCreationResponse.setIdamRegistrationResponse(201);
@@ -1532,7 +1532,7 @@ class StaffRefDataServiceImplTest {
         assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
         verify(staffAuditRepository, times(0)).save(any());
         verify(caseWorkerProfileRepository, times(1))
-                .findByEmailIdIgnoreCase(any());
+                .findByEmailId(any());
         verify(caseWorkerProfileRepository,times(1)).delete(any());
         verify(cwrCommonRepository,times(1)).flush();
 
@@ -1540,7 +1540,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_reInviteStaffProfile_Bad_Request() throws JsonProcessingException {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
         UserProfileCreationResponse userProfileCreationResponse = new UserProfileCreationResponse();
         userProfileCreationResponse.setIdamId("12345678");
         userProfileCreationResponse.setIdamRegistrationResponse(1);
@@ -1557,7 +1557,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_checkStaffProfileEmailAndSuspendFlag_ProfileAlreadyPresent() {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
 
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
             staffRefDataServiceImpl.checkStaffProfileEmailAndSuspendFlag(staffProfileCreationRequest);
@@ -1568,7 +1568,7 @@ class StaffRefDataServiceImplTest {
 
     @Test
     void test_checkStaffProfileEmailAndSuspendFlag_ProfileSuspended() {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
 
         staffProfileCreationRequest.setSuspended(true);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {

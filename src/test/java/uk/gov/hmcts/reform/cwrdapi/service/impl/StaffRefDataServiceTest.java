@@ -259,7 +259,7 @@ class StaffRefDataServiceTest {
     @Test
     @DisplayName("staff profile email id already present")
     void test_saveStaffProfileAlreadyPresent() {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234",staffProfileCreationRequest, STAFF_PROFILE_CREATE);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
@@ -272,7 +272,7 @@ class StaffRefDataServiceTest {
     @Test
     @DisplayName("suspended flag true for new create staff user")
     void test_SuspendStaffProfileTrue() {
-        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
         staffProfileCreationRequest.setSuspended(true);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234",staffProfileCreationRequest, STAFF_PROFILE_CREATE);
