@@ -67,7 +67,8 @@ public class DeleteCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
 
         assertThat(createResponse).containsEntry("http_status", "201 CREATED");
 
-        CaseWorkerProfile createdProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase("test.inttest@hmcts.gov.uk");
+        CaseWorkerProfile createdProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase(
+                "test.inttest@hmcts.gov.uk");
 
         //Check Created User Exists
         assertThat(createdProfile).isNotNull();
@@ -97,7 +98,8 @@ public class DeleteCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
 
         assertThat(createResponse).containsEntry("http_status", "201 CREATED");
 
-        CaseWorkerProfile createdProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase("test.inttest@hmcts.gov.uk");
+        CaseWorkerProfile createdProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase(
+                "test.inttest@hmcts.gov.uk");
 
         //Check Created User Exists
         assertThat(createdProfile).isNotNull();
@@ -110,7 +112,8 @@ public class DeleteCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
 
         assertThat(deleteResponse).containsEntry("status", "204 NO_CONTENT");
 
-        CaseWorkerProfile deletedProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase("test.inttest@hmcts.gov.uk");
+        CaseWorkerProfile deletedProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase(
+                "test.inttest@hmcts.gov.uk");
 
         //Check Deleted User Does Not Exist
         assertThat(deletedProfile).isNull();

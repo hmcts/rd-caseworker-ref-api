@@ -209,7 +209,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
-        CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailIdIgnoreCase(profileRequest.getEmailId().toLowerCase());
+        CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailIdIgnoreCase(
+                profileRequest.getEmailId().toLowerCase());
 
         if (isNotEmpty(dbCaseWorker)) {
             invalidRequestError(profileRequest, PROFILE_ALREADY_CREATED);
