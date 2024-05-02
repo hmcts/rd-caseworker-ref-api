@@ -503,10 +503,10 @@ public class StaffReferenceDataProviderTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        when(caseWorkerProfileRepo.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepo.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
-        when(caseWorkerProfileRepo.findByEmailIdIn(anySet()))
+        when(caseWorkerProfileRepo.findByEmailIdIgnoreCaseIn(anySet()))
                 .thenReturn(caseWorkerProfiles);
         when(caseWorkerProfileRepo.saveAll(anyList())).thenReturn(caseWorkerProfiles);
 
