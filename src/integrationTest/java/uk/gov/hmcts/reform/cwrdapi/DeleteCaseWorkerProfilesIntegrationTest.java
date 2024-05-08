@@ -89,6 +89,37 @@ public class DeleteCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
     }
 
     @Test
+    public void deleteCaseWorkerProfileByIdMixedCase() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        //Create User
+        Map<String, Object> createResponse = caseworkerReferenceDataClient
+                .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+
+        assertThat(createResponse).containsEntry("http_status", "201 CREATED");
+
+        CaseWorkerProfile createdProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase(
+                "Test.Inttest@hmcts.gov.uk");
+
+        //Check Created User Exists
+        assertThat(createdProfile).isNotNull();
+
+        userProfileDeleteUserWireMock();
+
+        //Delete User By User ID
+        Map<String, Object> deleteResponse = caseworkerReferenceDataClient
+                .deleteCaseWorker("/users?userId=" + createdProfile.getCaseWorkerId());
+
+        assertThat(deleteResponse).containsEntry("status", "204 NO_CONTENT");
+
+        Optional<CaseWorkerProfile> deletedProfile =
+                caseWorkerProfileRepository.findByCaseWorkerId(createdProfile.getCaseWorkerId());
+
+        //Check Deleted User Does Not Exist
+        assertThat(deletedProfile).isEmpty();
+    }
+
+    @Test
     public void deleteCaseWorkerProfileByEmailPattern() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
 

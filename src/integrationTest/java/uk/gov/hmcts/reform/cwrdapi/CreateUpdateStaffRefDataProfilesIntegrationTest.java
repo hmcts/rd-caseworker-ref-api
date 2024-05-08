@@ -73,7 +73,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
                 .caseWorkersProfileCreationRequest()
                 .firstName(" firstName ")
                 .lastName(" lastName ")
-                .emailId("test.inttest@hmcts.gov.uk")
+                .emailId("TEST.inttest@hmcts.gov.uk")
                 .regionId(1).userType("CTSC")
                 .region("region")
                 .suspended(false)
