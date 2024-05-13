@@ -209,7 +209,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public void checkStaffProfileEmailAndSuspendFlag(StaffProfileCreationRequest profileRequest) {
 
         // get all existing profile from db (used IN clause)
-        CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailId(profileRequest.getEmailId().toLowerCase());
+        CaseWorkerProfile dbCaseWorker = caseWorkerProfileRepo.findByEmailIdIgnoreCase(
+                profileRequest.getEmailId().toLowerCase());
 
         if (isNotEmpty(dbCaseWorker)) {
             invalidRequestError(profileRequest, PROFILE_ALREADY_CREATED);
@@ -676,7 +677,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public StaffProfileCreationResponse reinviteStaffProfile(StaffProfileCreationRequest profileRequest) {
 
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
-                .findByEmailId(profileRequest.getEmailId().toLowerCase());
+                .findByEmailIdIgnoreCase(profileRequest.getEmailId().toLowerCase());
         //if caseworker profile does not have the input emailid throw error
         if (caseWorkerProfile == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, PROFILE_NOT_PRESENT_IN_SRD,
@@ -706,7 +707,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
         // get all existing profile from db (used IN clause)
         CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepo
-                .findByEmailId(profileRequest.getEmailId().toLowerCase());
+                .findByEmailIdIgnoreCase(profileRequest.getEmailId().toLowerCase());
         if (caseWorkerProfile == null) {
             staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE,PROFILE_NOT_PRESENT_IN_SRD,
                     StringUtils.EMPTY,profileRequest,STAFF_PROFILE_UPDATE);

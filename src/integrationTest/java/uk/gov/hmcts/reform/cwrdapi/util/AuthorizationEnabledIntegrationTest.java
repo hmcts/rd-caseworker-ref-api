@@ -59,7 +59,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @SerenityTest
 @WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
-        "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
+    "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 

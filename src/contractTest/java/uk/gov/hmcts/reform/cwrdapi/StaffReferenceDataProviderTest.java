@@ -93,7 +93,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
         host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-        @VersionSelector(tag = "master")})
+            @VersionSelector(tag = "master")})
 @IgnoreNoPactsToVerify
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
@@ -503,10 +503,10 @@ public class StaffReferenceDataProviderTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        when(caseWorkerProfileRepo.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepo.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
-        when(caseWorkerProfileRepo.findByEmailIdIn(anySet()))
+        when(caseWorkerProfileRepo.findByEmailIdIgnoreCaseIn(anySet()))
                 .thenReturn(caseWorkerProfiles);
         when(caseWorkerProfileRepo.saveAll(anyList())).thenReturn(caseWorkerProfiles);
 
