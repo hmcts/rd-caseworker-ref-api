@@ -180,8 +180,9 @@ class StaffProfileCreateUpdateUtilTest {
 
     @Test
     void testGetUserTypeIdByDesc() {
+        when(caseWorkerStaticValueRepositoryAccessorImpl.getUserTypes()).thenReturn(List.of(userType));
         staffProfileCreateUpdateUtil.getUserTypeIdByDesc(
-                "1");
+                "testUser1");
         verify(caseWorkerStaticValueRepositoryAccessorImpl, times(1)).getUserTypes();
     }
 }

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
@@ -88,6 +89,7 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LRD_ERROR;
@@ -457,7 +459,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .regionName(profile.getRegion())
                 .userType(profile.getUserType().getDescription())
                 .userId(profile.getUserTypeId())
-                .suspended(profile.getSuspended().toString())
+                .suspended(Boolean.TRUE.equals(profile.getSuspended())
+                        ? Boolean.TRUE.toString() : Boolean.FALSE.toString())
                 .staffAdmin(Boolean.TRUE.equals(profile.getUserAdmin()) ? "Y" : "N")
                 .createdTime(profile.getCreatedDate())
                 .lastUpdatedTime(profile.getLastUpdate())
@@ -843,7 +846,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .stream().filter(userType ->
                         userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
                 .map(UserType::getUserTypeId).findFirst();
-        return userTypeId.orElse(0L);
+        return userTypeId.orElseThrow(() -> new InvalidRequestException(BAD_REQUEST));
     }
 
 
