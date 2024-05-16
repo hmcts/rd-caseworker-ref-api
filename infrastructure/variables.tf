@@ -60,6 +60,7 @@ variable "team_contact" {
   description = "The name of your Slack channel people can use to contact your team about your infrastructure"
   default     = "#refdata-pet"
 }
+
 variable "destroy_me" {
   type        = string
   description = "In the future if this is set to Yes then automation will delete this resource on a schedule. Please set to No unless you know what you are doing"
