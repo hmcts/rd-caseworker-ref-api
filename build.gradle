@@ -568,6 +568,10 @@ dependencyManagement {
 }
 
 dependencyCheck {
+  analyzers {
+    // Disable scanning of .NET related binaries
+    assemblyEnabled = false
+  }
   suppressionFile = 'config/owasp/suppressions.xml'
 }
 
