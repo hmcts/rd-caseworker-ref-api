@@ -11,7 +11,7 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.39'
+    id 'uk.gov.hmcts.java' version '0.12.61'
     id 'jacoco'
     id 'pmd'
     id 'com.github.ben-manes.versions' version '0.43.0'
@@ -568,6 +568,10 @@ dependencyManagement {
 }
 
 dependencyCheck {
+  analyzers {
+    // Disable scanning of .NET related binaries
+    assemblyEnabled = false
+  }
   suppressionFile = 'config/owasp/suppressions.xml'
 }
 
