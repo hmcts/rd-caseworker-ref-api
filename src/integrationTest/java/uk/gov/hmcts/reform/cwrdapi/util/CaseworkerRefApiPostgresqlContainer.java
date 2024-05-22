@@ -6,7 +6,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 public class CaseworkerRefApiPostgresqlContainer extends PostgreSQLContainer<CaseworkerRefApiPostgresqlContainer> {
-    private static final String IMAGE_VERSION = "postgres:16.2";
+    private static final String IMAGE_VERSION = "postgres:16";
 
     private CaseworkerRefApiPostgresqlContainer() {
         super(IMAGE_VERSION);
