@@ -6,8 +6,8 @@ java:
   ingressHost: rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: rd
   environment:
-    POSTGRES_HOST: rd-caseworker-ref-api-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
-    POSTGRES_USERNAME: dbrdcaseworker@rd-caseworker-ref-api-postgres-db-{{ .Values.global.environment }}
+    POSTGRES_HOST: rd-caseworker-ref-api-postgres-db-v16-{{ .Values.global.environment }}.postgres.database.azure.com
+    POSTGRES_USERNAME: pgadmin
     POSTGRES_DB_NAME: dbrdcaseworker
     POSTGRES_PORT: 5432
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
