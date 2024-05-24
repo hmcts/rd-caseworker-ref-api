@@ -45,6 +45,11 @@ spring:
   flyway.enabled: true
   flyway.schemas: dbrdcaseworker,rdstaffreport
   flyway.locations: classpath:db/migration
+  driverClassName: org.postgresql.Driver
+  flyway.url: "jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5457}/${POSTGRES_DB_NAME:dbrdcaseworker}${POSTGRES_CONNECTION_OPTIONS:}"
+  flyway.user: pgadmin
+  flyway.password: ${POSTGRES_PASSWORD:dbrdcaseworker}
+
   cache:
     cache-names: token
     caffeine:

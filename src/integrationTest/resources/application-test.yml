@@ -43,7 +43,11 @@ spring:
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
   flyway.locations: classpath:db/testmigration
-
+  flyway.schemas: dbrdcaseworker,rdstaffreport
+  driverClassName: org.postgresql.Driver
+  flyway.url: "jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5457}/${POSTGRES_DB_NAME:dbrdcaseworker}${POSTGRES_CONNECTION_OPTIONS:}"
+  flyway.user: pgadmin
+  flyway.password: ${POSTGRES_PASSWORD:dbrdcaseworker}
   ### database configuration
   datasource:
     url: ${DB_URL:jdbc:tc:postgresql:///dbrdcaseworker}
