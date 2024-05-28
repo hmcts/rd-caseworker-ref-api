@@ -105,6 +105,17 @@ variable "kv_subscription" {
   description = "Update this with the name of the subscription where the single server key vault is. Defaults to DCD-CNP-DEV."
 }
 
+variable "enable_replica" {
+  description = "Flag to enable the creation of a PostgreSQL Flexible server replica"
+  type        = bool
+  default     = false
+}
+variable "primary_server_id" {
+  description = "Azure resource ID of the primary PostgreSQL server"
+  type        = string
+  default     = "not_applicable" // Dummy Value for none replica environments
+}
+
 variable "pgsql_server_configuration" {
   description = "Postgres server configuration"
   type        = list(object({ name : string, value : string }))
