@@ -8,3 +8,5 @@ pgsql_server_configuration = [
     name  = "backslash_quote"
     value = "ON"
   }]
+# PG Flexible Server replica enable for this env (AAT)
+enable_replica = true
