@@ -108,7 +108,7 @@ variable "kv_subscription" {
 variable "enable_replica" {
   description = "Flag to enable the creation of a PostgreSQL Flexible server replica"
   type        = bool
-  default     = false
+  default     = true
 }
 variable "primary_server_id" {
   description = "Azure resource ID of the primary PostgreSQL server"
