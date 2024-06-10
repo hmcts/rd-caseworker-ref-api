@@ -1,5 +1,9 @@
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 provider "azurerm" {
@@ -15,12 +19,12 @@ terraform {
   required_providers {
     azurerm = {
       source = "hashicorp/azurerm"
-      version = "~> 3.98.0"
+      version = "~> 3.106"
     }
 
     azuread = {
       source  = "hashicorp/azuread"
-      version = "2.47.0"
+      version = "2.50.0"
     }
   }
 }

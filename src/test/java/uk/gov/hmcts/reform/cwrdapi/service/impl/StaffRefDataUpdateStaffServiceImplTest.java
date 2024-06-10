@@ -275,7 +275,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
     @Test
     void test_saveStaffProfileAlreadyPresent() {
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_CREATE);
         InvalidRequestException thrown = Assertions.assertThrows(InvalidRequestException.class, () -> {
@@ -287,7 +287,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
 
     @Test
     void test_newStaffProfileSuspended() {
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
         staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, null,
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_CREATE);
         staffProfileCreationRequest.setSuspended(true);
@@ -311,7 +311,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
 
@@ -374,7 +374,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(null);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(null);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
 
@@ -424,7 +424,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
 
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
 
@@ -478,7 +478,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
         caseWorkerProfile.setSuspended(true);
 
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
 
@@ -539,7 +539,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
         caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
         caseWorkerProfile.setSuspended(true);
 
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
 
         List<CaseWorkerProfile> caseWorkerProfiles = singletonList(caseWorkerProfile);
         when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
@@ -1152,7 +1152,7 @@ class StaffRefDataUpdateStaffServiceImplTest {
                 "1234", staffProfileCreationRequest,STAFF_PROFILE_UPDATE);
         CaseWorkerProfile caseWorkerProfile = null;
 
-        when(caseWorkerProfileRepository.findByEmailId(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
 
         StaffProfileCreationRequest staffProfileCreationRequest =  getStaffProfileUpdateRequest();
 

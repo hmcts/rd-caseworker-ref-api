@@ -73,7 +73,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
                 .caseWorkersProfileCreationRequest()
                 .firstName(" firstName ")
                 .lastName(" lastName ")
-                .emailId("test.inttest@hmcts.gov.uk")
+                .emailId("TEST.inttest@hmcts.gov.uk")
                 .regionId(1).userType("CTSC")
                 .region("region")
                 .suspended(false)
@@ -109,7 +109,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         Set<String> emails = new HashSet<>();
         emails.add("test.inttest@hmcts.gov.uk");
         CaseWorkerProfile profile =
-                caseWorkerProfileRepository.findByEmailIdIn(emails).get(0);
+                caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails).get(0);
         assertThat(profile.getFirstName()).isEqualTo("firstName");
         assertThat(profile.getLastName()).isEqualTo("lastName");
         assertThat(profile.getEmailId()).isEqualTo("test.inttest@hmcts.gov.uk");

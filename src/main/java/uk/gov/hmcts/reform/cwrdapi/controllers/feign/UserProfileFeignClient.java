@@ -21,14 +21,14 @@ public interface UserProfileFeignClient {
     @PostMapping(value = "/v1/userprofile")
     @RequestLine("POST /v1/userprofile")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
-            "Content-Type: application/json"})
+        "Content-Type: application/json"})
     Response createUserProfile(@RequestBody UserProfileCreationRequest userProfileCreationRequest,
                                @RequestParam(value = "origin") String origin);
 
     @PutMapping(value = "/v1/userprofile/{userId}")
     @RequestLine("PUT /v1/userprofile/{userId}")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
-            "Content-Type: application/json"})
+        "Content-Type: application/json"})
     Response modifyUserRoles(@RequestBody UserProfileUpdatedData modifyRoles, @PathVariable("userId") String userId,
                              @RequestParam(value = "origin") String origin);
 
@@ -48,7 +48,7 @@ public interface UserProfileFeignClient {
     @GetMapping(value = "/v1/userprofile")
     @RequestLine("GET /v1/userprofile")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
-            "Content-Type: application/json"})
+        "Content-Type: application/json"})
     Response getUserProfile(@RequestParam(value = "userId") String userId);
 
 }
