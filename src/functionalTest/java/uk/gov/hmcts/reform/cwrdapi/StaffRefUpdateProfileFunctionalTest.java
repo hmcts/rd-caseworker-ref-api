@@ -535,7 +535,7 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
         assertThat(staffProfileResponse1).isNotNull();
 
-        assertThat(staffProfileCreationRequest.isSuspended()).isTrue();
+        assertThat(staffProfileCreationRequest.getSuspended()).isTrue();
         assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
         assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
         response = caseWorkerApiClient.updateStaffUserProfile(staffProfileCreationRequest);
@@ -583,7 +583,7 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
         assertThat(staffProfileResponse1).isNotNull();
 
-        assertThat(staffProfileCreationRequest.isSuspended()).isFalse();
+        assertThat(staffProfileCreationRequest.getSuspended()).isFalse();
         assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
         assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
         staffProfileCreationRequest.setSuspended(true);
@@ -640,7 +640,7 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
         StaffProfileCreationResponse staffProfileResponse1 = response.getBody().as(StaffProfileCreationResponse.class);
         assertThat(staffProfileResponse1).isNotNull();
 
-        assertThat(staffProfileCreationRequest.isSuspended()).isFalse();
+        assertThat(staffProfileCreationRequest.getSuspended()).isFalse();
         assertThat(staffProfileCreationRequest.getFirstName()).isEqualTo("StaffProfilefirstName");
         assertThat(staffProfileCreationRequest.getLastName()).isEqualTo("StaffProfilelastName");
         staffProfileCreationRequest.setSuspended(true);
