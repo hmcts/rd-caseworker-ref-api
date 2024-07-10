@@ -15,7 +15,7 @@ public interface LocationReferenceDataFeignClient {
     @GetMapping(value = "/refdata/location/orgServices")
     @RequestLine("GET /refdata/location/orgServices")
     @Headers({"Authorization: {authorization}", "ServiceAuthorization: {serviceAuthorization}",
-            "Content-Type: application/json"})
+        "Content-Type: application/json"})
     Response getLocationRefServiceMapping(@RequestParam String ccdServiceNames);
 
 }

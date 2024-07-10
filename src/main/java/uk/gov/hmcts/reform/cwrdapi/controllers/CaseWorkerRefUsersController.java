@@ -100,8 +100,8 @@ public class CaseWorkerRefUsersController {
             summary = "This API creates caseworker profiles",
             description = "This API will be invoked by user having idam role of cwd-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -172,8 +172,8 @@ public class CaseWorkerRefUsersController {
             summary = "This API gets the User details from Caseworker Profile",
             description = "This API will be invoked by user having idam role of cwd-system-user",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -226,8 +226,8 @@ public class CaseWorkerRefUsersController {
     @Operation(summary = "Delete Case Worker Profiles by User ID or Email Pattern",
             description = "This API is only for use in non Prod environments",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             })
     @ApiResponse(
             responseCode = "204",
