@@ -45,13 +45,13 @@ variable "db_replicas" {
 
 
 variable "product-v16" {
-  type = string
-  default="rd-caseworker-ref-api"
+  type    = string
+  default = "rd-caseworker-ref-api"
 }
 
 variable "component-v16" {
-  type = string
-  default="postgres-db-v16"
+  type    = string
+  default = "postgres-db-v16"
 }
 variable "aks_subscription_id" {
 }

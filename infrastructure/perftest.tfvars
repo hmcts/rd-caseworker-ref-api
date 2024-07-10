@@ -1,1 +1,1 @@
-db_replicas = [ "replica" ]
+db_replicas = ["replica"]
