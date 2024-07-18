@@ -65,6 +65,9 @@ withNightlyPipeline(type, product, component) {
   env.Rules = params.SecurityRules
   env.execution_environment = "aat"
 
+  // Var for testcontainers.org
+  env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
+
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
 
