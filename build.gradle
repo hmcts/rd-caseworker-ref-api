@@ -423,7 +423,7 @@ dependencies {
   implementation group: 'net.minidev', name: 'json-smart', version: '2.4.11'
 
 
-  testImplementation ('com.github.hmcts:rd-commons-lib:v0.0.13'){
+  testImplementation ('com.github.hmcts:rd-commons-lib:0.0.18'){
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
   //Fix for CVE-2021-29425
