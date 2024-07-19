@@ -470,7 +470,7 @@ dependencies {
 
 
 
-  testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.1'
+  testImplementation group: 'org.skyscreamer', name: 'jsonassert', version: '1.5.3'
 
 
   contractTestImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
