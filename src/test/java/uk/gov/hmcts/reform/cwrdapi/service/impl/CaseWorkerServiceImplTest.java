@@ -924,7 +924,7 @@ class CaseWorkerServiceImplTest {
         ResponseEntity<Object> responseEntity = caseWorkerServiceImpl
                 .fetchStaffProfilesForRoleRefresh("cmc", pageRequest);
 
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(200, responseEntity.getStatusCode().value());
 
     }
 

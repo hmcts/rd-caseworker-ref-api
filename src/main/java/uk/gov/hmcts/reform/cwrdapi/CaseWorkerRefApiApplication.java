@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.microsoft.applicationinsights.attach.ApplicationInsights;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 public class CaseWorkerRefApiApplication {
 
     public static void main(final String[] args) {
+        ApplicationInsights.attach();
         SpringApplication.run(CaseWorkerRefApiApplication.class, args);
     }
 }

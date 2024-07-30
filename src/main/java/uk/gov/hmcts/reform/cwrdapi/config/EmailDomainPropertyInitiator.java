@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Locale;
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @NoArgsConstructor
