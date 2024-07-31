@@ -34,7 +34,7 @@ import javax.inject.Inject;
 @Configuration
 @ConfigurationProperties(prefix = "security")
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @Slf4j
 @SuppressWarnings("unchecked")
 public class SecurityConfiguration {
