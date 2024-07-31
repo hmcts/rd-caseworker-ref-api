@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Locale;
@@ -26,7 +25,6 @@ public class EmailDomainPropertyInitiator {
         EmailDomainPropertyInitiator.emailDomains = emailDomains.toLowerCase(Locale.ENGLISH);
     }
 
-    @Bean
     @PostConstruct
     public void getPropertySupportBean() {
         if (ObjectUtils.isNotEmpty(this.tempEmailDomains)) {

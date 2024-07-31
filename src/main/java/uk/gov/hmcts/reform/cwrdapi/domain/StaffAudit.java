@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.domain;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +23,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SequenceGenerator(name = "staff_audit_id_seq", sequenceName = "staff_audit_id_seq", allocationSize = 1)
-@Convert(attributeName = "jsonb", converter = JsonBinaryType.class)
 public class StaffAudit implements Serializable {
 
     @Id
@@ -54,7 +50,6 @@ public class StaffAudit implements Serializable {
     private String operationType;
 
     @Column(name = "request_log",columnDefinition = "json")
-    @Convert(converter = JsonType.class)
     private String requestLog;
 
 }

@@ -42,11 +42,11 @@ def versions = [
   jackson            : '2.17.2',
   log4j              : '2.23.1',
   poi                : '4.1.2',
-  logback            : '1.2.13',
-  testContainer_postgresql: '1.20.0',
+  reformS2sClient    : '5.1.0',
+  tc_postgresql      : '1.20.0',
   bouncycastle       : '1.78.1',
-  junit           : '5.9.2',
-  junitPlatform   : '1.10.3',
+  junit              : '5.9.2',
+  junitPlatform      : '1.10.3',
 ]
 
 ext {
@@ -350,10 +350,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-core'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
-  implementation ('org.springframework.boot:spring-boot-starter-security') {
-    exclude module: "spring-boot-starter-logging"
-    exclude module: "logback-classic"
-  }
+  implementation 'org.springframework.boot:spring-boot-starter-security'
 
   implementation group: 'org.springframework', name: 'spring-core'
   implementation group: 'org.springframework', name: 'spring-beans'
@@ -375,10 +372,10 @@ dependencies {
   testImplementation 'net.serenity-bdd:serenity-rest-assured:3.8.1'
   testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: '3.8.1'
   implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '2.3.9'
-  implementation 'com.github.hmcts:service-auth-provider-java-client:4.0.3'
-
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
+  implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
@@ -409,14 +406,11 @@ dependencies {
   implementation group: 'com.azure', name: 'azure-core', version: '1.50.0'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.2'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
-  implementation group: 'ch.qos.logback', name: 'logback-core', version: versions.logback
-  implementation group: 'ch.qos.logback', name: 'logback-classic', version: versions.logback
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
   implementation "io.github.openfeign:feign-httpclient:11.9.1"
   implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
-  implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.21.1'
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.8'
@@ -446,11 +440,10 @@ dependencies {
     exclude group: "org.hamcrest", module: "hamcrest-library"
   }
 
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testContainer_postgresql
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testContainer_postgresql
-    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.testContainer_postgresql
-
-    testImplementation ("com.github.tomakehurst:wiremock-jre8:2.32.0") {
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.tc_postgresql
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.tc_postgresql
+    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.tc_postgresql
+    testImplementation('com.github.tomakehurst:wiremock:2.27.2') {
       exclude group: 'com.github.jknack'
     }
   testImplementation ("org.mockito:mockito-core:4.3.1") {
@@ -483,7 +476,7 @@ dependencies {
   testImplementation 'io.github.openfeign:feign-jackson:12.1'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
-  testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock:3.1.10'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testImplementation group: 'org.springframework', name: 'spring-test'
   testImplementation('com.opentable.components:otj-pg-embedded:0.13.4')
