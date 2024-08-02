@@ -46,7 +46,7 @@ def versions = [
   tc_postgresql      : '1.20.0',
   bouncycastle       : '1.78.1',
   junit              : '5.9.2',
-  junitPlatform      : '1.10.3',
+  junitPlatform      : '1.10.3'
 ]
 
 ext {
