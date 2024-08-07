@@ -42,6 +42,7 @@ spring:
             client-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
   jackson.date-format: yyyy-MM-dd
   flyway.enabled: true
+  flyway.cleanDisabled: false
   flyway.locations: classpath:db/testmigration
 
   ### database configuration
