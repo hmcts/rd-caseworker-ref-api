@@ -24,7 +24,9 @@ import static java.util.Objects.isNull;
 import static org.mockito.Mockito.mock;
 
 @Configuration
-@ComponentScan({"uk.gov.hmcts.reform.cwrdapi"})
+@ComponentScan({"uk.gov.hmcts.reform.cwrdapi",
+        "uk.gov.hmcts.reform.idam",
+        "uk.gov.hmcts.reform.authorisation"})
 @Lazy
 public class TestConfig {
 
