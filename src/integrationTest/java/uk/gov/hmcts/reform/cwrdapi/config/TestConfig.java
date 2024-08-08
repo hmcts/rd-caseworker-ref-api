@@ -5,7 +5,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
@@ -24,7 +23,6 @@ import static java.util.Objects.isNull;
 import static org.mockito.Mockito.mock;
 
 @Configuration
-@ComponentScan({"uk.gov.hmcts.reform.cwrdapi", "uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.authorisation"})
 @Lazy
 public class TestConfig {
 
