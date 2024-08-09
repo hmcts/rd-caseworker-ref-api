@@ -48,10 +48,10 @@ class CaseWorkerProfileRepositoryTest {
         caseWorkerProfiles.add(new CaseWorkerProfile());
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 
-        when(cwProfileRepository.findByFirstNameOrLastNameIgnoreCase(any(),any()))
+        when(cwProfileRepository.findByFirstNameOrLastName(any(),any()))
                 .thenReturn(pages);
-        assertNotNull(cwProfileRepository.findByFirstNameOrLastNameIgnoreCase(any(),any()));
-        verify(cwProfileRepository, times(1)).findByFirstNameOrLastNameIgnoreCase(any(),any());
+        assertNotNull(cwProfileRepository.findByFirstNameOrLastName(any(),any()));
+        verify(cwProfileRepository, times(1)).findByFirstNameOrLastName(any(),any());
     }
 
     @Test

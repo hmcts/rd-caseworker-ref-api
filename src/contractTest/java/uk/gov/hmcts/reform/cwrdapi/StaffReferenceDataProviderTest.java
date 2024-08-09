@@ -262,7 +262,7 @@ public class StaffReferenceDataProviderTest {
         caseWorkerProfiles.add(caseWorkerProfile);
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 
-        when(caseWorkerProfileRepo.findByFirstNameOrLastNameIgnoreCase(searchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
 
 
