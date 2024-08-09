@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerStaticValueRepositoryAccess
 
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.PostConstruct;
 
 @Component
 public class CaseWorkerStaticValueRepositoryAccessorImpl implements CaseWorkerStaticValueRepositoryAccessor {

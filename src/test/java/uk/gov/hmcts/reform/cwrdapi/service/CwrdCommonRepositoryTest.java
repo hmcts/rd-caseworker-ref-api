@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import javax.persistence.EntityManager;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

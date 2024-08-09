@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import jakarta.validation.ConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileRoleRequest;
 
 import java.util.Collections;
 import java.util.List;
-import javax.validation.ConstraintValidatorContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

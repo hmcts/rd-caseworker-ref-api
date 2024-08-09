@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.internal.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,7 +15,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.cwrdapi.controllers.internal.CaseWorkerInternalApiClient;
 
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
 import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;

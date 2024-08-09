@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class CaseWorkerProfileValidator implements ConstraintValidator<ValidateCaseWorkerProfile,
     CaseWorkersProfileUpdationRequest> {

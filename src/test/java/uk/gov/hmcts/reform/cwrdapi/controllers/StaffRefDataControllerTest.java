@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
@@ -668,7 +668,7 @@ class StaffRefDataControllerTest {
     void should_return_staffCreateResponse_with_status_code_200() {
         ResponseEntity<StaffProfileCreationResponse> actual = staffRefDataController
                 .createStaffUserProfile(request);
-        assertThat(actual.getStatusCodeValue()).isEqualTo(201);
+        assertThat(actual.getStatusCode().value()).isEqualTo(201);
     }
 
 

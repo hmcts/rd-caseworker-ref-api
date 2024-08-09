@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.ConstraintValidatorContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

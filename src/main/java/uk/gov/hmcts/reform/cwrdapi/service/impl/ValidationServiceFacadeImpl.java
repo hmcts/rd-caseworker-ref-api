@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.service.impl;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,8 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.transaction.Transactional;
-import javax.validation.ConstraintViolation;
 
 import static java.util.Arrays.stream;
 import static java.util.Objects.isNull;
