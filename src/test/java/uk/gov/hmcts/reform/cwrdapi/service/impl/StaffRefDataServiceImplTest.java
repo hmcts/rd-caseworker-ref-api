@@ -517,8 +517,9 @@ class StaffRefDataServiceImplTest {
                         20, 1);
         String modifiedSearchString = generateSearchString(searchString);
 
-        when(caseWorkerProfileRepository.findByFirstNameOrLastNameIgnoreCase(modifiedSearchString.toLowerCase(), pageRequest))
-                .thenReturn(pages);
+        when(caseWorkerProfileRepository.findByFirstNameOrLastNameIgnoreCase(
+                modifiedSearchString.toLowerCase(),
+                pageRequest)).thenReturn(pages);
 
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString.toLowerCase(), pageRequest);
