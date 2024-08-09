@@ -428,7 +428,7 @@ class StaffRefDataServiceImplTest {
         caseWorkerProfiles.add(caseWorkerProfile);
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepository.findByFirstNameOrLastNameIgnoreCase(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
@@ -460,7 +460,7 @@ class StaffRefDataServiceImplTest {
                 validateAndBuildPagination(20, 1,
                         20, 1);
         String searchString = "cwr";
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepository.findByFirstNameOrLastNameIgnoreCase(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
@@ -485,7 +485,7 @@ class StaffRefDataServiceImplTest {
         ArrayList<CaseWorkerProfile> caseWorkerProfiles = new ArrayList<>();
         Page<CaseWorkerProfile> pages = new PageImpl<>(caseWorkerProfiles);
 
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepository.findByFirstNameOrLastNameIgnoreCase(searchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
@@ -517,7 +517,7 @@ class StaffRefDataServiceImplTest {
                         20, 1);
         String modifiedSearchString = generateSearchString(searchString);
 
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(modifiedSearchString.toLowerCase(), pageRequest))
+        when(caseWorkerProfileRepository.findByFirstNameOrLastNameIgnoreCase(modifiedSearchString.toLowerCase(), pageRequest))
                 .thenReturn(pages);
 
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =

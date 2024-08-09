@@ -415,7 +415,7 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                                                                                  PageRequest pageRequest) {
         searchString = generateSQLSearchString(searchString);
         Page<CaseWorkerProfile> pageable =
-                caseWorkerProfileRepo.findByFirstNameOrLastName(searchString.toLowerCase(), pageRequest);
+                caseWorkerProfileRepo.findByFirstNameOrLastNameIgnoreCase(searchString.toLowerCase(), pageRequest);
         long totalRecords = pageable.getTotalElements();
 
         List<CaseWorkerProfile> caseWorkerProfiles = pageable.getContent();
