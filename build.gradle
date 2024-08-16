@@ -427,7 +427,7 @@ dependencies {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-web'
   }
   //Fix for CVE-2021-29425
-  implementation 'commons-io:commons-io:2.15.1'
+  implementation 'commons-io:commons-io:2.16.1'
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
