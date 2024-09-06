@@ -51,7 +51,7 @@ public class ExceptionCaseWorker implements Serializable {
     private String fieldInError;
 
     @Column(name = "error_description")
-    @Size(max = 512)
+    @Size(max = 2000)
     private String errorDescription;
 
     @UpdateTimestamp
