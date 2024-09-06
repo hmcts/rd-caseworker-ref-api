@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.cwrdapi.controllers.advice;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public class StaffReferenceException extends RuntimeException {
 
-    private final HttpStatusCode status;
+    private final HttpStatus status;
     private final String errorMessage;
     private final String errorDescription;
 
-    public StaffReferenceException(HttpStatusCode status,
+    public StaffReferenceException(HttpStatus status,
                                    String errorMessage,
                                    String errorDescription) {
         super(errorMessage);

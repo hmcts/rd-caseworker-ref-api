@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -100,7 +100,7 @@ public class ExceptionMapper {
 
     @ExceptionHandler(StaffReferenceException.class)
     public ResponseEntity<Object> handleJsonFeignResponseException(StaffReferenceException ex) {
-        ErrorResponse errorDetails = new ErrorResponse(ex.getStatus().value(), ex.getMessage(),
+        ErrorResponse errorDetails = new ErrorResponse(ex.getStatus().value(),ex.getStatus().getReasonPhrase(),
                 ex.getErrorMessage(), ex.getErrorDescription(), getTimeStamp());
 
         return new ResponseEntity<>(errorDetails, ex.getStatus());
@@ -137,10 +137,10 @@ public class ExceptionMapper {
         return rootException;
     }
 
-    public ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatusCode httpStatus, String errorMsg) {
+    public ResponseEntity<Object> errorDetailsResponseEntity(Exception ex, HttpStatus httpStatus, String errorMsg) {
 
         log.info(HANDLING_EXCEPTION_TEMPLATE, loggingComponentName, ex.getMessage(), ex);
-        ErrorResponse errorDetails = new ErrorResponse(httpStatus.value(), ex.getMessage(), errorMsg,
+        ErrorResponse errorDetails = new ErrorResponse(httpStatus.value(),httpStatus.getReasonPhrase(),errorMsg,
                 getRootException(ex).getLocalizedMessage(),
                 getTimeStamp());
 
