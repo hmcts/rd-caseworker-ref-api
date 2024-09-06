@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditInterceptor;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureConditionEvaluation;
@@ -49,5 +50,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
         //Audit Interceptor
         registry.addInterceptor(auditInterceptor)
             .addPathPatterns("/refdata/case-worker/upload-file");
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseTrailingSlashMatch(true);
     }
 }
