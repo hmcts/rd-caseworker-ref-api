@@ -36,8 +36,7 @@ def versions = [
   reformLogging      : '6.1.5',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
-  pact_version       : '4.6.14',
-  pact_version_java  : '4.1.43',
+  pact_version       : '4.1.7',
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
   log4j              : '2.23.1',
@@ -487,12 +486,11 @@ dependencies {
   //Fix for CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
   implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
 
-  implementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version: '4.5.14'
 
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version_java
+  contractTestImplementation (group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version)
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
   contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
-  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version_java
+  contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
 
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5', version: versions.pact_version
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
