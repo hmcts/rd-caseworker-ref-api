@@ -242,7 +242,7 @@ pact {
     pactDirectory = 'pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
-    version = "1.0"
+    version = project.pactVersion
   }
 }
 
