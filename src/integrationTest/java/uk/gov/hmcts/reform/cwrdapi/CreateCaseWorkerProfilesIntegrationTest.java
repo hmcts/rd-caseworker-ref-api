@@ -151,10 +151,12 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         CaseWorkerRoleRequest cwRoleRequest3 = new CaseWorkerRoleRequest("Registrar", false);
         CaseWorkerRoleRequest cwRoleRequest4 = new CaseWorkerRoleRequest("CICA Caseworker", false);
         CaseWorkerRoleRequest cwRoleRequest5 = new CaseWorkerRoleRequest("Cafcass Cymru Caseworker", false);
+        CaseWorkerRoleRequest cwRoleRequest6 = new CaseWorkerRoleRequest("IBCA Caseworker",false);
 
 
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
-            .of(cwRoleRequest,cwRoleRequest1,cwRoleRequest2,cwRoleRequest3, cwRoleRequest4, cwRoleRequest5);
+            .of(cwRoleRequest,cwRoleRequest1,cwRoleRequest2,cwRoleRequest3,
+                    cwRoleRequest4, cwRoleRequest5, cwRoleRequest6);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
 
@@ -167,6 +169,7 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         assertEquals(16,(long)caseWorkerRoles.get(3).getRoleId());
         assertEquals(17,(long)caseWorkerRoles.get(4).getRoleId());
         assertEquals(18,(long)caseWorkerRoles.get(5).getRoleId());
+        assertEquals(19,(long)caseWorkerRoles.get(6).getRoleId());
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5,caseWorkerProfile.get(0).getUserTypeId());
     }

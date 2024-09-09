@@ -169,6 +169,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         assertEquals(16, (long) caseWorkerRoles.get(3).getRoleId());
         assertEquals(17, (long) caseWorkerRoles.get(4).getRoleId());
         assertEquals(18, (long) caseWorkerRoles.get(5).getRoleId());
+        assertEquals(19,(long)caseWorkerRoles.get(6).getRoleId());
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5, caseWorkerProfile.get(0).getUserTypeId());
     }
