@@ -438,7 +438,7 @@ public class UserProfileConsumerTest {
     @NotNull
     private Map<String, String> getResponseHeaders() {
         Map<String, String> responseHeaders = Maps.newHashMap();
-        responseHeaders.put("Content-Type", "application/json");
+        responseHeaders.put("Content-Type", "application/json; charset=UTF-8");
         return responseHeaders;
     }
 
@@ -453,7 +453,7 @@ public class UserProfileConsumerTest {
         HttpHeaders headers = new HttpHeaders();
         headers.add("ServiceAuthorization", "Bearer " + "1234");
         headers.add("Authorization", "Bearer " + "2345");
-        headers.add("Content-Type", "application/json");
+        headers.add("Content-Type", "application/json; charset=UTF-8");
         return headers;
     }
 
