@@ -153,10 +153,12 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         CaseWorkerRoleRequest cwRoleRequest3 = new CaseWorkerRoleRequest("Registrar", false);
         CaseWorkerRoleRequest cwRoleRequest4 = new CaseWorkerRoleRequest("CICA Caseworker", false);
         CaseWorkerRoleRequest cwRoleRequest5 = new CaseWorkerRoleRequest("Cafcass Cymru Caseworker", false);
+        CaseWorkerRoleRequest cwRoleRequest6 = new CaseWorkerRoleRequest("IBCA Caseworker", false);
 
 
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
-                .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3, cwRoleRequest4, cwRoleRequest5);
+                .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3,
+                        cwRoleRequest4, cwRoleRequest5, cwRoleRequest6);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
 
