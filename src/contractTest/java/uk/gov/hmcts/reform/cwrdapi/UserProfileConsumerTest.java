@@ -247,8 +247,7 @@ public class UserProfileConsumerTest {
         String actualResponseBody =
                 SerenityRest
                         .given()
-                        .headers(getHttpHeaders())
-                        .contentType(ContentType.JSON)
+                        .headers(getHttpHeaders(true))
                         .body(createUserProfileUpdateRequest().toString())
                         .put(mockServer.getUrl() + UP_URL + "007")
                         .then()
@@ -386,8 +385,7 @@ public class UserProfileConsumerTest {
         String actualResponseBody =
                 SerenityRest
                         .given()
-                        .headers(getHttpHeaders())
-                        .contentType(ContentType.JSON)
+                        .headers(getHttpHeaders(true))
                         .body(createUserProfileCreateRequest().toString())
                         .post(mockServer.getUrl() + UP_URL)
                         .then()
@@ -443,9 +441,16 @@ public class UserProfileConsumerTest {
     }
 
     private HttpHeaders getHttpHeaders() {
+        return getHttpHeaders(false);
+    }
+
+    private HttpHeaders getHttpHeaders(boolean addContentType) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("ServiceAuthorization", "Bearer " + "1234");
         headers.add("Authorization", "Bearer " + "2345");
+        if (addContentType) {
+            headers.add("Content-Type", "application/json; charset=UTF-8");
+        }
         return headers;
     }
 
