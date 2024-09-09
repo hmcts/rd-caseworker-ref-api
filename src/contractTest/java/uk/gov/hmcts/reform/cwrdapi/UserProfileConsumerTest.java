@@ -248,7 +248,7 @@ public class UserProfileConsumerTest {
                 SerenityRest
                         .given()
                         .headers(getHttpHeaders())
-                        .contentType(ContentType.JSON)
+                        .contentType("application/json;charset=utf-8")
                         .body(createUserProfileUpdateRequest().toString())
                         .put(mockServer.getUrl() + UP_URL + "007")
                         .then()
@@ -387,7 +387,7 @@ public class UserProfileConsumerTest {
                 SerenityRest
                         .given()
                         .headers(getHttpHeaders())
-                        .contentType(ContentType.JSON)
+                        .contentType("application/json;charset=utf-8")
                         .body(createUserProfileCreateRequest().toString())
                         .post(mockServer.getUrl() + UP_URL)
                         .then()
