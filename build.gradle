@@ -1,3 +1,5 @@
+import org.springframework.boot.loader.tools.LoaderImplementation
+
 buildscript {
   repositories {
     mavenLocal()
@@ -566,6 +568,7 @@ dependencyUpdates.resolutionStrategy = {
 gradle.startParameter.continueOnFailure = true
 
 bootJar {
+  loaderImplementation = LoaderImplementation.CLASSIC
   archiveFileName = jarName
   manifest {
     attributes('Implementation-Version': project.version.toString())
