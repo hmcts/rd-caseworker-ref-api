@@ -18,7 +18,6 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Component
@@ -48,7 +47,7 @@ public class FeatureConditionEvaluation implements HandlerInterceptor {
 
         if (isNotTrue(launchDarklyUrlMap.isEmpty()) && nonNull(flagName)) {
             flagStatus = featureToggleService
-                    .isFlagEnabled(EMPTY, launchDarklyUrlMap.get(clazz + "." + restMethod));
+                    .isFlagEnabled(getServiceName(flagName), launchDarklyUrlMap.get(clazz + "." + restMethod));
             if (!flagStatus) {
                 throw new ForbiddenException(flagName.concat(SPACE).concat(FORBIDDEN_EXCEPTION_LD));
             }
