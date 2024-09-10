@@ -309,7 +309,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 .post("/refdata/case-worker/profile")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
-        assertThat(response.getBody().asString()).contains("Access is denied");
+        assertThat(response.getBody().asString()).contains("Access Denied");
 
     }
 
