@@ -394,6 +394,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 Page<CaseWorkerProfile> staffProfilePage = caseWorkerProfileRepo.findByServiceCodeIn(
                         serviceNameToCodeMapping.keySet(), pageRequest);
 
+                log.info("{}:: No of Pages {} No of Records returned from DB {}", loggingComponentName,
+                        staffProfilePage.getTotalPages(),
+                        staffProfilePage.getTotalElements());
+
                 if (staffProfilePage.isEmpty()) {
                     log.error("{}:: No data found in CRD for the ccd service name {}",
                             loggingComponentName, ccdServiceNames);
@@ -413,8 +417,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                 .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
                                 .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
                                 .build()));
-                log.info("{}:: Successfully fetched the staff details to refresh role assignment "
-                        + "for ccd service names {}", loggingComponentName, ccdServiceNames);
+                logMessages(ccdServiceNames, serviceNameToCodeMapping, staffProfileList);
                 return ResponseEntity
                         .ok()
                         .header("total_records", String.valueOf(staffProfilePage.getTotalElements()))
@@ -435,6 +438,20 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             throw new StaffReferenceException(httpStatus, LRD_ERROR, LRD_ERROR);
         }
 
+    }
+
+    private void logMessages(String ccdServiceNames,
+                             Map<String, String> serviceNameToCodeMapping,
+                             List<StaffProfileWithServiceName> staffProfileList) {
+        log.info("{}:: Successfully fetched the staff details to refresh role assignment "
+                + "for ccd service names {}", loggingComponentName, ccdServiceNames);
+        log.info("{}:: Service Codes {} and CCD Service names {} ",
+                loggingComponentName,
+                serviceNameToCodeMapping.keySet(),
+                serviceNameToCodeMapping.values());
+
+        log.info("{}:: No of Records returned in Response {}", loggingComponentName,
+                staffProfileList.size());
     }
 
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
