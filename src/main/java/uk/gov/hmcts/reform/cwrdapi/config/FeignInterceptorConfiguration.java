@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.config;
 
 import feign.RequestInterceptor;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 
 import java.util.Enumeration;
-import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 public class FeignInterceptorConfiguration {

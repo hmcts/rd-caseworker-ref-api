@@ -290,7 +290,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
                 staffProfileAuditService.saveStaffAudit(AuditStatus.FAILURE, errorMessage,
                             null, staffProfileRequest,STAFF_PROFILE_CREATE);
 
-                throw new StaffReferenceException(responseEntity.getStatusCode(), errorMessage,
+                throw new StaffReferenceException((HttpStatus) responseEntity.getStatusCode(),
+                        errorMessage,
                         errorDescription);
             }
             return responseEntity;

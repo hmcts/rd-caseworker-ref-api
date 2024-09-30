@@ -432,7 +432,7 @@ class StaffRefDataServiceImplTest {
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(200, responseEntity.getStatusCode().value());
 
         assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
 
@@ -465,7 +465,7 @@ class StaffRefDataServiceImplTest {
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
 
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(200, responseEntity.getStatusCode().value());
         assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
 
         List<SearchStaffUserResponse> searchResponse =
@@ -489,7 +489,7 @@ class StaffRefDataServiceImplTest {
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString, pageRequest);
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(200, responseEntity.getStatusCode().value());
 
         List<SearchStaffUserResponse> searchResponse =
                 responseEntity.getBody();
@@ -517,12 +517,13 @@ class StaffRefDataServiceImplTest {
                         20, 1);
         String modifiedSearchString = generateSearchString(searchString);
 
-        when(caseWorkerProfileRepository.findByFirstNameOrLastName(modifiedSearchString.toLowerCase(), pageRequest))
-                .thenReturn(pages);
+        when(caseWorkerProfileRepository.findByFirstNameOrLastName(
+                modifiedSearchString.toLowerCase(),
+                pageRequest)).thenReturn(pages);
 
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffUserByName(searchString.toLowerCase(), pageRequest);
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(200, responseEntity.getStatusCode().value());
 
         assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
 
@@ -560,7 +561,7 @@ class StaffRefDataServiceImplTest {
 
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffProfile(searchReq, pageRequest);
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(200, responseEntity.getStatusCode().value());
         if (responseEntity.getHeaders().get("total-records") != null
                 && !responseEntity.getHeaders().get("total-records").isEmpty()) {
             assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("1");
@@ -588,7 +589,7 @@ class StaffRefDataServiceImplTest {
                 .thenReturn(pages);
         ResponseEntity<List<SearchStaffUserResponse>> responseEntity =
                 staffRefDataServiceImpl.retrieveStaffProfile(searchReq, pageRequest);
-        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(200, responseEntity.getStatusCode().value());
         if (responseEntity.getHeaders().get("total-records") != null
                 && !responseEntity.getHeaders().get("total-records").isEmpty()) {
             assertThat(responseEntity.getHeaders().get("total-records").get(0)).isEqualTo("0");

@@ -127,7 +127,7 @@ class CaseWorkerRefControllerTest {
                 .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
 
         assertNotNull(actual);
-        assertThat(actual.getStatusCodeValue()).isEqualTo(200);
+        assertThat(actual.getStatusCode().value()).isEqualTo(200);
         verify(caseWorkerServiceMock,times(1))
                 .buildIdamRoleMappings(Collections.singletonList(serviceRoleMapping));
     }
@@ -150,7 +150,7 @@ class CaseWorkerRefControllerTest {
 
         ResponseEntity<Object> actual = caseWorkerRefController
                 .caseWorkerFileUpload(multipartFile);
-        assertThat(actual.getStatusCodeValue()).isEqualTo(201);
+        assertThat(actual.getStatusCode().value()).isEqualTo(201);
 
     }
 

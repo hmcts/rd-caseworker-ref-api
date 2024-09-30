@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.cwrdapi.controllers.request;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,10 +13,6 @@ import uk.gov.hmcts.reform.cwrdapi.config.TrimStringFields;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateCaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.util.ValidateEmail;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASEWORKER_ID_MISSING;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FIRST_NAME_INVALID;
