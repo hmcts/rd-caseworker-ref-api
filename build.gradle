@@ -306,6 +306,7 @@ pitest {
   outputFormats = ['XML', 'HTML']
   timestampedReports = false
   mutationThreshold = 80
+  verbose = true
 }
 
 
