@@ -446,7 +446,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.tc_postgresql
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.tc_postgresql
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.tc_postgresql
-    testImplementation('com.github.tomakehurst:wiremock:2.27.2') {
+    testImplementation('com.github.tomakehurst:wiremock:2.35.2') {
       exclude group: 'com.github.jknack'
     }
   testImplementation ("org.mockito:mockito-core:4.3.1") {
