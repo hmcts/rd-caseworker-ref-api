@@ -387,7 +387,7 @@ dependencies {
   implementation 'com.github.hmcts:idam-java-client:2.1.1'
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.40'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.41.2'
   implementation group: 'org.flywaydb', name: 'flyway-core'
   implementation group: 'org.flywaydb', name: 'flyway-database-postgresql'
   implementation group: 'org.postgresql', name: 'postgresql'
