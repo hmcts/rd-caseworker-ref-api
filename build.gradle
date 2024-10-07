@@ -411,7 +411,7 @@ dependencies {
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-  implementation "io.github.openfeign:feign-httpclient:11.9.1"
+  implementation "io.github.openfeign:feign-httpclient:11.10"
   implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
@@ -476,7 +476,7 @@ dependencies {
   testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0'
   testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 
-  testImplementation 'io.github.openfeign:feign-jackson:12.1'
+  testImplementation 'io.github.openfeign:feign-jackson:12.5'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
