@@ -33,7 +33,7 @@ apply plugin: 'idea'
 def versions = [
   lombok             : '1.18.34',
   gradlePitest       : '1.5.1',
-  pitest             : '1.17.0',
+  pitest             : '1.16.1',
   reformHealthStarter: '0.0.5',
   reformLogging      : '6.1.5',
   serenity           : '2.0.76',
