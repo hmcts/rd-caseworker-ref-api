@@ -46,8 +46,8 @@ def versions = [
   reformS2sClient    : '5.2.0',
   tc_postgresql      : '1.20.2',
   bouncycastle       : '1.78.1',
-  junit              : '5.11.0',
-  junitPlatform      : '1.11.0'
+  junit              : '5.11.2',
+  junitPlatform      : '1.11.2'
 ]
 
 ext {
@@ -499,7 +499,7 @@ dependencies {
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'spring', version: versions.pact_version
   contractTestImplementation group: 'au.com.dius.pact.provider', name: 'junit5spring', version: versions.pact_version
 
-  functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2'
+  functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.2'
   functionalTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
   functionalTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
   functionalTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
