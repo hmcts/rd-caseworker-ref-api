@@ -14,4 +14,8 @@ file name: launchdarkly-java-server-sdk-5.10.2.jar (shaded: org.yaml:snakeyaml:1
         <cve>CVE-2022-4244</cve>
         <cve>CVE-2022-4245</cve>
     </suppress>
+    <suppress>
+        <notes>https://tools.hmcts.net/jira/browse/DTSRD-3524 glassfish</notes>
+        <cve>CVE-2024-9329</cve>
+    </suppress>
 </suppressions>
