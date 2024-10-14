@@ -386,7 +386,9 @@ dependencies {
   implementation group: 'org.jetbrains', name: 'annotations', version: '13.0'
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
   implementation 'com.github.hmcts:idam-java-client:2.1.1'
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+  implementation ('org.springframework.boot:spring-boot-starter-oauth2-client') {
+    exclude group: 'net.minidev', module: 'json-smart'
+  }
   implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.41.2'
   implementation group: 'org.flywaydb', name: 'flyway-core'
