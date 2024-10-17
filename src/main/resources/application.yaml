@@ -165,3 +165,9 @@ search:
 ### Email domain list
 email:
   domainList: ${EMAIL_DOMAIN_LIST:justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk}
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    operationsSorter: method
+  writer-with-order-by-keys: true
