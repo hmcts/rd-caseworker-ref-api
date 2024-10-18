@@ -79,31 +79,31 @@ withPipeline(type, product, component) {
     syncBranchesWithMaster(branchesToSync)
 
 
-    afterSuccess('integrationTest:preview') {
+    afterAlways('integrationTest:preview') {
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    afterSuccess('integrationTest:aat') {
+    afterAlways('integrationTest:aat') {
      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    afterSuccess('functionalTest:preview') {
+    afterAlways('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    afterSuccess('functionalTest:aat') {
+    afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
     }
 
-    afterSuccess('pact-provider-verification') {
+    afterAlways('pact-provider-verification') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 
-    afterSuccess('pact-consumer-tests') {
+    afterAlways('pact-consumer-tests') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 
-    afterSuccess('sonarscan') {
+    afterAlways('sonarscan') {
         publishHTML target: [
             allowMissing         : true,
             alwaysLinkToLastBuild: true,
@@ -123,7 +123,7 @@ withPipeline(type, product, component) {
         ]
     }
 
-    afterSuccess('smoketest:preview') {
+    afterAlways('smoketest:preview') {
         publishHTML target: [
             allowMissing         : true,
             alwaysLinkToLastBuild: true,
@@ -134,7 +134,7 @@ withPipeline(type, product, component) {
         ]
     }
 
-    afterSuccess('smoketest:aat') {
+    afterAlways('smoketest:aat') {
         publishHTML target: [
             allowMissing         : true,
             alwaysLinkToLastBuild: true,
@@ -145,7 +145,7 @@ withPipeline(type, product, component) {
         ]
     }
 
-    afterSuccess('functionalTest:aat') {
+    afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
         publishHTML target: [
             allowMissing         : true,
@@ -157,7 +157,7 @@ withPipeline(type, product, component) {
         ]
     }
 
-    afterSuccess('functionalTest:preview') {
+    afterAlways('functionalTest:preview') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
         publishHTML target: [
             allowMissing         : true,
@@ -169,7 +169,7 @@ withPipeline(type, product, component) {
         ]
     }
 
-    afterSuccess('pact-provider-verification') {
+    afterAlways('pact-provider-verification') {
         publishHTML target: [
              allowMissing         : true,
              alwaysLinkToLastBuild: true,
@@ -181,7 +181,7 @@ withPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
     }
 
-    afterSuccess('pact-consumer-tests') {
+    afterAlways('pact-consumer-tests') {
             publishHTML target: [
                  allowMissing         : true,
                  alwaysLinkToLastBuild: true,
