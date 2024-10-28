@@ -39,6 +39,7 @@ def versions = [
   reformLogging      : '6.1.5',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
+  junitPitest        : '1.2.1',
   pact_version       : '4.1.7',
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
@@ -289,7 +290,7 @@ jacocoTestReport {
 
 pitest {
   pitestVersion = versions.pitest
-  junit5PluginVersion = '1.2.1'
+  junit5PluginVersion = versions.junitPitest
   targetClasses = ['uk.gov.hmcts.reform.*']
   testSourceSets = [sourceSets.test]
   excludedClasses = [
