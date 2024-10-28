@@ -33,12 +33,13 @@ apply plugin: 'idea'
 
 def versions = [
   lombok             : '1.18.34',
-  gradlePitest       : '1.5.1',
+  gradlePitest       : '1.15.0',
   pitest             : '1.16.1',
   reformHealthStarter: '0.0.5',
   reformLogging      : '6.1.5',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
+  junitPitest        : '1.2.1',
   pact_version       : '4.1.7',
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
@@ -288,7 +289,8 @@ jacocoTestReport {
 }
 
 pitest {
-  junit5PluginVersion = '1.2.1'
+  pitestVersion = versions.pitest
+  junit5PluginVersion = versions.junitPitest
   targetClasses = ['uk.gov.hmcts.reform.*']
   testSourceSets = [sourceSets.test]
   excludedClasses = [
@@ -476,8 +478,8 @@ dependencies {
   testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
 
   testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-  testImplementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0'
-  testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
+  testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
+  testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
   testImplementation 'io.github.openfeign:feign-jackson:12.5'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
