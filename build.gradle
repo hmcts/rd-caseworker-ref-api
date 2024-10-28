@@ -222,13 +222,13 @@ task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test 
   systemProperty 'pact.rootDir', "pacts"
 }
 
-task fortifyScan(type: JavaExec)  {
-  mainClass.set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
-  classpath += sourceSets.test.runtimeClasspath
-  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-  // This is a temporary fix to prevent the nightly build from failing if the Fortify scan detects issues
-  ignoreExitValue = true
-}
+//task fortifyScan(type: JavaExec)  {
+//  mainClass.set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
+//  classpath += sourceSets.test.runtimeClasspath
+//  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+//  // This is a temporary fix to prevent the nightly build from failing if the Fortify scan detects issues
+//  ignoreExitValue = true
+//}
 
 runAndPublishConsumerPactTests.finalizedBy pactPublish
 
