@@ -20,32 +20,11 @@ import org.springframework.web.method.HandlerMethod;
 public class SwaggerConfiguration {
 
     @Bean
-    public GroupedOpenApi publicApi(OperationCustomizer customGlobalHeaders) {
+    public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("rd-caseworker-ref-api")
                 .pathsToMatch("/**")
                 .build();
     }
 
-    @Bean
-    public OperationCustomizer customGlobalHeaders() {
-        return (Operation customOperation, HandlerMethod handlerMethod) -> {
-            Parameter serviceAuthorizationHeader = new Parameter()
-                    .in(ParameterIn.HEADER.toString())
-                    .schema(new StringSchema())
-                    .name("ServiceAuthorization")
-                    .description("Keyword `Bearer` followed "
-                            + "by a service-to-service token for a whitelisted micro-service")
-                    .required(true);
-            Parameter authorizationHeader = new Parameter()
-                    .in(ParameterIn.HEADER.toString())
-                    .schema(new StringSchema())
-                    .name("Authorization")
-                    .description("Authorization token")
-                    .required(true);
-            customOperation.addParametersItem(authorizationHeader);
-            customOperation.addParametersItem(serviceAuthorizationHeader);
-            return customOperation;
-        };
-    }
 }
