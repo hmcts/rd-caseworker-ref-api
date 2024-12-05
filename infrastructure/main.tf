@@ -67,7 +67,7 @@ module "db-rd-caseworker-ref-v16" {
   product                     = "rd"
   name                        = local.db_name
   pgsql_server_configuration  = var.pgsql_server_configuration
-  action_group_name           = local.db_name
+  action_group_name           = join("-", [var.action_group_name, local.db_name, var.env])
   email_address_key           = var.email_address_key
   email_address_key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 
@@ -111,7 +111,7 @@ module "db-rd-caseworker-ref-v16-replica" {
   create_mode                    = "Replica"
   source_server_id               = var.primary_server_id
   pgsql_server_configuration     = var.pgsql_server_configuration
-  action_group_name              = join("-", [var.product-v16, var.component-v16, "replica"])
+  action_group_name              = join("-", [var.action_group_name, local.db_name, "replica", var.env])
   email_address_key              = var.email_address_key
   email_address_key_vault_id     = data.azurerm_key_vault.rd_key_vault.id
 

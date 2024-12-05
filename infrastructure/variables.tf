@@ -135,6 +135,12 @@ variable "pgsql_server_configuration" {
   ]
 }
 
+variable "action_group_name" {
+  description = "The name of the Action Group to create."
+  type        = string
+  default     = "action_group"
+}
+
 variable "pgsql_sku" {
   description = "The PGSql flexible server instance sku"
   default     = "GP_Standard_D4s_v3"
