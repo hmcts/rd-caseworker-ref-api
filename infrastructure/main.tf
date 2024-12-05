@@ -6,6 +6,7 @@ locals {
   s2s_rg_prefix            = "rpe-service-auth-provider"
   s2s_key_vault_name       = var.env == "preview" || var.env == "spreview" ? join("-", ["s2s", "aat"]) : join("-", ["s2s", var.env])
   s2s_vault_resource_group = var.env == "preview" || var.env == "spreview" ? join("-", [local.s2s_rg_prefix, "aat"]) : join("-", [local.s2s_rg_prefix, var.env])
+  db_name                  = join("-", [var.product-v16, var.component-v16])
 }
 
 data "azurerm_key_vault" "rd_key_vault" {
@@ -60,12 +61,14 @@ module "db-rd-caseworker-ref-v16" {
   user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER.name
   pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS.name
 
-  subnet_suffix = "expanded"
-  pgsql_version = "16"
-  pgsql_sku     = var.pgsql_sku
-  product       = "rd"
-  name          = join("-", [var.product-v16, var.component-v16])
-
+  subnet_suffix               = "expanded"
+  pgsql_version               = "16"
+  pgsql_sku                   = var.pgsql_sku
+  product                     = "rd"
+  name                        = local.db_name
+  email_address_key           = var.email_address_key
+  email_address_key_vailt_id  = data.azurerm_key_vault.rd_key_vault.id
+  
   pgsql_server_configuration = var.pgsql_server_configuration
 
 }
