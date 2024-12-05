@@ -67,7 +67,7 @@ public class SwaggerConfiguration {
     @Bean
     public OperationCustomizer customGlobalHeaders() {
         return (Operation customOperation, HandlerMethod handlerMethod) -> {
-            Parameter serviceAuthorizationHeader = new Parameter()
+            /*Parameter serviceAuthorizationHeader = new Parameter()
                 .in(ParameterIn.HEADER.toString())
                 .schema(new StringSchema())
                 .name("ServiceAuthorization")
@@ -81,7 +81,7 @@ public class SwaggerConfiguration {
                 .description("Authorization token")
                 .required(true);
             customOperation.addParametersItem(authorizationHeader);
-            customOperation.addParametersItem(serviceAuthorizationHeader);
+            customOperation.addParametersItem(serviceAuthorizationHeader);*/
             return customOperation;
         };
     }
