@@ -17,7 +17,7 @@ public class SwaggerConfiguration {
     private static final String DESCRIPTION = "API will help to provide Case worker user profile data to clients.";
 
     @Bean
-    public OpenAPI openAPI() {
+    public OpenAPI openApi() {
         return new OpenAPI()
             .components(new Components()
                 .addSecuritySchemes(
