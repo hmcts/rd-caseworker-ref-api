@@ -13,13 +13,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
 
 @Configuration
-@io.swagger.v3.oas.annotations.security.SecurityScheme(name = "Authorization", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
+@io.swagger.v3.oas.annotations.security.SecurityScheme(name = "Authorization", type = SecuritySchemeType.HTTP,
+    bearerFormat = "JWT", scheme = "bearer")
 @io.swagger.v3.oas.annotations.security.SecurityScheme(name = "ServiceAuthorization", type = SecuritySchemeType.APIKEY,
     in = SecuritySchemeIn.HEADER, bearerFormat = "JWT", description = "ServiceAuthorization")
 public class SwaggerConfiguration {
 
 
-   /* private static final String DESCRIPTION = "API will help to provide Case worker user profile data to clients.";
+    /* private static final String DESCRIPTION = "API will help to provide Case worker user profile data to clients.";
 
     @Bean
     public OpenAPI openApi() {
