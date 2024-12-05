@@ -68,7 +68,7 @@ module "db-rd-caseworker-ref-v16" {
   name                        = local.db_name
   email_address_key           = var.email_address_key
   email_address_key_vailt_id  = data.azurerm_key_vault.rd_key_vault.id
-  pgsql_server_configuration = var.pgsql_server_configuration
+  pgsql_server_configuration  = var.pgsql_server_configuration
 
 }
 
