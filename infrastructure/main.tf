@@ -66,9 +66,9 @@ module "db-rd-caseworker-ref-v16" {
   pgsql_sku                   = var.pgsql_sku
   product                     = "rd"
   name                        = local.db_name
-  email_address_key           = var.email_address_key
-  email_address_key_vailt_id  = data.azurerm_key_vault.rd_key_vault.id
   pgsql_server_configuration  = var.pgsql_server_configuration
+  email_address_key           = var.email_address_key
+  email_address_key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
 
 }
 
@@ -102,16 +102,16 @@ module "db-rd-caseworker-ref-v16-replica" {
   user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER.name
   pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS.name
 
-  subnet_suffix              = "expanded"
-  pgsql_version              = "16"
-  product                    = "rd"
-  name                       = join("-", [var.product-v16, var.component-v16, "replica"])
-  resource_group_name        = "rd-caseworker-ref-api-postgres-db-v16-data-${var.env}"
-  create_mode                = "Replica"
-  source_server_id           = var.primary_server_id
-  pgsql_server_configuration = var.pgsql_server_configuration
-  email_address_key           = var.email_address_key
-  email_address_key_vailt_id  = data.azurerm_key_vault.rd_key_vault.id
+  subnet_suffix                  = "expanded"
+  pgsql_version                  = "16"
+  product                        = "rd"
+  name                           = join("-", [var.product-v16, var.component-v16, "replica"])
+  resource_group_name            = "rd-caseworker-ref-api-postgres-db-v16-data-${var.env}"
+  create_mode                    = "Replica"
+  source_server_id               = var.primary_server_id
+  pgsql_server_configuration     = var.pgsql_server_configuration
+  email_address_key              = var.email_address_key
+  email_address_key_vault_id     = data.azurerm_key_vault.rd_key_vault.id
 
 }
 
