@@ -234,6 +234,11 @@ def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
+pactPublish {
+  dependsOn contract
+  pactPublish = project.pact.publish
+}
+
 pact {
   broker {
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
@@ -241,6 +246,7 @@ pact {
   publish {
     pactDirectory = 'pacts'
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:9292'
     version = project.pactVersion
   }
 }
