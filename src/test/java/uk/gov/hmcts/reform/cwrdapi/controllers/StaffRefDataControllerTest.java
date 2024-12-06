@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi.controllers;
 
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Assert;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomUtils;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Location;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.Role;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceResponse;
@@ -702,10 +701,10 @@ class StaffRefDataControllerTest {
     void shouldFetchJobTitles() {
         //given
 
-        final long roleId1 = RandomUtils.nextLong();
-        final long roleId2 = RandomUtils.nextLong();
-        final String roleDescription1 = RandomStringUtils.randomAlphanumeric(10);
-        final String roleDescription2 = RandomStringUtils.randomAlphanumeric(10);
+        final long roleId1 = RandomUtils.secure().randomLong();
+        final long roleId2 = RandomUtils.secure().randomLong();
+        final String roleDescription1 = RandomStringUtils.secure().nextAlphanumeric(10);
+        final String roleDescription2 = RandomStringUtils.secure().nextAlphanumeric(10);
 
         final List<RoleType> roleTypes = List.of(
                 new RoleType(roleId1, roleDescription1),
@@ -739,25 +738,25 @@ class StaffRefDataControllerTest {
 
         //then
         ResponseEntity<?> actualReponseEntity = staffRefDataController.retrieveJobTitles();
-        Assert.assertNotNull(actualReponseEntity);
-        Assert.assertEquals(expectedResponseEntity.getStatusCode(), actualReponseEntity.getStatusCode());
+        assertNotNull(actualReponseEntity);
+        assertEquals(expectedResponseEntity.getStatusCode(), actualReponseEntity.getStatusCode());
 
         final StaffRefJobTitleResponse actualStaffRefJobTitleResponse =
                 (StaffRefJobTitleResponse) actualReponseEntity.getBody();
-        Assert.assertNotNull(actualStaffRefJobTitleResponse);
+        assertNotNull(actualStaffRefJobTitleResponse);
 
         final StaffRefJobTitleResponse expectedResponseEntityBody =
                 (StaffRefJobTitleResponse) expectedResponseEntity.getBody();
-        Assert.assertNotNull(expectedResponseEntityBody);
+        assertNotNull(expectedResponseEntityBody);
 
 
         final List<StaffRefDataJobTitle> expectedJobTitles = expectedResponseEntityBody.getJobTitles();
-        Assert.assertNotNull(actualStaffRefJobTitleResponse);
+        assertNotNull(actualStaffRefJobTitleResponse);
 
         List<StaffRefDataJobTitle> actualJobTitles = actualStaffRefJobTitleResponse.getJobTitles();
-        Assert.assertNotNull(actualJobTitles);
+        assertNotNull(actualJobTitles);
 
-        Assert.assertEquals(expectedJobTitles.size(), actualJobTitles.size());
+        assertEquals(expectedJobTitles.size(), actualJobTitles.size());
         assertThat(expectedJobTitles).usingRecursiveComparison().isEqualTo(actualJobTitles);
         verify(staffRefDataService).getJobTitles();
     }
@@ -778,16 +777,16 @@ class StaffRefDataControllerTest {
 
         //then
         final ResponseEntity<?> actualResponseEntity = staffRefDataController.retrieveJobTitles();
-        Assert.assertNotNull(actualResponseEntity);
-        Assert.assertEquals(expectedResponseEntity.getStatusCode(), actualResponseEntity.getStatusCode());
+        assertNotNull(actualResponseEntity);
+        assertEquals(expectedResponseEntity.getStatusCode(), actualResponseEntity.getStatusCode());
 
         final StaffRefJobTitleResponse actualResponse = (StaffRefJobTitleResponse) actualResponseEntity.getBody();
-        Assert.assertNotNull(actualResponse);
+        assertNotNull(actualResponse);
 
         final List<StaffRefDataJobTitle> actualJobTitles = actualResponse.getJobTitles();
 
-        Assert.assertNotNull(actualJobTitles);
-        Assert.assertTrue(actualJobTitles.isEmpty());
+        assertNotNull(actualJobTitles);
+        assertTrue(actualJobTitles.isEmpty());
         verify(staffRefDataService).getJobTitles();
     }
 
