@@ -19,19 +19,21 @@ plugins {
 }
 
 def versions = [
+  commonsLang3       : '3.17.0',
   lombok             : '1.18.36',
   reformHealthStarter: '0.0.5',
   reformLogging      : '6.1.5',
   sonarPitest        : '0.5',
+  jackson            : '2.18.2',
   junitPitest        : '1.2.1',
   pact_version       : '4.6.15',
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
-  log4j              : '2.24.1',
+  log4j              : '2.24.2',
   poi                : '4.1.2',
-  reformS2sClient    : '5.2.0',
+  reformS2sClient    : '5.3.0',
   tc_postgresql      : '1.20.4',
-  bouncycastle       : '1.78.1',
+  bouncycastle       : '1.79',
   junit              : '5.11.3',
   junitPlatform      : '1.11.3',
   serenity           : '4.2.9',
@@ -157,9 +159,7 @@ configurations {
   pactTestRuntime.extendsFrom testRuntime
 }
 
-
 pmd {
-  toolVersion = '6.55.0'
   ignoreFailures = true
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
@@ -332,6 +332,14 @@ repositories {
   maven { url 'https://jitpack.io' }
 }
 
+configurations.configureEach {
+  resolutionStrategy.eachDependency { details ->
+    if (details.requested.name == 'commons-lang3') {
+      details.useVersion versions.commonsLang3
+    }
+  }
+}
+
 dependencies {
 
   implementation group: 'org.apache.poi', name: 'poi', version: versions.poi
@@ -354,14 +362,14 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations'
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-  implementation group: 'com.fasterxml.jackson', name: 'jackson-bom'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: versions.jackson
   implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
   implementation 'com.github.hmcts:idam-java-client:3.0.3'
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.41.2'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.47'
   implementation group: 'org.flywaydb', name: 'flyway-core'
   implementation group: 'org.flywaydb', name: 'flyway-database-postgresql'
   implementation group: 'org.postgresql', name: 'postgresql'
@@ -376,8 +384,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.53.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.4'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.54.1'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.7'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -411,9 +419,7 @@ dependencies {
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.tc_postgresql
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.tc_postgresql
   testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.tc_postgresql
-  testImplementation('com.github.tomakehurst:wiremock:2.35.2') {
-    exclude group: 'com.github.jknack'
-  }
+  testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.10.0'
   testImplementation ("org.mockito:mockito-core:4.11.0") {
     exclude group: "net.bytebuddy", module: "byte-buddy"
     exclude group: "net.bytebuddy", module: "byte-buddy-agent"
@@ -437,7 +443,7 @@ dependencies {
 
   testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
-  testImplementation 'io.github.openfeign:feign-jackson:12.5'
+  testImplementation 'io.github.openfeign:feign-jackson:13.5'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
