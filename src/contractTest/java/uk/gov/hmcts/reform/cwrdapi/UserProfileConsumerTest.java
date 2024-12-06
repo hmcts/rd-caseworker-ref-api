@@ -6,6 +6,7 @@ import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import au.com.dius.pact.core.model.annotations.PactFolder;
@@ -14,12 +15,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
+import jakarta.validation.constraints.NotNull;
 import net.serenitybdd.rest.SerenityRest;
-import org.apache.http.client.fluent.Executor;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.request.DeleteUserProfilesRequest;
 
 import java.io.IOException;
@@ -37,14 +35,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @ExtendWith(PactConsumerTestExt.class)
-@ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PactTestFor(providerName = "rd_user_profile_api_service")
+@PactTestFor(providerName = "rd_user_profile_api_service", pactVersion = PactSpecVersion.V3)
 @PactFolder("pacts")
 public class UserProfileConsumerTest {
 
@@ -53,11 +50,6 @@ public class UserProfileConsumerTest {
     @BeforeEach
     public void setUpEachTest() throws InterruptedException {
         Thread.sleep(2000);
-    }
-
-    @AfterEach
-    void teardown() {
-        Executor.closeIdleConnections();
     }
 
     //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service_for_multiple_profiles")
@@ -323,18 +315,14 @@ public class UserProfileConsumerTest {
                         .then()
                         .log().all().extract().asString();
         assertThat(actualResponseBody).isNotNull();
-
-
     }
-
 
     private static String getDeleteRequestString() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> userIds = new ArrayList<>();
         userIds.add("8dfe911f-bb02-4356-9c02-afa4bdccbb16");
         DeleteUserProfilesRequest deleteUserRequest = new DeleteUserProfilesRequest(userIds);
-        String jsonArray = objectMapper.writeValueAsString(deleteUserRequest);
-        return jsonArray;
+        return objectMapper.writeValueAsString(deleteUserRequest);
     }
 
     private DslPart createUserProfileUpdateRequest() {

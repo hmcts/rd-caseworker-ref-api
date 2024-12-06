@@ -8,12 +8,10 @@ import au.com.dius.pact.core.model.RequestResponsePact;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
+import jakarta.validation.constraints.NotNull;
 import net.serenitybdd.rest.SerenityRest;
-import org.apache.http.client.fluent.Executor;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +22,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Map;
 
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
-import static org.junit.Assert.assertNotNull;
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 @ExtendWith(PactConsumerTestExt.class)
@@ -41,12 +39,6 @@ public class StaffReferenceDataConsumerTest {
     public void setUpEachTest() throws InterruptedException {
         Thread.sleep(2000);
     }
-
-    @AfterEach
-    void teardown() {
-        Executor.closeIdleConnections();
-    }
-
 
     // GET call : This API is used to retrieve the service specific skills
     //@Pact(provider = "referenceData_caseworkerRefUsers", consumer = "referenceData_caseworker_consumer")

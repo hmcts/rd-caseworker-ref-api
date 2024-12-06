@@ -91,9 +91,12 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_caseworkerRefUsers")
-@PactBroker(scheme = "${PACT_BROKER_SCHEME:http}",
-        host = "${PACT_BROKER_URL:localhost}", port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
-            @VersionSelector(tag = "master")})
+@PactBroker(
+    url = "${PACT_BROKER_FULL_URL:https://pact-broker.platform.hmcts.net}",
+    enablePendingPacts = "${pactbroker.enablePending:true}",
+    providerTags = "${pactbroker.providerTags:master}",
+    consumerVersionSelectors = {@VersionSelector(tag = "master")}
+)
 @IgnoreNoPactsToVerify
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
