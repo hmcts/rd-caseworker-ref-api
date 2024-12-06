@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.response.Response;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
 import net.serenitybdd.rest.SerenityRest;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
@@ -43,7 +43,7 @@ public class WelcomeFuncTest {
 
         } else {
 
-            Assert.fail();
+            Assertions.fail();
         }
     }
 }
