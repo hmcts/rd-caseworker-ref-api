@@ -6,6 +6,7 @@ locals {
   s2s_rg_prefix            = "rpe-service-auth-provider"
   s2s_key_vault_name       = var.env == "preview" || var.env == "spreview" ? join("-", ["s2s", "aat"]) : join("-", ["s2s", var.env])
   s2s_vault_resource_group = var.env == "preview" || var.env == "spreview" ? join("-", [local.s2s_rg_prefix, "aat"]) : join("-", [local.s2s_rg_prefix, var.env])
+  db_name                  = join("-", [var.product-v16, var.component-v16])
 }
 
 data "azurerm_key_vault" "rd_key_vault" {
@@ -60,13 +61,18 @@ module "db-rd-caseworker-ref-v16" {
   user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER.name
   pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS.name
 
-  subnet_suffix = "expanded"
-  pgsql_version = "16"
-  pgsql_sku     = var.pgsql_sku
-  product       = "rd"
-  name          = join("-", [var.product-v16, var.component-v16])
-
-  pgsql_server_configuration = var.pgsql_server_configuration
+  subnet_suffix               = "expanded"
+  pgsql_version               = "16"
+  pgsql_sku                   = var.pgsql_sku
+  product                     = "rd"
+  name                        = local.db_name
+  pgsql_server_configuration  = var.pgsql_server_configuration
+  action_group_name           = join("-", [var.action_group_name, local.db_name, var.env])
+  email_address_key           = var.email_address_key
+  email_address_key_vault_id  = data.azurerm_key_vault.rd_key_vault.id
+  cpu_threshold               = var.cpu_threshold
+  memory_threshold            = var.memory_threshold
+  storage_threshold           = var.storage_threshold
 
 }
 
@@ -100,14 +106,20 @@ module "db-rd-caseworker-ref-v16-replica" {
   user_secret_name               = azurerm_key_vault_secret.POSTGRES-USER.name
   pass_secret_name               = azurerm_key_vault_secret.POSTGRES-PASS.name
 
-  subnet_suffix              = "expanded"
-  pgsql_version              = "16"
-  product                    = "rd"
-  name                       = join("-", [var.product-v16, var.component-v16, "replica"])
-  resource_group_name        = "rd-caseworker-ref-api-postgres-db-v16-data-${var.env}"
-  create_mode                = "Replica"
-  source_server_id           = var.primary_server_id
-  pgsql_server_configuration = var.pgsql_server_configuration
+  subnet_suffix                  = "expanded"
+  pgsql_version                  = "16"
+  product                        = "rd"
+  name                           = join("-", [var.product-v16, var.component-v16, "replica"])
+  resource_group_name            = "rd-caseworker-ref-api-postgres-db-v16-data-${var.env}"
+  create_mode                    = "Replica"
+  source_server_id               = var.primary_server_id
+  pgsql_server_configuration     = var.pgsql_server_configuration
+  action_group_name              = join("-", [var.action_group_name, local.db_name, "replica", var.env])
+  email_address_key              = var.email_address_key
+  email_address_key_vault_id     = data.azurerm_key_vault.rd_key_vault.id
+  cpu_threshold                  = var.cpu_threshold
+  memory_threshold               = var.memory_threshold
+  storage_threshold              = var.storage_threshold
 
 }
 
