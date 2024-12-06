@@ -18,5 +18,4 @@ public interface LocationReferenceDataFeignClient {
         "Content-Type: application/json"})
     Response getLocationRefServiceMapping(@RequestParam String ccdServiceNames);
 
-
 }
