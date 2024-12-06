@@ -245,8 +245,7 @@ public class JrdUserRequestV1ConsumerTest {
 
     @NotNull
     private Map<String, String> getResponseHeaders() {
-        Map<String, String> responseHeaders = Map.of("Content-Type", "application/json");
-        return responseHeaders;
+        return Map.of("Content-Type", "application/json");
     }
 
     private HttpHeaders getHttpHeaders() {
