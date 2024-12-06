@@ -92,7 +92,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 @ExtendWith(SpringExtension.class)
 @Provider("referenceData_caseworkerRefUsers")
 @PactBroker(
-    url="${PACT_BROKER_FULL_URL:https://pact-broker.platform.hmcts.net}",
+    url = "${PACT_BROKER_FULL_URL:https://pact-broker.platform.hmcts.net}",
     enablePendingPacts = "${pactbroker.enablePending:true}",
     providerTags = "${pactbroker.providerTags:master}",
     consumerVersionSelectors = {@VersionSelector(tag = "master")}
