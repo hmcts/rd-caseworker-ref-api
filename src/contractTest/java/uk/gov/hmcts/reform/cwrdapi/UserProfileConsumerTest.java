@@ -14,12 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
+import jakarta.validation.constraints.NotNull;
 import net.serenitybdd.rest.SerenityRest;
-import org.apache.http.client.fluent.Executor;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -53,11 +51,6 @@ public class UserProfileConsumerTest {
     @BeforeEach
     public void setUpEachTest() throws InterruptedException {
         Thread.sleep(2000);
-    }
-
-    @AfterEach
-    void teardown() {
-        Executor.closeIdleConnections();
     }
 
     //@Pact(provider = "rd_user_profile_api_service", consumer = "crd_case_worker_ref_service_for_multiple_profiles")
