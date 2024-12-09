@@ -36,7 +36,7 @@ def versions = [
   gradlePitest       : '1.15.0',
   pitest             : '1.16.1',
   reformHealthStarter: '0.0.5',
-  reformLogging      : '6.1.5',
+  reformLogging      : '6.1.7',
   serenity           : '2.0.76',
   sonarPitest        : '0.5',
   junitPitest        : '1.2.1',
