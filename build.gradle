@@ -401,7 +401,7 @@ dependencies {
   //Added org.glassfish to support javax.el
   implementation group: 'org.glassfish', name: 'javax.el', version: '3.0.0'
   implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.6.0'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.6.0'
