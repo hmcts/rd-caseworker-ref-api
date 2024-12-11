@@ -6,7 +6,6 @@ plugins {
     id 'idea'
     id 'jacoco'
     id 'pmd'
-    id 'project-report'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.6'
@@ -19,6 +18,8 @@ plugins {
 }
 
 def versions = [
+  commonsCompress    : '1.27.1',
+  commonsIo          : '2.18.0',
   commonsLang3       : '3.17.0',
   lombok             : '1.18.36',
   reformHealthStarter: '0.0.5',
@@ -345,11 +346,14 @@ configurations.configureEach {
     if (details.requested.name == 'commons-lang3') {
       details.useVersion versions.commonsLang3
     }
+    if (details.requested.name == 'commons-compress') {
+      details.useVersion versions.commonsCompress
+    }
   }
 }
 
 dependencies {
-
+  implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
   implementation group: 'org.apache.poi', name: 'poi', version: versions.poi
   implementation group: 'org.apache.poi', name: 'poi-ooxml', version: versions.poi
 
