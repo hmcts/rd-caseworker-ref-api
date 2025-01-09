@@ -411,7 +411,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.53.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.4'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.8'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
