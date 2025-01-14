@@ -109,8 +109,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     Flyway flyway;
 
-    @MockitoBean
-    protected static JwtDecoder jwtDecoder;
+//    @MockitoBean
+//    protected JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
@@ -250,7 +250,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @AfterEach
     public void cleanupTestData() {
-        JwtDecoderMockBuilder.resetJwtDecoder();
+//        JwtDecoderMockBuilder.resetJwtDecoder();
+//        jwtDecoder = null;
     }
 
 
