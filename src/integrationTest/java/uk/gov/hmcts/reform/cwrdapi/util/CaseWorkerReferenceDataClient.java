@@ -60,8 +60,6 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
