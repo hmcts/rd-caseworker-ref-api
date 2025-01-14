@@ -704,8 +704,8 @@ class StaffRefDataControllerTest {
 
         final long roleId1 = RandomUtils.nextLong();
         final long roleId2 = RandomUtils.nextLong();
-        final String roleDescription1 = RandomStringUtils.randomAlphanumeric(10);
-        final String roleDescription2 = RandomStringUtils.randomAlphanumeric(10);
+        final String roleDescription1 = RandomStringUtils.secure().nextAlphabetic(10);
+        final String roleDescription2 = RandomStringUtils.secure().nextAlphabetic(10);
 
         final List<RoleType> roleTypes = List.of(
                 new RoleType(roleId1, roleDescription1),
