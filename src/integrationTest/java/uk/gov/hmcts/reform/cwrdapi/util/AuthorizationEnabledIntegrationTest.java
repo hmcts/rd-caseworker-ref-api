@@ -109,9 +109,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     Flyway flyway;
 
-//    @MockitoBean
-//    protected JwtDecoder jwtDecoder;
-
     @BeforeEach
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
@@ -247,13 +244,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"idamRegistrationResponse\":\"201\""
                                 + "}")));
     }
-
-    @AfterEach
-    public void cleanupTestData() {
-//        JwtDecoderMockBuilder.resetJwtDecoder();
-//        jwtDecoder = null;
-    }
-
 
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
     //for update use insert response UUID in test or other mock methods

@@ -501,11 +501,6 @@ public class CaseWorkerReferenceDataClient {
         return bearerTokenMap.get(role);
     }
 
-//    public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
-//        String[] bearerTokenArray = bearerToken.split(" ");
-//        when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
-//    }
-
     private Jwt createJwt(String token, JWT parsedJwt) {
         Jwt jwt = null;
         try {
@@ -549,7 +544,6 @@ public class CaseWorkerReferenceDataClient {
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
         String bearerToken = getAndReturnBearerToken(userId, role);
-//        mockJwtToken(role, userId, bearerToken);
         headers.add("Authorization", bearerToken);
         return headers;
     }
