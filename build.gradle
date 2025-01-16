@@ -419,7 +419,7 @@ dependencies {
   implementation "io.github.openfeign:feign-httpclient:11.10"
   implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
 
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
   // https://mvnrepository.com/artifact/net.minidev/json-smart
