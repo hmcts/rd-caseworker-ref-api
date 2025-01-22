@@ -145,7 +145,7 @@ class CaseWorkerProfileTest {
     void testCaseWorkerProfileWithNameLongerThan128CharactersIsConstraintViolation() {
         CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
         caseWorkerProfile.setCaseWorkerId("CWID1");
-        caseWorkerProfile.setFirstName(RandomStringUtils.randomAlphabetic(129));
+        caseWorkerProfile.setFirstName(RandomStringUtils.secure().nextAlphabetic(129));
         caseWorkerProfile.setLastName("CWLastName");
         caseWorkerProfile.setEmailId("CWtest@test.com");
         caseWorkerProfile.setUserTypeId(1L);
