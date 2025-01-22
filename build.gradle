@@ -41,7 +41,7 @@ def versions = [
 ]
 
 ext {
-  springCloudVersion = '2023.0.3'
+  springCloudVersion = '2023.0.5'
 }
 
 application {
@@ -391,6 +391,8 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
 
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.6.2'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.6.2'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.6.2'
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
@@ -440,8 +442,8 @@ dependencies {
     exclude group: "net.bytebuddy", module: "byte-buddy"
     exclude group: "net.bytebuddy", module: "byte-buddy-agent"
   }
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.4'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.4'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.11'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.11'
   testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
 
