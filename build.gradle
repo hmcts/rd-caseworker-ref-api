@@ -375,7 +375,7 @@ dependencies {
 
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.8'
   testImplementation 'net.serenity-bdd:serenity-rest-assured:3.8.1'
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: '3.8.1'
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: '3.9.8'
   implementation group: 'com.sun.xml.bind', name: 'jaxb-osgi', version: '2.3.9'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
