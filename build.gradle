@@ -34,7 +34,7 @@ def versions = [
   poi                : '4.1.2',
   reformS2sClient    : '5.3.0',
   tc_postgresql      : '1.20.4',
-  bouncycastle       : '1.79',
+  bouncycastle       : '1.80',
   junit              : '5.11.4',
   junitPlatform      : '1.11.4',
   serenity           : '4.2.13',
@@ -442,8 +442,8 @@ dependencies {
     exclude group: "net.bytebuddy", module: "byte-buddy"
     exclude group: "net.bytebuddy", module: "byte-buddy-agent"
   }
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.11'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.11'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.16.1'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.16.1'
   testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
 
