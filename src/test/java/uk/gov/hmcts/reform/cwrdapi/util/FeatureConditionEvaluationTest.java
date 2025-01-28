@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +15,6 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ForbiddenException;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,10 +127,7 @@ class FeatureConditionEvaluationTest {
         return Jwts.builder()
                 .subject(serviceName)
                 .issuedAt(new Date())
-                .signWith(Keys.hmacShaKeyFor(
-                            Encoders.BASE64.encode(
-                                    "AA".getBytes(StandardCharsets.UTF_8))
-                                .getBytes(StandardCharsets.UTF_8)))
+                .signWith(Jwts.SIG.HS256.key().build())
                 .compact();
     }
 }
