@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
