@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
+import io.jsonwebtoken.io.Encoders;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,8 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ForbiddenException;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,9 +130,12 @@ class FeatureConditionEvaluationTest {
 
     static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+                .subject(serviceName)
+                .issuedAt(new Date())
+                .signWith(Keys.hmacShaKeyFor(
+                            Encoders.BASE64.encode(
+                                    "AA".getBytes(StandardCharsets.UTF_8))
+                                .getBytes(StandardCharsets.UTF_8)))
                 .compact();
     }
 }
