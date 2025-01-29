@@ -587,9 +587,9 @@ public class CaseWorkerReferenceDataClient {
 
     public static String generateS2SToken(String serviceName) {
         return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+                .subject(serviceName)
+                .issuedAt(new Date())
+                .signWith(Jwts.SIG.HS256.key().build())
                 .compact();
     }
 

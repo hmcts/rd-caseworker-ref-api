@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -98,6 +100,9 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @MockitoBean
     AuthTokenGenerator authTokenGenerator;
 
+    @MockitoBean
+    JwtDecoder jwtDecoder;
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -110,6 +115,11 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @BeforeEach
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
+        Jwt jwt = Jwt.withTokenValue("test-decoded-jwt")
+            .header("alg", "HMAC256")
+            .claim("sub", "1234567890")
+            .build();
+        when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         doNothing().when(topicPublisher).sendMessage(any());
         flyway.clean();
         flyway.migrate();
