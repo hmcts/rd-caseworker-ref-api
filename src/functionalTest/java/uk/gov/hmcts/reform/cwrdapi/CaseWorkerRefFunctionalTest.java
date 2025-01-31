@@ -24,12 +24,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.StaffProfileWithServiceName;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.client.response.UserProfileResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerRoleRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerWorkAreaRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
+import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerFileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
@@ -51,6 +53,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -795,6 +798,42 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
         CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
                 response.getBody().as(CaseWorkerProfileCreationResponse.class);
         caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+    }
+
+    @Test
+    public void updateCaseworkerToSuspended() {
+
+        List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequests = caseWorkerApiClient
+                .createCaseWorkerProfiles();
+        Response response = caseWorkerApiClient.createUserProfiles(caseWorkersProfileCreationRequests);
+
+        CaseWorkerProfileCreationResponse caseWorkerProfileCreationResponse =
+                response.getBody().as(CaseWorkerProfileCreationResponse.class);
+        List<String> caseWorkerIds = caseWorkerProfileCreationResponse.getCaseWorkerIds();
+
+        CaseWorkersProfileUpdationRequest caseWorkersProfileUpdationRequest = CaseWorkersProfileUpdationRequest
+                .caseWorkersProfileUpdationRequest().firstName("StaffProfilefirstNamesnew")
+                .lastName("StaffProfilelastNamenew")
+                .userId(caseWorkerIds.get(0))
+                .emailId(String.format(EMAIL_TEMPLATE, randomAlphanumeric(10)).toLowerCase())
+                .suspended(true)
+                .build();
+
+        Response updateResponse = caseWorkerApiClient.updateCaseWorkerProfile(caseWorkersProfileUpdationRequest);
+        assertEquals(200,updateResponse.statusCode());
+        Response fetchResponse = caseWorkerApiClient.getMultipleAuthHeadersInternal(ROLE_CWD_SYSTEM_USER)
+                .body(UserRequest.builder().userIds(caseWorkerIds).build())
+                .post("/refdata/case-worker/users/fetchUsersById/")
+                .andReturn();
+        fetchResponse.then()
+                .assertThat()
+                .statusCode(200);
+
+        List<CaseWorkerProfile> fetchedList =
+                Arrays.asList(fetchResponse.getBody().as(
+                        CaseWorkerProfile[].class));
+        assertEquals(1, fetchedList.size());
+        assertEquals("true", fetchedList.get(0).getSuspended());
     }
 
     @AfterAll
