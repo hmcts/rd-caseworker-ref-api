@@ -9,13 +9,11 @@ import au.com.dius.pact.core.model.RequestResponsePact;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import groovy.util.logging.Slf4j;
 import io.restassured.http.ContentType;
+import jakarta.validation.constraints.NotNull;
 import net.serenitybdd.rest.SerenityRest;
-import org.apache.http.client.fluent.Executor;
 import org.assertj.core.api.Assertions;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.junit.After;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,8 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Map;
 
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonArray;
-import static io.pactfoundation.consumer.dsl.LambdaDsl.newJsonBody;
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 
 @Slf4j
 @ExtendWith(PactConsumerTestExt.class)
@@ -46,12 +44,6 @@ public class JrdUserRequestV2ConsumerTest {
     public void setUpEachTest() throws InterruptedException {
         Thread.sleep(2000);
     }
-
-    @After
-    void teardown() {
-        Executor.closeIdleConnections();
-    }
-
 
     //To run the Pact tests please uncommnet all Pact Test annotations
     //@Pact(provider = "referenceData_judicialv2", consumer = "JRD_API_V2_Search_ConsumerTest")

@@ -18,7 +18,7 @@ Business of the CaseWorker (https://tools.hmcts.net/confluence/display/RTRD/Case
 
 To run the project you will need to have the following installed:
 
-* Java 17
+* Java 21
 * Docker
 
 For information about the software versions used to build this API and a complete list of it's dependencies see build.gradle

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.google.common.base.Splitter;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.ReflectionUtils;
