@@ -32,7 +32,7 @@ public interface CaseWorkerProfileRepository extends JpaRepository<CaseWorkerPro
     Page<CaseWorkerProfile> findByFirstNameOrLastName(String searchString, Pageable pageable);
 
     @Query(value = """
-            select cw from case_worker_profile cw 
+            select distinct cw from case_worker_profile cw 
             JOIN FETCH case_worker_work_area wa ON cw.caseWorkerId = wa.caseWorkerId 
             where wa.serviceCode IN :serviceCode""")
     Page<CaseWorkerProfile> findByServiceCodeIn(Set<String> serviceCode, Pageable pageable);

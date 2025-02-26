@@ -2,7 +2,7 @@ import org.springframework.boot.loader.tools.LoaderImplementation
 
 plugins {
     id 'application'
-    id 'uk.gov.hmcts.java' version '0.12.64'
+    id 'uk.gov.hmcts.java' version '0.12.65'
     id 'idea'
     id 'jacoco'
     id 'pmd'
@@ -12,9 +12,9 @@ plugins {
     id 'org.sonarqube' version '6.0.1.5171'
     id 'org.springframework.boot' version '3.4.2'
     id "org.flywaydb.flyway" version '9.22.3'
-    id 'au.com.dius.pact' version '4.6.16'
+    id 'au.com.dius.pact' version '4.6.17'
     id 'org.owasp.dependencycheck' version '11.1.1'
-    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.15'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.16'
 }
 
 def versions = [
@@ -33,11 +33,11 @@ def versions = [
   log4j              : '2.24.2',
   poi                : '4.1.2',
   reformS2sClient    : '5.3.0',
-  tc_postgresql      : '1.20.4',
+  tc_postgresql      : '1.20.5',
   bouncycastle       : '1.80',
   junit              : '5.11.4',
   junitPlatform      : '1.11.4',
-  serenity           : '4.2.14',
+  serenity           : '4.2.16',
 ]
 
 ext {
