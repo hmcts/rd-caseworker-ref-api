@@ -153,5 +153,5 @@ search:
 
 ### Email domain list
 email:
-  domainList: justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk,ibca.org.uk,cabinetoffice.gov.uk
+  domainList: justice.gov.uk,DWP.GOV.UK,hmrc.gov.uk
 
