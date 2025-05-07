@@ -164,7 +164,7 @@ search:
   pageNumber: ${REFRESH_PAGE_NUMBER:1}
 ### Email domain list
 email:
-  domainList: ${EMAIL_DOMAIN_LIST:justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk}
+  domainList: ${EMAIL_DOMAIN_LIST:justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk,ibca.org.uk,cabinetoffice.gov.uk}
 
 springdoc:
   swagger-ui:
