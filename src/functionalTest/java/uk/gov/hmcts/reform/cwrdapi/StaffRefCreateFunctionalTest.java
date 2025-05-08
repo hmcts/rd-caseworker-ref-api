@@ -64,8 +64,6 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
 
     @ParameterizedTest
-    //@ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
-    //@ExtendWith(FeatureToggleConditionExtension.class)
     @ValueSource(strings = { STAFF_EMAIL_TEMPLATE,STAFF_EMAIL_TEMPLATE_IBCA,STAFF_EMAIL_TEMPLATE_CABINETOFFICE})
     void createStaffProfile(String email) {
         String creationEmail = format(email, randomAlphanumeric(10) + "deleteTest1234").toLowerCase();
