@@ -73,6 +73,9 @@ public class AuthorizationFunctionalTest {
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
     public static final String STAFF_EMAIL_TEMPLATE = "staff-rd-profile-func-test-user-only-%s@justice.gov.uk";
+    public static final String STAFF_EMAIL_TEMPLATE_IBCA = "staff-rd-profile-func-test-user-only-%s@ibca.org.uk";
+    public static final String STAFF_EMAIL_TEMPLATE_CABINETOFFICE =
+        "staff-rd-profile-func-test-user-only-%s@cabinetoffice.gov.uk";
     public static final String STAFF_EMAIL_PATTERN = "staff-rd-profile-func-test-user-only";
     public static final String CWR_EMAIL_PATTERN = "cwr-rd-func-test-user-only";
 
