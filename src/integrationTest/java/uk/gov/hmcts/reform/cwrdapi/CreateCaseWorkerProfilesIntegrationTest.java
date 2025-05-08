@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -174,4 +176,67 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5,caseWorkerProfile.get(0).getUserTypeId());
     }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = { "test.inttest@ibca.org.uk","cabinetoffice.gov.uk"})
+    public void shouldCreateCaseWorkerWithNewDomains(String email) {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+
+        assertThat(caseWorkerProfileRepository.count()).isZero();
+        assertThat(caseWorkerLocationRepository.count()).isZero();
+        assertThat(caseWorkerWorkAreaRepository.count()).isZero();
+
+        caseWorkersProfileCreationRequests = ImmutableList.of(CaseWorkersProfileCreationRequest
+            .caseWorkersProfileCreationRequest()
+            .firstName(" firstName ")
+            .lastName(" lastName ")
+            .emailId(email)
+            .regionId(1).userType("CTSC")
+            .region("region")
+            .suspended(false)
+            .taskSupervisor(true)
+            .caseAllocator(false)
+            .roles(ImmutableList.of(CaseWorkerRoleRequest.caseWorkerRoleRequest().role(" role ")
+                .isPrimaryFlag(true).build()))
+            .idamRoles(ImmutableSet.of(" tribunal_case_worker "))
+            .baseLocations(ImmutableList.of(CaseWorkerLocationRequest
+                .caseWorkersLocationRequest()
+                .isPrimaryFlag(true).locationId(1)
+                .location(" location ").build()))
+            .workerWorkAreaRequests(ImmutableList.of(CaseWorkerWorkAreaRequest
+                .caseWorkerWorkAreaRequest()
+                .areaOfWork(" areaOfWork ").serviceCode(" serviceCode ")
+                .build()))
+            .build());
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+            .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+        assertThat(response).containsEntry("http_status", "201 CREATED");
+
+        assertThat(caseWorkerProfileRepository.count()).isEqualTo(1L);
+        assertThat(caseWorkerLocationRepository.count()).isEqualTo(1L);
+        assertThat(caseWorkerWorkAreaRepository.count()).isEqualTo(1L);
+        Set<String> emails = new HashSet<>();
+        emails.add(email);
+        CaseWorkerProfile profile =
+            caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails).get(0);
+        assertThat(profile.getFirstName()).isEqualTo("firstName");
+        assertThat(profile.getLastName()).isEqualTo("lastName");
+        assertThat(profile.getEmailId()).isEqualTo(email);
+        assertThat(profile.getRegion()).isEqualTo("region");
+        assertFalse(profile.getCaseAllocator());
+        assertTrue(profile.getTaskSupervisor());
+
+        List<CaseWorkerLocation> caseWorkerLocations = caseWorkerLocationRepository.findAll();
+        CaseWorkerLocation caseWorkerLocation = caseWorkerLocations.get(0);
+        assertThat(caseWorkerLocation.getLocation()).isEqualTo("location");
+
+        List<CaseWorkerWorkArea> caseWorkerWorkAreas = caseWorkerWorkAreaRepository.findAll();
+        CaseWorkerWorkArea caseWorkerWorkArea = caseWorkerWorkAreas.get(0);
+        assertThat(caseWorkerWorkArea.getAreaOfWork()).isEqualTo("areaOfWork");
+        assertThat(caseWorkerWorkArea.getServiceCode()).isEqualTo("serviceCode");
+    }
+
+
 }
