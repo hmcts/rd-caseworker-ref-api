@@ -1,24 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
-import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
@@ -65,6 +46,26 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerWorkArea;
 import uk.gov.hmcts.reform.cwrdapi.domain.RoleType;
 import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
+
+import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
+
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application-test.yml")
