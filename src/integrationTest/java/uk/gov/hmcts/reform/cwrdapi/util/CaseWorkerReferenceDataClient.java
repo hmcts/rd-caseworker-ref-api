@@ -641,8 +641,8 @@ public class CaseWorkerReferenceDataClient {
 
         return StaffProfileCreationRequest
             .staffProfileCreationRequest()
-            .firstName("StaffProfilefirstName")
-            .lastName("StaffProfilelastName")
+            .firstName("StaffProfileFirstName")
+            .lastName("StaffProfileLastName")
             .emailId(email)
             .regionId(1).userType("CTSC")
             .region("National")
