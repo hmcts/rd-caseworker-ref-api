@@ -637,26 +637,7 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
-    public StaffProfileCreationRequest buildStaffProfileCreationRequestForVariousEmails(String email) {
-
-        return StaffProfileCreationRequest
-            .staffProfileCreationRequest()
-            .firstName("StaffProfileFirstName")
-            .lastName("StaffProfileLastName")
-            .emailId(email)
-            .regionId(1).userType("CTSC")
-            .region("National")
-            .suspended(false)
-            .taskSupervisor(true)
-            .caseAllocator(true)
-            .staffAdmin(false)
-            .roles(getCaseWorkerRoleRequests())
-            .baseLocations(getCaseWorkerLocationRequests())
-            .services(getCaseWorkerServicesRequests())
-            .skills(getSkillsRequest())
-            .build();
-    }
-
+    
     public StaffProfileCreationRequest buildStaffProfileCreationRequest(String firstName,
                                                                         String lastName,
                                                                         Integer locationId1,
@@ -684,6 +665,27 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
+    public StaffProfileCreationRequest buildStaffProfileCreationRequestForVariousEmails(String email) {
+
+        return StaffProfileCreationRequest
+            .staffProfileCreationRequest()
+            .firstName("StaffProfileFirstName")
+            .lastName("StaffProfileLastName")
+            .emailId(email)
+            .regionId(1).userType("CTSC")
+            .region("National")
+            .suspended(false)
+            .taskSupervisor(true)
+            .caseAllocator(true)
+            .staffAdmin(false)
+            .roles(getCaseWorkerRoleRequests())
+            .baseLocations(getCaseWorkerLocationRequests())
+            .services(getCaseWorkerServicesRequests())
+            .skills(getSkillsRequest())
+            .build();
+    }
+
+    
     private List<SkillsRequest> getSkillsRequest() {
         return ImmutableList.of(SkillsRequest
                 .skillsRequest()
