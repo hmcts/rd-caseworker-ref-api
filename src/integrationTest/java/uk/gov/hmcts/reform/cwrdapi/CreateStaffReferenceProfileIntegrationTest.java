@@ -151,11 +151,9 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
         Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
 
-        assertThat(response)
-            .isNotNull()
-            .containsEntry("http_status", "400");
-
-        assertThat(response.get("case_worker_id")).isNull();
+        assertThat(response).containsEntry("http_status", "400");
+        String responseBody = (String) response.get("response_body");
+        assertThat(responseBody).contains(INVALID_EMAIL);
     }
 
 
