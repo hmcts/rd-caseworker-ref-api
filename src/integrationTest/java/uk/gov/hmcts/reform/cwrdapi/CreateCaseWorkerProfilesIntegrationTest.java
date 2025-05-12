@@ -174,5 +174,4 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5,caseWorkerProfile.get(0).getUserTypeId());
     }
-    
 }
