@@ -79,7 +79,20 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
 
     }
 
+@Test
+    void createStaffProfileIncorrectEmail() {
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient.createStaffProfile(
+            "staff-rd-profile-func-test-user-only-%s@gmail.com");
+        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        assertEquals(400,response.statusCode());
 
+        StaffProfileCreationResponse staffProfileCreationResponse =
+            response.getBody().as(StaffProfileCreationResponse.class);
+
+        assertNotNull(staffProfileCreationResponse);
+
+    }
+    
     @Test
     @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
