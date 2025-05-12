@@ -296,8 +296,8 @@ public class CaseWorkerApiClient {
 
         return   StaffProfileCreationRequest
                  .staffProfileCreationRequest()
-                 .firstName("staffProfileFirstName")
-                 .lastName("staffProfileLastName")
+                 .firstName("staffProfilefirstName")
+                 .lastName("staffProfilelastName")
                  .emailId(email)
                  .regionId(1).userType("CTSC")
                  .region("region")
@@ -498,8 +498,8 @@ public class CaseWorkerApiClient {
 
         return   StaffProfileCreationRequest
             .staffProfileCreationRequest()
-            .firstName("StaffProfileFirstName")
-            .lastName("StaffProfileLastName")
+            .firstName("StaffProfilefirstName")
+            .lastName("StaffProfilelastName")
             .emailId(emailToUse)
             .regionId(1).userType("CTSC")
             .region("region")
