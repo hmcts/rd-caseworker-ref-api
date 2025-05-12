@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -176,6 +174,5 @@ public class CreateCaseWorkerProfilesIntegrationTest extends AuthorizationEnable
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5,caseWorkerProfile.get(0).getUserTypeId());
     }
-
-
+    
 }
