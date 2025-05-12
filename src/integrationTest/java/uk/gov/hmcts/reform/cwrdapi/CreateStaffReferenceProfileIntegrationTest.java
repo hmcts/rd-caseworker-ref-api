@@ -570,8 +570,8 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
 
         assertThat(caseWorkerProfile.getEmailId()).isNotNull();
 
-        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("StaffProfileFirstName");
-        assertThat(caseWorkerProfile.getLastName()).isEqualTo("StaffProfileLastName");
+        assertThat(caseWorkerProfile.getFirstName()).isEqualTo("StaffProfilefirstName");
+        assertThat(caseWorkerProfile.getLastName()).isEqualTo("StaffProfilelastName");
         assertThat(caseWorkerProfile.getRegion()).isEqualTo("National");
         assertThat(caseWorkerProfile.getSuspended()).isFalse();
         assertThat(caseWorkerProfile.getTaskSupervisor()).isTrue();
