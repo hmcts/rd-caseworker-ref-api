@@ -1,5 +1,18 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT_PROFILE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_ROLE_PRESENT_PROFILE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +46,6 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.apache.logging.log4j.util.Strings.EMPTY;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_PRIMARY_AND_SECONDARY_ROLES;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.DUPLICATE_SERVICE_CODE_IN_AREA_OF_WORK;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT_PROFILE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_ROLE_PRESENT_PROFILE;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 
 public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -112,6 +113,48 @@ public class CreateStaffReferenceProfileIntegrationTest extends AuthorizationEna
         String caseWorkerId = ((Map<String, String>)response.get("body")).get("case_worker_id");
         assertThat(caseWorkerId).isNotNull();
         validateCreateCaseWorkerProfile(request.getEmailId(),caseWorkerId);
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = { "test.inttest@ibca.org.uk","test.inttest@cabinetoffice.gov.uk"})
+    @DisplayName("Create Staff profile with status 201")
+    @Transactional
+    public void shouldCreateCaseWorkerWithNewDomains(String email) {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+
+        StaffProfileCreationRequest request = caseWorkerReferenceDataClient
+            .buildStaffProfileCreationRequestForVariousEmails(email);
+
+        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
+
+        assertThat(response)
+            .isNotNull()
+            .containsEntry("http_status", "201 CREATED");
+
+        String caseWorkerId = ((Map<String, String>)response.get("body")).get("case_worker_id");
+        assertThat(caseWorkerId).isNotNull();
+        validateCreateCaseWorkerProfile(request.getEmailId(),caseWorkerId);
+    }
+
+    @Test
+    @DisplayName("Error with invalid email status 400")
+    void should_return_error_with_incorrect_domain() {
+
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
+
+        StaffProfileCreationRequest request =
+            caseWorkerReferenceDataClient.buildStaffProfileCreationRequestForVariousEmails("test.inttest@gmail.com");
+
+        Map<String, Object> response = caseworkerReferenceDataClient.createStaffProfile(request, ROLE_STAFF_ADMIN);
+
+        assertThat(response)
+            .isNotNull()
+            .containsEntry("http_status", "400");
+
+        assertThat(response.get("case_worker_id")).isNull();
     }
 
 
