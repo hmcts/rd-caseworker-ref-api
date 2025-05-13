@@ -85,7 +85,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     void createStaffProfileIncorrectEmail() {
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient.createStaffProfile(
             "staff-rd-profile-func-test-user-only-%s@gmail.com");
-        Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
+        Response response = caseWorkerApiClient.createStaffUserProfileForIncorrectEmail(staffProfileCreationRequest);
         assertEquals(400,response.statusCode());
 
         StaffProfileCreationResponse staffProfileCreationResponse =
