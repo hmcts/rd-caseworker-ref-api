@@ -296,8 +296,8 @@ public class CaseWorkerApiClient {
 
         return   StaffProfileCreationRequest
                  .staffProfileCreationRequest()
-                 .firstName("staffProfilefirstName")
-                 .lastName("staffProfilelastName")
+                 .firstName("StaffProfilefirstName")
+                 .lastName("StaffProfilelastName")
                  .emailId(email)
                  .regionId(1).userType("CTSC")
                  .region("region")
