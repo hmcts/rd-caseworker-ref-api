@@ -414,6 +414,22 @@ public class CaseWorkerApiClient {
         return response;
     }
 
+    public Response createStaffUserProfileForIncorrectEmail(StaffProfileCreationRequest request) {
+
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,request.getEmailId(),
+                request.getFirstName(),request.getFirstName());
+        setEmailsTobeDeleted(users.get(EMAIL).toLowerCase());
+
+        Response response = getMultipleAuthHeadersInternal(userRoles)
+                .body(request)
+                .post("/refdata/case-worker/profile")
+                .andReturn();
+        log.info(":: Create staff profile response status code :: " + response.statusCode());
+
+        return response;
+    }
+    
     public Response updateCaseWorkerProfile(CaseWorkersProfileUpdationRequest request) {
 
         Response response = getMultipleAuthHeadersInternal(PRD_ADMIN)
