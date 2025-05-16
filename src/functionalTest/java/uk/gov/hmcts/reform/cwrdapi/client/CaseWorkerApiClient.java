@@ -414,6 +414,22 @@ public class CaseWorkerApiClient {
         return response;
     }
 
+    public Response createStaffUserProfileForIncorrectEmail(StaffProfileCreationRequest request) {
+
+        List<String> userRoles = List.of(ROLE_CWD_ADMIN,ROLE_STAFF_ADMIN);
+        Map<String, String> users =  idamOpenIdClient.createUser(userRoles,request.getEmailId(),
+                request.getFirstName(),request.getFirstName());
+        setEmailsTobeDeleted(users.get(EMAIL).toLowerCase());
+
+        Response response = getMultipleAuthHeadersInternal(userRoles)
+                .body(request)
+                .post("/refdata/case-worker/profile")
+                .andReturn();
+        log.info(":: Create staff profile response status code :: " + response.statusCode());
+
+        return response;
+    }
+    
     public Response updateCaseWorkerProfile(CaseWorkersProfileUpdationRequest request) {
 
         Response response = getMultipleAuthHeadersInternal(PRD_ADMIN)
@@ -473,5 +489,45 @@ public class CaseWorkerApiClient {
 
         return response;
     }
+
+    public StaffProfileCreationRequest createStaffProfile(String email) {
+
+        String emailPattern = "deleteTest1234";
+        String emailToUse = format(email, randomAlphanumeric(10) + emailPattern).toLowerCase();
+
+        Set<String> roles = ImmutableSet.of(" tribunal_case_worker ");
+        List<StaffProfileRoleRequest> caseWorkerRoleRequests =
+            ImmutableList.of(StaffProfileRoleRequest.staffProfileRoleRequest()
+                .roleId(1)
+                .role("Senior Legal Caseworker")
+                .isPrimaryFlag(true).build());
+
+        List<CaseWorkerLocationRequest> caseWorkerLocationRequests = ImmutableList.of(CaseWorkerLocationRequest
+            .caseWorkersLocationRequest()
+            .isPrimaryFlag(true).locationId(1)
+            .location("location").build());
+
+        List<CaseWorkerServicesRequest> caseWorkerServicesRequests = ImmutableList.of(CaseWorkerServicesRequest
+            .caseWorkerServicesRequest()
+            .service("areaOfWork").serviceCode("serviceCode")
+            .build());
+
+        return   StaffProfileCreationRequest
+            .staffProfileCreationRequest()
+            .firstName("StaffProfilefirstName")
+            .lastName("StaffProfilelastName")
+            .emailId(emailToUse)
+            .regionId(1).userType("CTSC")
+            .region("region")
+            .suspended(false)
+            .taskSupervisor(true)
+            .caseAllocator(false)
+            .staffAdmin(false)
+            .roles(caseWorkerRoleRequests)
+            .baseLocations(caseWorkerLocationRequests)
+            .services(caseWorkerServicesRequests)
+            .build();
+    }
+
 
 }
