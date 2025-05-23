@@ -21,7 +21,7 @@ java:
     CWRD_DATA_PER_MESSAGE: 50
     LAUNCH_DARKLY_ENV: "preview"
     ENVIRONMENT_NAME: "preview"
-    EMAIL_DOMAIN_LIST: "justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk"
+    EMAIL_DOMAIN_LIST: "justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk,ibca.org.uk,cabinetoffice.gov.uk"
     STAFF_UPLOAD_FILE: false # false: Block the File,  true: Able to Upload the File
     IDAM_ROLE_MAPPING_FILE: true # false: Block the File,  true: Able to Upload the File
   postgresql:

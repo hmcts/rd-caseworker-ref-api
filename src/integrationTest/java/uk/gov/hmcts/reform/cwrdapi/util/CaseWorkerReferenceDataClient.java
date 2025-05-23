@@ -62,6 +62,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
 
+
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application-test.yml")
 public class CaseWorkerReferenceDataClient {
@@ -626,6 +627,7 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
+    
     public StaffProfileCreationRequest buildStaffProfileCreationRequest(String firstName,
                                                                         String lastName,
                                                                         Integer locationId1,
@@ -653,6 +655,27 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
+    public StaffProfileCreationRequest buildStaffProfileCreationRequestForVariousEmails(String email) {
+
+        return StaffProfileCreationRequest
+            .staffProfileCreationRequest()
+            .firstName("StaffProfilefirstName")
+            .lastName("StaffProfilelastName")
+            .emailId(email)
+            .regionId(1).userType("CTSC")
+            .region("National")
+            .suspended(false)
+            .taskSupervisor(true)
+            .caseAllocator(true)
+            .staffAdmin(false)
+            .roles(getCaseWorkerRoleRequests())
+            .baseLocations(getCaseWorkerLocationRequests())
+            .services(getCaseWorkerServicesRequests())
+            .skills(getSkillsRequest())
+            .build();
+    }
+
+    
     private List<SkillsRequest> getSkillsRequest() {
         return ImmutableList.of(SkillsRequest
                 .skillsRequest()
