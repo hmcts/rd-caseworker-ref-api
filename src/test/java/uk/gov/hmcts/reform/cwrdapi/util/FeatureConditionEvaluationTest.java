@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,9 +125,9 @@ class FeatureConditionEvaluationTest {
 
     static String generateDummyS2SToken(String serviceName) {
         return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+                .subject(serviceName)
+                .issuedAt(new Date())
+                .signWith(Jwts.SIG.HS256.key().build())
                 .compact();
     }
 }
