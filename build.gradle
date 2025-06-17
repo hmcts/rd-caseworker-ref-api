@@ -23,7 +23,7 @@ def versions = [
   commonsLang3       : '3.17.0',
   lombok             : '1.18.36',
   reformHealthStarter: '0.0.5',
-  reformLogging      : '6.1.5',
+  reformLogging      : '6.1.9',
   sonarPitest        : '0.5',
   jackson            : '2.18.2',
   junitPitest        : '1.2.1',
