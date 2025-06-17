@@ -170,7 +170,6 @@ pmd {
   ]
 }
 
-
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
@@ -312,7 +311,6 @@ pitest {
   mutationThreshold = 75
   verbose = false
 }
-
 
 project.tasks['pitest'].group = "Verification"
 
@@ -462,7 +460,6 @@ dependencies {
   testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock'
-
 
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
