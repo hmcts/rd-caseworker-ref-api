@@ -8,9 +8,9 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerDomain;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile;
@@ -51,7 +51,7 @@ class ValidationServiceFacadeImplTest {
     @Autowired
     ExceptionCaseWorkerRepository exceptionCaseWorkerRepository;
 
-    @MockBean
+    @MockitoBean
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
     StaffAuditRepository staffAuditRepository = mock(StaffAuditRepository.class);
