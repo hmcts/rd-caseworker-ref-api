@@ -100,11 +100,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @MockitoBean
     AuthTokenGenerator authTokenGenerator;
 
-    @MockitoBean
+    @Autowired
     JwtDecoder jwtDecoder;
 
     @Autowired
     ObjectMapper objectMapper;
+
+    JwtDecoderMockBuilder helper;
 
     @Autowired
     protected CaseWorkerIdamRoleAssociationRepository roleAssocRepository;
@@ -114,6 +116,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @BeforeEach
     public void setUpClient() {
+        helper = new JwtDecoderMockBuilder(jwtDecoder);
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
         Jwt jwt = Jwt.withTokenValue("test-decoded-jwt")
             .header("alg", "HMAC256")
