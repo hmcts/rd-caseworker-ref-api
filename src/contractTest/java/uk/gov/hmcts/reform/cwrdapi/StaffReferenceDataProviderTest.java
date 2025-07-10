@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileResponse;
@@ -101,7 +102,7 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
 
-    @Mock
+    @MockitoBean
     private RoleTypeRepository roleTypeRepository;
     @InjectMocks
     private CaseWorkerServiceImpl caseWorkerServiceImpl;
@@ -119,7 +120,7 @@ public class StaffReferenceDataProviderTest {
     @Mock
     private CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataFeignClient locationReferenceDataFeignClient;
 
 
