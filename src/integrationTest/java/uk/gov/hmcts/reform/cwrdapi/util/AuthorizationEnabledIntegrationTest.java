@@ -11,14 +11,12 @@ import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -108,9 +106,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     Flyway flyway;
-
-    @MockitoBean
-    protected static JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
@@ -248,10 +243,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
-    @AfterEach
-    public void cleanupTestData() {
-        JwtDecoderMockBuilder.resetJwtDecoder();
-    }
 
 
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
