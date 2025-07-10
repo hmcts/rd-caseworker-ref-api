@@ -18,7 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -143,7 +143,7 @@ public class StaffReferenceDataProviderTest {
 
     @InjectMocks
     private StaffRefDataServiceImpl staffRefDataServiceImpl;
-    @MockBean
+    @MockitoBean
     private UserProfileFeignClient userProfileFeignClient;
     @Mock
     StaffProfileCreateUpdateUtil staffProfileCreateUpdateUtil;
