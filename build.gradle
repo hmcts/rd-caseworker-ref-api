@@ -19,7 +19,7 @@ plugins {
 
 def versions = [
   commonsCompress    : '1.27.1',
-  commonsIo          : '2.18.0',
+  commonsIo          : '2.20.0',
   commonsLang3       : '3.17.0',
   lombok             : '1.18.38',
   reformHealthStarter: '0.0.5',
