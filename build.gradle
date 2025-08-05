@@ -34,7 +34,7 @@ def versions = [
   poi                : '4.1.2',
   reformS2sClient    : '5.3.3',
   tc_postgresql      : '1.20.5',
-  bouncycastle       : '1.80',
+  bouncycastle       : '1.81',
   junit              : '5.11.4',
   junitPlatform      : '1.11.4',
   serenity           : '4.2.34',
