@@ -431,7 +431,7 @@ dependencies {
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.tc_postgresql
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.tc_postgresql
   testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.tc_postgresql
-  testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.10.0'
+  testImplementation group: 'org.wiremock', name: 'wiremock', version: '3.13.1'
   testImplementation ("org.mockito:mockito-core:4.11.0") {
     exclude group: "net.bytebuddy", module: "byte-buddy"
     exclude group: "net.bytebuddy", module: "byte-buddy-agent"
