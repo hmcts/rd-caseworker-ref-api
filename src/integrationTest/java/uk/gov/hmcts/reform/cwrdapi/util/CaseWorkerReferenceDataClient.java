@@ -24,8 +24,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
@@ -62,8 +60,6 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.powermock.api.mockito.PowerMockito.when;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
@@ -92,10 +88,6 @@ public class CaseWorkerReferenceDataClient {
     private long expiration;
     @Autowired
     Environment environment;
-
-    @MockitoBean
-    private JwtDecoder jwtDecoder;
-
     static String bearerToken;
     @Value("${idam.s2s-authorised.services}")
     private String serviceName;
@@ -510,11 +502,6 @@ public class CaseWorkerReferenceDataClient {
 
     public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
         String[] bearerTokenArray = bearerToken.split(" ");
-        // JwtDecoderMockBuilder build  =  new JwtDecoderMockBuilder();
-        //Mockito.when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn
-        // (decode(bearerTokenArray[1]));
-        //when(jwtDecoder.decode(anyString())).thenReturn(mockJwt(bearerTokenArray[1]));
-        when(jwtDecoder.decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
     }
 
     private Jwt createJwt(String token, JWT parsedJwt) {

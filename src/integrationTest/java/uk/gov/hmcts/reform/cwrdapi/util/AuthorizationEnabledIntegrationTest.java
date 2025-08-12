@@ -13,10 +13,12 @@ import net.serenitybdd.annotations.WithTags;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -106,6 +108,14 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
 
     @Autowired
     Flyway flyway;
+
+    @MockitoBean
+    JwtDecoder jwtDecoder;
+
+    static JwtDecoder jwtDecoderTestOverride() {
+        // Return mock JwtDecoder here
+        return Mockito.mock(JwtDecoder.class);
+    }
 
     @BeforeEach
     public void setUpClient() {
@@ -242,7 +252,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"idamRegistrationResponse\":\"201\""
                                 + "}")));
     }
-
 
 
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
