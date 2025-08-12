@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -512,7 +511,8 @@ public class CaseWorkerReferenceDataClient {
     public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
         String[] bearerTokenArray = bearerToken.split(" ");
         // JwtDecoderMockBuilder build  =  new JwtDecoderMockBuilder();
-        //Mockito.when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
+        //Mockito.when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn
+        // (decode(bearerTokenArray[1]));
         //when(jwtDecoder.decode(anyString())).thenReturn(mockJwt(bearerTokenArray[1]));
         when(jwtDecoder.decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
     }
