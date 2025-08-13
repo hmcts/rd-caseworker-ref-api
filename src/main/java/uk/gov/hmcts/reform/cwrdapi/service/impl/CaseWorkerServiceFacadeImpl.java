@@ -142,7 +142,7 @@ public class CaseWorkerServiceFacadeImpl implements CaseWorkerServiceFacade {
             auditLog(file, ex);
             // We are not using Spring Advice here. We are preparing the response from below method are returning it.
             return new ExceptionMapper().errorDetailsResponseEntity(ex,
-                ex.getStatusCode(), ex.getMessage());
+                    (HttpStatus) ex.getStatusCode(), ex.getMessage());
         } catch (Exception ex) {
             auditLog(file, ex);
 

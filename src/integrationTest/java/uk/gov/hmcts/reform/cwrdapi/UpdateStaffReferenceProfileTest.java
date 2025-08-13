@@ -558,7 +558,7 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
 
     void validateUpdateCaseWorkerProfile(String emailId, String caseWorkerId) {
 
-        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailId(emailId);
+        CaseWorkerProfile caseWorkerProfile = caseWorkerProfileRepository.findByEmailIdIgnoreCase(emailId);
 
         assertThat(caseWorkerProfile).isNotNull();
 

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.WorkArea;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.IdamRolesMappingException;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ResourceNotFoundException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.StaffReferenceException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.feign.LocationReferenceDataFeignClient;
@@ -88,6 +89,7 @@ import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ALREADY_SUSPENDED_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.LRD_ERROR;
@@ -171,7 +173,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
 
         try {
             // get all existing profiles from db (used IN clause)
-            List<CaseWorkerProfile> cwDbProfiles = caseWorkerProfileRepo.findByEmailIdIn(emailToRequestMap.keySet());
+            List<CaseWorkerProfile> cwDbProfiles = caseWorkerProfileRepo.findByEmailIdIgnoreCaseIn(
+                    emailToRequestMap.keySet());
 
             //remove all existing profiles requests from cwUiRequests to separate out new and update/suspend profiles
             for (CaseWorkerProfile dbProfile : cwDbProfiles) {
@@ -391,6 +394,10 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 Page<CaseWorkerProfile> staffProfilePage = caseWorkerProfileRepo.findByServiceCodeIn(
                         serviceNameToCodeMapping.keySet(), pageRequest);
 
+                log.info("{}:: No of Pages {} No of Records returned from DB {}", loggingComponentName,
+                        staffProfilePage.getTotalPages(),
+                        staffProfilePage.getTotalElements());
+
                 if (staffProfilePage.isEmpty()) {
                     log.error("{}:: No data found in CRD for the ccd service name {}",
                             loggingComponentName, ccdServiceNames);
@@ -410,8 +417,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                 .ccdServiceName(serviceNameToCodeMapping.get(workArea.getServiceCode()))
                                 .staffProfile(buildCaseWorkerProfileDto(workArea.getCaseWorkerProfile()))
                                 .build()));
-                log.info("{}:: Successfully fetched the staff details to refresh role assignment "
-                        + "for ccd service names {}", loggingComponentName, ccdServiceNames);
+                logMessages(ccdServiceNames, serviceNameToCodeMapping, staffProfileList);
                 return ResponseEntity
                         .ok()
                         .header("total_records", String.valueOf(staffProfilePage.getTotalElements()))
@@ -432,6 +438,20 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
             throw new StaffReferenceException(httpStatus, LRD_ERROR, LRD_ERROR);
         }
 
+    }
+
+    private void logMessages(String ccdServiceNames,
+                             Map<String, String> serviceNameToCodeMapping,
+                             List<StaffProfileWithServiceName> staffProfileList) {
+        log.info("{}:: Successfully fetched the staff details to refresh role assignment "
+                + "for ccd service names {}", loggingComponentName, ccdServiceNames);
+        log.info("{}:: Service Codes {} and CCD Service names {} ",
+                loggingComponentName,
+                serviceNameToCodeMapping.keySet(),
+                serviceNameToCodeMapping.values());
+
+        log.info("{}:: No of Records returned in Response {}", loggingComponentName,
+                staffProfileList.size());
     }
 
     private List<uk.gov.hmcts.reform.cwrdapi.client.domain.CaseWorkerProfile> mapCaseWorkerProfileToDto(
@@ -456,7 +476,8 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .regionName(profile.getRegion())
                 .userType(profile.getUserType().getDescription())
                 .userId(profile.getUserTypeId())
-                .suspended(profile.getSuspended().toString())
+                .suspended(Boolean.TRUE.equals(profile.getSuspended())
+                        ? Boolean.TRUE.toString() : Boolean.FALSE.toString())
                 .staffAdmin(Boolean.TRUE.equals(profile.getUserAdmin()) ? "Y" : "N")
                 .createdTime(profile.getCreatedDate())
                 .lastUpdatedTime(profile.getLastUpdate())
@@ -842,7 +863,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 .stream().filter(userType ->
                         userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
                 .map(UserType::getUserTypeId).findFirst();
-        return userTypeId.orElse(0L);
+        return userTypeId.orElseThrow(() -> new InvalidRequestException(BAD_REQUEST));
     }
 
 

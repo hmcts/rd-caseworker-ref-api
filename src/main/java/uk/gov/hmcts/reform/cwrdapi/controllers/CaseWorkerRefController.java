@@ -59,8 +59,8 @@ public class CaseWorkerRefController {
                     + "and mappings between caseworker and IDAM roles",
             description = "This API will be invoked by user having idam role of cwd-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -100,8 +100,8 @@ public class CaseWorkerRefController {
             summary = "This API builds the idam role mappings for case worker roles",
             description = "This API will be invoked by user having idam role of cwd-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(

@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.cwrdapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +12,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -34,13 +36,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefFunctionalTest.DELETE_CASEWORKER_BY_ID_OR_EMAILPATTERN;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
+
+
 
 @ComponentScan("uk.gov.hmcts.reform.cwrdapi")
 @WithTags({@WithTag("testType:Functional")})
@@ -58,23 +64,34 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
     public static final String FETCH_BY_CASEWORKER_ID = "CaseWorkerRefUsersController.fetchCaseworkersById";
     public static final String STAFF_PROFILE_URL = "/refdata/case-worker";
 
-    @Test
-    @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
-    @ExtendWith(FeatureToggleConditionExtension.class)
-    void createStaffProfile() {
 
-        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
-                .createStaffProfileCreationRequest();
+    @ParameterizedTest
+    @ValueSource(strings = { STAFF_EMAIL_TEMPLATE,STAFF_EMAIL_TEMPLATE_IBCA,STAFF_EMAIL_TEMPLATE_CABINETOFFICE})
+    void createStaffProfile(String email) {
+        String creationEmail = format(email, randomAlphanumeric(10) + "deleteTest1234").toLowerCase();
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient.createStaffProfile(creationEmail);
         Response response = caseWorkerApiClient.createStaffUserProfile(staffProfileCreationRequest);
         assertEquals(201,response.statusCode());
 
         StaffProfileCreationResponse staffProfileCreationResponse =
-                response.getBody().as(StaffProfileCreationResponse.class);
+            response.getBody().as(StaffProfileCreationResponse.class);
 
         assertNotNull(staffProfileCreationResponse);
         assertNotNull(staffProfileCreationResponse.getCaseWorkerId());
+
     }
 
+    @Test
+    void createStaffProfileIncorrectEmail() {
+        StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient.createStaffProfile(
+            "staff-rd-profile-func-test-user-only-%s@gmail.com");
+        Response response = caseWorkerApiClient.createStaffUserProfileForIncorrectEmail(staffProfileCreationRequest);
+
+        assertNotNull(response);
+        assertEquals(400,response.statusCode());
+
+    }
+    
     @Test
     @ToggleEnable(mapKey = CREATE_STAFF_PROFILE, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
@@ -309,7 +326,7 @@ class StaffRefCreateFunctionalTest extends AuthorizationFunctionalTest {
                 .post("/refdata/case-worker/profile")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
-        assertThat(response.getBody().asString()).contains("Access is denied");
+        assertThat(response.getBody().asString()).contains("Access Denied");
 
     }
 

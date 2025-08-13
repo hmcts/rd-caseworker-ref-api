@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 @Repository
 public class CwrdCommonRepository implements ICwrdCommonRepository {

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.util;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -7,8 +9,6 @@ import uk.gov.hmcts.reform.cwrdapi.config.EmailDomainPropertyInitiator;
 
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 @Slf4j
 @NoArgsConstructor

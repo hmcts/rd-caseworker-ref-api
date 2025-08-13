@@ -45,13 +45,13 @@ variable "db_replicas" {
 
 
 variable "product-v16" {
-  type = string
-  default="rd-caseworker-ref-api"
+  type    = string
+  default = "rd-caseworker-ref-api"
 }
 
 variable "component-v16" {
-  type = string
-  default="postgres-db-v16"
+  type    = string
+  default = "postgres-db-v16"
 }
 variable "aks_subscription_id" {
 }
@@ -105,13 +105,24 @@ variable "kv_subscription" {
   description = "Update this with the name of the subscription where the single server key vault is. Defaults to DCD-CNP-DEV."
 }
 
+variable "enable_replica" {
+  description = "Flag to enable the creation of a PostgreSQL Flexible server replica"
+  type        = bool
+  default     = false
+}
+variable "primary_server_id" {
+  description = "Azure resource ID of the primary PostgreSQL server"
+  type        = string
+  default     = "not_applicable" // Dummy Value for none replica environments
+}
+
 variable "pgsql_server_configuration" {
   description = "Postgres server configuration"
   type        = list(object({ name : string, value : string }))
   default = [
     {
       name  = "azure.extensions"
-      value = "PLPGSQL,PG_STAT_STATEMENTS,PG_BUFFERCACHE"
+      value = "PG_STAT_STATEMENTS,PG_BUFFERCACHE"
     },
     {
       name  = "backslash_quote"
@@ -122,4 +133,21 @@ variable "pgsql_server_configuration" {
       value = "OFF"
     }
   ]
+}
+
+variable "action_group_name" {
+  description = "The name of the Action Group to create."
+  type        = string
+  default     = "action_group"
+}
+
+variable "pgsql_sku" {
+  description = "The PGSql flexible server instance sku"
+  default     = "GP_Standard_D4s_v3"
+}
+
+variable "email_address_key" {
+  description = "Email address key in azure Key Vault."
+  type        = string
+  default     = "db-alert-monitoring-email-address"
 }

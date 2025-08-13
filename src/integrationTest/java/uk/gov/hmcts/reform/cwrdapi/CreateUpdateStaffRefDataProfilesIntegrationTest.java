@@ -73,7 +73,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
                 .caseWorkersProfileCreationRequest()
                 .firstName(" firstName ")
                 .lastName(" lastName ")
-                .emailId("test.inttest@hmcts.gov.uk")
+                .emailId("TEST.inttest@hmcts.gov.uk")
                 .regionId(1).userType("CTSC")
                 .region("region")
                 .suspended(false)
@@ -109,7 +109,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         Set<String> emails = new HashSet<>();
         emails.add("test.inttest@hmcts.gov.uk");
         CaseWorkerProfile profile =
-                caseWorkerProfileRepository.findByEmailIdIn(emails).get(0);
+                caseWorkerProfileRepository.findByEmailIdIgnoreCaseIn(emails).get(0);
         assertThat(profile.getFirstName()).isEqualTo("firstName");
         assertThat(profile.getLastName()).isEqualTo("lastName");
         assertThat(profile.getEmailId()).isEqualTo("test.inttest@hmcts.gov.uk");
@@ -153,10 +153,14 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         CaseWorkerRoleRequest cwRoleRequest3 = new CaseWorkerRoleRequest("Registrar", false);
         CaseWorkerRoleRequest cwRoleRequest4 = new CaseWorkerRoleRequest("CICA Caseworker", false);
         CaseWorkerRoleRequest cwRoleRequest5 = new CaseWorkerRoleRequest("Cafcass Cymru Caseworker", false);
-
+        CaseWorkerRoleRequest cwRoleRequest6 = new CaseWorkerRoleRequest("IBCA Caseworker", false);
+        CaseWorkerRoleRequest cwRoleRequest7 = new CaseWorkerRoleRequest("WLU Administrator", false);
+        CaseWorkerRoleRequest cwRoleRequest8 = new CaseWorkerRoleRequest("WLU Team Leader", false);
 
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
-                .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3, cwRoleRequest4, cwRoleRequest5);
+                .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3,
+                        cwRoleRequest4, cwRoleRequest5, cwRoleRequest6, cwRoleRequest7,
+                        cwRoleRequest8);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
 
@@ -169,6 +173,9 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         assertEquals(16, (long) caseWorkerRoles.get(3).getRoleId());
         assertEquals(17, (long) caseWorkerRoles.get(4).getRoleId());
         assertEquals(18, (long) caseWorkerRoles.get(5).getRoleId());
+        assertEquals(19,(long)caseWorkerRoles.get(6).getRoleId());
+        assertEquals(20,(long)caseWorkerRoles.get(7).getRoleId());
+        assertEquals(21,(long)caseWorkerRoles.get(8).getRoleId());
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5, caseWorkerProfile.get(0).getUserTypeId());
     }

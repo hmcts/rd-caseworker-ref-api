@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
+import jakarta.validation.ConstraintViolation;
+
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
 
 public interface IJsrValidatorInitializer<T> {
 

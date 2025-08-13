@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi.config;
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +14,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.Skill;
 import uk.gov.hmcts.reform.cwrdapi.domain.StaffAudit;
 import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 
 @Configuration
 public class RepositoryConfig {

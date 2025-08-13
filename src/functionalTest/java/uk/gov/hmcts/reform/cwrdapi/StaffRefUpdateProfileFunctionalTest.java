@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.cwrdapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -107,7 +107,7 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
                 .put("/refdata/case-worker/profile")
                 .andReturn();
         assertThat(HttpStatus.FORBIDDEN.value()).isEqualTo(response.statusCode());
-        assertThat(response.getBody().asString()).contains("Access is denied");
+        assertThat(response.getBody().asString()).contains("Access Denied");
 
     }
 

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.cwrdapi.controllers.advice.InvalidRequestException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 
 @Service
 @Slf4j
@@ -54,7 +57,7 @@ public class StaffProfileCreateUpdateUtil {
                 .stream().filter(userType ->
                         userType.getDescription().equalsIgnoreCase(userTypeReq.trim()))
                 .map(UserType::getUserTypeId).findFirst();
-        return userTypeId.orElse(0L);
+        return userTypeId.orElseThrow(() -> new InvalidRequestException(BAD_REQUEST));
     }
 
     public List<CaseWorkerLocation> mapStaffLocationRequest(String idamId,

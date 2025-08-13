@@ -6,10 +6,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -42,8 +44,6 @@ import uk.gov.hmcts.reform.cwrdapi.domain.UserType;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -86,8 +86,8 @@ public class StaffRefDataController {
             summary = "This API allows the search of staff user by their name or surname.",
             description = "This API will be invoked by user having idam role of staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -137,8 +137,8 @@ public class StaffRefDataController {
             summary = "This API is used to retrieve the service specific skills ",
             description = "This API will be invoked by user having idam role of staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -179,8 +179,8 @@ public class StaffRefDataController {
             summary = "This API gets the user types from staff reference data",
             description = "This API will be invoked by user having idam role of staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             })
     @ApiResponse(
             responseCode = "200",
@@ -228,8 +228,8 @@ public class StaffRefDataController {
             summary = "This API is used to retrieve the Job Title's ",
             description = "This API will be invoked by user having idam role of staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -279,8 +279,8 @@ public class StaffRefDataController {
             summary = "This API creates staff user profile",
             description = "This API will be invoked by user having idam role of staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -336,8 +336,8 @@ public class StaffRefDataController {
             summary = "This API allows the Advance search of staff",
             description = "This API will be invoked by user having idam role of staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -385,8 +385,8 @@ public class StaffRefDataController {
             summary = "This API updates staff user profile",
             description = "This API will be invoked by user having idam role with staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
@@ -445,8 +445,8 @@ public class StaffRefDataController {
             summary = "This API search a staff user by Id",
             description = "This API will be invoked by user having idam role of staff-admin",
             security = {
-                    @SecurityRequirement(name = "ServiceAuthorization"),
-                    @SecurityRequirement(name = "Authorization")
+                @SecurityRequirement(name = "ServiceAuthorization"),
+                @SecurityRequirement(name = "Authorization")
             }
     )
     @ApiResponse(
