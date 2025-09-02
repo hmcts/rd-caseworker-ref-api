@@ -59,7 +59,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills.size()).isEqualTo(3);
+        assertThat(serviceSkills.size()).isEqualTo(4);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
@@ -91,7 +91,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
         assertThat(serviceSkills).isNotNull();
-        assertThat(serviceSkills.size()).isEqualTo(3);
+        assertThat(serviceSkills.size()).isEqualTo(4);
 
         ServiceSkill serviceSkill = serviceSkills.get(0);
 
