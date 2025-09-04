@@ -58,8 +58,9 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
         assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isGreaterThan(0);
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-        assertThat(serviceSkills.size()).isEqualTo(4);
+        assertThat(serviceSkills.size()).isEqualTo(5);
         for (ServiceSkill ss: serviceSkills) {
+            log.info(":::: skill fetched is"+ss.getId());
             List<SkillDTO> listOfSkillsForSsid = fetchListOfSkills(ss.getId());
             assertThat(ss.getSkills().size()).isEqualTo(listOfSkillsForSsid.size());
             for (int i = 0; i < ss.getSkills().size(); i++) {
