@@ -97,7 +97,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
     @Test
     @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-    void should_return_service_skills_with_status_code_200_verify_heat_count() throws JsonProcessingException {
+    void should_return_service_skills_with_status_code_200_verify_head_count() throws JsonProcessingException {
 
         StaffWorkerSkillResponse staffWorkerSkillResponse = fetchResponse(null);
         assertThat(staffWorkerSkillResponse).isNotNull();
