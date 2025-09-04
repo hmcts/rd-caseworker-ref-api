@@ -15,7 +15,7 @@ INSERT INTO SKILL(skill_id,skill_code,description,service_id,user_type,created_d
 	 (51,'SKILL:HRS1:BD','HRS Tax Chamber','HRS1','Future Operations',timezone('utc', now()),timezone('utc',
 	  now()));
 INSERT INTO SKILL(skill_id,skill_code,description,service_id,user_type,created_date,last_update) VALUES
-	 (52,'SKILL:HRS1:BE','HRS  War Pensions and Armed Forces Compensation Chamber','HRS1','Future Operations',
+	 (52,'SKILL:HRS1:BE','HRS War Pensions and Armed Forces Compensation Chamber','HRS1','Future Operations',
 	 timezone('utc', now()),timezone('utc', now()));
 INSERT INTO SKILL(skill_id,skill_code,description,service_id,user_type,created_date,last_update) VALUES
 	 (53,'SKILL:HRS1:BF','HRS Immigration and Asylum Chamber','HRS1','Future Operations',timezone('utc', now()),
