@@ -12,11 +12,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffWorkerSkillResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.ServiceSkill;
+import uk.gov.hmcts.reform.cwrdapi.domain.SkillDTO;
 import uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension;
 import uk.gov.hmcts.reform.cwrdapi.util.ToggleEnable;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.FeatureToggleConditionExtension.getToggledOffMessage;
@@ -37,7 +41,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
     @Test
     @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
-     void should_return_service_skills_with_status_code_200_when_flag_true() {
+     void should_return_service_skills_with_status_code_200_when_flag_true() throws JsonProcessingException {
 
         Response fetchResponse = caseWorkerApiClient
                 .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
@@ -53,10 +57,37 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
         assertThat(staffWorkerSkillResponse.getServiceSkills()).isNotNull();
         assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isGreaterThan(0);
 
-        ServiceSkill serviceSkill = staffWorkerSkillResponse.getServiceSkills().get(0);
-        assertThat(serviceSkill.getId()).isEqualTo("AAA7");
-        assertThat(serviceSkill.getSkills().size()).isGreaterThanOrEqualTo(1);
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+        assertThat(serviceSkills.size()).isEqualTo(4);
+        for (ServiceSkill ss: serviceSkills) {
+            List<SkillDTO> listOfSkillsForSsid = fetchListOfSkills(ss.getId());
+            assertThat(ss.getSkills().size()).isEqualTo(listOfSkillsForSsid.size());
+            for (int i = 0; i < ss.getSkills().size(); i++) {
+                SkillDTO skillDto = ss.getSkills().get(i);
+                assertThat(skillDto.getSkillId()).isEqualTo(listOfSkillsForSsid.get(i).getSkillId());
+                assertThat(skillDto.getSkillCode()).isEqualTo(listOfSkillsForSsid.get(i).getSkillCode());
+                assertThat(skillDto.getDescription()).isEqualTo(listOfSkillsForSsid.get(i).getDescription());
+                assertThat(skillDto.getUserType()).isEqualTo(listOfSkillsForSsid.get(i).getUserType());
+            }
+        }
 
+    }
+
+    List<SkillDTO> fetchListOfSkills(String code) throws JsonProcessingException {
+        Response staffWorkerSkillResponse = caseWorkerApiClient
+            .getMultipleAuthHeadersWithoutContentType(ROLE_STAFF_ADMIN)
+            .get(STAFF_REF_DATA_SKILL_URL  + "?service_codes=" + code)
+            .andReturn();
+        staffWorkerSkillResponse.then()
+            .assertThat()
+            .statusCode(200);
+        StaffWorkerSkillResponse swResponse =
+            staffWorkerSkillResponse.getBody().as(StaffWorkerSkillResponse.class);
+        assertThat(staffWorkerSkillResponse).isNotNull();
+        List<ServiceSkill> serviceSkills = swResponse.getServiceSkills();
+        assertThat(swResponse.getServiceSkills().size()).isEqualTo(1);
+
+        return serviceSkills.get(0).getSkills();
     }
 
     @Test
