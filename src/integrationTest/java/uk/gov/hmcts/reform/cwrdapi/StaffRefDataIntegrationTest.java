@@ -102,7 +102,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         assertThat(serviceSkills).isNotNull();
         assertThat(serviceSkills.size()).isEqualTo(4);
 
-        ServiceSkill serviceSkill = serviceSkills.get(0);
+        ServiceSkill serviceSkill = serviceSkills.get(1);
 
         assertThat(serviceSkill.getId()).isEqualTo("AAA7");
 
