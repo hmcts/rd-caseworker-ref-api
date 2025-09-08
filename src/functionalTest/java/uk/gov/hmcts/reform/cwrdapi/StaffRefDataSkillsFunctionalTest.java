@@ -107,7 +107,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
         for (ServiceSkill serviceSkill: staffWorkerSkillResponse.getServiceSkills()) {
             if (serviceSkill.getId().equalsIgnoreCase("AAA7")) {
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(AAA7_SKILL_COUNT);
-            } else if (serviceSkill.getId().equalsIgnoreCase("HRS1")) {
+            } else if (serviceSkill.getId().equalsIgnoreCase("HRS")) {
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(HRS1_SKILL_COUNT);
             } else if (serviceSkill.getId().equalsIgnoreCase("BHA1")) {
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(BHA1_SKILL_COUNT);
