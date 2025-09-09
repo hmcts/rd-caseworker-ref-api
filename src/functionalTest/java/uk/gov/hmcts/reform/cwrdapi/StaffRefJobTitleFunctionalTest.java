@@ -74,16 +74,21 @@ class StaffRefJobTitleFunctionalTest extends AuthorizationFunctionalTest {
 
     @Test
     @ToggleEnable(mapKey = mapKey, withFeature = true)
-    void fetchJobTitlesWithoutRegistrarStatusCode_200() {
+    void fetchJobTitlesWithoutRegistrarRole_200() {
         StaffRefJobTitleResponse responses = (StaffRefJobTitleResponse)
             caseWorkerApiClient.fetchJobTitles(
                 HttpStatus.OK
             );
-        for (int i = 0; i <= responses.getJobTitles().size(); i++) {
-            log.info("%^%$^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$ jobs i fetched" + responses.getJobTitles().get(i));
-        }
 
-        assertTrue(responses.getJobTitles().size() < 0);
+        assertThat(responses.getJobTitles().size()).isEqualTo(20);
+        // Assert that no job title contains "Registrar" in the role_description
+        assertThat(responses.getJobTitles())
+            .noneMatch(jobTitle -> jobTitle.getRoleDescription().contains("Registrar"));
+
+        // Assert that no job title has role_id 16
+        assertThat(responses.getJobTitles())
+            .noneMatch(jobTitle -> jobTitle.getRoleId() == 16);
+
     }
 
     @Test
