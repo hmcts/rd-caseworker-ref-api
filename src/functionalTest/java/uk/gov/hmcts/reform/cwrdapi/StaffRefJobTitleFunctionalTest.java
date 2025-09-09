@@ -73,6 +73,20 @@ class StaffRefJobTitleFunctionalTest extends AuthorizationFunctionalTest {
     }
 
     @Test
+    @ToggleEnable(mapKey = mapKey, withFeature = true)
+    void fetchJobTitlesWithoutRegistrarStatusCode_200() {
+        StaffRefJobTitleResponse responses = (StaffRefJobTitleResponse)
+            caseWorkerApiClient.fetchJobTitles(
+                HttpStatus.OK
+            );
+        for(int i=0; i<=responses.getJobTitles().size(); i++){
+            log.info("%^%$^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$ jobs i fetched"+responses.getJobTitles().get(i));
+        }
+
+        assertTrue(responses.getJobTitles().size() < 0);
+    }
+
+    @Test
     @ExtendWith(FeatureToggleConditionExtension.class)
     @ToggleEnable(mapKey = mapKey, withFeature = false)
     void should_fetchJobTitles_403_when_Api_toggled_off() {
