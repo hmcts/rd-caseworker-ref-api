@@ -120,8 +120,6 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
 
     }
 
-
-
     @Test
     @ToggleEnable(mapKey = STAFF_REF_DATA_RD_STAFF_UI_KEY, withFeature = false)
     @ExtendWith(FeatureToggleConditionExtension.class)
