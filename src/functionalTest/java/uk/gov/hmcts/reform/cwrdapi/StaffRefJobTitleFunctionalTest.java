@@ -79,7 +79,7 @@ class StaffRefJobTitleFunctionalTest extends AuthorizationFunctionalTest {
             caseWorkerApiClient.fetchJobTitles(
                 HttpStatus.OK
             );
-        for(int i=0; i<= responses.getJobTitles().size(); i++){
+        for (int i = 0; i <= responses.getJobTitles().size(); i++) {
             log.info("%^%$^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$%^$ jobs i fetched" + responses.getJobTitles().get(i));
         }
 
