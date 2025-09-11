@@ -6,6 +6,7 @@ plugins {
     id 'idea'
     id 'jacoco'
     id 'pmd'
+    id 'checkstyle'
     id 'com.github.ben-manes.versions' version '0.52.0'
     id "info.solidsoft.pitest" version '1.15.0'
     id 'io.spring.dependency-management' version '1.1.7'
@@ -161,6 +162,7 @@ configurations {
 }
 
 pmd {
+  toolVersion = "7.16.0"
   ignoreFailures = true
   sourceSets = [sourceSets.main, sourceSets.test, sourceSets.integrationTest, sourceSets.functionalTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
@@ -168,6 +170,10 @@ pmd {
     'category/java/errorprone.xml',
     'category/java/bestpractices.xml'
   ]
+}
+
+checkstyle {
+  toolVersion = '11.0.1'
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
