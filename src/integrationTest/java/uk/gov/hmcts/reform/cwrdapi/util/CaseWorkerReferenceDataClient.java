@@ -6,8 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -595,7 +593,7 @@ public class CaseWorkerReferenceDataClient {
         return Jwts.builder()
                 .setSubject(serviceName)
                 .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+                .signWith(Jwts.SIG.HS256.key().build())
                 .compact();
     }
 
