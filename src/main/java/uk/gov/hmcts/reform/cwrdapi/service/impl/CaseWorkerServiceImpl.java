@@ -251,7 +251,6 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                                                             List<CaseWorkerProfile> suspendedCaseWorkerProfiles,
                                                             Map<String, CaseWorkersProfileCreationRequest>
                                                                     emailToRequestMap) {
-        List<CaseWorkerProfile> processedCwProfiles = null;
         List<CaseWorkerProfile> profilesToBePersisted = new ArrayList<>();
 
         profilesToBePersisted.addAll(newCaseWorkerProfiles);
@@ -259,6 +258,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
         profilesToBePersisted.addAll(suspendedCaseWorkerProfiles);
         profilesToBePersisted = profilesToBePersisted.stream().filter(Objects::nonNull).collect(toList());
 
+        List<CaseWorkerProfile> processedCwProfiles = null;
         if (isNotEmpty(profilesToBePersisted)) {
             processedCwProfiles = caseWorkerProfileRepo.saveAll(profilesToBePersisted);
             log.info("{}:: {} case worker profiles inserted :: Job Id {}", loggingComponentName,
