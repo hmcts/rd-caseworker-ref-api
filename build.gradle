@@ -408,7 +408,7 @@ dependencies {
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
   implementation group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
-  implementation "io.github.openfeign:feign-httpclient:13.5"
+  implementation "io.github.openfeign:feign-httpclient:13.6"
   implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
 
@@ -461,7 +461,7 @@ dependencies {
 
   testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: versions.sonarPitest
 
-  testImplementation 'io.github.openfeign:feign-jackson:13.5'
+  testImplementation 'io.github.openfeign:feign-jackson:13.6'
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
   testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 
