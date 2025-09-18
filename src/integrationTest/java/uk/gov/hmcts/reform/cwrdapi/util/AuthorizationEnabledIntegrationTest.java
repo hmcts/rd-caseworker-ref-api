@@ -11,17 +11,18 @@ import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
@@ -63,13 +64,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     protected FeatureToggleServiceImpl featureToggleServiceImpl;
 
-    @MockBean
+    @MockitoBean
     protected TopicPublisher topicPublisher;
 
-    @MockBean
+    @MockitoBean
     LDClient ldClient;
 
     @Autowired
@@ -97,7 +98,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${oidc.expiration}")
     private long expiration;
 
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
 
     @Autowired
@@ -109,12 +110,26 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     Flyway flyway;
 
-    @MockBean
-    protected static JwtDecoder jwtDecoder;
+    @MockitoBean
+    JwtDecoder jwtDecoder;
+
+    @MockitoBean
+    JwtDecoderMockBuilder helper;
+
+    static JwtDecoder jwtDecoderTestOverride() {
+        // Return mock JwtDecoder here
+        return Mockito.mock(JwtDecoder.class);
+    }
 
     @BeforeEach
     public void setUpClient() {
+        helper = new JwtDecoderMockBuilder();
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
+        Jwt jwt = Jwt.withTokenValue("test-decoded-jwt")
+            .header("alg", "HMAC256")
+            .claim("sub", "1234567890")
+            .build();
+        when(jwtDecoder.decode(anyString())).thenReturn(jwt);
         doNothing().when(topicPublisher).sendMessage(any());
         flyway.clean();
         flyway.migrate();
@@ -246,11 +261,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withBody("{"
                                 + "  \"idamRegistrationResponse\":\"201\""
                                 + "}")));
-    }
-
-    @AfterEach
-    public void cleanupTestData() {
-        JwtDecoderMockBuilder.resetJwtDecoder();
     }
 
 
