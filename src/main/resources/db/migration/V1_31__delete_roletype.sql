@@ -8,3 +8,8 @@ delete from
     role_type
 where
     role_id = '16' and description = 'Registrar';
+
+delete from
+   case_worker_role cwr
+where
+   role_id ='16';
