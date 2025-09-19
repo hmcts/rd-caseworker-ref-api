@@ -928,6 +928,8 @@ class CaseWorkerServiceImplTest {
 
     }
 
+
+
     @Test
     void testRefreshRoleAllocationWhenLrdResponseIsNon200() {
 
