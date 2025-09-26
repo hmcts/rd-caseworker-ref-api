@@ -5,11 +5,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 public class JwtDecoderMockBuilder extends AuthorizationEnabledIntegrationTest {
 
-    public static void resetJwtDecoder() {
+    public  void resetJwtDecoder() {
         jwtDecoder = null;
     }
 
-    public static synchronized JwtDecoder getJwtDecoder() {
+    public synchronized JwtDecoder getJwtDecoder() {
         return jwtDecoder;
     }
 }
