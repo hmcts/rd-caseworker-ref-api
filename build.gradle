@@ -13,7 +13,7 @@ plugins {
     id 'org.springframework.boot' version '3.3.7'
     id "org.flywaydb.flyway" version '9.22.3'
     id 'au.com.dius.pact' version '4.6.17'
-    id 'org.owasp.dependencycheck' version '11.1.1'
+    id 'org.owasp.dependencycheck' version '12.1.6'
     id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.34'
 }
 
@@ -30,7 +30,7 @@ def versions = [
   pact_version       : '4.6.16',
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
-  log4j              : '2.24.2',
+  log4j              : '2.25.2',
   poi                : '4.1.2',
   reformS2sClient    : '5.3.3',
   tc_postgresql      : '1.20.5',
@@ -389,7 +389,7 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
 
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.4'
-  implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.7.4'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.7.5'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.4'
 
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: versions.log4j
@@ -397,7 +397,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.56.1'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.14'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.15'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -441,7 +441,7 @@ dependencies {
     exclude group: "net.bytebuddy", module: "byte-buddy-agent"
   }
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.7'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.6'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.7'
   testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
 
