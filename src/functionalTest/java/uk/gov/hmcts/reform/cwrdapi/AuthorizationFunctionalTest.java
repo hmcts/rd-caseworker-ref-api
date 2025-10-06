@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.response.Response;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.rest.SerenityRest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import uk.gov.hmcts.reform.lib.client.response.S2sClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.codehaus.groovy.runtime.InvokerHelper.asList;
@@ -73,6 +73,9 @@ public class AuthorizationFunctionalTest {
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
     public static final String ROLE_CWD_SYSTEM_USER = "cwd-system-user";
     public static final String STAFF_EMAIL_TEMPLATE = "staff-rd-profile-func-test-user-only-%s@justice.gov.uk";
+    public static final String STAFF_EMAIL_TEMPLATE_IBCA = "staff-rd-profile-func-test-user-only-%s@ibca.org.uk";
+    public static final String STAFF_EMAIL_TEMPLATE_CABINETOFFICE =
+        "staff-rd-profile-func-test-user-only-%s@cabinetoffice.gov.uk";
     public static final String STAFF_EMAIL_PATTERN = "staff-rd-profile-func-test-user-only";
     public static final String CWR_EMAIL_PATTERN = "cwr-rd-func-test-user-only";
 

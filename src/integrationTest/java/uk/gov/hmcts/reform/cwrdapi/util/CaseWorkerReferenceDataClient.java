@@ -8,10 +8,10 @@ import com.nimbusds.jwt.JWTParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.TextCodec;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -20,7 +20,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -65,6 +65,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
+
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application-test.yml")
@@ -142,7 +143,7 @@ public class CaseWorkerReferenceDataClient {
 
     private Object mapServiceSkillsIdResponse(ResponseEntity<Object> responseEntity,
                                               Class<?> clazz) throws JsonProcessingException {
-        HttpStatus status = responseEntity.getStatusCode();
+        HttpStatusCode status = responseEntity.getStatusCode();
 
         if (status.is2xxSuccessful()) {
             return objectMapper.convertValue(responseEntity.getBody(), clazz);
@@ -636,6 +637,7 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
+    
     public StaffProfileCreationRequest buildStaffProfileCreationRequest(String firstName,
                                                                         String lastName,
                                                                         Integer locationId1,
@@ -663,6 +665,27 @@ public class CaseWorkerReferenceDataClient {
                 .build();
     }
 
+    public StaffProfileCreationRequest buildStaffProfileCreationRequestForVariousEmails(String email) {
+
+        return StaffProfileCreationRequest
+            .staffProfileCreationRequest()
+            .firstName("StaffProfilefirstName")
+            .lastName("StaffProfilelastName")
+            .emailId(email)
+            .regionId(1).userType("CTSC")
+            .region("National")
+            .suspended(false)
+            .taskSupervisor(true)
+            .caseAllocator(true)
+            .staffAdmin(false)
+            .roles(getCaseWorkerRoleRequests())
+            .baseLocations(getCaseWorkerLocationRequests())
+            .services(getCaseWorkerServicesRequests())
+            .skills(getSkillsRequest())
+            .build();
+    }
+
+    
     private List<SkillsRequest> getSkillsRequest() {
         return ImmutableList.of(SkillsRequest
                 .skillsRequest()

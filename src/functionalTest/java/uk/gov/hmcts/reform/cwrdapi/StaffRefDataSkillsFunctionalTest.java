@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -54,7 +54,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
         assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isGreaterThan(0);
 
         ServiceSkill serviceSkill = staffWorkerSkillResponse.getServiceSkills().get(0);
-        assertThat(serviceSkill.getId()).isEqualTo("BHA1");
+        assertThat(serviceSkill.getId()).isEqualTo("AAA7");
         assertThat(serviceSkill.getSkills().size()).isGreaterThanOrEqualTo(1);
 
     }

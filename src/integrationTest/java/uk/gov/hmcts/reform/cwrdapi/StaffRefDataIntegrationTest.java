@@ -222,7 +222,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<StaffRefDataJobTitle> jobTitles = staffRefJobTitleResponse.getJobTitles();
 
         assertThat(jobTitles).isNotNull();
-        assertThat(jobTitles).hasSize(18);
+        assertThat(jobTitles).hasSize(21);
 
         StaffRefDataJobTitle staffRefDataJobTitle = jobTitles.get(0);
 
