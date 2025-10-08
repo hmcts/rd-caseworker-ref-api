@@ -21,7 +21,7 @@ def versions = [
   commonsCompress    : '1.27.1',
   commonsIo          : '2.20.0',
   commonsLang3       : '3.17.0',
-  lombok             : '1.18.38',
+  lombok             : '1.18.42',
   reformHealthStarter: '0.0.5',
   reformLogging      : '6.1.9',
   sonarPitest        : '0.5',
