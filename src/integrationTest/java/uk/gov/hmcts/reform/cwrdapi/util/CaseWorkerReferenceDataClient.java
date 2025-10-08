@@ -6,8 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -60,8 +58,6 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
@@ -504,7 +500,6 @@ public class CaseWorkerReferenceDataClient {
 
     public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
         String[] bearerTokenArray = bearerToken.split(" ");
-        when(JwtDecoderMockBuilder.getJwtDecoder().decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
     }
 
     private Jwt createJwt(String token, JWT parsedJwt) {
@@ -598,7 +593,7 @@ public class CaseWorkerReferenceDataClient {
         return Jwts.builder()
                 .setSubject(serviceName)
                 .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
+                .signWith(Jwts.SIG.HS256.key().build())
                 .compact();
     }
 
