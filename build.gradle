@@ -25,7 +25,7 @@ def versions = [
   reformHealthStarter: '0.0.5',
   reformLogging      : '6.1.9',
   sonarPitest        : '0.5',
-  jackson            : '2.18.2',
+  jackson            : '2.20.0',
   junitPitest        : '1.2.1',
   pact_version       : '4.6.16',
   launchDarklySdk    : '5.10.9',
