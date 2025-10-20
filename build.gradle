@@ -392,7 +392,7 @@ dependencies {
 
   implementation group: 'com.google.guava', name: 'guava', version: '33.5.0-jre'
   implementation group: 'jakarta.el', name: 'jakarta.el-api', version: '6.0.1'
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '3.7.5'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-runtime-attach', version: '3.7.5'
