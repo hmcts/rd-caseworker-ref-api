@@ -159,6 +159,7 @@ public class CaseWorkerReferenceDataClient {
 
     }
 
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     private ResponseEntity<Object> getRequest(String uriPath, Class clasz, String role) {
 
