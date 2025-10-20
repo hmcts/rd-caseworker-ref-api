@@ -17,15 +17,18 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreatio
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileUpdationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.UserRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfileCreationResponse;
+import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkersProfileUpdationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileUpdateservice;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
+import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,6 +43,7 @@ class CaseWorkerRefUsersControllerTest {
 
     CaseWorkerService caseWorkerServiceMock;
     CaseWorkerProfileUpdateservice caseWorkerProfileUpdateserviceMock;
+    StaffRefDataService staffRefDataServiceMock;
     List<CaseWorkersProfileCreationRequest> caseWorkersProfileCreationRequest = new ArrayList<>();
     CaseWorkersProfileCreationRequest cwRequest;
     CaseWorkerProfileCreationResponse cwProfileCreationResponse;
@@ -52,6 +56,7 @@ class CaseWorkerRefUsersControllerTest {
     void setUp() {
         caseWorkerServiceMock = mock(CaseWorkerService.class);
         caseWorkerProfileUpdateserviceMock = mock(CaseWorkerProfileUpdateservice.class);
+        staffRefDataServiceMock = mock(StaffRefDataService.class);
         cwResponse = CaseWorkerProfileCreationResponse
                 .builder()
                 .caseWorkerRegistrationResponse("Case Worker Profiles Created.")
@@ -237,5 +242,41 @@ class CaseWorkerRefUsersControllerTest {
         Assertions.assertThrows(InvalidRequestException.class, () ->
             caseWorkerRefUsersController.updateCaseWorkerDetails(caseWorkersProfileUpdationRequest));
 
+    }
+
+    @Test
+    void updateCaseWorkerProfileAlsoUpdateStaffProfile() {
+
+        CaseWorkersProfileUpdationRequest caseWorkersProfileUpdationRequest = CaseWorkersProfileUpdationRequest
+                .caseWorkersProfileUpdationRequest()
+                .suspended(true)
+                .build();
+        when(caseWorkerProfileUpdateserviceMock.updateCaseWorkerProfile(caseWorkersProfileUpdationRequest))
+                .thenReturn(new CaseWorkersProfileUpdationResponse());
+        when(caseWorkerServiceMock.getUserProfileUpdateResponse(any(), any(), any()))
+                .thenReturn(Optional.empty());
+        ResponseEntity<?> actual =
+                caseWorkerRefUsersController.updateCaseWorkerDetails(caseWorkersProfileUpdationRequest);
+        assertNotNull(actual);
+        verify(staffRefDataServiceMock, times(1))
+                .publishStaffProfileToTopic(any());
+    }
+
+    @Test
+    void updateCaseWorkerProfileWhenUserIdEmpty() {
+
+        when(caseWorkerServiceMock.getUserProfileUpdateResponse(any(), any(), any()))
+                .thenReturn(any());
+        CaseWorkersProfileUpdationRequest caseWorkersProfileUpdationRequest = CaseWorkersProfileUpdationRequest
+                .caseWorkersProfileUpdationRequest()
+                .suspended(true)
+                .build();
+        when(caseWorkerProfileUpdateserviceMock.updateCaseWorkerProfile(caseWorkersProfileUpdationRequest))
+                .thenReturn(new CaseWorkersProfileUpdationResponse());
+        ResponseEntity<?> actual =
+                caseWorkerRefUsersController.updateCaseWorkerDetails(caseWorkersProfileUpdationRequest);
+        assertNotNull(actual);
+        verify(staffRefDataServiceMock, times(0))
+                .publishStaffProfileToTopic(any());
     }
 }
