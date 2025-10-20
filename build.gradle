@@ -37,7 +37,7 @@ def versions = [
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
   log4j              : '2.25.2',
-  poi                : '4.1.2',
+  poi                : '5.4.1',
   reformS2sClient    : '5.3.3',
   tc_postgresql      : '1.21.3',
   bouncycastle       : '1.82',
