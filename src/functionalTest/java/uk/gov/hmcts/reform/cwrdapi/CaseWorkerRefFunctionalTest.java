@@ -442,7 +442,7 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ExtendWith(FeatureToggleConditionExtension.class)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
         uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
-                403, null,
+                403,REQUEST_COMPLETED_SUCCESSFULLY,
                 TYPE_XLSX, "Invalid");
     }
 
