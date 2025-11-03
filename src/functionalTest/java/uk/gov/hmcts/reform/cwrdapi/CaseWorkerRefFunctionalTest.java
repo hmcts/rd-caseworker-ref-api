@@ -441,8 +441,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     @ToggleEnable(mapKey = CASEWORKER_FILE_UPLOAD, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload2.xlsx",
-                403, REQUEST_COMPLETED_SUCCESSFULLY, TYPE_XLSX, ROLE_CWD_ADMIN);
+        uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
+                403, "Forbidden", TYPE_XLSX, "Invalid");
     }
 
     @Test
