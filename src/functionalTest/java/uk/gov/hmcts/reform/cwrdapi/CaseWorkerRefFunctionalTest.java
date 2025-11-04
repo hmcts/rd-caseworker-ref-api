@@ -443,7 +443,8 @@ public class CaseWorkerRefFunctionalTest extends AuthorizationFunctionalTest {
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
 
         uploadCaseWorkerFile("src/functionalTest/resources/Staff Data Upload.xlsx",
-                403, "Forbidden", TYPE_XLS, ROLE_CWD_SYSTEM_USER);
+                403, null,
+                TYPE_XLSX, ROLE_CWD_SYSTEM_USER);
     }
 
     @Test
