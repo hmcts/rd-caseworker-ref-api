@@ -188,4 +188,3 @@ Remember to return the localhost back to the remote broker
 for more information, Please refer to the confluence on how to run and publish PACT tests.
 https://tools.hmcts.net/confluence/display/RTRD/PACT+testing
 
-
