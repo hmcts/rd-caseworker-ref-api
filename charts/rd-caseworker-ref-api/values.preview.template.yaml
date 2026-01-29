@@ -34,8 +34,8 @@ java:
   keyVaults:
     rd:
       secrets:
-        - name: ApplicationInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: caseworker-ref-api-s2s-secret
           alias: CASEWORKER_REF_API_S2S_SECRET
         - name: LD-SDK-KEY
