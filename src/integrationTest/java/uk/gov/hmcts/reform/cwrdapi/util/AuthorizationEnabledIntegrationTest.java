@@ -11,7 +11,6 @@ import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +109,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     Flyway flyway;
 
     @MockitoBean
-    protected static JwtDecoder jwtDecoder;
+    protected JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
@@ -248,12 +247,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
-    @AfterEach
-    public void cleanupTestData() {
-        JwtDecoderMockBuilder.resetJwtDecoder();
-    }
-
-
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
     //for update use insert response UUID in test or other mock methods
     public void userProfileCreateUserWireMock(HttpStatus status) {
@@ -318,4 +311,3 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         }
     }
 }
-

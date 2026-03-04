@@ -183,6 +183,12 @@ pmd {
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+  // Prefer local docker-compose postgres for local runs; CI/env can still override via DB_URL/DB_USERNAME/DB_PASSWORD.
+  environment 'DB_URL', System.getenv('DB_URL') ?: 'jdbc:postgresql://localhost:5457/dbrdcaseworker?stringtype=unspecified'
+  environment 'DB_USERNAME', System.getenv('DB_USERNAME') ?: 'dbrdcaseworker'
+  environment 'DB_PASSWORD', System.getenv('DB_PASSWORD') ?: 'dbrdcaseworker'
+  environment 'SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED',
+      System.getenv('SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED') ?: 'false'
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
   finalizedBy aggregate
@@ -499,6 +505,7 @@ dependencies {
   integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
   integrationTestImplementation group: 'org.junit.platform', name: 'junit-platform-commons', version: versions.junitPlatform
   integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: versions.junitPlatform
+  integrationTestRuntimeOnly group: 'org.jetbrains.kotlin', name: 'kotlin-reflect'
 
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
