@@ -183,12 +183,21 @@ pmd {
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-  // Prefer local docker-compose postgres for local runs; CI/env can still override via DB_URL/DB_USERNAME/DB_PASSWORD.
-  environment 'DB_URL', System.getenv('DB_URL') ?: 'jdbc:postgresql://localhost:5457/dbrdcaseworker?stringtype=unspecified'
-  environment 'DB_USERNAME', System.getenv('DB_USERNAME') ?: 'dbrdcaseworker'
-  environment 'DB_PASSWORD', System.getenv('DB_PASSWORD') ?: 'dbrdcaseworker'
-  environment 'SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED',
-      System.getenv('SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED') ?: 'false'
+  // Opt-in local DB mode for environments where Testcontainers is unavailable.
+  // Enable with: LOCAL_DB_INTEGRATION=true ./gradlew integration
+  // or: ./gradlew integration -PlocalIntegrationDb=true
+  def localIntegrationDbEnabled = (
+      System.getenv('LOCAL_DB_INTEGRATION')
+          ?: project.findProperty('localIntegrationDb')
+          ?: 'false'
+  ).toString().toBoolean()
+  if (localIntegrationDbEnabled) {
+    environment 'DB_URL', System.getenv('DB_URL') ?: 'jdbc:postgresql://localhost:5457/dbrdcaseworker?stringtype=unspecified'
+    environment 'DB_USERNAME', System.getenv('DB_USERNAME') ?: 'dbrdcaseworker'
+    environment 'DB_PASSWORD', System.getenv('DB_PASSWORD') ?: 'dbrdcaseworker'
+    environment 'SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED',
+        System.getenv('SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED') ?: 'false'
+  }
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
   finalizedBy aggregate
