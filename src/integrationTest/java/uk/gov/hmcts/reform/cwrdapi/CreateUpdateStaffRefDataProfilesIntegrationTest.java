@@ -156,11 +156,12 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         CaseWorkerRoleRequest cwRoleRequest6 = new CaseWorkerRoleRequest("IBCA Caseworker", false);
         CaseWorkerRoleRequest cwRoleRequest7 = new CaseWorkerRoleRequest("WLU Administrator", false);
         CaseWorkerRoleRequest cwRoleRequest8 = new CaseWorkerRoleRequest("WLU Team Leader", false);
+        CaseWorkerRoleRequest cwRoleRequest9 = new CaseWorkerRoleRequest("HRS Team Leader", false);
 
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
                 .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3,
                         cwRoleRequest4, cwRoleRequest5, cwRoleRequest6, cwRoleRequest7,
-                        cwRoleRequest8);
+                        cwRoleRequest8, cwRoleRequest9);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
 
@@ -176,6 +177,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         assertEquals(19,(long)caseWorkerRoles.get(6).getRoleId());
         assertEquals(20,(long)caseWorkerRoles.get(7).getRoleId());
         assertEquals(21,(long)caseWorkerRoles.get(8).getRoleId());
+        assertEquals(22,(long)caseWorkerRoles.get(9).getRoleId());
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5, caseWorkerProfile.get(0).getUserTypeId());
     }
