@@ -48,7 +48,7 @@ def versions = [
 ]
 
 ext {
-  springCloudVersion = '2024.0.0'
+  springCloudVersion = '2024.0.3'
 }
 
 application {
