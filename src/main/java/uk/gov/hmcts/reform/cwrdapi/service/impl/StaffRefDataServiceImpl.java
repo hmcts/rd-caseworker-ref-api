@@ -693,23 +693,14 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         if (upResponse != null && !upResponse.getIdamId().equals(caseWorkerProfile.getCaseWorkerId())) {
             caseWorkerProfileRepo.delete(caseWorkerProfile);
             cwrCommonRepository.flush();
-            resetGeneratedChildIds(caseWorkerProfile);
             caseWorkerProfile.setCaseWorkerId(upResponse.getIdamId());
             caseWorkerProfile.getCaseWorkerLocations().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfile.getCaseWorkerRoles().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfile.getCaseWorkerWorkAreas().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
             caseWorkerProfile.getCaseWorkerSkills().forEach(e -> e.setCaseWorkerId(upResponse.getIdamId()));
-            caseWorkerProfile.setNew(true);
             caseWorkerProfileRepo.save(caseWorkerProfile);
         }
         return new StaffProfileCreationResponse(caseWorkerProfile.getCaseWorkerId());
-    }
-
-    private void resetGeneratedChildIds(CaseWorkerProfile caseWorkerProfile) {
-        caseWorkerProfile.getCaseWorkerLocations().forEach(location -> location.setCaseWorkerLocationId(null));
-        caseWorkerProfile.getCaseWorkerRoles().forEach(role -> role.setCaseWorkerRoleId(null));
-        caseWorkerProfile.getCaseWorkerWorkAreas().forEach(workArea -> workArea.setCaseWorkerWorkAreaId(null));
-        caseWorkerProfile.getCaseWorkerSkills().forEach(skill -> skill.setCaseWorkerSkillId(null));
     }
 
 
