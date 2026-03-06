@@ -40,7 +40,7 @@ def versions = [
   log4j              : '2.25.2',
   poi                : '4.1.2',
   reformS2sClient    : '5.3.3',
-  tc_postgresql      : '1.21.3',
+  tc_postgresql      : '1.21.4',
   bouncycastle       : '1.82',
   junit              : '5.11.4',
   junitPlatform      : '1.11.4',
@@ -48,7 +48,7 @@ def versions = [
 ]
 
 ext {
-  springCloudVersion = '2023.0.6'
+  springCloudVersion = '2024.0.0'
 }
 
 application {
