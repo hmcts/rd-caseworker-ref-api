@@ -11,17 +11,16 @@ import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.AttributeResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
@@ -63,13 +62,13 @@ import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     protected FeatureToggleServiceImpl featureToggleServiceImpl;
 
-    @MockBean
+    @MockitoBean
     protected TopicPublisher topicPublisher;
 
-    @MockBean
+    @MockitoBean
     LDClient ldClient;
 
     @Autowired
@@ -97,7 +96,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Value("${oidc.expiration}")
     private long expiration;
 
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
 
     @Autowired
@@ -109,8 +108,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     Flyway flyway;
 
-    @MockBean
-    protected static JwtDecoder jwtDecoder;
+    @MockitoBean
+    protected JwtDecoder jwtDecoder;
 
     @BeforeEach
     public void setUpClient() {
@@ -248,12 +247,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
-    @AfterEach
-    public void cleanupTestData() {
-        JwtDecoderMockBuilder.resetJwtDecoder();
-    }
-
-
     //removed UUID mock here and put in Test config,hence use this only for insert integration testing
     //for update use insert response UUID in test or other mock methods
     public void userProfileCreateUserWireMock(HttpStatus status) {
@@ -318,4 +311,3 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         }
     }
 }
-
