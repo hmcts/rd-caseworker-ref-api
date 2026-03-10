@@ -9,7 +9,7 @@ public interface IJsrValidatorStaffProfile {
     /**
      * JSR validation.
      *
-     * @param staffProfile
+     * @param staffProfile staff profile to validate
      *
      */
     void validateStaffProfile(StaffProfileCreationRequest staffProfile,String operationType);
