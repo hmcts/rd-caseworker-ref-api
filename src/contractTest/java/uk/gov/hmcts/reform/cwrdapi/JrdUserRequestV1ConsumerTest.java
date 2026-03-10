@@ -219,8 +219,8 @@ public class JrdUserRequestV1ConsumerTest {
 
     private DslPart createJrdProfileUpdateRequest() {
         return newJsonBody(o -> o
-                .stringType("ccdServiceName", null)
-                .stringType("object_ids", null)
+                .nullValue("ccdServiceName")
+                .nullValue("object_ids")
                 .minArrayLike("sidam_ids", 1,
                         PactDslJsonRootValue.stringType("44362987-4b00-f2e7-4ff8-761b87f16bf9"),1)
         ).build();
@@ -237,7 +237,7 @@ public class JrdUserRequestV1ConsumerTest {
     private DslPart createJrdProfileForServiceNameRequest() {
         return newJsonBody(o -> o
                 .stringType("ccdServiceName", "CMC")
-                .stringType("object_ids", null)
+                .nullValue("object_ids")
                 .minArrayLike("sidam_ids", 1,
                         PactDslJsonRootValue.stringType("44362987-4b00-f2e7-4ff8-761b87f16bf9"),1)
         ).build();
