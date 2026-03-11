@@ -183,7 +183,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
     }
 
     @Test
-    void shouldCreateCaseworkerWithRole_ENFORCEMENT() {
+    void shouldCreateCaseworkerWithRole_Enforcement() {
         userProfileCreateUserWireMock(HttpStatus.CREATED);
         CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
         CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
