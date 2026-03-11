@@ -193,7 +193,7 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
                 .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3);
         caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
-        caseWorkersProfileCreationRequests.get(0).setUserType("Other Government Department");
+        caseWorkersProfileCreationRequests.get(0).setUserType("ENFORCEMENT");
 
         Map<String, Object> response = caseworkerReferenceDataClient
                 .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
