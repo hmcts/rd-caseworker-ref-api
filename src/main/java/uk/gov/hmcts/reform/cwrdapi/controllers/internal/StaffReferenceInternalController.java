@@ -106,7 +106,7 @@ public class StaffReferenceInternalController {
             @RequestParam(name = "sort_direction", required = false) String sortDirection,
             @RequestParam(name = "sort_column", required = false) String sortColumn
     ) {
-        log.info("{}:: Fetching the staff details to refresh role assignment for ccd service names {}",
+        log.debug("{}:: Fetching the staff details to refresh role assignment for ccd service names {}",
                 loggingComponentName, ccdServiceNames);
         if (StringUtils.isBlank(ccdServiceNames)) {
             throw new InvalidRequestException(REQUIRED_PARAMETER_CCD_SERVICE_NAMES_IS_EMPTY);
