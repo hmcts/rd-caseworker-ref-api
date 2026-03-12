@@ -193,6 +193,9 @@ class CaseWorkerRefUsersControllerTest {
         CaseWorkerRoleRequest cwRoleRequest5 = new CaseWorkerRoleRequest("WLU Administrator",false);
         CaseWorkerRoleRequest cwRoleRequest6 = new CaseWorkerRoleRequest("WLU Team Leader",false);
         CaseWorkerRoleRequest cwRoleRequest7 = new CaseWorkerRoleRequest("HRS Team Leader",false);
+        CaseWorkerRoleRequest cwRoleRequest8 = new CaseWorkerRoleRequest("Bailiff",false);
+        CaseWorkerRoleRequest cwRoleRequest9 = new CaseWorkerRoleRequest("Bailiff Administrator",false);
+        CaseWorkerRoleRequest cwRoleRequest10 = new CaseWorkerRoleRequest("Bailiff Manager",false);
         caseWorkerRoleRequests.add(cwRoleRequest);
         caseWorkerRoleRequests.add(cwRoleRequest1);
         caseWorkerRoleRequests.add(cwRoleRequest2);
@@ -201,6 +204,9 @@ class CaseWorkerRefUsersControllerTest {
         caseWorkerRoleRequests.add(cwRoleRequest5);
         caseWorkerRoleRequests.add(cwRoleRequest6);
         caseWorkerRoleRequests.add(cwRoleRequest7);
+        caseWorkerRoleRequests.add(cwRoleRequest8);
+        caseWorkerRoleRequests.add(cwRoleRequest9);
+        caseWorkerRoleRequests.add(cwRoleRequest10);
         caseWorkersProfileCreationRequest.get(0).setRoles(caseWorkerRoleRequests);
         caseWorkersProfileCreationRequest.get(0).setUserType("Other Government Department");
         when(caseWorkerServiceMock.processCaseWorkerProfiles(caseWorkersProfileCreationRequest))
