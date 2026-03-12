@@ -247,7 +247,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<StaffRefDataUserType> userTypes = staffRefDataUserTypesResponse.getUserTypes();
 
         assertThat(userTypes).isNotNull();
-        assertThat(userTypes).hasSize(5);
+        assertThat(userTypes).hasSize(6);
 
 
         validateUserTypes(userTypes);
@@ -293,6 +293,11 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         userTypes.add(StaffRefDataUserType.builder()
                 .id(5L)
                 .code("Other Government Department")
+                .build());
+
+        userTypes.add(StaffRefDataUserType.builder()
+                .id(6L)
+                .code("ENFORCEMENT")
                 .build());
 
 
