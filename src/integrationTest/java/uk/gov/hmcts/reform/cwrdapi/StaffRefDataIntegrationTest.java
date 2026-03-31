@@ -48,10 +48,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_retrieveAllServiceSkills_return_status_code_200()
             throws JsonProcessingException {
         String path = "/skill";
-
         String role = "staff-admin";
-
-
         final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
                 .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
 
@@ -59,21 +56,33 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills.size()).isEqualTo(3);
+        assertThat(serviceSkills.size()).isEqualTo(4);
 
-        ServiceSkill serviceSkill = serviceSkills.get(0);
+        for (ServiceSkill ss: serviceSkills) {
+            List<SkillDTO> listOfSkillsForSSId = fetchListOfSkills(ss.getId());
+            assertThat(ss.getSkills().size()).isEqualTo(listOfSkillsForSSId.size());
+            for (int i = 0; i < ss.getSkills().size(); i++) {
+                SkillDTO skillDTO = ss.getSkills().get(i);
+                assertThat(skillDTO.getSkillId()).isEqualTo(listOfSkillsForSSId.get(i).getSkillId());
+                assertThat(skillDTO.getSkillCode()).isEqualTo(listOfSkillsForSSId.get(i).getSkillCode());
+                assertThat(skillDTO.getDescription()).isEqualTo(listOfSkillsForSSId.get(i).getDescription());
+                assertThat(skillDTO.getUserType()).isEqualTo(listOfSkillsForSSId.get(i).getUserType());
+            }
+        }
 
-        assertThat(serviceSkill.getId()).isEqualTo("AAA7");
-
-        assertThat(serviceSkill.getSkills().size()).isEqualTo(4);
-
-        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
-
-        assertThat(skillDTO.getSkillId()).isEqualTo(9L);
-        assertThat(skillDTO.getSkillCode()).isEqualTo("SKILL:AAA7:TEST1");
-        assertThat(skillDTO.getDescription()).isEqualTo("testskill1");
-        assertThat(skillDTO.getUserType()).isEqualTo("CTSC");
     }
+
+    List<SkillDTO> fetchListOfSkills(String code) throws JsonProcessingException {
+        String path = "/skill?service_codes=" + code;
+        String role = "staff-admin";
+        final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
+            .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
+        assertThat(staffWorkerSkillResponse).isNotNull();
+        List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
+        assertThat(serviceSkills.size()).isEqualTo(1);
+        return serviceSkills.get(0).getSkills();
+    }
+
 
     @Test
     void should_retrieveAllServiceSkills_return_status_code_200_when_empty_servicecode()
@@ -91,9 +100,9 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
         assertThat(serviceSkills).isNotNull();
-        assertThat(serviceSkills.size()).isEqualTo(3);
+        assertThat(serviceSkills.size()).isEqualTo(4);
 
-        ServiceSkill serviceSkill = serviceSkills.get(0);
+        ServiceSkill serviceSkill = serviceSkills.get(1);
 
         assertThat(serviceSkill.getId()).isEqualTo("AAA7");
 
