@@ -181,4 +181,28 @@ public class CreateUpdateStaffRefDataProfilesIntegrationTest extends Authorizati
         var caseWorkerProfile = caseWorkerProfileRepository.findAll();
         assertEquals(5, caseWorkerProfile.get(0).getUserTypeId());
     }
+
+    @Test
+    void shouldCreateCaseworkerWithRole_Enforcement() {
+        userProfileCreateUserWireMock(HttpStatus.CREATED);
+        CaseWorkerRoleRequest cwRoleRequest = new CaseWorkerRoleRequest("Regional Centre Administrator", true);
+        CaseWorkerRoleRequest cwRoleRequest1 = new CaseWorkerRoleRequest("Regional Centre Team Leader", false);
+        CaseWorkerRoleRequest cwRoleRequest2 = new CaseWorkerRoleRequest("DWP Caseworker", false);
+        CaseWorkerRoleRequest cwRoleRequest3 = new CaseWorkerRoleRequest("Registrar", false);
+
+        List<CaseWorkerRoleRequest> caseWorkerRoleRequests = ImmutableList
+                .of(cwRoleRequest, cwRoleRequest1, cwRoleRequest2, cwRoleRequest3);
+        caseWorkersProfileCreationRequests.get(0).setRoles(caseWorkerRoleRequests);
+        caseWorkersProfileCreationRequests.get(0).setUserType("ENFORCEMENT");
+
+        Map<String, Object> response = caseworkerReferenceDataClient
+                .createCaseWorkerProfile(caseWorkersProfileCreationRequests, "cwd-admin");
+        assertThat(response).containsEntry("http_status", "201 CREATED");
+        List<CaseWorkerRole> caseWorkerRoles = caseWorkerRoleRepository.findAll();
+        assertEquals(13, (long) caseWorkerRoles.get(0).getRoleId());
+        assertEquals(14, (long) caseWorkerRoles.get(2).getRoleId());
+        assertEquals(16, (long) caseWorkerRoles.get(3).getRoleId());
+        var caseWorkerProfile = caseWorkerProfileRepository.findAll();
+        assertEquals(6, caseWorkerProfile.get(0).getUserTypeId());
+    }
 }
