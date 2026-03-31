@@ -32,7 +32,7 @@ def versions = [
   reformHealthStarter: '0.0.5',
   reformLogging      : '8.0.0',
   sonarPitest        : '0.5',
-  jackson            : '2.18.2',
+  jackson            : '2.20.0',
   junitPitest        : '1.2.1',
   pact_version       : '4.6.19',
   launchDarklySdk    : '5.10.9',
@@ -387,7 +387,7 @@ dependencies {
   
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.20'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
   implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: versions.jackson
   implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
