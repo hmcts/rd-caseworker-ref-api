@@ -66,11 +66,11 @@ withNightlyPipeline(type, product, component) {
   env.execution_environment = "aat"
 
   // Var for testcontainers.org
-  env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctspublic.azurecr.io/imported/"
+  env.TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX = "hmctsprod.azurecr.io/imported/"
 
   overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
-
+  
   enableMutationTest()
   enableFullFunctionalTest()
   enableSecurityScan()
@@ -107,6 +107,13 @@ withNightlyPipeline(type, product, component) {
             reportFiles          : "index.html",
             reportName           : "Mutation Test Report"
     ]
+  
+    // Authenticate Docker to hmctsprod ACR so Testcontainers can pull the Ryuk reaper
+    // and base images via TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX. Reuses the managed
+    // identity already established by `az login --identity` earlier in the pipeline.
+    sh '''
+      env AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
+    '''
   }
 
   afterAlways('fortify-scan') {
@@ -115,7 +122,7 @@ withNightlyPipeline(type, product, component) {
 }
 
 def deleteFunctionalDbData() {
-  withDocker('hmctspublic.azurecr.io/imported/jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${FUNC_DATABASE_PASS} -v ${WORKSPACE}/deletescript/:/deletescript") {
+  withDocker('hmctsprod.azurecr.io/imported/jbergknoff/postgresql-client', "--entrypoint='' -e PGPASSWORD=${FUNC_DATABASE_PASS} -v ${WORKSPACE}/deletescript/:/deletescript") {
     sh "chmod +x /deletescript/delete-functional-data.sh"
     sh "/deletescript/delete-functional-data.sh \
                         ${FUNC_DATABASE_USER} \
