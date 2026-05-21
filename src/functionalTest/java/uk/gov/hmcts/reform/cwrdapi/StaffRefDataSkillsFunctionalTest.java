@@ -36,7 +36,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
     public static final String STAFF_REF_DATA_SKILL_URL = "/refdata/case-worker/skill";
     public static final String STAFF_REF_DATA_RD_STAFF_UI_KEY =
             "StaffRefDataController.retrieveAllServiceSkills";
-    public static final int SKILL_COUNT = 5;
+    public static final int SKILL_COUNT = 6;
     public static final int AAA7_SKILL_COUNT = 2;
     public static final int BHA1_SKILL_COUNT = 1;
     public static final int AAA6_SKILL_COUNT = 2;
