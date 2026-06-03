@@ -37,7 +37,7 @@ def versions = [
   pact_version       : '4.6.19',
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
-  log4j              : '2.25.2',
+  log4j              : '2.26.0',
   poi                : '4.1.2',
   reformS2sClient    : '5.3.3',
   tc_postgresql      : '1.21.4',
