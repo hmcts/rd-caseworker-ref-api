@@ -13,7 +13,6 @@ Architecture of the Caseworker (https://tools.hmcts.net/confluence/pages/viewpag
 Business of the CaseWorker (https://tools.hmcts.net/confluence/display/RTRD/Caseworker+Reference+Data)
 
 
-
 ### Prerequisites
 
 To run the project you will need to have the following installed:
