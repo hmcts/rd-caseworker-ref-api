@@ -36,12 +36,13 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
     public static final String STAFF_REF_DATA_SKILL_URL = "/refdata/case-worker/skill";
     public static final String STAFF_REF_DATA_RD_STAFF_UI_KEY =
             "StaffRefDataController.retrieveAllServiceSkills";
-    public static final int SKILL_COUNT = 5;
+    public static final int SKILL_COUNT = 6;
     public static final int AAA7_SKILL_COUNT = 2;
     public static final int BHA1_SKILL_COUNT = 1;
     public static final int AAA6_SKILL_COUNT = 2;
     public static final int ABA5_SKILL_COUNT = 13;
     public static final int ABA6_SKILL_COUNT = 32;
+    public static final int ABA2_SKILL_COUNT = 9;
 
 
     @Test
@@ -115,6 +116,8 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(ABA5_SKILL_COUNT);
             } else if (serviceSkill.getId().equalsIgnoreCase("ABA6")) {
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(ABA6_SKILL_COUNT);
+            } else if (serviceSkill.getId().equalsIgnoreCase("ABA2")) {
+                assertThat(serviceSkill.getSkills().size()).isEqualTo(ABA2_SKILL_COUNT);
             }
         }
 
