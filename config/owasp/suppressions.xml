@@ -29,4 +29,17 @@
     </notes>
     <cve>CVE-2026-33117</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-06-19
+        False positive:
+        CVE-2025-7962 applies to angus-activation.
+        Affected libraries reported by dependency-check are:
+        - angus-activation 2.0.3
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2025-7962</cve>
+  </suppress>
 </suppressions>
