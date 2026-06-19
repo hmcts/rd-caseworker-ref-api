@@ -588,6 +588,9 @@ dependencyManagement {
       entry 'junit-platform-engine'
       entry 'junit-platform-launcher'
     }
+    dependencySet(group: 'com.azure', version: '2.12.0') {
+      entry 'azure-core-amqp'
+    }
   }
 }
 
