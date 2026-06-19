@@ -580,6 +580,14 @@ dependencyManagement {
     dependencySet(group: 'org.assertj', version: '3.27.7') {
       entry 'assertj-core'
     }
+    dependencySet(group: 'org.codehaus.plexus', version: '3.6.1') {
+      entry 'plexus-utils'
+    }
+    dependencySet(group: 'org.junit.platform', version: versions.junitPlatform) {
+      entry 'junit-platform-commons'
+      entry 'junit-platform-engine'
+      entry 'junit-platform-launcher'
+    }
   }
 }
 
