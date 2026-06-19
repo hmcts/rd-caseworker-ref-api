@@ -42,4 +42,19 @@
     </notes>
     <cve>CVE-2025-7962</cve>
   </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+        Reviewed 2026-06-19
+        False positive:
+        CVE-2022-26336 and CVE-2025-31672 apply to apache poi libraries.
+        Affected libraries reported by dependency-check are:
+        - poi 4.1.2
+        - poi-ooxml 4.1.2
+        - poi-ooxml-schemas 4.1.2
+        Versions of used libraries are their latest respectively.
+      ]]>
+    </notes>
+    <cve>CVE-2025-7962</cve>
+  </suppress>
 </suppressions>
