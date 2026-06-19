@@ -577,6 +577,9 @@ dependencyManagement {
       entry 'feign-jackson'
       entry 'feign-slf4j'
     }
+    dependencySet(group: 'org.assertj', version: '3.27.7') {
+      entry 'assertj-core'
+    }
   }
 }
 
