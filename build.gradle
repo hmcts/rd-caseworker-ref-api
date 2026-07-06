@@ -397,7 +397,7 @@ dependencies {
   }
   implementation (group: 'com.fasterxml.jackson.core', name: 'jackson-annotations') {
     version {
-      strictly versions.jackson
+      strictly '2.22'
     }
   }
   implementation (group: 'com.fasterxml.jackson.core', name: 'jackson-databind') {
