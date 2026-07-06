@@ -51,7 +51,9 @@ public class StaffProfileAuditServiceImpl implements IStaffProfileAuditService {
 
             UserInfo userInfo = jwtGrantedAuthoritiesConverter.getUserInfo();
             String userId = (nonNull(userInfo) && nonNull(userInfo.getUid())) ? userInfo.getUid() : null;
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+//            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+//            objectMapper.setDefaultPropertyInclusion(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
             String request = objectMapper.writeValueAsString(staffProfileCreationRequest);
 
             StaffAudit staffAudit = StaffAudit.builder()
