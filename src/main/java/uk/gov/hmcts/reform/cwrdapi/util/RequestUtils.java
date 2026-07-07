@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.ReflectionUtils;
@@ -214,7 +215,7 @@ public class RequestUtils {
     }
 
     private static void checkIfStringStartsAndEndsWithComma(String csvIds, String exceptionMessage) {
-        if (StringUtils.startsWith(csvIds, COMMA) || StringUtils.endsWith(csvIds, COMMA)) {
+        if (Strings.CS.startsWith(csvIds, COMMA) || Strings.CS.endsWith(csvIds, COMMA)) {
             throw new InvalidRequestException(String.format(exceptionMessage, csvIds));
         }
     }
