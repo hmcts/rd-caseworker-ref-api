@@ -44,7 +44,7 @@ def versions = [
   bouncycastle       : '1.84',
   junit              : '5.12.2',
   junitPlatform      : '1.12.2',
-  serenity           : '4.3.3',
+  serenity           : '5.3.10',
 ]
 
 ext {
