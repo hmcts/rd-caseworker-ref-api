@@ -288,7 +288,7 @@ runProviderPactVerification.dependsOn contractTest
 runProviderPactVerification.finalizedBy pactVerify
 
 jacoco {
-  toolVersion = "0.8.14"
+  toolVersion = "0.8.15"
 }
 
 jacocoTestReport {
