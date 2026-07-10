@@ -37,7 +37,7 @@ def versions = [
   pact_version       : '4.6.19',
   launchDarklySdk    : '5.10.9',
   restAssured        : '4.3.3',
-  log4j              : '2.26.0',
+  log4j              : '2.26.1',
   poi                : '4.1.2',
   reformS2sClient    : '5.3.4',
   tc_postgresql      : '1.21.4',
@@ -379,7 +379,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
 
   implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: versions.bouncycastle
-  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.2'
+  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.4'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.reformS2sClient
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version:'0.9.1'
   implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.2'
