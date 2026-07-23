@@ -35,12 +35,14 @@ import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkerProfilesDeleti
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.CaseWorkersProfileUpdationResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.StaffProfileCreationResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerDeleteService;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerProfileUpdateservice;
 import uk.gov.hmcts.reform.cwrdapi.service.CaseWorkerService;
 import uk.gov.hmcts.reform.cwrdapi.service.StaffRefDataService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -51,6 +53,8 @@ import static uk.gov.hmcts.reform.cwrdapi.controllers.constants.ErrorConstants.N
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.API_IS_NOT_AVAILABLE_IN_PROD_ENV;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.BAD_REQUEST;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.FORBIDDEN_ERROR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_PENDING;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.IDAM_STATUS_SUSPENDED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INTERNAL_SERVER_ERROR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
@@ -337,9 +341,18 @@ public class CaseWorkerRefUsersController {
         caseWorkersProfileUpdationResponse = caseWorkerProfileUpdateservice
             .updateCaseWorkerProfile(caseWorkersProfileUpdationRequest);
         if (isNotEmpty(caseWorkersProfileUpdationResponse)) {
-            StaffProfileCreationResponse staffProfileCreationResponse = StaffProfileCreationResponse
-                .builder().caseWorkerId(caseWorkersProfileUpdationResponse.getUserId()).build();
-            staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
+
+            Optional<Object> resultResponse = caseWorkerService.getUserProfileUpdateResponse(
+                UserProfileUpdatedData.builder().idamStatus(
+                    caseWorkersProfileUpdationRequest.getSuspended() ? IDAM_STATUS_SUSPENDED
+                        : IDAM_STATUS_PENDING).build(),
+                caseWorkersProfileUpdationRequest.getUserId(), "NON-EXUI");
+
+            if (isNotEmpty(resultResponse)) {
+                StaffProfileCreationResponse staffProfileCreationResponse = StaffProfileCreationResponse
+                    .builder().caseWorkerId(caseWorkersProfileUpdationResponse.getUserId()).build();
+                staffRefDataService.publishStaffProfileToTopic(staffProfileCreationResponse);
+            }
         }
         return ResponseEntity
             .status(HttpStatus.OK).body(caseWorkersProfileUpdationResponse);
