@@ -625,6 +625,9 @@ dependencyManagement {
     dependencySet(group: 'com.fasterxml.jackson.module', version: versions.jackson) {
       entry 'jackson-module-parameter-names'
     }
+    dependencySet(group: 'org.apache.qpid', version: '0.35.0') {
+      entry 'proton-j'
+    }
   }
 }
 
