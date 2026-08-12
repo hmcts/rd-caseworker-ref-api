@@ -628,6 +628,9 @@ dependencyManagement {
     dependencySet(group: 'org.apache.qpid', version: '0.35.0') {
       entry 'proton-j'
     }
+    dependencySet(group: 'org.apache.httpcomponents.client5', version: '5.6.3') {
+      entry 'httpclient5'
+    }
   }
 }
 
