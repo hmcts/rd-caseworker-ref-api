@@ -547,12 +547,12 @@ dependencyManagement {
     mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
   }
   dependencies {
-    dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.57') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.59') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
     }
-    dependencySet(group: 'io.netty', version: '4.2.16.Final') {
+    dependencySet(group: 'io.netty', version: '4.2.17.Final') {
       entry 'netty-buffer'
       entry 'netty-codec'
       entry 'netty-codec-dns'
