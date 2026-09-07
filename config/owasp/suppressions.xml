@@ -154,4 +154,39 @@
         <notes>https://tools.hmcts.net/jira/browse/DTSRD-6689 Reactor Netty</notes>
         <cve>CVE-2026-47874</cve>
     </suppress>
+  <!-- CVE-2026-47834 - Spring Data JPA 3.5.13 -->
+<suppress>
+    <notes><![CDATA[
+        CVE-2026-47834 - Spring Data JPA 3.5.13.
+        Temporary suppression pending upgrade to a patched Spring version.
+    ]]></notes>
+    <packageUrl regex="true">
+        ^pkg:maven/org\.springframework\.data/spring-data-jpa@3\.5\.13$
+    </packageUrl>
+    <cve>CVE-2026-47834</cve>
+</suppress>
+
+<!-- CVE-2026-47841 - Spring Security 6.5.11 -->
+<suppress>
+    <notes><![CDATA[
+        CVE-2026-47841 - Spring Security 6.5.11.
+        Temporary suppression pending upgrade to a patched Spring version.
+    ]]></notes>
+    <packageUrl regex="true">
+        ^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$
+    </packageUrl>
+    <cve>CVE-2026-47841</cve>
+</suppress>
+
+<!-- CVE-2026-47842 - Spring Security 6.5.11 -->
+<suppress>
+    <notes><![CDATA[
+        CVE-2026-47842 - Spring Security 6.5.11.
+        Temporary suppression pending upgrade to a patched Spring version.
+    ]]></notes>
+    <packageUrl regex="true">
+        ^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$
+    </packageUrl>
+    <cve>CVE-2026-47842</cve>
+</suppress>
 </suppressions>
