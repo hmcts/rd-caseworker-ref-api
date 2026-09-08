@@ -55,6 +55,7 @@ module "db-rd-caseworker-ref-v16" {
 
   # Sets correct DB owner after migration to fix permissions
   enable_schema_ownership        = var.enable_schema_ownership
+  enable_write_group_access      = true
   force_schema_ownership_trigger = "3"
   kv_subscription                = var.kv_subscription
   kv_name                        = data.azurerm_key_vault.rd_key_vault.name
