@@ -47,6 +47,7 @@ module "db-rd-caseworker-ref-v16" {
   pgsql_databases = [
     {
       name = "dbrdcaseworker"
+      schemas_for_writer_access = ["dbrdcaseworker"]
     }
   ]
 
