@@ -85,8 +85,6 @@ import java.util.stream.Collectors;
 import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.Objects.requireNonNull;
-import static java.util.Set.copyOf;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
@@ -739,6 +737,21 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
 
     public UserProfileResponse getUserProfileFromUP(String idamId) {
         Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId, "SRD");
+        UserProfileResponse userProfileResponse = toUserProfileResponse(response);
+
+        if (userProfileResponse == null) {
+            response = userProfileFeignClient.getUserProfile(idamId);
+            userProfileResponse = toUserProfileResponse(response);
+        }
+
+        return userProfileResponse;
+    }
+
+    private UserProfileResponse toUserProfileResponse(Response response) {
+        if (response == null) {
+            return null;
+        }
+
         ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
 
 
@@ -905,12 +918,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
     public boolean updateUserRolesInIdam(StaffProfileCreationRequest cwrProfileRequest, String idamId) {
 
 
-        Response response = userProfileFeignClient.getUserProfileWithRolesById(idamId, "SRD");
-        ResponseEntity<Object> responseEntity = toResponseEntity(response, UserProfileResponse.class);
-
-        Optional<Object> resultResponse = validateAndGetResponseEntity(responseEntity);
-        if (!resultResponse.isPresent() || !(resultResponse.get() instanceof UserProfileResponse profileResponse)
-                || !nonNull(profileResponse.getIdamStatus())) {
+        UserProfileResponse userProfileResponse = getUserProfileFromUP(idamId);
+        if (userProfileResponse == null || !nonNull(userProfileResponse.getIdamStatus())) {
 
             log.error("{}:: updateUserRolesInIdam :: status code {}", loggingComponentName);
             throw new StaffReferenceException(HttpStatus.BAD_REQUEST, IDAM_STATUS_USER_PROFILE,
@@ -930,9 +939,8 @@ public class StaffRefDataServiceImpl implements StaffRefDataService {
         idamRolesCwr.addAll(mappedRoles);
         Set<RoleName> mergedRoles = new HashSet<>();
 
-        UserProfileResponse userProfileResponse = (UserProfileResponse) requireNonNull(responseEntity.getBody());
-
-        Set<String> userProfileRoles = copyOf(userProfileResponse.getRoles());
+        Set<String> userProfileRoles = new HashSet<>(
+                Optional.ofNullable(userProfileResponse.getRoles()).orElse(Collections.emptyList()));
         if ((isNotTrue(userProfileRoles.equals(idamRolesCwr)) && isNotEmpty(idamRolesCwr))) {
             mergedRoles = idamRolesCwr.stream()
                     .filter(s -> !(userProfileRoles.contains(s)))
