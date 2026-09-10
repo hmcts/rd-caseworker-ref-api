@@ -394,7 +394,7 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
                 Page<CaseWorkerProfile> staffProfilePage = caseWorkerProfileRepo.findByServiceCodeIn(
                         serviceNameToCodeMapping.keySet(), pageRequest);
 
-                log.info("{}:: No of Pages {} No of Records returned from DB {}", loggingComponentName,
+                log.debug("{}:: No of Pages {} No of Records returned from DB {}", loggingComponentName,
                         staffProfilePage.getTotalPages(),
                         staffProfilePage.getTotalElements());
 
@@ -443,14 +443,14 @@ public class CaseWorkerServiceImpl implements CaseWorkerService {
     private void logMessages(String ccdServiceNames,
                              Map<String, String> serviceNameToCodeMapping,
                              List<StaffProfileWithServiceName> staffProfileList) {
-        log.info("{}:: Successfully fetched the staff details to refresh role assignment "
+        log.debug("{}:: Successfully fetched the staff details to refresh role assignment "
                 + "for ccd service names {}", loggingComponentName, ccdServiceNames);
-        log.info("{}:: Service Codes {} and CCD Service names {} ",
+        log.debug("{}:: Service Codes {} and CCD Service names {} ",
                 loggingComponentName,
                 serviceNameToCodeMapping.keySet(),
                 serviceNameToCodeMapping.values());
 
-        log.info("{}:: No of Records returned in Response {}", loggingComponentName,
+        log.debug("{}:: No of Records returned in Response {}", loggingComponentName,
                 staffProfileList.size());
     }
 
