@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -218,26 +218,45 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     @Test
     void should_retrieveAllTitles_return_status_code_200()
             throws JsonProcessingException {
-        String path = "/job-title";
 
-        String role = "staff-admin";
-
-
-        final var staffRefJobTitleResponse = (StaffRefJobTitleResponse) caseworkerReferenceDataClient
-                .retrieveStaffRefData(StaffRefJobTitleResponse.class, path, role);
+        final var staffRefJobTitleResponse =
+                (StaffRefJobTitleResponse) caseworkerReferenceDataClient.retrieveStaffRefData(
+                        StaffRefJobTitleResponse.class,
+                        "/job-title",
+                        CaseWorkerReferenceDataClient.ROLE_STAFF_ADMIN);
 
         assertThat(staffRefJobTitleResponse).isNotNull();
 
         List<StaffRefDataJobTitle> jobTitles = staffRefJobTitleResponse.getJobTitles();
 
         assertThat(jobTitles).isNotNull();
-        assertThat(jobTitles).hasSize(23);
-
-        StaffRefDataJobTitle staffRefDataJobTitle = jobTitles.get(0);
-
-        assertThat(staffRefDataJobTitle.getRoleId()).isEqualTo(3L);
-        assertThat(staffRefDataJobTitle.getRoleDescription()).isEqualTo("Hearing Centre Team Leader");
-
+        assertThat(jobTitles).hasSize(25);
+        org.hamcrest.MatcherAssert.assertThat(jobTitles, containsInAnyOrder(
+                new StaffRefDataJobTitle(1L, "Senior Legal Caseworker"),
+                new StaffRefDataJobTitle(2L, "Legal Caseworker"),
+                new StaffRefDataJobTitle(3L, "Hearing Centre Team Leader"),
+                new StaffRefDataJobTitle(4L, "Hearing Centre Administrator"),
+                new StaffRefDataJobTitle(5L, "Court Clerk"),
+                new StaffRefDataJobTitle(6L, "National Business Centre Team Leader"),
+                new StaffRefDataJobTitle(7L, "National Business Centre Listing Team"),
+                new StaffRefDataJobTitle(8L, "National Business Centre Payments Team"),
+                new StaffRefDataJobTitle(9L, "CTSC Team Leader"),
+                new StaffRefDataJobTitle(10L, "CTSC Administrator"),
+                new StaffRefDataJobTitle(11L, "National Business Centre Administrator"),
+                new StaffRefDataJobTitle(12L, "Regional Centre Team Leader"),
+                new StaffRefDataJobTitle(13L, "Regional Centre Administrator"),
+                new StaffRefDataJobTitle(14L, "DWP Caseworker"),
+                new StaffRefDataJobTitle(15L, "HMRC Caseworker"),
+                new StaffRefDataJobTitle(16L, "Registrar"),
+                new StaffRefDataJobTitle(17L, "CICA Caseworker"),
+                new StaffRefDataJobTitle(18L, "Cafcass Cymru Caseworker"),
+                new StaffRefDataJobTitle(19L, "IBCA Caseworker"),
+                new StaffRefDataJobTitle(20L, "WLU Administrator"),
+                new StaffRefDataJobTitle(21L, "WLU Team Leader"),
+                new StaffRefDataJobTitle(22L, "HRS Team Leader"),
+                new StaffRefDataJobTitle(23L, "Bailiff Administrator"),
+                new StaffRefDataJobTitle(24L, "Bailiff"),
+                new StaffRefDataJobTitle(25L, "Bailiff Manager")));
     }
 
     @Test
@@ -307,7 +326,4 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         return userTypes;
     }
-
-
-
 }
