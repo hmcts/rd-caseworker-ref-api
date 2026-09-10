@@ -529,6 +529,69 @@ class StaffRefDataUpdateStaffServiceImplTest {
     }
 
     @Test
+    void test_updateStaffProfile_with_suspended_user_when_roles_lookup_returns_404()
+            throws JsonProcessingException {
+
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        caseWorkerProfile.setCaseWorkerId("CWID1");
+        caseWorkerProfile.setFirstName("CWFirstName");
+        caseWorkerProfile.setLastName("CWLastName");
+        caseWorkerProfile.setEmailId("cwr-func-test-user@test.com");
+        caseWorkerProfile.setSuspended(true);
+
+        when(caseWorkerProfileRepository.findByEmailIdIgnoreCase(any())).thenReturn(caseWorkerProfile);
+        when(caseWorkerProfileRepository.save(any())).thenReturn(caseWorkerProfile);
+
+        UserProfileResponse emptyUserProfileResponse = new UserProfileResponse();
+
+        when(userProfileFeignClient.getUserProfileWithRolesById(any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.GET, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(emptyUserProfileResponse),
+                                defaultCharset())
+                        .status(404).build());
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setIdamId("CWID1");
+        userProfileResponse.setIdamStatus(IDAM_STATUS_SUSPENDED);
+        userProfileResponse.setRoles(Arrays.asList(ROLE_CWD_USER, ROLE_STAFF_ADMIN));
+        userProfileResponse.setFirstName("CWFirstName");
+        userProfileResponse.setLastName("CWLastName");
+
+        when(userProfileFeignClient.getUserProfile(any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.GET, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        UserProfileRolesResponse userProfileRolesResponse = new UserProfileRolesResponse();
+        AttributeResponse attributeResponse = new AttributeResponse();
+        attributeResponse.setIdamStatusCode(HttpStatus.OK.value());
+        userProfileRolesResponse.setAttributeResponse(attributeResponse);
+
+        when(userProfileFeignClient.modifyUserRoles(any(), any(), any()))
+                .thenReturn(Response.builder()
+                        .request(Request.create(Request.HttpMethod.PUT, "", new HashMap<>(), Request.Body.empty(),
+                                null)).body(mapper.writeValueAsString(userProfileRolesResponse),
+                                defaultCharset())
+                        .status(200).build());
+
+        StaffProfileCreationRequest staffProfileCreationRequest = getStaffProfileUpdateRequest();
+        staffProfileCreationRequest.setSuspended(true);
+        staffProfileCreationRequest.setFirstName("testFNChanged");
+        staffProfileCreationRequest.setLastName("testLNChanged");
+
+        StaffProfileCreationResponse staffProfileCreationResponse = staffRefDataServiceImpl
+                .updateStaffProfile(staffProfileCreationRequest);
+
+        assertThat(staffProfileCreationResponse).isNotNull();
+        assertThat(staffProfileCreationResponse.getCaseWorkerId()).isEqualTo("CWID1");
+        verify(userProfileFeignClient, times(2)).getUserProfileWithRolesById(any(), any());
+        verify(userProfileFeignClient, times(2)).getUserProfile(any());
+    }
+
+    @Test
     void test_updateStaffProfile_with_changed_values() throws JsonProcessingException {
 
 
