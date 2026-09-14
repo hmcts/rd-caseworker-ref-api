@@ -27,6 +27,9 @@ java:
     REFRESH_SORT_COLUMN: caseWorkerId
     STAFF_UPLOAD_FILE: false # false: Block the File,  true: Able to Upload the File
     IDAM_ROLE_MAPPING_FILE: true # false: Block the File,  true: Able to Upload the File
+    JWT_ISSUER_VALIDATION_ENABLED: false
+    IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o
+    IDAM_SECURITY_ALLOWED_ISSUERS_1: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
   keyVaults:
     rd:
       secrets:

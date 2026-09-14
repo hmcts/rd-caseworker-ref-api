@@ -24,6 +24,9 @@ java:
     EMAIL_DOMAIN_LIST: "justice.gov.uk,dwp.gov.uk,hmrc.gov.uk,hmcts.net,dfcni.gov.uk,ibca.org.uk,cabinetoffice.gov.uk"
     STAFF_UPLOAD_FILE: false # false: Block the File,  true: Able to Upload the File
     IDAM_ROLE_MAPPING_FILE: true # false: Block the File,  true: Able to Upload the File
+    JWT_ISSUER_VALIDATION_ENABLED: true
+    IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.aat.platform.hmcts.net/o
+    IDAM_SECURITY_ALLOWED_ISSUERS_1: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
   postgresql:
     enabled: true
     auth:
