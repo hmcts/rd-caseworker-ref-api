@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.google.common.collect.ImmutableList;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +21,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerProfileRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerRoleRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
+import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockTestEnvironment;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,7 +31,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,8 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CASE_ALLOCATOR;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_FIRST_NAME;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.CW_LAST_NAME;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TASK_SUPERVISOR;
+import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithGivenRoleAndStatus;
 
 @Transactional
 public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEnabledIntegrationTest {
@@ -54,16 +58,24 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
     @Autowired
     CaseWorkerWorkAreaRepository caseWorkerWorkAreaRepository;
 
-
-    public static final String ROLE_STAFF_ADMIN = "staff-admin";
-
     SearchRequest searchReq;
+
+    private static WireMockServer idamMockServer = WireMockTestEnvironment.idam();
+    private static StubMapping cwdSystemUserStub = null;
 
     @BeforeEach
     public void setUpClient() {
         super.setUpClient();
+        cwdSystemUserStub = stubIdamWithGivenRoleAndStatus(idamMockServer, "active", List.of(ROLE_STAFF_ADMIN));
         cleanUpEach();
     }
+
+    @AfterAll
+    public static void cleanUp() {
+        idamMockServer.removeStub(cwdSystemUserStub);
+    }
+
+
 
     @AfterEach
     public void cleanUpEach() {
@@ -71,7 +83,6 @@ public class CaseWorkerProfileRepositoryIntegrationTest extends AuthorizationEna
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
         caseWorkerWorkAreaRepository.deleteAll();
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
 

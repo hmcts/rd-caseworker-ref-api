@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
+import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockTestEnvironment;
 
 import java.util.List;
 import java.util.Map;
@@ -44,9 +47,11 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_PROFI
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_LOCATION_PRESENT_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_PRIMARY_ROLE_PRESENT_PROFILE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithInvalidRole;
 
 public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegrationTest {
 
+    private static WireMockServer idamMockServer = WireMockTestEnvironment.idam();
 
     @Autowired
     CaseWorkerProfileRepository caseWorkerProfileRepository;
@@ -104,14 +109,12 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
     @Transactional
     void should_return_update_staff_user_with_status_code_200_child_tables_size() throws Exception {
 
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
 
         Map<String, Object> createResponse = caseworkerReferenceDataClient
                 .createStaffProfile(request,ROLE_STAFF_ADMIN);
 
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
 
         String roles = "[\"Senior Legal Caseworker\"]";
@@ -121,8 +124,13 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         request.setFirstName("StaffProfilefirstNameCN");
         request.setLastName("StaffProfilelastNameCN");
         request.setResendInvite(false);
+
+        StubMapping invalidRoleStubbing = stubIdamWithInvalidRole(idamMockServer);
+
         Map<String, Object> response = caseworkerReferenceDataClient
                 .updateStaffProfile(request,ROLE_STAFF_ADMIN);
+
+        idamMockServer.removeStub(invalidRoleStubbing);
 
         assertThat(response).isNotNull();
         assertThat(response.get("case_worker_id")).isNotNull();
@@ -149,7 +157,6 @@ public class UpdateStaffReferenceProfileTest extends AuthorizationEnabledIntegra
         assertThat(caseWorkerRoleRepository.findAll().size()).isEqualTo(1);
         assertThat(caseWorkerWorkAreaRepository.findAll().size()).isEqualTo(2);
         assertThat(caseWorkerSkillRepository.findAll().size()).isEqualTo(1);
-
     }
 
 

@@ -4,26 +4,41 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
+import static uk.gov.hmcts.reform.cwrdapi.oidc.JwtGrantedAuthoritiesConverter.TOKEN_NAME;
 
 
 @Slf4j
 public final class JwtTokenUtil {
 
     private static final String SUBJECT = "sub";
+    private static final RSAKey TEST_RSA_JWK;
+    private static final String CRD_CLAIM = "CRD_Claim";
 
     private JwtTokenUtil() {
+    }
+
+    static {
+        try {
+            TEST_RSA_JWK = KeyGenUtil.getRsaJwk();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -34,6 +49,7 @@ public final class JwtTokenUtil {
      */
     public static String generateToken(String issuer, long ttlMillis, String userId, String role) {
         final long nowMillis = System.currentTimeMillis();
+        long expMillis = nowMillis + ttlMillis;
 
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
                 .subject(role + " " + userId)
@@ -42,18 +58,14 @@ public final class JwtTokenUtil {
                 .audience(role)
                 .claim("tokenName", "access_token");
 
-        if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
-            Date exp = new Date(expMillis);
-            builder.expirationTime(exp);
-        }
+        getJwtClaimsBuilder(new Date(),new Date(expMillis));
 
         SignedJWT signedJwt = null;
         try {
             signedJwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256)
-                    .keyID(KeyGenUtil.getRsaJwk().getKeyID()).build(),
+                    .keyID(TEST_RSA_JWK.getKeyID()).build(),
                     builder.build());
-            signedJwt.sign(new RSASSASigner(KeyGenUtil.getRsaJwk()));
+            signedJwt.sign(new RSASSASigner(TEST_RSA_JWK));
         } catch (JOSEException e) {
             log.error("error while creating bearer token : " + (e.getMessage()));
         }
@@ -92,6 +104,46 @@ public final class JwtTokenUtil {
         tokenResult.add(tokenisedSubValue[0]);
         tokenResult.add(tokenisedSubValue[1]);
         return tokenResult;
+    }
+
+    public static String generateAuthToken(String issuer, boolean isExpired) throws Exception {
+
+        Instant now = Instant.now();
+
+        Instant issuedAt = isExpired
+                ? now.minus(2, ChronoUnit.HOURS)
+                : now.minusSeconds(60);
+
+        Instant expiresAt = isExpired
+                ? now.minus(1, ChronoUnit.HOURS)
+                : now.plusSeconds(3600);
+
+        JWTClaimsSet.Builder claimsBuilder =
+                getJwtClaimsBuilder(Date.from(issuedAt), Date.from(expiresAt));
+
+        if (issuer != null) {
+            claimsBuilder.issuer(issuer);
+        }
+
+        JWSHeader header =
+                new JWSHeader.Builder(JWSAlgorithm.RS256)
+                        .keyID(TEST_RSA_JWK.getKeyID())
+                        .build();
+
+        SignedJWT signedJwt = new SignedJWT(header, claimsBuilder.build());
+
+        signedJwt.sign(new RSASSASigner(TEST_RSA_JWK));
+
+        return signedJwt.serialize();
+    }
+
+    private static JWTClaimsSet.Builder getJwtClaimsBuilder(Date issuedAt,
+                                                            Date expiresAt) {
+        return new JWTClaimsSet.Builder()
+                .subject(CRD_CLAIM)
+                .issueTime(issuedAt)
+                .claim(TOKEN_NAME, ACCESS_TOKEN)
+                .expirationTime(expiresAt);
     }
 }
 

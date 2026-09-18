@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -19,15 +21,19 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerWorkAreaRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
+import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockTestEnvironment;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_EMAIL;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.NO_DATA_FOUND;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_SYSTEM_USER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_PRD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
+import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithGivenRoleAndStatus;
 
 public class UpdateCaseWorkerIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -51,10 +57,20 @@ public class UpdateCaseWorkerIntegrationTest extends AuthorizationEnabledIntegra
     @Autowired
     StaffAuditRepository staffAuditRepository;
 
+    private static WireMockServer idamMockServer = WireMockTestEnvironment.idam();
+    private static StubMapping cwdSystemUserStub = null;
+
+    @AfterAll
+    public static void cleanUp() {
+        idamMockServer.removeStub(cwdSystemUserStub);
+    }
+
     @BeforeEach
     public void setUpClient() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         super.setUpClient();
+        cwdSystemUserStub = stubIdamWithGivenRoleAndStatus(idamMockServer, "active", List.of(ROLE_CWD_SYSTEM_USER,
+                ROLE_PRD_ADMIN));
         caseWorkerProfileRepository.deleteAll();
         caseWorkerLocationRepository.deleteAll();
         caseWorkerRoleRepository.deleteAll();
@@ -85,7 +101,7 @@ public class UpdateCaseWorkerIntegrationTest extends AuthorizationEnabledIntegra
 
 
     @Test
-    void should_return_update_staff_user_with_status_code_200_from_profile_sync() throws Exception {
+    void should_return_update_staff_user_with_status_code_200_from_profile_sync() {
 
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
@@ -116,15 +132,11 @@ public class UpdateCaseWorkerIntegrationTest extends AuthorizationEnabledIntegra
     @Test
     void should_return_resource_notfound_when_passing_an_invalid_caseworkerID() throws Exception {
 
-
-
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
         StaffProfileCreationRequest request = caseWorkerReferenceDataClient.createStaffProfileCreationRequest();
-        Map<String, Object> createResponse = caseworkerReferenceDataClient
+        caseworkerReferenceDataClient
             .createStaffProfile(request,ROLE_STAFF_ADMIN);
 
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
 
         request.setFirstName("StaffProfilefirstNameCN");

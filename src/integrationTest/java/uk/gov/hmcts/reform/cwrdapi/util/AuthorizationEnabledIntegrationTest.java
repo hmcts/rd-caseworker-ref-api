@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -27,7 +26,7 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.RestTemplateConfiguration;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
-import uk.gov.hmcts.reform.cwrdapi.config.WireMockExtension;
+import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockExtension;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
@@ -43,7 +42,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,13 +51,14 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.decodeJwtToken;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
-import static uk.gov.hmcts.reform.cwrdapi.util.KeyGenUtil.getDynamicJwksResponse;
 
 @Configuration
 @SerenityTest
 @WithTags({@WithTag("testType:Integration")})
-@TestPropertySource(properties = {"S2S_URL=http://127.0.0.1:8990", "IDAM_URL:http://127.0.0.1:5000",
-    "USER_PROFILE_URL:http://127.0.0.1:8091", "spring.config.location=classpath:application-test.yml"})
+@TestPropertySource(properties = {
+    "USER_PROFILE_URL:http://127.0.0.1:8091",
+    "spring.config.location=classpath:application-test.yml",
+})
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 
@@ -75,17 +75,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     protected CaseWorkerReferenceDataClient caseworkerReferenceDataClient;
 
     @RegisterExtension
-    public static WireMockExtension s2sService = new WireMockExtension(8990);
-
-
-    @RegisterExtension
     public static WireMockExtension userProfileService = new WireMockExtension(8091);
-
-    @RegisterExtension
-    public static WireMockExtension sidamService = new WireMockExtension(5000, new CaseWorkerTransformer());
-
-    @RegisterExtension
-    public static WireMockExtension mockHttpServerForOidc = new WireMockExtension(7000);
 
     @Value("${crd.security.roles.cwd-admin}")
     public String cwdAdmin;
@@ -108,9 +98,6 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
     @Autowired
     Flyway flyway;
 
-    @MockitoBean
-    protected JwtDecoder jwtDecoder;
-
     @BeforeEach
     public void setUpClient() {
         when(featureToggleServiceImpl.isFlagEnabled(anyString(), anyString())).thenReturn(true);
@@ -119,50 +106,13 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
         flyway.migrate();
     }
 
-    @BeforeEach
-    public void setupIdamStubs() throws Exception {
-
-        s2sService.stubFor(get(urlEqualTo("/details"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withHeader("Connection", "close")
-                        .withBody("rd_caseworker_ref_api")));
-
-
-        UserIdentifier userDetails = UserIdentifier.builder()
-                .id("%s")
-                .uid("%s")
-                .forename("Super")
-                .surname("User")
-                .email("super.user@hmcts.net")
-                .accountStatus("active")
-                .roles(List.of("%s"))
-                .build();
-
-        sidamService.stubFor(get(urlPathMatching("/o/userinfo"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withHeader("Connection", "close")
-                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(userDetails))
-                        .withTransformers("user-token-response")));
-
-        mockHttpServerForOidc.stubFor(get(urlPathMatching("/jwks"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withHeader("Connection", "close")
-                        .withBody(getDynamicJwksResponse())));
-    }
-
     public void userProfileGetUserWireMock(String idamStatus, String roles) throws JsonProcessingException {
         userProfileService.stubFor(get(urlPathMatching("/v1/userprofile.*"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withHeader("Connection", "close")
                         .withStatus(200)
-                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(
+                        .withBody(getObjectMapper().writeValueAsString(
                                 getUserIdentifierData(idamStatus, roles))))
         );
     }
@@ -173,7 +123,7 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                         .withHeader("Content-Type", "application/json")
                         .withHeader("Connection", "close")
                         .withStatus(status)
-                        .withBody(WireMockUtil.getObjectMapper().writeValueAsString(
+                        .withBody(getObjectMapper().writeValueAsString(
                                 getUserIdentifierData("pending", "%s"))))
         );
     }
@@ -261,8 +211,8 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "}")));
     }
 
-    public void userProfilePostUserWireMockForStaffProfile(HttpStatus status) {
-        userProfileService.stubFor(post(urlPathMatching("/v1/userprofile"))
+    public static void userProfilePostUserWireMockForStaffProfile(HttpStatus status) {
+        userProfileService.stubFor(post(urlPathEqualTo("/v1/userprofile"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withStatus(201)

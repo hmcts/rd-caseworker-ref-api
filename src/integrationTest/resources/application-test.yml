@@ -1,5 +1,5 @@
 server:
-  port: 8095
+  port: 0
 
 management:
   endpoints:

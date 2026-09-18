@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,7 @@ import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
 import uk.gov.hmcts.reform.cwrdapi.domain.ExceptionCaseWorker;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
+import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockTestEnvironment;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -61,13 +66,30 @@ import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_FAILE
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.RECORDS_UPLOADED;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_COMPLETED_SUCCESSFULLY;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.REQUEST_FAILED_FILE_UPLOAD_JSR;
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.TYPE_XLSX;
+import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithGivenRoleAndStatus;
+import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithInvalidRole;
 
 public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Autowired
     JdbcTemplate template;
+
+    private static WireMockServer idamMockServer = WireMockTestEnvironment.idam();
+    private static StubMapping cwdSystemUserStub = null;
+
+    @AfterAll
+    public static void cleanUp() {
+        idamMockServer.removeStub(cwdSystemUserStub);
+    }
+
+    @BeforeAll
+    public static void setUp() {
+        cwdSystemUserStub = stubIdamWithGivenRoleAndStatus(idamMockServer, "active", List.of(ROLE_CWD_ADMIN));
+    }
+
 
     String exceptedResponse = "{\"message\":\"Request Completed Successfully\","
         + "\"message_details\":\"4 record(s) uploaded\"}";
@@ -209,10 +231,10 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldReturn403WhenRoleIsInvalid() throws IOException {
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        StubMapping invalidRoleStub = stubIdamWithInvalidRole(idamMockServer);
         uploadCaseWorkerFile("Staff Data Upload Xlsx With Only Header.xlsx",
             TYPE_XLSX, "403", "invalid");
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        idamMockServer.removeStub(invalidRoleStub);
     }
 
     @Test
@@ -502,13 +524,13 @@ public class CaseWorkerCreateUserWithFileUploadTest extends FileUploadTest {
 
     @Test
     public void shouldFailToCreateAuditForInvalidRole() throws IOException {
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        StubMapping invalidRoleStub = stubIdamWithInvalidRole(idamMockServer);
         uploadCaseWorkerFile("Staff Data Upload.xlsx",
                         TYPE_XLSX, "403", "invalid");
 
         List<CaseWorkerAudit> caseWorkerAudits = caseWorkerAuditRepository.findAll();
         assertThat(caseWorkerAudits.size()).isZero();
-        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
+        idamMockServer.removeStub(invalidRoleStub);
     }
 
     @Test
