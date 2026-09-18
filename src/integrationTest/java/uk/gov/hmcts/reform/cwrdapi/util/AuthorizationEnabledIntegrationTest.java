@@ -26,10 +26,10 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.RoleAdditionResponse;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.UserProfileRolesResponse;
 import uk.gov.hmcts.reform.cwrdapi.config.RestTemplateConfiguration;
 import uk.gov.hmcts.reform.cwrdapi.config.TestConfig;
-import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockExtension;
 import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepository;
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
+import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockExtension;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.LinkedList;
