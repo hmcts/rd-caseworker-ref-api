@@ -157,14 +157,14 @@ idea {
 }
 
 configurations {
-  integrationTestImplementation.extendsFrom testCompile
-  integrationTestRuntime.extendsFrom testRuntime
-  functionalTestImplementation.extendsFrom testCompile
-  functionalTestRuntimeOnly.extendsFrom testRuntime
-  contractTestImplementation.extendsFrom testCompile
-  contractTestRuntimeOnly.extendsFrom testRuntime
-  pactTestImplementation.extendsFrom testCompile
-  pactTestRuntime.extendsFrom testRuntime
+  integrationTestImplementation.extendsFrom testImplementation
+  integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+  functionalTestImplementation.extendsFrom testImplementation
+  functionalTestRuntimeOnly.extendsFrom testRuntimeOnly
+  contractTestImplementation.extendsFrom testImplementation
+  contractTestRuntimeOnly.extendsFrom testRuntimeOnly
+  pactTestImplementation.extendsFrom testImplementation
+  pactTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 checkstyle {
@@ -457,8 +457,10 @@ dependencies {
     exclude group: "org.hamcrest", module: "hamcrest-library"
   }
 
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: versions.serenity
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-junit5', version: versions.serenity
   testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: versions.serenity
-  testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
+  testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.tc_postgresql
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.tc_postgresql
   testImplementation group: 'org.testcontainers', name: 'testcontainers', version: versions.tc_postgresql

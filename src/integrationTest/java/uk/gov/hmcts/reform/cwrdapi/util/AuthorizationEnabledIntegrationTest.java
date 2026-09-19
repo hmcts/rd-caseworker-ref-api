@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchdarkly.sdk.server.LDClient;
-import net.serenitybdd.annotations.WithTag;
-import net.serenitybdd.annotations.WithTags;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -25,7 +23,6 @@ import uk.gov.hmcts.reform.cwrdapi.repository.CaseWorkerIdamRoleAssociationRepos
 import uk.gov.hmcts.reform.cwrdapi.service.impl.FeatureToggleServiceImpl;
 import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockExtension;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,8 +41,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@SerenityTest
-@WithTags({@WithTag("testType:Integration")})
 @TestPropertySource(properties = {
     "USER_PROFILE_URL:http://127.0.0.1:8091",
     "spring.config.location=classpath:application-test.yml",

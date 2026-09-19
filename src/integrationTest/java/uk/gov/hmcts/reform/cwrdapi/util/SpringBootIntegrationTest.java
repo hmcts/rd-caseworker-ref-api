@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,10 +14,11 @@ import uk.gov.hmcts.reform.cwrdapi.CaseWorkerRefApiApplication;
 import uk.gov.hmcts.reform.cwrdapi.config.TestApplicationServer;
 import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockContextInitializer;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = CaseWorkerRefApiApplication.class, webEnvironment =
-        SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ExtendWith({SpringExtension.class, SerenityJUnit5Extension.class})
+@SpringBootTest(classes = CaseWorkerRefApiApplication.class,
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = WireMockContextInitializer.class)
+@WithTags({@WithTag("testType:Integration")})
 public abstract class SpringBootIntegrationTest {
 
     @Autowired
