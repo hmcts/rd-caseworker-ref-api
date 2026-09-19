@@ -60,6 +60,7 @@ public class CreateStaffReferenceProfileBasicSearchTest extends AuthorizationEna
 
     @BeforeEach
     public void setUpClient() {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         super.setUpClient();
         caseWorkerProfileRepository.deleteAll();
         caseWorkerLocationRepository.deleteAll();

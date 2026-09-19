@@ -10,7 +10,7 @@ public final class WireMockTestEnvironment {
             new WireMockServer(wireMockConfig().dynamicPort());
 
     private static final WireMockServer IDAM_MOCK_SERVER =
-            new WireMockServer(wireMockConfig().dynamicPort());
+            new WireMockServer(wireMockConfig().dynamicPort().extensions(new IdamResponseTransformer()));
 
     private static final WireMockServer S2S_MOCK_SERVER =
             new WireMockServer(wireMockConfig().dynamicPort());

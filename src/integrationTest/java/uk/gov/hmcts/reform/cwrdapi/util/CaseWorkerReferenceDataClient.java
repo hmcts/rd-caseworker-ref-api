@@ -65,8 +65,6 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateAuthToken;
-import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
-
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application-test.yml")
@@ -548,9 +546,9 @@ public class CaseWorkerReferenceDataClient {
         return headers;
     }
 
-    public static HttpHeaders getHttpHeaders(String issuer, boolean isExpired) throws Exception {
+    public static HttpHeaders getHttpHeaders(String issuer, boolean isExpired, String userId, String role) {
         HttpHeaders headers = new HttpHeaders();
-        var userAuthToken = generateAuthToken(issuer,isExpired);
+        var userAuthToken = generateAuthToken(issuer, isExpired, userId, role);
         headers.setBearerAuth(userAuthToken);
         headers.add(SERVICE_AUTHORIZATION, "Bearer " + generateS2SToken(CASEWORKER_REF_API));
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -592,8 +590,8 @@ public class CaseWorkerReferenceDataClient {
         return response;
     }
 
-    private final String getBearerToken(String userId, String role) {
-        return generateToken(issuer, expiration, userId, role);
+    private String getBearerToken(String userId, String role) {
+        return generateAuthToken(issuer, false, userId, role);
     }
 
     public static String generateS2SToken(String serviceName) {

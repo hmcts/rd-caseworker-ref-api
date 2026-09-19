@@ -1,26 +1,20 @@
 package uk.gov.hmcts.reform.cwrdapi.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import io.restassured.specification.RequestSpecification;
 import net.serenitybdd.rest.SerenityRest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.cwrdapi.config.TestApplicationServer;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.StaffProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockTestEnvironment;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_STAFF_ADMIN;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient.getHttpHeaders;
-import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithGivenRoleAndStatus;
 
 public class BaseSecurityIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
@@ -29,28 +23,16 @@ public class BaseSecurityIntegrationTest extends AuthorizationEnabledIntegration
     protected static final String ROGUE_ISSUER = "https://rogue-issuer.com";
     protected static final String CREATE_STAFF_URI = "/refdata/case-worker/profile";
 
-    static WireMockServer idamMockServer = WireMockTestEnvironment.idam();
-
-    private static StubMapping staffAdminUserStub = null;
+    private static final String USER_ID = UUID.randomUUID().toString();
     private StaffProfileCreationRequest staffProfileCreationRequest = null;
 
-    @BeforeAll
-    public static void setUp() {
-        staffAdminUserStub = stubIdamWithGivenRoleAndStatus(idamMockServer, "active", List.of(ROLE_STAFF_ADMIN));
-    }
+    @Autowired
+    private TestApplicationServer testApplicationServer;
 
     @BeforeEach
     public void setUP() {
         userProfilePostUserWireMockForStaffProfile(HttpStatus.CREATED);
     }
-
-    @AfterAll
-    public static void cleanUp() {
-        idamMockServer.removeStub(staffAdminUserStub);
-    }
-
-    @Autowired
-    private TestApplicationServer testApplicationServer;
 
     protected String getStaffProfileCreationRequest() throws JsonProcessingException {
 
@@ -61,28 +43,19 @@ public class BaseSecurityIntegrationTest extends AuthorizationEnabledIntegration
         return getObjectMapper().writeValueAsString(staffProfileCreationRequest);
     }
 
-    protected RequestSpecification jwtRequest(
-            String issuer,
-            boolean expired)
-            throws Exception {
+    protected RequestSpecification jwtRequest(String issuer, boolean expired) {
 
         return SerenityRest.given()
                 .baseUri(testApplicationServer.getBaseUrl())
-                .headers(getHttpHeaders(issuer, expired));
+                .headers(getHttpHeaders(issuer, expired, USER_ID, ROLE_STAFF_ADMIN));
 
     }
 
-    protected RequestSpecification unexpiredJwt(
-            String issuer)
-            throws Exception {
-
+    protected RequestSpecification unexpiredJwt(String issuer) {
         return jwtRequest(issuer, false);
     }
 
-    protected RequestSpecification expiredJwt(
-            String issuer)
-            throws Exception {
-
+    protected RequestSpecification expiredJwt(String issuer) {
         return jwtRequest(issuer, true);
     }
 }

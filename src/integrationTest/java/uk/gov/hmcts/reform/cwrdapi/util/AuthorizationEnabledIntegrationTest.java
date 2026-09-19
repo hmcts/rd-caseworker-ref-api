@@ -2,11 +2,6 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.common.FileSource;
-import com.github.tomakehurst.wiremock.extension.Parameters;
-import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
-import com.github.tomakehurst.wiremock.http.Request;
-import com.github.tomakehurst.wiremock.http.Response;
 import com.launchdarkly.sdk.server.LDClient;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
@@ -32,7 +27,6 @@ import uk.gov.hmcts.reform.cwrdapi.servicebus.TopicPublisher;
 import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockExtension;
 import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,13 +38,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.decodeJwtToken;
-import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.getUserIdAndRoleFromToken;
 
 @Configuration
 @SerenityTest
@@ -233,31 +224,5 @@ public abstract class AuthorizationEnabledIntegrationTest extends SpringBootInte
                                 + "  \"idamId\":\"" + UUID.randomUUID() + "\","
                                 + "  \"idamRegistrationResponse\":\"" + 201 + "\""
                                 + "}")));
-    }
-
-    public static class CaseWorkerTransformer extends ResponseTransformer {
-        @Override
-        public Response transform(Request request, Response response, FileSource files, Parameters parameters) {
-
-            String formatResponse = response.getBodyAsString();
-
-            String token = request.getHeader("Authorization");
-            String tokenBody = decodeJwtToken(token.split(" ")[1]);
-            LinkedList tokenInfo = getUserIdAndRoleFromToken(tokenBody);
-            formatResponse = format(formatResponse, tokenInfo.get(1), tokenInfo.get(1), tokenInfo.get(0));
-
-            return Response.Builder.like(response)
-                    .but().body(formatResponse)
-                    .build();
-        }
-
-        @Override
-        public String getName() {
-            return "user-token-response";
-        }
-
-        public boolean applyGlobally() {
-            return false;
-        }
     }
 }

@@ -1,38 +1,37 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockTestEnvironment;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
-import java.util.List;
 import java.util.Map;
 
+import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.INVALID_FIELD;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_NUMBER;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PAGE_SIZE;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SORT_DIRECTION;
-import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithGivenRoleAndStatus;
 
 public class FetchStaffProfileByCcdServiceNamesIntegrationTest extends AuthorizationEnabledIntegrationTest {
-
-    private static WireMockServer idamMockServer = WireMockTestEnvironment.idam();
-    private static StubMapping cwdSystemUserStub = null;
 
     @BeforeEach
     public void setUpClient() {
         super.setUpClient();
-        cwdSystemUserStub = stubIdamWithGivenRoleAndStatus(idamMockServer, "active", List.of("cwd-system-user"));
+    }
+
+    @BeforeAll
+    public static void setup() {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @AfterAll
-    public static void cleanUp() {
-        idamMockServer.removeStub(cwdSystemUserStub);
+    public static void tearDown() {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @Test

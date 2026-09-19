@@ -1,37 +1,19 @@
 package uk.gov.hmcts.reform.cwrdapi;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerIdamRoleAssociation;
 import uk.gov.hmcts.reform.cwrdapi.util.AuthorizationEnabledIntegrationTest;
-import uk.gov.hmcts.reform.cwrdapi.wiremock.WireMockTestEnvironment;
+import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerReferenceDataClient;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.ROLE_CWD_ADMIN;
-import static uk.gov.hmcts.reform.cwrdapi.wiremock.IdamWireMockStubs.stubIdamWithGivenRoleAndStatus;
 
 public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledIntegrationTest {
-
-    private static WireMockServer idamMockServer = WireMockTestEnvironment.idam();
-    private static StubMapping invalidRoleStub = null;
-
-    @BeforeAll
-    public static void setUp() {
-        invalidRoleStub = stubIdamWithGivenRoleAndStatus(idamMockServer, "active", List.of(ROLE_CWD_ADMIN));
-    }
-
-    @AfterAll
-    public static void cleanUp() {
-        idamMockServer.removeStub(invalidRoleStub);
-    }
 
     @Test
     public void returns_200_when_idam_roles_mapping_created_successfully() {
@@ -48,20 +30,23 @@ public class CreateIdamRolesMappingIntegrationTest extends AuthorizationEnabledI
 
     @Test
     public void returns_403_for_invalid_role() {
-        StubMapping invalidRoleStub = stubIdamWithGivenRoleAndStatus(idamMockServer, "active",List.of("invalid-role"));
+
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, Object> response = caseworkerReferenceDataClient
             .createIdamRolesAssoc(Collections.emptyList(), "invalid role");
 
         assertThat(response).containsEntry("http_status", "403");
-        idamMockServer.removeStub(invalidRoleStub);
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @Test
     void returns_400_when_request_invalid() {
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
         Map<String, Object> response = caseworkerReferenceDataClient
             .createIdamRolesAssoc(Collections.emptyList(), cwdAdmin);
 
         assertThat(response).containsEntry("http_status", "400");
+        CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @Test
