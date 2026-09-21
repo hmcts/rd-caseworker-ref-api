@@ -15,7 +15,6 @@ locationRefDataUrl: http://rd-location-ref-api-aat.service.core-compute-aat.inte
 ### staff Upload File configuration
 staff_upload_file: ${STAFF_UPLOAD_FILE:false}
 idam_role_mapping_file: ${IDAM_ROLE_MAPPING_FILE:true}
-idam.security.issuerValidation: false
 
 #######
 postgres.host_name: ${FUNC_DATABASE_HOST}

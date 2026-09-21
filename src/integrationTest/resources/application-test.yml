@@ -35,7 +35,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: ${OPEN_ID_API_BASE_URI:http://0.0.0.0:6000/o}
+            issuer-uri: http://0.0.0.0:6000/o
         registration:
           oidc:
             client-id: microservicekey-rd-caseworker-ref-api
@@ -99,7 +99,7 @@ idam:
     services: ${CRD_S2S_AUTHORISED_SERVICES:rd_caseworker_ref_api}
   api.url: ${IDAM_URL:http://127.0.0.1:5000}
   security:
-    issuerValidation: ${JWT_ISSUER_VALIDATION_ENABLED:false}
+    issuerValidation: false
 
 auth.idam.client.baseUrl: ${http://127.0.0.1:5000/o}
 oidc:
