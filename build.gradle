@@ -159,8 +159,8 @@ idea {
 configurations {
   integrationTestImplementation.extendsFrom testImplementation
   integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-  functionalTestImplementation.extendsFrom testImplementation
-  functionalTestRuntimeOnly.extendsFrom testRuntimeOnly
+  functionalTestImplementation.extendsFrom testCompile
+  functionalTestRuntimeOnly.extendsFrom testRuntime
   contractTestImplementation.extendsFrom testImplementation
   contractTestRuntimeOnly.extendsFrom testRuntimeOnly
   pactTestImplementation.extendsFrom testImplementation
