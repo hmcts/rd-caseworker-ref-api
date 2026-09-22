@@ -4,32 +4,17 @@ s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-c
 
 s2s-name: rd_caseworker_ref_api
 scope-name: openid profile roles manage-user create-user search-user
+
+idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
 oauth2.client.secret: ${CA_REF_OAUTH2_CLIENT_SECRET:}
+idam.auth.clientId: ${CA_REF_OAUTH2_CLIENT_ID:}
+idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/oauth2redirect}
 s2s-secret: ${CASEWORKER_REF_API_S2S_SECRET:}
 userProfUrl: http://rd-user-profile-api-aat.service.core-compute-aat.internal
 locationRefDataUrl: http://rd-location-ref-api-aat.service.core-compute-aat.internal
 ### staff Upload File configuration
 staff_upload_file: ${STAFF_UPLOAD_FILE:false}
 idam_role_mapping_file: ${IDAM_ROLE_MAPPING_FILE:true}
-
-idam:
-  api:
-    url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
-  auth:
-    clientId: ${CA_REF_OAUTH2_CLIENT_ID:}
-    redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/oauth2redirect}
-  security:
-    issuerValidation: ${JWT_ISSUER_VALIDATION_ENABLED:false}
-    allowed-issuers:
-      - ${IDAM_SECURITY_ALLOWED_ISSUERS_0:https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts}
-      - ${IDAM_SECURITY_ALLOWED_ISSUERS_1:https://idam-web-public.aat.platform.hmcts.net/o}
-spring:
-  security:
-    oauth2:
-      client:
-        provider:
-          oidc:
-            issuer-uri: ${OPEN_ID_API_BASE_URI:https://idam-web-public.aat.platform.hmcts.net/o}
 
 #######
 postgres.host_name: ${FUNC_DATABASE_HOST}
