@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -65,6 +62,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SERVICE_AUTHORIZATION;
 import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateAuthToken;
+import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateS2SToken;
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application-test.yml")
@@ -592,14 +590,6 @@ public class CaseWorkerReferenceDataClient {
 
     private String getBearerToken(String userId, String role) {
         return generateAuthToken(issuer, false, userId, role);
-    }
-
-    public static String generateS2SToken(String serviceName) {
-        return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
-                .compact();
     }
 
     public static void setBearerToken(String bearerToken) {

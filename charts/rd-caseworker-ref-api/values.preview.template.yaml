@@ -25,7 +25,10 @@ java:
     STAFF_UPLOAD_FILE: false # false: Block the File,  true: Able to Upload the File
     IDAM_ROLE_MAPPING_FILE: true # false: Block the File,  true: Able to Upload the File
     JWT_ISSUER_VALIDATION_ENABLED: true
-    IDAM_SECURITY_ALLOWED_ISSUERS_0: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
+    IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.aat.platform.hmcts.net/o
+    IDAM_SECURITY_ALLOWED_ISSUERS_1: https://hmcts-access.aat.platform.hmcts.net/o
+    IDAM_SECURITY_ALLOWED_ISSUERS_2: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
+    IDAM_SECURITY_ALLOWED_ISSUERS_3: https://idam-api.aat.platform.hmcts.net/o
   postgresql:
     enabled: true
     auth:

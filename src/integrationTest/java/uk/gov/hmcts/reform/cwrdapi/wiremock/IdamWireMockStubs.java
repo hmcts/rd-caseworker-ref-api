@@ -16,7 +16,6 @@ public final class IdamWireMockStubs {
     }
 
     public static void registerDefaults(WireMockServer server) {
-
         server.stubFor(
                 get(urlPathEqualTo("/o/userinfo"))
                         .atPriority(10)
@@ -24,13 +23,13 @@ public final class IdamWireMockStubs {
                                 aResponse()
                                         .withStatus(200)
                                         .withHeader("Content-Type", "application/json")
-                                        .withBody(getUserDetailsJson("active"))
+                                        .withBody(getUserDetailsJson())
                                         .withTransformers("user-token-response")
                         )
         );
     }
 
-    private static String getUserDetailsJson(String status) {
+    private static String getUserDetailsJson() {
         try {
             return getObjectMapper().writeValueAsString(
                     UserIdentifier.builder()
@@ -39,7 +38,7 @@ public final class IdamWireMockStubs {
                             .forename("Super")
                             .surname("User")
                             .email("super.user@hmcts.net")
-                            .accountStatus(status)
+                            .accountStatus("active")
                             .roles(List.of("%s"))
                             .build()
             );

@@ -13,7 +13,6 @@ public final class OidcWireMockStubs {
     }
 
     public static void registerDefaults(WireMockServer server) {
-
         String issuer = "http://127.0.0.1:" + server.port() + "/o";
 
         String jwksUri = issuer + "/jwks";
