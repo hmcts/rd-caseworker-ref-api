@@ -3,8 +3,12 @@ package uk.gov.hmcts.reform.cwrdapi.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.launchdarkly.sdk.server.LDClient;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTags;
+import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +49,8 @@ import static org.mockito.Mockito.when;
     "USER_PROFILE_URL:http://127.0.0.1:8091",
     "spring.config.location=classpath:application-test.yml",
 })
+@ExtendWith({SerenityJUnit5Extension.class})
+@WithTags({@WithTag("testType:Integration")})
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
 

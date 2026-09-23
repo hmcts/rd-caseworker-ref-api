@@ -21,7 +21,7 @@ plugins {
     id "org.flywaydb.flyway" version '11.20.3'
     id 'au.com.dius.pact' version '4.6.19'
     id 'org.owasp.dependencycheck' version '12.2.2'
-    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.3.2'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.34'
 }
 
 def versions = [
@@ -44,7 +44,7 @@ def versions = [
   bouncycastle       : '1.85',
   junit              : '5.12.2',
   junitPlatform      : '1.12.2',
-  serenity           : '4.3.4',
+  serenity           : '4.2.34'
 ]
 
 ext {
