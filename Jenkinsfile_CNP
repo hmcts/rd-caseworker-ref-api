@@ -145,6 +145,30 @@ withPipeline(type, product, component) {
         ]
     }
 
+    afterAlways('integrationTest:aat') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        publishHTML target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "target/site/serenity/",
+                reportFiles          : "index.html",
+                reportName           : "Integration Tests Report"
+        ]
+    }
+
+    afterAlways('integrationTest:preview') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+        publishHTML target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "target/site/serenity/",
+                reportFiles          : "index.html",
+                reportName           : "Integration Tests (Serenity) Report"
+        ]
+    }
+
     afterAlways('functionalTest:aat') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
         publishHTML target: [
