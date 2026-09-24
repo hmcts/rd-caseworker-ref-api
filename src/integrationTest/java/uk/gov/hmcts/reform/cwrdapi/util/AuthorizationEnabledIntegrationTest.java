@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
     "USER_PROFILE_URL:http://127.0.0.1:8091",
     "spring.config.location=classpath:application-test.yml",
 })
-@ExtendWith({SerenityJUnit5Extension.class})
+@ExtendWith(SerenityJUnit5Extension.class)
 @WithTags({@WithTag("testType:Integration")})
 @ContextConfiguration(classes = {TestConfig.class, RestTemplateConfiguration.class})
 public abstract class AuthorizationEnabledIntegrationTest extends SpringBootIntegrationTest {
