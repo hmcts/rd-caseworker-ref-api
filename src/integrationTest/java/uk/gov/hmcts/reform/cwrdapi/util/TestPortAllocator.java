@@ -15,7 +15,6 @@ public final class TestPortAllocator {
     }
 
     public static int allocate() {
-
         while (true) {
             int port = findAvailablePort();
 
@@ -30,7 +29,6 @@ public final class TestPortAllocator {
     }
 
     private static int findAvailablePort() {
-
         try (ServerSocket socket =
                      new ServerSocket(
                              0,
