@@ -490,7 +490,7 @@ dependencies {
   testImplementation group: 'com.github.mifmif', name: 'generex', version: '1.0.2'
   testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '4.2.3'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-contract-wiremock', version: '5.0.3'
 
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
