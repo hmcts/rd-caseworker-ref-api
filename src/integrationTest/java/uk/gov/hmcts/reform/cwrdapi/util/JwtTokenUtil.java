@@ -40,7 +40,6 @@ public final class JwtTokenUtil {
                                            final boolean isExpired,
                                            final String userId,
                                            final String role) {
-
         final LocalDateTime now = LocalDateTime.now();
 
         final LocalDateTime issuedAt = isExpired
@@ -80,7 +79,6 @@ public final class JwtTokenUtil {
     private static JWTClaimsSet.Builder getJwtClaimsBuilder(
             final LocalDateTime issuedAt,
             final LocalDateTime expiresAt) {
-
         final ZoneId zoneId = ZoneId.systemDefault();
 
         return new JWTClaimsSet.Builder()

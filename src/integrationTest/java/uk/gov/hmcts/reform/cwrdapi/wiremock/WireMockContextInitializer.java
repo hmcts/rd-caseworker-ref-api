@@ -39,12 +39,10 @@ public class WireMockContextInitializer
                 "s2sMockServer",
                 WireMockTestEnvironment.s2s()
         );
-
     }
 
     @Override
     public void initialize(@NonNull ConfigurableApplicationContext context) {
-
         int applicationPort =
                 TestPortAllocator.allocate();
 

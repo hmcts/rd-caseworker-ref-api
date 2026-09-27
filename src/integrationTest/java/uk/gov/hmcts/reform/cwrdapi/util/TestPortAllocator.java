@@ -34,9 +34,7 @@ public final class TestPortAllocator {
                              0,
                              50,
                              InetAddress.getLoopbackAddress())) {
-
             return socket.getLocalPort();
-
         } catch (IOException e) {
             throw new IllegalStateException(
                     "Unable to find an available test port",
