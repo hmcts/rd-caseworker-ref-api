@@ -5,8 +5,6 @@ import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvide
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
-import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -98,15 +96,6 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 )
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
-
-    @PactBrokerConsumerVersionSelectors
-    public static SelectorBuilder consumerVersionSelectors() {
-        String branch = System.getProperty("pactbroker.consumerBranch", "");
-        if (!branch.isBlank()) {
-            return new SelectorBuilder().branch(branch);
-        }
-        return new SelectorBuilder().tag(System.getProperty("pactbroker.consumerTag", "master"));
-    }
 
     @Mock
     private RoleTypeRepository roleTypeRepository;
