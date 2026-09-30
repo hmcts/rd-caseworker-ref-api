@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.cwrdapi.docs;
 
-import net.serenitybdd.annotations.WithTag;
-import net.serenitybdd.annotations.WithTags;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +20,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Built-in feature which saves service's swagger specs in temporary directory.
  * Each travis run on master should automatically save and upload (if updated) documentation.
  */
-@WithTags({@WithTag("testType:Integration")})
 class SwaggerPublisherTest extends AuthorizationEnabledIntegrationTest {
 
     private MockMvc mvc;
