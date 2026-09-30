@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.TextCodec;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -24,12 +21,12 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
+import uk.gov.hmcts.reform.cwrdapi.config.TestApplicationServer;
 import uk.gov.hmcts.reform.cwrdapi.controllers.advice.ErrorResponse;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerLocationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkerServicesRequest;
@@ -61,12 +58,11 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateToken;
-
+import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.SERVICE_AUTHORIZATION;
+import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateAuthToken;
+import static uk.gov.hmcts.reform.cwrdapi.util.JwtTokenUtil.generateS2SToken;
 
 @Slf4j
 @PropertySource(value = "/integrationTest/resources/application-test.yml")
@@ -78,6 +74,7 @@ public class CaseWorkerReferenceDataClient {
     public static final String ROLE_STAFF_ADMIN = "staff-admin";
 
     public static final String STAFF_EMAIL_TEMPLATE = "staff-profile-func-test-user-%s@justice.gov.uk";
+    private static final String CASEWORKER_REF_API = "rd_caseworker_ref_api";
     private static String JWT_TOKEN = null;
     @Autowired
     private ObjectMapper objectMapper;
@@ -91,18 +88,13 @@ public class CaseWorkerReferenceDataClient {
     private long expiration;
     @Autowired
     Environment environment;
-    @Autowired
-    private JwtDecoder jwtDecoder;
     static String bearerToken;
     @Value("${idam.s2s-authorised.services}")
     private String serviceName;
 
-    public CaseWorkerReferenceDataClient(int port) {
-        this.baseUrl = "http://localhost:" + port + APP_BASE_PATH;
-        this.baseInternalUrl = "http://localhost:" + port + APP_INTERNAL_BASE_PATH;
-    }
-
-    public CaseWorkerReferenceDataClient() {
+    public CaseWorkerReferenceDataClient(TestApplicationServer testApplicationServer) {
+        this.baseUrl = testApplicationServer.url(APP_BASE_PATH);
+        this.baseInternalUrl = testApplicationServer.url(APP_INTERNAL_BASE_PATH);
     }
 
     public Map<String, Object> createCaseWorkerProfile(CaseWorkersProfileCreationRequest request, String role) {
@@ -475,7 +467,7 @@ public class CaseWorkerReferenceDataClient {
 
     public String setAndReturnJwtToken() {
         if (StringUtils.isBlank(JWT_TOKEN)) {
-            JWT_TOKEN = generateS2SToken("rd_caseworker_ref_api");
+            JWT_TOKEN = generateS2SToken(CASEWORKER_REF_API);
         }
         return JWT_TOKEN;
     }
@@ -503,11 +495,6 @@ public class CaseWorkerReferenceDataClient {
             return bearerTokenMap.get(role + userId);
         }
         return bearerTokenMap.get(role);
-    }
-
-    public synchronized void mockJwtToken(String role, String userId, String bearerToken) {
-        String[] bearerTokenArray = bearerToken.split(" ");
-        when(jwtDecoder.decode(anyString())).thenReturn(decode(bearerTokenArray[1]));
     }
 
     private Jwt createJwt(String token, JWT parsedJwt) {
@@ -553,8 +540,16 @@ public class CaseWorkerReferenceDataClient {
         headers.add("ServiceAuthorization", JWT_TOKEN);
 
         String bearerToken = getAndReturnBearerToken(userId, role);
-        mockJwtToken(role, userId, bearerToken);
         headers.add("Authorization", bearerToken);
+        return headers;
+    }
+
+    public static HttpHeaders getHttpHeaders(String issuer, boolean isExpired, String userId, String role) {
+        HttpHeaders headers = new HttpHeaders();
+        var userAuthToken = generateAuthToken(issuer, isExpired, userId, role);
+        headers.setBearerAuth(userAuthToken);
+        headers.add(SERVICE_AUTHORIZATION, "Bearer " + generateS2SToken(CASEWORKER_REF_API));
+        headers.setContentType(MediaType.APPLICATION_JSON);
         return headers;
     }
 
@@ -593,16 +588,8 @@ public class CaseWorkerReferenceDataClient {
         return response;
     }
 
-    private final String getBearerToken(String userId, String role) {
-        return generateToken(issuer, expiration, userId, role);
-    }
-
-    public static String generateS2SToken(String serviceName) {
-        return Jwts.builder()
-                .setSubject(serviceName)
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, TextCodec.BASE64.encode("AA"))
-                .compact();
+    private String getBearerToken(String userId, String role) {
+        return generateAuthToken(issuer, false, userId, role);
     }
 
     public static void setBearerToken(String bearerToken) {
