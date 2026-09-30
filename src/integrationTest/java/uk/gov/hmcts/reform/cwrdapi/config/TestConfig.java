@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.cwrdapi.config;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -27,6 +26,12 @@ import static org.mockito.Mockito.mock;
 public class TestConfig {
 
     @Bean
+    TestApplicationServer applicationServer() {
+        return new TestApplicationServer();
+
+    }
+
+    @Bean
     ValidationServiceFacadeImpl validationServiceFacadeImpl() {
         return new ValidationServiceFacadeImpl();
     }
@@ -38,8 +43,8 @@ public class TestConfig {
 
 
     @Bean
-    CaseWorkerReferenceDataClient caseWorkerReferenceDataClient(@Value("${local.server.port}") int port) {
-        return new CaseWorkerReferenceDataClient(port);
+    CaseWorkerReferenceDataClient caseWorkerReferenceDataClient(TestApplicationServer testApplicationServer) {
+        return new CaseWorkerReferenceDataClient(testApplicationServer);
     }
 
     //Create new UUID for each excel rows
