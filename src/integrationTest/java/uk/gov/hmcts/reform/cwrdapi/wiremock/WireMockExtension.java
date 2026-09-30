@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cwrdapi.config;
+package uk.gov.hmcts.reform.cwrdapi.wiremock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
