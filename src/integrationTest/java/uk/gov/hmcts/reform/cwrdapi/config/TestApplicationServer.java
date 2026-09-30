@@ -14,7 +14,7 @@ public class TestApplicationServer
 
     private final int allocatedPort;
 
-    private volatile int actualPort;
+    private int actualPort;
 
     public TestApplicationServer() {
         this.allocatedPort = findAvailablePort();
