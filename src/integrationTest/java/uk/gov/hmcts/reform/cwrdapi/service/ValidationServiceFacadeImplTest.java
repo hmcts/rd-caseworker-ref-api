@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.cwrdapi.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.serenitybdd.annotations.WithTag;
-import net.serenitybdd.annotations.WithTags;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,6 @@ import uk.gov.hmcts.reform.cwrdapi.repository.ExceptionCaseWorkerRepository;
 import uk.gov.hmcts.reform.cwrdapi.repository.StaffAuditRepository;
 import uk.gov.hmcts.reform.cwrdapi.util.AuditStatus;
 import uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants;
-import uk.gov.hmcts.reform.lib.util.serenity5.SerenityTest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,8 +33,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static uk.gov.hmcts.reform.cwrdapi.util.CaseWorkerConstants.PARTIAL_SUCCESS;
 
-@SerenityTest
-@WithTags({@WithTag("testType:Integration")})
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(properties = {"spring.config.location=classpath:application-test.yml"})
