@@ -2,11 +2,9 @@ package uk.gov.hmcts.reform.cwrdapi;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
-import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
-import au.com.dius.pact.provider.junitsupport.loader.VersionSelector;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,10 +92,8 @@ import static uk.gov.hmcts.reform.cwrdapi.util.RequestUtils.validateAndBuildPagi
 @PactBroker(
     url = "${PACT_BROKER_FULL_URL:https://pact-broker.platform.hmcts.net}",
     enablePendingPacts = "${pactbroker.enablePending:true}",
-    providerTags = "${pactbroker.providerTags:master}",
-    consumerVersionSelectors = {@VersionSelector(tag = "master")}
+    providerTags = "${pactbroker.providerTags:master}"
 )
-@IgnoreNoPactsToVerify
 @ExtendWith(MockitoExtension.class)
 public class StaffReferenceDataProviderTest {
 
@@ -624,5 +620,3 @@ public class StaffReferenceDataProviderTest {
         doReturn(Optional.of(caseWorkerProfile)).when(caseWorkerProfileRepo).findByCaseWorkerId(anyString());
     }
 }
-
-
