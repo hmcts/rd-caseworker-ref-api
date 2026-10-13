@@ -10,7 +10,7 @@ management:
       base-path: "/"
   endpoint:
     health:
-      show-details: "always"
+      show-details: "never"
 
 spring:
   jpa:
