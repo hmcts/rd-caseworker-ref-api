@@ -325,9 +325,8 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         userTypes.add(StaffRefDataUserType.builder()
                 .id(6L)
-                .code("ENFORCEMENT")
+                .code("Enforcement")
                 .build());
-
 
         return userTypes;
     }
