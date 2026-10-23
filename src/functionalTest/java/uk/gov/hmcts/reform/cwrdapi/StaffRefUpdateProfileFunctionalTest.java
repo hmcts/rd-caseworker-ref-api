@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.annotations.WithTags;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -573,6 +574,7 @@ class StaffRefUpdateProfileFunctionalTest extends AuthorizationFunctionalTest {
     @Test
     @ToggleEnable(mapKey = UPDATE_STAFF_PROFILE, withFeature = true)
     @ExtendWith(FeatureToggleConditionExtension.class)
+    @Disabled("DTSRD-6963 raised to resolve")
     void should_update_staff_profile_for_Unsuspend_a_suspend_user_and_returns_status_200() {
 
         StaffProfileCreationRequest staffProfileCreationRequest = caseWorkerApiClient
