@@ -5,7 +5,7 @@ s2s-url: ${S2S_URL_FOR_TESTS:http://rpe-service-auth-provider-aat.service.core-c
 s2s-name: rd_caseworker_ref_api
 scope-name: openid profile roles manage-user create-user search-user
 
-idam.api.url: ${IDAM_URL:https://idam-api.aat.platform.hmcts.net}
+idam.api.url: ${IDAM_URL:https://idam-web-public.aat.platform.hmcts.net}
 oauth2.client.secret: ${CA_REF_OAUTH2_CLIENT_SECRET:}
 idam.auth.clientId: ${CA_REF_OAUTH2_CLIENT_ID:}
 idam.auth.redirectUrl: ${OAUTH2_REDIRECT_URI:https://rd-caseworker-ref-api-aat.service.core-compute-aat.internal/oauth2redirect}
