@@ -280,8 +280,12 @@ task runProviderPactVerification(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
   ['pact.verifier.publishResults', 'pactbroker.consumerTag', 'pactbroker.consumerBranch',
    'pactbroker.providerTags'].each { propertyName ->
-    if (System.getProperty(propertyName) != null) {
-      systemProperty propertyName, System.getProperty(propertyName)
+    def propertyValue = project.findProperty(propertyName)
+    if (propertyValue == null) {
+      propertyValue = System.getProperty(propertyName)
+    }
+    if (propertyValue != null) {
+      systemProperty propertyName, propertyValue.toString()
     }
   }
   systemProperty 'pact.provider.version', project.pactVersion
