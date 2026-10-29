@@ -256,7 +256,10 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
                 new StaffRefDataJobTitle(22L, "HRS Team Leader"),
                 new StaffRefDataJobTitle(23L, "Bailiff Administrator"),
                 new StaffRefDataJobTitle(24L, "Bailiff"),
-                new StaffRefDataJobTitle(25L, "Bailiff Manager")));
+                new StaffRefDataJobTitle(25L, "Bailiff Manager"),
+                new StaffRefDataJobTitle(26L, "HRS Listener"),
+                new StaffRefDataJobTitle(27L, "HRS Sharer")));
+
     }
 
     @Test
