@@ -43,7 +43,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
     public static final int ABA5_SKILL_COUNT = 13;
     public static final int ABA6_SKILL_COUNT = 32;
     public static final int ABA2_SKILL_COUNT = 9;
-    public static final int HRS_SKILL_COUNT = 15;
+    public static final int HRS_SKILL_COUNT  = 15;
 
 
     @Test
@@ -120,7 +120,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
             } else if (serviceSkill.getId().equalsIgnoreCase("ABA2")) {
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(ABA2_SKILL_COUNT);
             } else if (serviceSkill.getId().equalsIgnoreCase("HRS")) {
-            assertThat(serviceSkill.getSkills().size()).isEqualTo(HRS_SKILL_COUNT);
+                assertThat(serviceSkill.getSkills().size()).isEqualTo(HRS_SKILL_COUNT);
         }
         }
 
