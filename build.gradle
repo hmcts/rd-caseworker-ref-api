@@ -441,8 +441,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.58.1'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.19'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.61.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.18.1'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -623,7 +623,7 @@ dependencyManagement {
       entry 'junit-platform-engine'
       entry 'junit-platform-launcher'
     }
-    dependencySet(group: 'com.azure', version: '2.12.0') {
+    dependencySet(group: 'com.azure', version: '2.13.0') {
       entry 'azure-core-amqp'
     }
     dependencySet(group: 'com.fasterxml.jackson.core', version: versions.jackson) {
