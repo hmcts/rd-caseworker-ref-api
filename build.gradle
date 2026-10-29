@@ -41,7 +41,7 @@ def versions = [
   poi                : '4.1.2',
   reformS2sClient    : '5.3.5',
   tc_postgresql      : '1.21.4',
-  bouncycastle       : '1.85',
+  bouncycastle       : '1.86',
   junit              : '5.12.2',
   junitPlatform      : '1.12.2',
   serenity           : '4.3.4',
@@ -441,8 +441,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j', version: versions.log4j
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: versions.log4j
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.58.1'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.19'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.61.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.18.1'
   implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.2'
 
   implementation group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
@@ -488,7 +488,7 @@ dependencies {
     exclude group: "net.bytebuddy", module: "byte-buddy-agent"
   }
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.11'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.11-jdk5'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.16-jdk5'
   testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.24.0'
 
@@ -623,7 +623,7 @@ dependencyManagement {
       entry 'junit-platform-engine'
       entry 'junit-platform-launcher'
     }
-    dependencySet(group: 'com.azure', version: '2.12.0') {
+    dependencySet(group: 'com.azure', version: '2.13.0') {
       entry 'azure-core-amqp'
     }
     dependencySet(group: 'com.fasterxml.jackson.core', version: versions.jackson) {
