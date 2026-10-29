@@ -29,6 +29,9 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
+    // count of services with skills
+    public static final int SERVICE_SKILL_COUNT = 5;
+
     @BeforeEach
     public void setUpClient() {
         super.setUpClient();
@@ -56,7 +59,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills.size()).isEqualTo(4);
+        assertThat(serviceSkills.size()).isEqualTo(SERVICE_SKILL_COUNT);
 
         for (ServiceSkill ss: serviceSkills) {
             List<SkillDTO> listOfSkillsForSSId = fetchListOfSkills(ss.getId());
@@ -100,7 +103,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
         assertThat(serviceSkills).isNotNull();
-        assertThat(serviceSkills.size()).isEqualTo(4);
+        assertThat(serviceSkills.size()).isEqualTo(SERVICE_SKILL_COUNT);
 
         ServiceSkill serviceSkill = serviceSkills.get(1);
 
