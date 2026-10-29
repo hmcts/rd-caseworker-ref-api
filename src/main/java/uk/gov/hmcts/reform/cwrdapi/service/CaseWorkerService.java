@@ -7,8 +7,10 @@ import uk.gov.hmcts.reform.cwrdapi.client.domain.ServiceRoleMapping;
 import uk.gov.hmcts.reform.cwrdapi.controllers.request.CaseWorkersProfileCreationRequest;
 import uk.gov.hmcts.reform.cwrdapi.controllers.response.IdamRolesMappingResponse;
 import uk.gov.hmcts.reform.cwrdapi.domain.CaseWorkerProfile;
+import uk.gov.hmcts.reform.cwrdapi.domain.UserProfileUpdatedData;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface CaseWorkerService {
@@ -47,5 +49,8 @@ public interface CaseWorkerService {
      * @return StaffProfile
      */
     ResponseEntity<Object> fetchStaffProfilesForRoleRefresh(String ccdServiceNames, PageRequest pageRequest);
+
+    public Optional<Object> getUserProfileUpdateResponse(UserProfileUpdatedData userProfileUpdatedData,
+                                                         String userId, String origin);
 }
 
