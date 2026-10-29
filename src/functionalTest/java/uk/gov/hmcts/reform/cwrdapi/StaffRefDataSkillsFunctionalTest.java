@@ -121,7 +121,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(ABA2_SKILL_COUNT);
             } else if (serviceSkill.getId().equalsIgnoreCase("HRS")) {
                 assertThat(serviceSkill.getSkills().size()).isEqualTo(HRS_SKILL_COUNT);
-        }
+            }
         }
 
     }
