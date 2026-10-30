@@ -36,7 +36,8 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
     public static final String STAFF_REF_DATA_SKILL_URL = "/refdata/case-worker/skill";
     public static final String STAFF_REF_DATA_RD_STAFF_UI_KEY =
             "StaffRefDataController.retrieveAllServiceSkills";
-    public static final int SKILL_COUNT = 6;
+    
+    public static final int SERVICE_SKILL_COUNT = 7; // count of services with skills
     public static final int AAA7_SKILL_COUNT = 2;
     public static final int BHA1_SKILL_COUNT = 1;
     public static final int AAA6_SKILL_COUNT = 2;
@@ -56,7 +57,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
         assertThat(staffWorkerSkillResponse.getServiceSkills()).isNotNull();
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
-        assertThat(serviceSkills.size()).isEqualTo(SKILL_COUNT);
+        assertThat(serviceSkills.size()).isEqualTo(SERVICE_SKILL_COUNT);
 
         for (ServiceSkill ss: serviceSkills) {
             log.info(":::: skill fetched is  " + ss.getId());
@@ -104,7 +105,7 @@ public class StaffRefDataSkillsFunctionalTest extends AuthorizationFunctionalTes
         StaffWorkerSkillResponse staffWorkerSkillResponse = fetchResponse(null);
         assertThat(staffWorkerSkillResponse).isNotNull();
         assertThat(staffWorkerSkillResponse.getServiceSkills()).isNotNull();
-        assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isEqualTo(SKILL_COUNT);
+        assertThat(staffWorkerSkillResponse.getServiceSkills().size()).isEqualTo(SERVICE_SKILL_COUNT);
 
         for (ServiceSkill serviceSkill: staffWorkerSkillResponse.getServiceSkills()) {
             if (serviceSkill.getId().equalsIgnoreCase("AAA7")) {
