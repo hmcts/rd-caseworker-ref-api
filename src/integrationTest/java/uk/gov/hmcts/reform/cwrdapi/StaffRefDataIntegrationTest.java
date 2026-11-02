@@ -230,7 +230,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<StaffRefDataJobTitle> jobTitles = staffRefJobTitleResponse.getJobTitles();
 
         assertThat(jobTitles).isNotNull();
-        assertThat(jobTitles).hasSize(25);
+        assertThat(jobTitles).hasSize(27);
         org.hamcrest.MatcherAssert.assertThat(jobTitles, containsInAnyOrder(
                 new StaffRefDataJobTitle(1L, "Senior Legal Caseworker"),
                 new StaffRefDataJobTitle(2L, "Legal Caseworker"),
@@ -256,7 +256,10 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
                 new StaffRefDataJobTitle(22L, "HRS Team Leader"),
                 new StaffRefDataJobTitle(23L, "Bailiff Administrator"),
                 new StaffRefDataJobTitle(24L, "Bailiff"),
-                new StaffRefDataJobTitle(25L, "Bailiff Manager")));
+                new StaffRefDataJobTitle(25L, "Bailiff Manager"),
+                new StaffRefDataJobTitle(26L, "HRS Listener"),
+                new StaffRefDataJobTitle(27L, "HRS Sharer")));
+
     }
 
     @Test
