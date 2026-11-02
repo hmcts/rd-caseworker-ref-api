@@ -29,18 +29,21 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegrationTest {
 
+    // count of services with skills
+    public static final int SERVICE_SKILL_COUNT = 5;
+
     @BeforeEach
     public void setUpClient() {
         super.setUpClient();
     }
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @AfterAll
-    public static void tearDown() {
+    static void tearDown() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
@@ -56,7 +59,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills.size()).isEqualTo(4);
+        assertThat(serviceSkills.size()).isEqualTo(SERVICE_SKILL_COUNT);
 
         for (ServiceSkill ss: serviceSkills) {
             List<SkillDTO> listOfSkillsForSSId = fetchListOfSkills(ss.getId());
@@ -88,10 +91,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_retrieveAllServiceSkills_return_status_code_200_when_empty_servicecode()
             throws JsonProcessingException {
         String path = "/skill?service_codes=";
-
         String role = "staff-admin";
-
-
         final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
                 .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
 
@@ -100,13 +100,34 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
         assertThat(serviceSkills).isNotNull();
-        assertThat(serviceSkills.size()).isEqualTo(4);
+        assertThat(serviceSkills.size()).isEqualTo(SERVICE_SKILL_COUNT);
 
-        ServiceSkill serviceSkill = serviceSkills.get(1);
+        // find and validate at least 1 set: i.e. Skills for AAA7
+        int aaa7Index = -1;
+        for (int i = 0; i < serviceSkills.size(); i++) {
+            if ("AAA7".equals(serviceSkills.get(i).getId())) {
+                aaa7Index = i;
+                break;
+            }
+        }
+        assertThat(aaa7Index).isNotEqualTo(-1);
+
+        ServiceSkill serviceSkill = serviceSkills.get(aaa7Index);
 
         assertThat(serviceSkill.getId()).isEqualTo("AAA7");
 
-        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        // find and validate at least 1 skill
+        int testIndex = -1;
+        for (int i = 0; i < serviceSkill.getSkills().size(); i++) {
+            if ("SKILL:AAA7:TEST1".equals(serviceSkill.getSkills().get(i).getSkillCode())) {
+                testIndex = i;
+                break;
+            }
+        }
+        assertThat(testIndex).isNotEqualTo(-1);
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(testIndex);
 
         assertThat(serviceSkill.getSkills().size()).isEqualTo(4);
 
@@ -299,7 +320,6 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     private List<StaffRefDataUserType> getUserTypesData() {
 
         List<StaffRefDataUserType> userTypes = new ArrayList<>();
-        StaffRefDataUserType staffRefDataUserType;
 
         userTypes.add(StaffRefDataUserType.builder()
                 .id(1L)
