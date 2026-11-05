@@ -5,27 +5,29 @@ SELECT case_worker_id
 FROM   case_worker_profile
 WHERE  email_id ILIKE ANY (ARRAY[
          'cwr-rd-func-test-user-only-%',
+         'cwr-func-test-user-%',
          'staff-rd-profile-func-test-user-only-%'
-       ]);
+       ])
+       and created_date <= CURRENT_TIMESTAMP - INTERVAL '1 hour';
 
 SELECT p.case_worker_id, p.email_id
-FROM   case_worker_profile p
-           JOIN   tmp_cw_ids t USING (case_worker_id)
-ORDER  BY p.email_id;
+FROM case_worker_profile p
+         JOIN tmp_cw_ids t USING (case_worker_id)
+ORDER BY p.email_id;
 
 -- BEFORE deleting counts
-SELECT 'case_worker_location'  AS table_name, count(*) AS before_count FROM case_worker_location  WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
+SELECT 'case_worker_location' AS table_name, count(*) AS before_count FROM case_worker_location WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
 SELECT 'case_worker_work_area', count(*) FROM case_worker_work_area WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
-SELECT 'case_worker_role',      count(*) FROM case_worker_role      WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
+SELECT 'case_worker_role', count(*) FROM case_worker_role WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
-SELECT 'case_worker_skill',     count(*) FROM case_worker_skill     WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
+SELECT 'case_worker_skill', count(*) FROM case_worker_skill WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
-SELECT 'case_worker_profile',   count(*) FROM case_worker_profile   WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids);
+SELECT 'case_worker_profile', count(*) FROM case_worker_profile WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids);
 
 -- Deletes and prints the actual rows removed per table
-WITH del_loc   AS (DELETE FROM case_worker_location  WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids) RETURNING 1),
+WITH del_loc  AS (DELETE FROM case_worker_location  WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids) RETURNING 1),
     del_area  AS (DELETE FROM case_worker_work_area WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids) RETURNING 1),
     del_role  AS (DELETE FROM case_worker_role      WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids) RETURNING 1),
     del_skill AS (DELETE FROM case_worker_skill     WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids) RETURNING 1)
@@ -38,15 +40,15 @@ WITH del_profile AS (DELETE FROM case_worker_profile WHERE case_worker_id IN (SE
 SELECT count(*) AS deleted_profile FROM del_profile;
 
 -- AFTER deleting counts
-SELECT 'case_worker_location'  AS table_name, count(*) AS after_count FROM case_worker_location  WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
+SELECT 'case_worker_location' AS table_name, count(*) AS after_count FROM case_worker_location WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
 SELECT 'case_worker_work_area', count(*) FROM case_worker_work_area WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
-SELECT 'case_worker_role',      count(*) FROM case_worker_role      WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
+SELECT 'case_worker_role', count(*) FROM case_worker_role WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
-SELECT 'case_worker_skill',     count(*) FROM case_worker_skill     WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
+SELECT 'case_worker_skill', count(*) FROM case_worker_skill WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids)
 UNION ALL
-SELECT 'case_worker_profile',   count(*) FROM case_worker_profile   WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids);
+SELECT 'case_worker_profile', count(*) FROM case_worker_profile WHERE case_worker_id IN (SELECT case_worker_id FROM tmp_cw_ids);
 
 COMMIT;
 
