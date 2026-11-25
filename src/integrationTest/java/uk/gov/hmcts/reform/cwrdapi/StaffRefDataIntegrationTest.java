@@ -24,10 +24,13 @@ import java.util.List;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegrationTest {
+
+    // count of services with skills
+    public static final int SERVICE_SKILL_COUNT = 5;
 
     @BeforeEach
     public void setUpClient() {
@@ -35,12 +38,12 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     }
 
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
     @AfterAll
-    public static void tearDown() {
+    static void tearDown() {
         CaseWorkerReferenceDataClient.setBearerToken(EMPTY);
     }
 
@@ -56,7 +59,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
 
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
-        assertThat(serviceSkills.size()).isEqualTo(4);
+        assertThat(serviceSkills.size()).isEqualTo(SERVICE_SKILL_COUNT);
 
         for (ServiceSkill ss: serviceSkills) {
             List<SkillDTO> listOfSkillsForSSId = fetchListOfSkills(ss.getId());
@@ -88,10 +91,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     void should_retrieveAllServiceSkills_return_status_code_200_when_empty_servicecode()
             throws JsonProcessingException {
         String path = "/skill?service_codes=";
-
         String role = "staff-admin";
-
-
         final var staffWorkerSkillResponse = (StaffWorkerSkillResponse) caseworkerReferenceDataClient
                 .retrieveAllServiceSkills(StaffWorkerSkillResponse.class, path, role);
 
@@ -100,13 +100,34 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<ServiceSkill> serviceSkills = staffWorkerSkillResponse.getServiceSkills();
 
         assertThat(serviceSkills).isNotNull();
-        assertThat(serviceSkills.size()).isEqualTo(4);
+        assertThat(serviceSkills.size()).isEqualTo(SERVICE_SKILL_COUNT);
 
-        ServiceSkill serviceSkill = serviceSkills.get(1);
+        // find and validate at least 1 set: i.e. Skills for AAA7
+        int aaa7Index = -1;
+        for (int i = 0; i < serviceSkills.size(); i++) {
+            if ("AAA7".equals(serviceSkills.get(i).getId())) {
+                aaa7Index = i;
+                break;
+            }
+        }
+        assertThat(aaa7Index).isNotEqualTo(-1);
+
+        ServiceSkill serviceSkill = serviceSkills.get(aaa7Index);
 
         assertThat(serviceSkill.getId()).isEqualTo("AAA7");
 
-        SkillDTO skillDTO = serviceSkill.getSkills().get(0);
+
+        // find and validate at least 1 skill
+        int testIndex = -1;
+        for (int i = 0; i < serviceSkill.getSkills().size(); i++) {
+            if ("SKILL:AAA7:TEST1".equals(serviceSkill.getSkills().get(i).getSkillCode())) {
+                testIndex = i;
+                break;
+            }
+        }
+        assertThat(testIndex).isNotEqualTo(-1);
+
+        SkillDTO skillDTO = serviceSkill.getSkills().get(testIndex);
 
         assertThat(serviceSkill.getSkills().size()).isEqualTo(4);
 
@@ -218,25 +239,47 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     @Test
     void should_retrieveAllTitles_return_status_code_200()
             throws JsonProcessingException {
-        String path = "/job-title";
 
-        String role = "staff-admin";
-
-
-        final var staffRefJobTitleResponse = (StaffRefJobTitleResponse) caseworkerReferenceDataClient
-                .retrieveStaffRefData(StaffRefJobTitleResponse.class, path, role);
+        final var staffRefJobTitleResponse =
+                (StaffRefJobTitleResponse) caseworkerReferenceDataClient.retrieveStaffRefData(
+                        StaffRefJobTitleResponse.class,
+                        "/job-title",
+                        CaseWorkerReferenceDataClient.ROLE_STAFF_ADMIN);
 
         assertThat(staffRefJobTitleResponse).isNotNull();
 
         List<StaffRefDataJobTitle> jobTitles = staffRefJobTitleResponse.getJobTitles();
 
         assertThat(jobTitles).isNotNull();
-        assertThat(jobTitles).hasSize(23);
-
-        StaffRefDataJobTitle staffRefDataJobTitle = jobTitles.get(0);
-
-        assertThat(staffRefDataJobTitle.getRoleId()).isEqualTo(3L);
-        assertThat(staffRefDataJobTitle.getRoleDescription()).isEqualTo("Hearing Centre Team Leader");
+        assertThat(jobTitles).hasSize(27);
+        org.hamcrest.MatcherAssert.assertThat(jobTitles, containsInAnyOrder(
+                new StaffRefDataJobTitle(1L, "Senior Legal Caseworker"),
+                new StaffRefDataJobTitle(2L, "Legal Caseworker"),
+                new StaffRefDataJobTitle(3L, "Hearing Centre Team Leader"),
+                new StaffRefDataJobTitle(4L, "Hearing Centre Administrator"),
+                new StaffRefDataJobTitle(5L, "Court Clerk"),
+                new StaffRefDataJobTitle(6L, "National Business Centre Team Leader"),
+                new StaffRefDataJobTitle(7L, "National Business Centre Listing Team"),
+                new StaffRefDataJobTitle(8L, "National Business Centre Payments Team"),
+                new StaffRefDataJobTitle(9L, "CTSC Team Leader"),
+                new StaffRefDataJobTitle(10L, "CTSC Administrator"),
+                new StaffRefDataJobTitle(11L, "National Business Centre Administrator"),
+                new StaffRefDataJobTitle(12L, "Regional Centre Team Leader"),
+                new StaffRefDataJobTitle(13L, "Regional Centre Administrator"),
+                new StaffRefDataJobTitle(14L, "DWP Caseworker"),
+                new StaffRefDataJobTitle(15L, "HMRC Caseworker"),
+                new StaffRefDataJobTitle(16L, "Registrar"),
+                new StaffRefDataJobTitle(17L, "CICA Caseworker"),
+                new StaffRefDataJobTitle(18L, "Cafcass Cymru Caseworker"),
+                new StaffRefDataJobTitle(19L, "IBCA Caseworker"),
+                new StaffRefDataJobTitle(20L, "WLU Administrator"),
+                new StaffRefDataJobTitle(21L, "WLU Team Leader"),
+                new StaffRefDataJobTitle(22L, "HRS Team Leader"),
+                new StaffRefDataJobTitle(23L, "Bailiff Administrator"),
+                new StaffRefDataJobTitle(24L, "Bailiff"),
+                new StaffRefDataJobTitle(25L, "Bailiff Manager"),
+                new StaffRefDataJobTitle(26L, "HRS Listener"),
+                new StaffRefDataJobTitle(27L, "HRS Sharer")));
 
     }
 
@@ -256,7 +299,7 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
         List<StaffRefDataUserType> userTypes = staffRefDataUserTypesResponse.getUserTypes();
 
         assertThat(userTypes).isNotNull();
-        assertThat(userTypes).hasSize(5);
+        assertThat(userTypes).hasSize(6);
 
 
         validateUserTypes(userTypes);
@@ -277,7 +320,6 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
     private List<StaffRefDataUserType> getUserTypesData() {
 
         List<StaffRefDataUserType> userTypes = new ArrayList<>();
-        StaffRefDataUserType staffRefDataUserType;
 
         userTypes.add(StaffRefDataUserType.builder()
                 .id(1L)
@@ -304,10 +346,11 @@ public class StaffRefDataIntegrationTest extends AuthorizationEnabledIntegration
                 .code("Other Government Department")
                 .build());
 
+        userTypes.add(StaffRefDataUserType.builder()
+                .id(6L)
+                .code("Enforcement")
+                .build());
 
         return userTypes;
     }
-
-
-
 }

@@ -61,7 +61,7 @@ public class AuthorizationFunctionalTest {
 
     public static final String EMAIL = "EMAIL";
     public static final String CREDS = "CREDS";
-    public static final String EMAIL_TEMPLATE = "CWR-rd-func-test-user-only-%s@justice.gov.uk";
+    public static final String EMAIL_TEMPLATE = "cwr-rd-func-test-user-only-%s@justice.gov.uk";
     public static final String CWD_USER = "cwd-user";
     public static final String CASEWORKER_IAC_BULKSCAN = "caseworker-iac-bulkscan";
     public static final String CASEWORKER_CIVIL = "caseworker-civil";

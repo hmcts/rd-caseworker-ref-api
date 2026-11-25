@@ -1,0 +1,16 @@
+INSERT INTO SKILL(skill_id,skill_code,description,service_id,user_type,created_date,last_update) VALUES
+(87, 'SKILL:HRS:AA', 'HRS Civil', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(88, 'SKILL:HRS:AB', 'HRS Family', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(89, 'SKILL:HRS:BA', 'HRS General Regulatory Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(90, 'SKILL:HRS:BB', 'HRS Social Entitlement Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(91, 'SKILL:HRS:BC', 'HRS Health, Education and Social Care Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(92, 'SKILL:HRS:BD', 'HRS Tax Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(93, 'SKILL:HRS:BE', 'HRS War Pensions and Armed Forces Compensation Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(94, 'SKILL:HRS:BF', 'HRS Immigration and Asylum Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(95, 'SKILL:HRS:BG', 'HRS Property Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(96, 'SKILL:HRS:BH', 'HRS Employment Tribunals', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(97, 'SKILL:HRS:BT', 'HRS Upper Tribunal Tax and Chancery Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(98, 'SKILL:HRS:BL', 'HRS Upper Tribunal Lands Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(99, 'SKILL:HRS:BI', 'HRS Upper Tribunal Immigration and Asylum Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(100, 'SKILL:HRS:BK', 'HRS Upper Tribunal Administrative Appeals Chamber', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now())),
+(101, 'SKILL:HRS:BM', 'HRS Employment Appeals Tribunal', 'HRS', 'Future Operations', timezone('utc', now()), timezone('utc', now()));
